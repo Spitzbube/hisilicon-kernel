@@ -215,6 +215,14 @@ config CMA
 	  For more information see <include/linux/dma-contiguous.h>.
 	  If unsure, say "n".
 
+config MMZ_PARAM
+	string "MMZ param for CMA and ION"
+	depends on CMA 
+	default "ddr,0,0,160M" if MACH_S40
+	help
+	  This is the parameter of mmz memory manager, which now is for CMA
+	  and ION memory manager. 
+
 if CMA
 
 config CMA_DEBUG

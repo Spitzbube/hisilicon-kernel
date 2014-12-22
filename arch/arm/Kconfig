@@ -375,6 +375,45 @@ config ARCH_CLPS711X
 	help
 	  Support for Cirrus Logic 711x/721x/731x based boards.
 
+config ARCH_GODBOX
+    bool "Hisilicon Godbox family"
+    select ARM_AMBA
+    select HAVE_CLK
+    select COMMON_CLKDEV
+    select CLKDEV_LOOKUP
+    select HAVE_MACH_CLKDEV
+    select NEED_MACH_IO_H
+    select NEED_MACH_MEMORY_H
+    select MIGHT_HAVE_PCI
+    select GENERIC_TIME
+    select GENERIC_CLOCKEVENTS
+    help
+      This enables support for Hisilicon GODBOX platform.
+
+config ARCH_S40
+    bool "Hisilicon S40 family"
+    select ARM_AMBA
+    select HAVE_CLK
+    select CLKDEV_LOOKUP
+    select HAVE_SCHED_CLOCK
+    select GENERIC_TIME
+    select GENERIC_CLOCKEVENTS
+    select ARCH_HAS_CPUFREQ
+    select MIGHT_HAVE_PCI
+    select HAVE_SMP
+    select HAVE_ARM_SCU
+    select MIGHT_HAVE_CACHE_L2X0
+    select NEED_MACH_IO_H
+    select NEED_MACH_MEMORY_H
+    select ARCH_HAS_CPUFREQ
+    help
+      This enables support for Hisilicon S40 platform.
+      With the advanced ARM Cortex A9 processor,
+      S40 serial provides high-speed processing capability.
+      And S40 serial constains a very powerfull media process engine,
+      two ethernet interface, EHCI and OHCI controllers, PCI-Express
+      controller and many peripheral equipments.
+
 config ARCH_GEMINI
 	bool "Cortina Systems Gemini"
 	select ARCH_REQUIRE_GPIOLIB
@@ -955,6 +994,14 @@ source "arch/arm/mach-ks8695/Kconfig"
 source "arch/arm/mach-msm/Kconfig"
 
 source "arch/arm/mach-mv78xx0/Kconfig"
+
+if ARCH_GODBOX
+source "arch/arm/mach-godbox/Kconfig"
+endif
+
+if ARCH_S40
+source "arch/arm/mach-s40/Kconfig"
+endif
 
 source "arch/arm/mach-imx/Kconfig"
 
@@ -1602,6 +1649,7 @@ config HZ
 		ARCH_S5PV210 || ARCH_EXYNOS4
 	default AT91_TIMER_HZ if ARCH_AT91
 	default SHMOBILE_TIMER_HZ if ARCH_SHMOBILE
+	default HI_S40_HZ if ARCH_S40
 	default 100
 
 config SCHED_HRTICK
@@ -1718,6 +1766,30 @@ config HIGHMEM
 	  option which should result in a slightly faster kernel.
 
 	  If unsure, say n.
+
+menuconfig SUPPORT_SRAM_MANAGER
+	bool "SRAM manager suppport"
+	default n
+	help
+	  If say y, SRAM manager is supported
+
+menu "SRAM manager config"
+	depends on SUPPORT_SRAM_MANAGER
+
+config SRAM_PHYS_START
+	hex "SRAM physical address"
+	default "0xFFFF2800"
+	depends on SUPPORT_SRAM_MANAGER
+	help
+	  SRAM physical address
+
+config SRAM_PHYS_SIZE
+	hex "SRAM size"
+	default "0x00002800"
+	depends on SUPPORT_SRAM_MANAGER
+	help
+	  SRAM size
+endmenu
 
 config HIGHPTE
 	bool "Allocate 2nd-level pagetables from highmem"

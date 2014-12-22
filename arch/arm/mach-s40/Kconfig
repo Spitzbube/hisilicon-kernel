@@ -1,0 +1,71 @@
+menu "S40 board feature"
+
+config MACH_S40
+    bool "Support s40 platform"
+    select CPU_V7
+    select ARM_GIC
+    select ARM_TIMER_SP804
+    help
+      Include support for the hisilion S40 platform.
+      S40 support ARM CORTEX-A9 processer,
+      within a Generic Interrupt Controller.
+      Support DDR2 and DDR3.
+
+choice
+    prompt "CPU timer source"
+    default HAVE_SP804_LOCAL_TIMER
+
+config HAVE_SP804_LOCAL_TIMER
+    bool "arm local timer from sp804"
+    help
+      arm local timer from sp804.
+
+config HAVE_ARM_LOCAL_TIMER
+    bool "arm local timer from arm self"
+    help
+      arm local timer from arm self.
+endchoice
+
+config HI_S40_HZ
+    int "Config HZ"
+    default 100 if HIGH_RES_TIMERS
+    default 100
+
+config DEFAULT_BUSCLK
+    int "DEFAULT_BUSCLK"
+    default "50000000"
+    help
+      Default AHB clock rate
+
+config SUPPORT_CA
+    bool "Support ca"
+    default n
+    help
+      If support ca, user privileges will be limit.
+      select y, support ca, otherwise not support ca.
+
+config S40_FPGA
+    bool "Enable S40 Fpga config"
+    default y if ARCH_S40
+
+menuconfig SUPPORT_DSP_RUN_MEM
+    bool "Support DSP run memory"
+    default y
+    help
+      Support DSP run memory
+
+config DSP_RUN_MEM_ADDR
+    hex "DSP run memory address"
+    depends on SUPPORT_DSP_RUN_MEM
+    default "0x2000000"
+    help
+      The start address of DSP run memory.
+
+config DSP_RUN_MEM_SIZE
+    hex "DSP run memory size"
+    depends on SUPPORT_DSP_RUN_MEM
+    default "0x800000"
+    help
+      The size of DSP run memory.
+
+endmenu

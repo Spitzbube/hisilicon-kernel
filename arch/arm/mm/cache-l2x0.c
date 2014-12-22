@@ -818,3 +818,70 @@ int __init l2x0_of_init(u32 aux_val, u32 aux_mask)
 	return 0;
 }
 #endif
+
+/* TODO: XXX */
+
+static __u32 aux_ctrl;
+static __u32 latency_ctrl;
+static __u32 prefetch_ctrl;
+/*
+ *  hi_pm_disable_l2cache()/hi_pm_enable_l2cache() is designed to
+ *  disable and enable l2-cache during Suspend-Resume phase
+ */
+int hi_pm_disable_l2cache(void)
+{
+	/* backup aux control register value */
+	aux_ctrl = readl_relaxed(/*l2x0_base*/0xf9a10000 + L2X0_AUX_CTRL);
+
+	latency_ctrl = readl_relaxed(/*l2x0_base*/0xf9a10000 + L2X0_DATA_LATENCY_CTRL);
+
+	prefetch_ctrl = readl_relaxed(/*l2x0_base*/0xf9a10000 + L2X0_PREFETCH_CTRL);
+
+#if 0
+	/* flush cache all */
+	l2x0_flush_all();
+#else
+	outer_flush_all();
+#endif
+
+	/* disable l2x0 cache */
+	writel_relaxed(0, /*l2x0_base*/0xf9a10000 + L2X0_CTRL);
+
+	/* barrier */
+	dmb();
+
+	printk(KERN_INFO "[PM]l2x0 cache disabled.\r\n");
+
+	return 0;
+}
+
+int hi_pm_enable_l2cache(void)
+{
+	/*enable dynamic clk gating and standby mode*/
+	writel_relaxed((L2X0_DYNAMIC_CLK_GATING_EN | L2X0_STNDBY_MODE_EN),
+		(/*l2x0_base*/0xf9a10000 + L2X0_POWER_CTRL));
+
+	/* disable cache */
+	writel_relaxed(0, /*l2x0_base*/0xf9a10000 + L2X0_CTRL);
+
+	/* restore aux control register */
+	writel_relaxed(aux_ctrl, /*l2x0_base*/0xf9a10000 + L2X0_AUX_CTRL);
+	writel_relaxed(latency_ctrl, /*l2x0_base*/0xf9a10000 + L2X0_DATA_LATENCY_CTRL);
+	writel_relaxed(prefetch_ctrl, /*l2x0_base*/0xf9a10000 + L2X0_PREFETCH_CTRL);
+
+#if 0
+	/* invalidate l2x0 cache */
+	l2x0_inv_all();
+#else
+	outer_inv_all();
+#endif
+
+	/* enable l2x0 cache */
+	writel_relaxed(1, /*l2x0_base*/0xf9a10000 + L2X0_CTRL);
+
+	mb();
+
+	/* printk(KERN_ERR "[PM]L2 Cache enabled\r\n"); */
+
+	return 0;
+}
