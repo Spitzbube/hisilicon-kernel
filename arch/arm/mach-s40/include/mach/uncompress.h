@@ -13,23 +13,34 @@
  */
 static inline void putc(int c)
 {
+#if 0
 	unsigned int val;
 	val = __raw_readl(AMBA_UART_FR);
 	while (val & (1 << 5)) {
 		val = __raw_readl(AMBA_UART_FR);
 		barrier();
 	}
+
 	__raw_writel(c, AMBA_UART_DR);
+#else
+	while (((volatile char*)AMBA_UART_FR)[0] & (1 << 5)) barrier();
+
+	((volatile char*)AMBA_UART_DR)[0] = c;
+#endif
 }
 
 static inline void flush(void)
 {
+#if 0
 	unsigned int val;
 	val = __raw_readl(AMBA_UART_FR);
 	while (val & (1 << 3)) {
 		val = __raw_readl(AMBA_UART_FR);
 		barrier();
 	}
+#else
+	while (((volatile char*)AMBA_UART_FR)[0] & (1 << 3)) barrier();
+#endif
 }
 
 /*
