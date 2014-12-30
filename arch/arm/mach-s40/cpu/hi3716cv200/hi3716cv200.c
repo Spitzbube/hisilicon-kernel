@@ -83,7 +83,7 @@ static void hi3716cv200_cpu_init(struct cpu_info *info)
 	clkdev_add_table(hi3716cv200_lookups,
 		ARRAY_SIZE(hi3716cv200_lookups));
 
-	reg_val = readl((volatile void*)(IO_ADDRESS(0xF8A90000 + 0x7C) - 0x4000000));
+	reg_val = readl((volatile void*)(IO_ADDRESS(0xF8A90000 + 0x7C)));
 	reg_val = (reg_val >> 8) & 0xFF;
 
 	if (reg_val > 0x40)
