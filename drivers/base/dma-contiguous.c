@@ -256,7 +256,7 @@ int __init dma_declare_contiguous(struct device *dev, phys_addr_t size,
 	if (base) {
 		if (memblock_is_region_reserved(base, size) ||
 		    memblock_reserve(base, size) < 0) {
-			base = -EBUSY;
+			base = 0;
 			goto err;
 		}
 	} else {
@@ -266,7 +266,7 @@ int __init dma_declare_contiguous(struct device *dev, phys_addr_t size,
 		 */
 		phys_addr_t addr = __memblock_alloc_base(size, alignment, limit);
 		if (!addr) {
-			base = -ENOMEM;
+			base = 0;
 			goto err;
 		} else {
 			base = addr;
@@ -286,7 +286,7 @@ int __init dma_declare_contiguous(struct device *dev, phys_addr_t size,
 
 	/* Architecture specific contiguous memory fixup. */
 	dma_contiguous_early_fixup(base, size);
-	return 0;
+	return base;
 err:
 	pr_err("CMA: failed to reserve %ld MiB\n", (unsigned long)size / SZ_1M);
 	return base;
