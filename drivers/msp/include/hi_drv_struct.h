@@ -7,13 +7,13 @@ Author        : Hisilicon
 Created       : 2009/12/16
 Last Modified :
 Description   : Defines the common data type of the system.
-                CNcomment: ÏµÍ³¹²ÓÃµÄÊý¾ÝÀàÐÍ¶¨Òå
+                CNcomment: ÏµÍ³ï¿½ï¿½ï¿½Ãµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¶ï¿½ï¿½ï¿½
 Function List :
 History       :
 ******************************************************************************/
 /**
  * \file
- * \brief Describes the information about basic data types. CNcomment: Ìá¹©»ù±¾Êý¾ÝÀàÐÍµÄÏà¹ØÐÅÏ¢
+ * \brief Describes the information about basic data types. CNcomment: ï¿½á¹©ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Íµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢
  */
 #ifndef __DRV_STRUCT_EXT_H__
 #define __DRV_STRUCT_EXT_H__
@@ -29,7 +29,7 @@ extern "C"{
 
 /*************************** Structure Definition ****************************/
 /** \addtogroup      H_2_1_2 */
-/** @{ */  /** <!-- ¡¾Common data structure. CNcomment: Í¨ÓÃÊý¾Ý½á¹¹¡¿ */
+/** @{ */  /** <!-- ï¿½ï¿½Common data structure. CNcomment: Í¨ï¿½ï¿½ï¿½ï¿½Ý½á¹¹ï¿½ï¿½ */
 
 #define UMAP_NAME    "hi_"
 
@@ -68,7 +68,7 @@ extern "C"{
 /*End of CMPI */
 
 /*Other modules*/
-/**CNcomment:  ÆäËüÄ£¿é */
+/**CNcomment:  ï¿½ï¿½ï¿½ï¿½Ä£ï¿½ï¿½ */
 #define HI_MOD_CIPHER               "cipher"
 #define UMAP_DEVNAME_CIPHER         UMAP_NAME HI_MOD_CIPHER
 #define UMAP_DEV_NUM_CIPHER         1
@@ -380,6 +380,9 @@ extern "C"{
 #define UMAP_DEV_NUM_PQ           1
 #define UMAP_MIN_MINOR_PQ         (UMAP_MAX_MINOR_SIL9293 + 1)
 #define UMAP_MAX_MINOR_PQ         (UMAP_MIN_MINOR_PQ + UMAP_DEV_NUM_PQ -1)
+#if 1
+#warning TODO: Increase UMAP_DEV_NUM_TOTAL by 2
+#endif
 #define UMAP_DEV_NUM_TOTAL          UMAP_MAX_MINOR_PQ
 /** @} */  /** <!-- ==== Structure Definition End ==== */
 

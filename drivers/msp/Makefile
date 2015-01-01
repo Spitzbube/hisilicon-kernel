@@ -1,6 +1,7 @@
 
 ccflags-y += -Idrivers/msp/include
 
+obj-y += drv_base_ext_k.o
 obj-y += drv_dev_ext_k.o
 obj-y += drv_log_ext_k.o
 #obj-y += drv_media_mem.o
