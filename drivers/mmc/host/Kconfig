@@ -646,3 +646,6 @@ config MMC_REALTEK_PCI
 	help
 	  Say Y here to include driver code to support SD/MMC card interface
 	  of Realtek PCI-E card reader
+
+source "drivers/mmc/host/himciv200/Kconfig"
+	  
