@@ -505,7 +505,7 @@ HI_S32 LogUdiskInit(const HI_U8* pDiskFolder)
         log_udisk_task = kthread_create(LogUdiskWriteThread, (void*)pDiskFolder, "log_udisk_task");
         if(IS_ERR(log_udisk_task))
         {
-            HI_ERR_LOG("create new kernel thread failed\n");
+            HI_ERR_LOG("create new kernel thread failed\n"); //508
 
             err = PTR_ERR(log_udisk_task);
             log_udisk_task = NULL;
@@ -937,9 +937,6 @@ static HI_S32 LOGConfigInfoInit(HI_VOID)
 {
     HI_U32 i;
     
-#if 1
-#warning TODO
-#else
     if (HI_SUCCESS == HI_DRV_MMZ_AllocAndMap("CMN_LogInfo", MMZ_OTHERS,
             LOG_CONFIG_BUF_SIZE, 0, &g_LogConfigBuf))
     {
@@ -958,10 +955,9 @@ static HI_S32 LOGConfigInfoInit(HI_VOID)
     }
     else
     {
-        HI_ERR_LOG("calling HI_DRV_MMZ_AllocAndMap failed.\n");
+        HI_ERR_LOG("calling HI_DRV_MMZ_AllocAndMap failed.\n"); //958
         return HI_FAILURE;
     }
-#endif
 
     return HI_SUCCESS;
 }
@@ -971,11 +967,7 @@ static HI_S32 LOGConfigInfoExit(HI_VOID)
     if (0 != g_LogConfigBuf.u32StartVirAddr)
     {
         g_pLogConfigInfo = NULL;
-#if 0
         HI_DRV_MMZ_UnmapAndRelease(&g_LogConfigBuf);
-#else
-#warning TODO
-#endif
     }
 
     return HI_SUCCESS;
@@ -1009,7 +1001,7 @@ static HI_S32 LOGBufferInit(HI_U32 u32BufSize)
         }
         else
         {
-            HI_ERR_LOG("init failed there is not enough mem for debug message buffer.\n");
+            HI_ERR_LOG("init failed there is not enough mem for debug message buffer.\n"); //1004
             return -1;
         }
     }

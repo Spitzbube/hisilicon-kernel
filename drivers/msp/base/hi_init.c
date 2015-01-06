@@ -49,6 +49,8 @@
 #ifndef MODULE
 HI_S32 HI_DRV_LoadModules(HI_VOID)
 {
+	printk("--> HI_DRV_LoadModules");
+
 #if 0
     GPIO_DRV_ModInit();
 
@@ -145,6 +147,8 @@ HI_S32 HI_DRV_LoadModules(HI_VOID)
     VI_DRV_ModInit();
 #endif
 #endif
+
+    printk("<-- HI_DRV_LoadModules");
 
     return HI_SUCCESS;
 }

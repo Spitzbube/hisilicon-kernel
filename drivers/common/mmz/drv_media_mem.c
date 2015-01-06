@@ -93,18 +93,20 @@
         if (gfp == 0 ? 0 : (p)->gfp != (gfp)) \
             continue;\
         if (mmz_name != NULL) { \
-            if ((*mmz_name != '\0') && strcmp(mmz_name, p->name)) \
+            if ((*mmz_name != '\0') && strncmp(mmz_name, p->name, 32)) \
                 continue;\
         } \
         if ((mmz_name == NULL) && (anony == 1)){ \
-            if (strcmp("anonymous", p->name)) \
+            if (strncmp("anonymous", p->name, 32)) \
                 continue;\
         } \
         mmz_trace(1, HIL_MMZ_FMT_S, hil_mmz_fmt_arg(p));
 
 #define end_list_for_each_mmz() }
 
-char line[COMMAND_LINE_SIZE];
+static int initialized = 0; //81104c44
+
+char line[COMMAND_LINE_SIZE]; //81104c48
 
 static int mmz_total_size = 0;
 
@@ -147,7 +149,7 @@ hil_mmz_t *hil_mmz_create(const char *name, unsigned long gfp, unsigned long phy
 
     if (name == NULL)
     {
-        PRINTK_CA(KERN_ERR "%s: 'name' can not be zero!", __FUNCTION__);
+        PRINTK_CA(KERN_ERR "%s: 'name' can not be zero!", __FUNCTION__); //155
         return NULL;
     }
 
@@ -262,7 +264,7 @@ int hil_mmz_unregister(hil_mmz_t *zone)
     down(&mmz_lock);
     list_for_each_entry(p, &zone->mmb_list, list)
     {
-        PRINTK_CA(KERN_WARNING "          MB Lost: " HIL_MMB_FMT_S "\n", hil_mmb_fmt_arg(p));
+        PRINTK_CA(KERN_WARNING "          MB Lost: " HIL_MMB_FMT_S "\n", hil_mmb_fmt_arg(p)); //270
         losts++;
     }
 
@@ -315,6 +317,7 @@ static int _do_mmb_alloc(hil_mmb_t *mmb)
 static hil_mmb_t *__mmb_alloc(const char *name, unsigned long size, unsigned long align,
                               unsigned long gfp, const char *mmz_name, hil_mmz_t *_user_mmz)
 {
+#warning TODO: __mmb_alloc
     hil_mmz_t *mmz;
     hil_mmb_t *mmb;
 
@@ -511,6 +514,12 @@ hil_mmb_t *hil_mmb_alloc(const char *name, unsigned long size, unsigned long ali
 
     down(&mmz_lock);
     mmb = __mmb_alloc(name, size, align, gfp, mmz_name, NULL);
+
+    if (mmb)
+    {
+    	mmb->Data_56++;
+    }
+
     up(&mmz_lock);
 
     return mmb;
@@ -748,7 +757,7 @@ int hil_mmb_get(hil_mmb_t *mmb)
 
     if (mmb->flags & HIL_MMB_RELEASED)
     {
-        PRINTK_CA(KERN_WARNING "hil_mmb_get: amazing, mmb<%s> is released!\n", mmb->name);
+        PRINTK_CA(KERN_WARNING "hil_mmb_get: amazing, mmb<%s> is released!\n", mmb->name); //758
     }
 
     ref = ++mmb->phy_ref;
@@ -765,16 +774,21 @@ static int _mmb_free(hil_mmb_t *mmb)
 
     hil_mmz_t *mmz = mmb->zone;	
 
-    if (mmb->flags & HIL_MMB_MAP2KERN_CACHED)
+    if (mmb->Data_56)
     {
-	__cpuc_flush_dcache_area((void *)mmb->kvirt, (size_t)mmb->length); // flush l1cache
-	outer_flush_range(mmb->phys_addr, mmb->phys_addr + mmb->length); // flush l2cache
+    	mmb->Data_56--;
+
+		if (mmb->flags & HIL_MMB_MAP2KERN_CACHED)
+		{
+		__cpuc_flush_dcache_area((void *)mmb->kvirt, (size_t)mmb->length); // flush l1cache
+		outer_flush_range(mmb->phys_addr, mmb->phys_addr + mmb->length); // flush l2cache
+		}
+
+		dma_release_from_contiguous(mmz->cma_dev,page,count);
+
+		list_del(&mmb->list);
+		kfree(mmb);
     }
-
-    dma_release_from_contiguous(mmz->cma_dev,page,count);
-
-    list_del(&mmb->list);
-    kfree(mmb);
 
     return 0;
 }
@@ -792,7 +806,7 @@ int hil_mmb_put(hil_mmb_t *mmb)
 
     if (mmb->flags & HIL_MMB_RELEASED)
     {
-        PRINTK_CA(KERN_WARNING "hil_mmb_put: amazing, mmb<%s> is released!\n", mmb->name);
+        PRINTK_CA(KERN_WARNING "hil_mmb_put: amazing, mmb<%s> is released!\n", mmb->name); //809
     }
 
     ref = --mmb->phy_ref;
@@ -969,7 +983,7 @@ static int media_mem_parse_cmdline(char *s)
 	cma_zone = hisi_get_cma_zone(argv[0]);
 	if(!cma_zone)
 	{
-		PRINTK_CA(KERN_ERR"can't get cma zone info:%s\n",argv[0]);
+		PRINTK_CA(KERN_ERR"can't get cma zone info:%s\n",argv[0]); //985
 		continue;
 	}
 
@@ -1020,7 +1034,7 @@ static int media_mem_parse_cmdline(char *s)
         mmz_info_phys_start = zone->phys_start + zone->nbytes - 0x2000;
         if (hil_mmz_register(zone))
         {
-            PRINTK_CA(KERN_WARNING "Add MMZ failed: " HIL_MMZ_FMT_S "\n", hil_mmz_fmt_arg(zone));
+            PRINTK_CA(KERN_WARNING "Add MMZ failed: " HIL_MMZ_FMT_S "\n", hil_mmz_fmt_arg(zone)); //1036
             hil_mmz_destroy(zone);
         }
 
@@ -1095,6 +1109,14 @@ static void dump_mmz_mem(void)
 	printk(SPLIT_LINE);
 }
 
+#if 1
+int mmz_read_proc(struct seq_file *file, void *data)
+{
+#warning TODO: mmz_read_proc
+	printk("mmz_read_proc: TODO\n");
+	return 0;
+}
+#else
 int mmz_read_proc(char *page, char **start, off_t off,
                   int count, int *eof, void *data)
 {
@@ -1211,7 +1233,7 @@ int mmz_read_proc(char *page, char **start, off_t off,
 
 	return ret;
 }
-
+#endif
 
 #define MMZ_SETUP_CMDLINE_LEN 256
 static char __initdata setup_zones[MMZ_SETUP_CMDLINE_LEN] = "ddr,0,0,160M";
@@ -1237,32 +1259,40 @@ int HI_DRV_MMZ_Init(void)
 
     //PRINTK_CA(KERN_INFO "Hisilicon Media Memory Zone Manager state 0\n");
 
- //   len = strlen(setup_zones);
- //   if (len == 0)
+    if (!initialized)
     {
-        strlcpy(line, saved_command_line, COMMAND_LINE_SIZE);
-        q = strstr(line, "mmz=");
-        if (q)
-        {
-            s = strsep(&q, "=");
-            if (s)
-            {
-                p = strsep(&q, " ");
-            }
-	     if (p)
-	     {
-            	   strlcpy(setup_zones, p, MMZ_SETUP_CMDLINE_LEN);
-	     }
-        }
-    }
+    	 //   len = strlen(setup_zones);
+    	 //   if (len == 0)
+		{
+			strlcpy(line, saved_command_line, COMMAND_LINE_SIZE);
+			q = strstr(line, "mmz=");
+			if (q)
+			{
+				s = strsep(&q, "=");
+				if (s)
+				{
+					p = strsep(&q, " ");
+				}
+			 if (p)
+			 {
+					   strlcpy(setup_zones, p, MMZ_SETUP_CMDLINE_LEN);
+			 }
+			}
+		}
 
-    media_mem_parse_cmdline(setup_zones);
+		media_mem_parse_cmdline(setup_zones);
+
+		initialized = 1;
+    }
     return 0;
 }
 
 void HI_DRV_MMZ_Exit(void)
 {
     mmz_exit_check();
+
+    initialized = 0;
+
     return;
 }
 

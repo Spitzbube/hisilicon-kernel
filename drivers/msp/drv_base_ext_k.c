@@ -36,42 +36,47 @@ HI_S32 HI_DRV_CommonInit(HI_VOID)
 {
     HI_S32 ret;
 
+    printk("--> HI_DRV_CommonInit\n");
+
+    ret = HI_DRV_MMZ_Init();
+    if(HI_SUCCESS != ret)
+    {
+        HI_ERR_SYS("DRV_MMZ_ModInit failed:%#x!\n", ret); //42
+        goto ErrorExit_MMZ;
+    }
+
     ret = HI_DRV_DEV_Init();
     if(HI_SUCCESS != ret)
     {
-        HI_ERR_SYS("CMPI_DEV_ModInit_0 failed:%#x!\n", ret);
-
-        return ret;
+        HI_ERR_SYS("CMPI_DEV_ModInit_0 failed:%#x!\n", ret); //49
+        goto ErrExit_DEV;
     }
 
     ret = HI_DRV_LOG_KInit();
     if(HI_SUCCESS != ret)
     {
-        HI_ERR_SYS("HI_DRV_LOG_KInit failed:%#x!\n", ret);
+        HI_ERR_SYS("HI_DRV_LOG_KInit failed:%#x!\n", ret); //56
         goto ErrExit_LOG;
     }
 
     ret = HI_DRV_PROC_KInit();
     if(HI_SUCCESS != ret)
     {
-        HI_ERR_SYS("HI_DRV_PROC_KInit failed:%#x!\n", ret);
+        HI_ERR_SYS("HI_DRV_PROC_KInit failed:%#x!\n", ret); //63
         goto ErrExit_PROC;
     }
 
-#if 1
-#warning TODO
-#else
     ret = HI_DRV_STAT_KInit();
     if(HI_SUCCESS != ret)
     {
-        HI_ERR_SYS("HI_DRV_STAT_KInit failed:%#x!\n", ret);
+        HI_ERR_SYS("HI_DRV_STAT_KInit failed:%#x!\n", ret); //70
         goto ErrExit_STAT;
     }
 
     ret = HI_DRV_SYS_KInit();
     if(HI_SUCCESS != ret)
     {
-        HI_ERR_SYS("HI_DRV_STAT_KInit failed:%#x!\n", ret);
+        HI_ERR_SYS("HI_DRV_STAT_KInit failed:%#x!\n", ret); //77
         goto ErrExit_SYS;
     }
 
@@ -79,19 +84,16 @@ HI_S32 HI_DRV_CommonInit(HI_VOID)
     ret = HI_DRV_MMNGR_Init(HI_KMODULE_MAX_COUNT, HI_KMODULE_MEM_MAX_COUNT);
     if(HI_SUCCESS != ret)
     {
-        HI_ERR_SYS("KModuleMgr_Init failed:%#x!\n", ret);
+        HI_ERR_SYS("KModuleMgr_Init failed:%#x!\n", ret); //85
         goto ErrExit_SYS;
     }
-#endif
+
+    printk("<-- HI_DRV_CommonInit\n");
 
     return HI_SUCCESS;
 
 ErrExit_SYS:
-#if 1
-#warning TODO
-#else
     HI_DRV_STAT_KExit();
-#endif
 
 ErrExit_STAT:
     HI_DRV_PROC_KExit();
@@ -102,20 +104,21 @@ ErrExit_PROC:
 ErrExit_LOG:
     HI_DRV_DEV_Exit();
 
+ErrExit_DEV:
+	HI_DRV_MMZ_Exit();
+
+ErrorExit_MMZ:
+
     return ret;
 }
 
 HI_VOID HI_DRV_CommonExit(HI_VOID)
 {
-#if 1
-#warning TODO
-#else
     HI_DRV_MMNGR_Exit();
 
     HI_DRV_SYS_KExit();
 
     HI_DRV_STAT_KExit();
-#endif
 
     HI_DRV_LOG_KExit();
 

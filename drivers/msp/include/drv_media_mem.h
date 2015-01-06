@@ -119,6 +119,7 @@ struct hil_media_memory_block {
     unsigned int order;
     int phy_ref;
     int map_ref;
+    int Data_56; //56
 };
 typedef struct hil_media_memory_block hil_mmb_t;
 
@@ -169,8 +170,12 @@ extern int hil_mmb_force_put(hil_mmb_t *mmb);
 #endif
 extern int get_mmz_info_phys_start(void);
 
+#if 0
 extern int mmz_read_proc(char *page, char **start, off_t off,
                             int count, int *eof, void *data);
+#else
+extern int mmz_read_proc(struct seq_file *file, void *data);
+#endif
 
 extern int mmz_write_proc(struct file *file, const char __user *buffer,
                                    unsigned long count, void *data);
