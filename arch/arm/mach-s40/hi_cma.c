@@ -10,9 +10,11 @@
 
 struct cma_zone {
 	struct device pdev;
+#if 0
 	int fill1[4];
 	long long Data_264; //264
 	int fill2[20]; //272
+#endif
 	char name[NAME_LEN_MAX]; //344
 	unsigned long gfp;
 	unsigned long phys_start;
@@ -72,7 +74,7 @@ static int __init hisi_mmz_parse_cmdline(char *s)
 			if (++i == ARRAY_SIZE(argv))
 				break;
 
-		hisi_zone[num_zones].Data_264 = -1LL;
+		hisi_zone[num_zones].pdev.coherent_dma_mask/*Data_264*/ = -1LL;
 
 		if (i == 4) {
 			strlcpy(hisi_zone[num_zones].name, argv[0], NAME_LEN_MAX);
