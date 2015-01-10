@@ -1578,9 +1578,6 @@ HI_S32 MCE_ModuleInit(HI_VOID)
         return Ret;
     }
 
-#if 1
-#warning TODO
-#else
     Ret = HI_DRV_I2C_Init();
     if(HI_SUCCESS != Ret)
     {
@@ -1588,6 +1585,9 @@ HI_S32 MCE_ModuleInit(HI_VOID)
         return Ret;
     }
 
+#if 1
+#warning TODO
+#else
     Ret = HI_DRV_GPIO_Init();
     if(HI_SUCCESS != Ret)
     {

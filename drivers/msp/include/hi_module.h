@@ -23,7 +23,7 @@ typedef enum hiMOD_ID_E
 {
     HI_ID_STB         = 0,
 
-    /**< common. */ /**< CNcomment: ÏµÍ³Í¨ÓÃÃ¶¾ÙÊý¾Ý³£Á¿ */
+    /**< common. */ /**< CNcomment: ÏµÍ³Í¨ï¿½ï¿½Ã¶ï¿½ï¿½ï¿½ï¿½Ý³ï¿½ï¿½ï¿½ */
     HI_ID_SYS         = 1,
     HI_ID_MODULE      ,
     HI_ID_LOG         ,
@@ -35,7 +35,7 @@ typedef enum hiMOD_ID_E
 
     HI_ID_DEMUX       = 0x0A,
 
-    /**< audio. */ /**< CNcomment: ÒôÆµ²¿·Ö³£Á¿Çø */
+    /**< audio. */ /**< CNcomment: ï¿½ï¿½Æµï¿½ï¿½ï¿½Ö³ï¿½ï¿½ï¿½ï¿½ï¿½ */
     HI_ID_ADEC        = 0x10,
     HI_ID_AO          ,
     HI_ID_SIO_AI      ,
@@ -48,7 +48,7 @@ typedef enum hiMOD_ID_E
     HI_ID_ADE         ,
     HI_ID_ADSP        ,
 
-    /**< video. */ /**< CNcomment: ÊÓÆµ²¿·Ö³£Á¿Çø */
+    /**< video. */ /**< CNcomment: ï¿½ï¿½Æµï¿½ï¿½ï¿½Ö³ï¿½ï¿½ï¿½ï¿½ï¿½ */
     HI_ID_VFMW        = 0x20,
     HI_ID_SVDEC       ,
     HI_ID_DISP        ,
@@ -59,7 +59,7 @@ typedef enum hiMOD_ID_E
     HI_ID_VI          ,
     HI_ID_VENC        ,
     HI_ID_PQ         ,
-    /**< graphics. */ /**< CNcomment: Í¼ÐÎ²¿·Ö³£Á¿Çø */
+    /**< graphics. */ /**< CNcomment: Í¼ï¿½Î²ï¿½ï¿½Ö³ï¿½ï¿½ï¿½ï¿½ï¿½ */
     HI_ID_TDE         = 0x30,
     HI_ID_JPGDEC      ,
     HI_ID_JPGENC      ,
@@ -67,7 +67,7 @@ typedef enum hiMOD_ID_E
     HI_ID_PNG         ,
     HI_ID_HIGO        ,
 
-    /**< player. */ /**< CNcomment: ²¥·ÅÏà¹Ø²¿·Ö³£Á¿Çø */
+    /**< player. */ /**< CNcomment: ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ø²ï¿½ï¿½Ö³ï¿½ï¿½ï¿½ï¿½ï¿½ */
     HI_ID_PVR         = 0x40,
     HI_ID_AVPLAY      ,
     HI_ID_SYNC        ,
@@ -75,11 +75,11 @@ typedef enum hiMOD_ID_E
     HI_ID_ASYNC       ,
     HI_ID_FASTPLAY ,
 
-    /**< ecs. */ /**< CNcomment: ÍâÉè²¿·Ö³£Á¿Çø */
+    /**< ecs. */ /**< CNcomment: ï¿½ï¿½ï¿½è²¿ï¿½Ö³ï¿½ï¿½ï¿½ï¿½ï¿½ */
     HI_ID_FLASH       = 0x50,
     HI_ID_IR          ,
     HI_ID_RTC         ,
-    HI_ID_I2C         ,
+    HI_ID_I2C         , //83
     HI_ID_SCI         ,
     HI_ID_ETH         ,
     HI_ID_USB_PROTECT ,
@@ -100,18 +100,18 @@ typedef enum hiMOD_ID_E
     HI_ID_TVP5150     ,
     HI_ID_SIL9293     ,
 
-    /**< voip, bluetooth,alsa. */ /**<  CNcomment: VOIP¡¢À¶ÑÀ²¿·Ö³£Á¿Çø*/
+    /**< voip, bluetooth,alsa. */ /**<  CNcomment: VOIPï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö³ï¿½ï¿½ï¿½ï¿½ï¿½*/
     HI_ID_VOIP_HME    = 0x80,
     HI_ID_NDPT        ,
     HI_ID_AUDADP      ,
     HI_ID_BT          ,
     HI_ID_ALSA        ,
 
-    /**< vp. */ /**<  CNcomment: VP³£Á¿Çø*/
+    /**< vp. */ /**<  CNcomment: VPï¿½ï¿½ï¿½ï¿½ï¿½ï¿½*/
     HI_ID_VP          = 0x90,
     HI_ID_HDCP        ,
 
-    /**< subtitle. */ /**<  CNcomment: ×ÖÄ»³£Á¿Çø*/
+    /**< subtitle. */ /**<  CNcomment: ï¿½ï¿½Ä»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½*/
     HI_ID_SUBT        = 0x98,
     HI_ID_TTX         ,
     HI_ID_CC          ,
@@ -119,7 +119,7 @@ typedef enum hiMOD_ID_E
     /**< loader. */ /**< CNcomment: loader */
     HI_ID_LOADER      = 0xA0,
 
-    /**< user definition. */ /**< CNcomment: ÎªÕû»ú±£ÁôµÄ×Ô¶¨ÒåÇø */
+    /**< user definition. */ /**< CNcomment: Îªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô¶ï¿½ï¿½ï¿½ï¿½ï¿½ */
     HI_ID_USR_START   = 0xB0,
     HI_ID_USR_END     = 0xFE,
 

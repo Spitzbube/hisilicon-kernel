@@ -32,7 +32,7 @@ extern "C"
 #if defined (CHIP_TYPE_hi3716cv200)       \
         || defined (CHIP_TYPE_hi3719cv100) || defined (CHIP_TYPE_hi3718cv100)  \
         || defined (CHIP_TYPE_hi3719mv100) || defined (CHIP_TYPE_hi3719mv100_a)\
-        || defined (CHIP_TYPE_hi3718mv100)     
+        || defined (CHIP_TYPE_hi3718mv100) || defined(CHIP_TYPE_hi3798cv100)
 #define DSP0_CLOCK_HZ     (300*1000*1000)
 #elif defined (CHIP_TYPE_hi3716cv200es)   
 #define DSP0_CLOCK_HZ     (345*1000*1000)
@@ -101,7 +101,7 @@ dsp running(code&data) memory DSP_DDR_DMAREMAP_BEG_ADDR~DSP_DDR_DMAREMAP_END_ADD
 
 #define DSP_DDR_DMAREMAP_BEG_ADDR  0x00000000    /* 512M,(0x00000000~0x1fffffff) */
 #define DSP_DDR_DMAREMAP_END_ADDR  0x20000000    /* 512M, 0x20000000 */
-#define DSP_DDR_DMAREMAP_MAP_ADDR  0xc0000000    /* 6*512M£¬must sure dsp never use this phy addr(0xc0000000~0xdfffffff) */
+#define DSP_DDR_DMAREMAP_MAP_ADDR  0xc0000000    /* 6*512Mï¿½ï¿½must sure dsp never use this phy addr(0xc0000000~0xdfffffff) */
 
 /* Define the union U_ADSP_ATTR */
 typedef union
@@ -182,7 +182,7 @@ typedef struct
 } S_ADSP_CHN_REGS_TYPE;
 
 /** Audio DSP Code definition*/
-/** CNcomment:ÒôÆµ´¦ÀíÆ÷Ä£¿é´úÂë±êÊ¶¶¨Òå */
+/** CNcomment:ï¿½ï¿½Æµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¶ï¿½ï¿½ï¿½ï¿½ */
 typedef enum hiADSP_CODEID_E
 {
     /* dsp manage module */

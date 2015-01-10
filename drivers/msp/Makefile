@@ -2,7 +2,7 @@
 ccflags-y += -Idrivers/msp/include
 ccflags-y += -Idrivers/msp/adsp/adsp_v1_1/include
 ccflags-y += -Idrivers/msp/mce/include
-ccflags-y += -DCHIP_TYPE_hi3716cv200
+ccflags-y += -DCHIP_TYPE_hi3798cv100
 ccflags-y += -DLOG_UDISK_SUPPORT
 ccflags-y += -DHI_PROC_SUPPORT
 
@@ -20,9 +20,11 @@ obj-y += drv_mmz_intf.o
 obj-y += drv_mutils.o
 obj-y += drv_osal.o
 obj-y += drv_proc_ext_k.o
+obj-y += drv_reg_common.o
 obj-y += drv_stat_ext_k.o
 obj-y += drv_sys_ext_k.o
 
 obj-y += base/hi_init.o
+obj-y += i2c/std_i2c/drv_i2c.o
 obj-y += mce/drv_mce_intf.o
 obj-y += mce/drv_mce_play.o

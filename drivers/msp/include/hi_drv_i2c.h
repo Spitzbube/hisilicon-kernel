@@ -43,6 +43,8 @@
 	|| defined (CHIP_TYPE_hi3719mv100) || defined (CHIP_TYPE_hi3719mv100_a)\
 	|| defined (CHIP_TYPE_hi3718mv100) 
 #define HI_STD_I2C_NUM 6
+#elif  defined (CHIP_TYPE_hi3798cv100)
+#define HI_STD_I2C_NUM 8
 #else
  #error YOU MUST DEFINE  CHIP_TYPE!
 #endif

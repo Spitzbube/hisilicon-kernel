@@ -45,7 +45,7 @@
 #elif defined (CHIP_TYPE_hi3716cv200es) || defined (CHIP_TYPE_hi3716cv200) \
 	|| defined (CHIP_TYPE_hi3719cv100) || defined (CHIP_TYPE_hi3718cv100)  \
 	|| defined (CHIP_TYPE_hi3719mv100) || defined (CHIP_TYPE_hi3719mv100_a)\
-	|| defined (CHIP_TYPE_hi3718mv100) 
+	|| defined (CHIP_TYPE_hi3718mv100) || defined(CHIP_TYPE_hi3798cv100)
 #define     HI_GPIO_GROUP_NUM 18
 #else
  #error YOU MUST DEFINE  CHIP_TYPE!

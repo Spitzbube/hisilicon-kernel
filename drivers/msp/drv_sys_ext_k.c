@@ -27,7 +27,8 @@
     || defined(CHIP_TYPE_hi3718mv100)   \
     || defined(CHIP_TYPE_hi3719cv100)   \
     || defined(CHIP_TYPE_hi3719mv100)   \
-    || defined(CHIP_TYPE_hi3719mv100_a)
+    || defined(CHIP_TYPE_hi3719mv100_a) \
+    || defined(CHIP_TYPE_hi3798cv100)
 
 #define GET_CHIP_INFO(type, version) do{                  \
     if (0x37160200 == g_pstRegSysCtrl->SC_SYSID)          \
