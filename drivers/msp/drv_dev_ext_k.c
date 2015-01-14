@@ -122,7 +122,7 @@ HI_S32 HI_DRV_DEV_Register(UMAP_DEVICE_S *umapd)
 
     if (i == UMAP_DEV_NUM_TOTAL)
     {
-        HI_ERR_DEV("too many devices!\n");
+        HI_ERR_DEV("too many devices!\n"); //191
         return -1;
     }
 
@@ -134,15 +134,11 @@ HI_S32 HI_DRV_DEV_Register(UMAP_DEVICE_S *umapd)
 
     //HI_INFO_CMPI("try register dev:'%s', minor=%d.\n", umapd->devfs_name, umapd->minor);
 
-#if 1
-#warning TODO
-#else
     ret = HI_DRV_PM_Register(&s_umap_devs[i]);
     if (HI_SUCCESS != ret)
     {
-        HI_FATAL_DEV("failed register dev:'%s', minor=%d, ret=%d.\n", umapd->devfs_name, umapd->minor, ret);
+        HI_FATAL_DEV("failed register dev:'%s', minor=%d, ret=%d.\n", umapd->devfs_name, umapd->minor, ret); //206
     }
-#endif
 
     return ret;
 }
@@ -160,7 +156,7 @@ HI_VOID HI_DRV_DEV_UnRegister(UMAP_DEVICE_S *umapd)
 
 	if (0 == umapd->minor)
 	{
-		HI_WARN_DEV("try unregister dev:'%s', but minor=%d is invalid.\n", umapd->devfs_name, umapd->minor);
+		HI_WARN_DEV("try unregister dev:'%s', but minor=%d is invalid.\n", umapd->devfs_name, umapd->minor); //225
 		return ;
 	}
 
@@ -172,11 +168,7 @@ HI_VOID HI_DRV_DEV_UnRegister(UMAP_DEVICE_S *umapd)
 
     //HI_ERR_DEV("try unregister dev:'%s', minor=%d.\n", umapd->devfs_name, umapd->minor);
 
-#if 1
-#warning TODO
-#else
     HI_DRV_PM_UnRegister(&s_umap_devs[i]);
-#endif
     s_umap_devs[i].minor = 0;
     return ;
 }

@@ -1585,13 +1585,10 @@ HI_S32 MCE_ModuleInit(HI_VOID)
         return Ret;
     }
 
-#if 1
-#warning TODO
-#else
     Ret = HI_DRV_GPIO_Init();
     if(HI_SUCCESS != Ret)
     {
-        HI_ERR_MCE("ERR: HI_DRV_GPIO_Init!\n");
+        HI_ERR_MCE("ERR: HI_DRV_GPIO_Init!\n"); //1602
         return Ret;
     }
     
@@ -1599,15 +1596,18 @@ HI_S32 MCE_ModuleInit(HI_VOID)
     Ret = HI_DRV_GPIOI2C_Init();
     if(HI_SUCCESS != Ret)
     {
-        HI_ERR_MCE("ERR: HI_DRV_GPIOI2C_Init!\n");
+        HI_ERR_MCE("ERR: HI_DRV_GPIOI2C_Init!\n"); //1610
         return Ret;
     }
 #endif
 
+#if 1
+#warning TODO
+#else
     Ret = HI_DRV_TUNER_Init();
     if(HI_SUCCESS != Ret)
     {
-        HI_ERR_MCE("ERR: HI_DRV_TUNER_Init!\n");
+        HI_ERR_MCE("ERR: HI_DRV_TUNER_Init!\n"); //1618
         return Ret;
     }
     

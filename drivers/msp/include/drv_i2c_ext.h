@@ -21,6 +21,9 @@ HI_VOID I2C_DRV_ModExit(HI_VOID);
 typedef HI_S32 (*FN_I2C_WRITECONFIG)(HI_U32, HI_U8);
 typedef HI_S32 (*FN_I2C_WRITE)(HI_U32, HI_U8, HI_U32, HI_U32, HI_U8 *, HI_U32);
 typedef HI_S32 (*FN_I2C_READ)(HI_U32, HI_U8, HI_U32, HI_U32, HI_U8 *, HI_U32);
+typedef HI_S32 (*FN_I2C_SETRATE)(HI_U32, HI_U32);
+typedef int    (*FN_I2C_SUSPEND)(/*PM_BASEDEV_S*/void *, pm_message_t);
+typedef int    (*FN_I2C_RESUME)(/*PM_BASEDEV_S*/void *);
 
 typedef struct
 {
@@ -29,6 +32,9 @@ typedef struct
     FN_I2C_READ        pfnI2cRead;
     FN_I2C_WRITE       pfnI2cWriteNostop;
     FN_I2C_READ        pfnI2cReadDirectly;
+    FN_I2C_SETRATE     pfnI2cSetRate;
+    FN_I2C_SUSPEND     pfnI2cSuspend;
+    FN_I2C_RESUME      pfnI2cResume;
 } I2C_EXT_FUNC_S;
 
 #endif

@@ -2,6 +2,7 @@
 #include <linux/init.h>
 #include <linux/interrupt.h>
 #include <linux/semaphore.h>
+#include <linux/pm.h>
 
 #include "hi_type.h"
 
@@ -9,9 +10,11 @@
 #include "drv_vdec_ext.h"
 #include "drv_omxvdec_ext.h"
 #include "drv_pmoc_ext.h"
+#endif
 #include "drv_gpio_ext.h"
 #include "drv_gpioi2c_ext.h"
 #include "drv_i2c_ext.h"
+#if 0
 #include "drv_sci_ext.h"
 #include "drv_otp_ext.h"
 #include "drv_hdcp_ext.h"
@@ -51,13 +54,13 @@ HI_S32 HI_DRV_LoadModules(HI_VOID)
 {
 	printk("--> HI_DRV_LoadModules");
 
-#if 0
     GPIO_DRV_ModInit();
 
 #ifdef HI_GPIOI2C_SUPPORT
     GPIOI2C_DRV_ModInit();
 #endif
 
+#if 0
     IR_DRV_ModInit();
 
     CIPHER_DRV_ModInit();

@@ -248,7 +248,7 @@ extern "C"{
 #define HI_MOD_I2C                  "i2c"
 #define UMAP_DEVNAME_I2C            UMAP_NAME HI_MOD_I2C
 #define UMAP_DEV_NUM_I2C            1
-#define UMAP_MIN_MINOR_I2C          (UMAP_MAX_MINOR_KEYLED + 1)
+#define UMAP_MIN_MINOR_I2C          (UMAP_MAX_MINOR_KEYLED + 1) //45 ok
 #define UMAP_MAX_MINOR_I2C          (UMAP_MIN_MINOR_I2C + UMAP_DEV_NUM_I2C -1)
 
 #define HI_MOD_TUNER                "tuner"
@@ -366,7 +366,7 @@ extern "C"{
 #define HI_MOD_GPIO                   "gpio"
 #define UMAP_DEVNAME_GPIO             UMAP_NAME HI_MOD_GPIO
 #define UMAP_DEV_NUM_GPIO             1
-#define UMAP_MIN_MINOR_GPIO          (UMAP_MAX_MINOR_WDG+ 1)
+#define UMAP_MIN_MINOR_GPIO          (UMAP_MAX_MINOR_WDG+ 1) //67 ok
 #define UMAP_MAX_MINOR_GPIO          (UMAP_MIN_MINOR_GPIO + UMAP_DEV_NUM_GPIO - 1)
 
 #define HI_MOD_SIL9293                  "sil9293"

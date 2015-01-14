@@ -5,6 +5,7 @@ ccflags-y += -Idrivers/msp/mce/include
 ccflags-y += -DCHIP_TYPE_hi3798cv100
 ccflags-y += -DLOG_UDISK_SUPPORT
 ccflags-y += -DHI_PROC_SUPPORT
+ccflags-y += -DHI_GPIOI2C_SUPPORT
 
 obj-y += drv_base_ext.o
 obj-y += drv_base_ext_k.o
@@ -25,6 +26,14 @@ obj-y += drv_stat_ext_k.o
 obj-y += drv_sys_ext_k.o
 
 obj-y += base/hi_init.o
+
+obj-y += gpio/drv_gpio_intf.o
+obj-y += gpio/drv_gpio.o
+
+obj-y += i2c/std_i2c/drv_i2c_intf.o
 obj-y += i2c/std_i2c/drv_i2c.o
+obj-y += i2c/gpio_i2c/drv_gpioi2c_intf.o
+obj-y += i2c/gpio_i2c/drv_gpio_i2c.o
+
 obj-y += mce/drv_mce_intf.o
 obj-y += mce/drv_mce_play.o

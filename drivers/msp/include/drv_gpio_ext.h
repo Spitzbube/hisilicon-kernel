@@ -28,6 +28,8 @@ typedef HI_S32 (*FN_GPIO_Set_Int_Type)(HI_U32, HI_UNF_GPIO_INTTYPE_E);
 typedef HI_S32 (*FN_GPIO_Set_Int_Enable)(HI_U32, HI_BOOL);
 typedef HI_S32 (*FN_GPIO_Clear_GroupInt)(HI_U32);
 typedef HI_S32 (*FN_GPIO_Clear_BitInt)(HI_U32);
+typedef int    (*FN_GPIO_SUSPEND)(/*PM_BASEDEV_S*/void *, pm_message_t);
+typedef int    (*FN_GPIO_RESUME)(/*PM_BASEDEV_S*/void *);
 
 typedef struct
 {
@@ -42,6 +44,8 @@ typedef struct
     FN_GPIO_Set_Int_Enable         pfnGpioSetIntEnable;
     FN_GPIO_Clear_GroupInt         pfnGpioClearGroupInt;
     FN_GPIO_Clear_BitInt           pfnGpioClearBitInt;
+    FN_GPIO_SUSPEND                pfnI2cSuspend;
+    FN_GPIO_RESUME                 pfnI2cResume;
 } GPIO_EXT_FUNC_S;
 
 #endif

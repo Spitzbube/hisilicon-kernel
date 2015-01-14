@@ -468,7 +468,7 @@ HI_S32 I2C_DRV_ModInit(HI_VOID)
     g_I2cRegisterData.drvops = &i2c_drvops;
     if (HI_DRV_DEV_Register(&g_I2cRegisterData) < 0)
     {
-        HI_FATAL_I2C("register I2C failed.\n");
+        HI_FATAL_I2C("register I2C failed.\n"); //471
         return HI_FAILURE;
     }
 
@@ -476,7 +476,7 @@ HI_S32 I2C_DRV_ModInit(HI_VOID)
     pProcItem = HI_DRV_PROC_AddModule(HI_MOD_I2C, HI_NULL, HI_NULL);
     if (!pProcItem)
     {
-        HI_INFO_I2C("add I2C proc failed.\n");
+        HI_INFO_I2C("add I2C proc failed.\n"); //479
         HI_DRV_DEV_UnRegister(&g_I2cRegisterData);
         return HI_FAILURE;
     }

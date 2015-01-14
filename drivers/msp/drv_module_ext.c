@@ -161,7 +161,7 @@ static HI_S32 ModuleMgr_FindNodeByID(MODULE_S* pNodeHeader, MODULE_S** pstNode, 
         return HI_SUCCESS;
     }
 
-    HI_ERR_MODULE("not found out the module id:0x%08x node\n", u32ModuleID);
+    HI_INFO_MODULE("not found out the module id:0x%08x node\n", u32ModuleID);
 
     return HI_FAILURE;
 

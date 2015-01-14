@@ -84,8 +84,8 @@ typedef enum hiMOD_ID_E
     HI_ID_ETH         ,
     HI_ID_USB_PROTECT ,
     HI_ID_WDG         = 0x57,   /* watch dog used 'W' */
-    HI_ID_GPIO        ,
-    HI_ID_GPIO_I2C    ,
+    HI_ID_GPIO        , //88
+    HI_ID_GPIO_I2C    , //89
     HI_ID_DMAC        ,
     HI_ID_PMOC        ,
     HI_ID_TUNER       ,
