@@ -254,7 +254,7 @@ extern "C"{
 #define HI_MOD_TUNER                "tuner"
 #define UMAP_DEVNAME_TUNER          UMAP_NAME HI_MOD_TUNER
 #define UMAP_DEV_NUM_TUNER          1
-#define UMAP_MIN_MINOR_TUNER        (UMAP_MAX_MINOR_I2C + 1)
+#define UMAP_MIN_MINOR_TUNER        (UMAP_MAX_MINOR_I2C + 1) //46 ok
 #define UMAP_MAX_MINOR_TUNER        (UMAP_MIN_MINOR_TUNER + UMAP_DEV_NUM_TUNER -1)
 
 #define HI_MOD_SCI                  "sci"

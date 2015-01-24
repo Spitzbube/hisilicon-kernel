@@ -88,7 +88,7 @@ typedef enum hiMOD_ID_E
     HI_ID_GPIO_I2C    , //89
     HI_ID_DMAC        ,
     HI_ID_PMOC        ,
-    HI_ID_TUNER       ,
+    HI_ID_TUNER       , //92
     HI_ID_KEYLED      ,
     HI_ID_E2PROM      ,
     HI_ID_CIPHER      ,

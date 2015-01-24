@@ -34,9 +34,9 @@
 #elif  defined (CHIP_TYPE_hi3798cv100)
 
 #include "./hi3716cv200/hi_reg_sys.h"
-#include "./hi3716cv200/hi_reg_peri.h"
+#include "./hi3798cv100/hi_reg_peri.h"
 #include "./hi3716cv200/hi_reg_io.h"
-#include "./hi3716cv200/hi_reg_crg.h"
+#include "./hi3798cv100/hi_reg_crg.h"
 
 #define HI_SYS_BASE_ADDR        0xF8000000
 #define HI_PERI_BASE_ADDR       0xF8A20000
