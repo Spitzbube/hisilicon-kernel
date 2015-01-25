@@ -81,22 +81,39 @@ HI_VOID HI_DRV_PROC_KExit(void)
  * this implement implicit that current task file handle '0' must be terminal device file. 
  * otherwise do nothing.
  */
-HI_VOID HI_DRV_PROC_EchoHelper(const HI_CHAR *string)
+HI_VOID HI_DRV_PROC_EchoHelper(const HI_CHAR *string, ...)
+{
+    va_list args;
+    HI_CHAR buf[512];
+
+    if (!string)
+    	return;
+
+    va_start(args, string);
+    HI_DRV_PROC_EchoHelperVargs(buf, 512, string, args);
+    va_end(args);
+}
+
+/*
+ * HI_DRV_PROC_EchoHelper extent interface support Variable parameter  
+ */
+HI_VOID HI_DRV_PROC_EchoHelperVargs(HI_CHAR *buf, HI_U32 size, const HI_CHAR * fmt, va_list args)
 {
 #define DEFAULT_ECHO_DEVICE_HANDLE (0)
-
     struct kstat stat;
     HI_S32 ret;
 
-    if (!string)
-        return;
-    
-    ret = vfs_fstat(DEFAULT_ECHO_DEVICE_HANDLE, &stat);
-    if (ret)
-    {
-        HI_PRINT("Default echo device handle(%u) invalid!\n", DEFAULT_ECHO_DEVICE_HANDLE);
-        return;
-    }
+	if (!buf || !size)
+		return;
+
+	ret = vfs_fstat(DEFAULT_ECHO_DEVICE_HANDLE, &stat);
+	if (ret)
+	{
+	   printk("Default echo device handle(%u) invalid!\n", DEFAULT_ECHO_DEVICE_HANDLE);
+	   return;
+	}
+
+	HI_OSAL_Vsnprintf(buf, size, fmt, args);
 
     /* echo device must be chrdev and major number must be TTYAUX_MAJOR or UNIX98_PTY_SLAVE_MAJOR */
     if ( S_ISCHR(stat.mode) && (MAJOR(stat.rdev) == TTYAUX_MAJOR || MAJOR(stat.rdev) == UNIX98_PTY_SLAVE_MAJOR) )
@@ -104,43 +121,24 @@ HI_VOID HI_DRV_PROC_EchoHelper(const HI_CHAR *string)
         struct file *file = fget(DEFAULT_ECHO_DEVICE_HANDLE);
         if (file)
         {
-		mm_segment_t stOld_FS = {0};
-		/* file pos is invalid for chrdev */
-		loff_t pos = 0;
+			mm_segment_t stOld_FS = {0};
+			/* file pos is invalid for chrdev */
+			loff_t pos = 0;
 
-		set_fs(KERNEL_DS);
-		ret = vfs_write(file, string, strlen(string), &pos);
-		if (ret < 0)
-		{
-			HI_PRINT("write to echo device failed(%d)!\n", ret);
-		}
-		set_fs(stOld_FS);
-			
-		fput(file);
-	}
+			set_fs(KERNEL_DS);
+			ret = vfs_write(file, buf, strlen(buf), &pos);
+			if (ret < 0)
+			{
+				printk("write to echo device failed(%d)!\n", ret);
+			}
+			set_fs(stOld_FS);
+			fput(file);
+        }
     }
     else
     {
-        HI_PRINT("Default echo device is invalid!\n");
+        printk("Default echo device is invalid!\n");
     }
-}
-
-/*
- * HI_DRV_PROC_EchoHelper extent interface support Variable parameter  
- */
-HI_VOID HI_DRV_PROC_EchoHelperVargs(HI_CHAR *buf, HI_U32 size, const HI_CHAR * fmt, ...)
-{
-       va_list args;
-
-       if (!buf)
-            return;
-
-       va_start(args, fmt);
-       HI_OSAL_Vsnprintf(buf, size, fmt, args);
-       va_end(args);
-
-       HI_DRV_PROC_EchoHelper(buf);
-       
 }
 
 #ifndef MODULE

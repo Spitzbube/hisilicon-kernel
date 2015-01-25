@@ -1601,9 +1601,6 @@ HI_S32 MCE_ModuleInit(HI_VOID)
     }
 #endif
 
-#if 1
-#warning TODO
-#else
     Ret = HI_DRV_TUNER_Init();
     if(HI_SUCCESS != Ret)
     {
@@ -1611,6 +1608,9 @@ HI_S32 MCE_ModuleInit(HI_VOID)
         return Ret;
     }
     
+#if 1
+#warning TODO
+#else
     Ret = HI_DRV_DMX_Init();
     if(HI_SUCCESS != Ret)
     {

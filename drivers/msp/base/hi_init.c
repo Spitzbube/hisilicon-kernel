@@ -31,7 +31,9 @@
 #include "drv_jpge_ext.h"
 #include "drv_hifb_ext.h"
 #include "drv_tde_ext.h"
+#endif
 #include "drv_tuner_ext.h"
+#if 0
 #include "drv_png_ext.h"
 #include "drv_avplay_ext.h"
 #include "drv_disp_ext.h"
@@ -78,19 +80,23 @@ HI_S32 HI_DRV_LoadModules(HI_VOID)
     HIFB_DRV_ModInit();
 
     JPEG_DRV_ModInit();
+#endif
 
 #ifdef HI_LOADER_RECOVERY
     PNG_DRV_ModInit();
 #else
     I2C_DRV_ModInit();
 
-    TUNER_DRV_ModInit();
+//    TUNER_DRV_ModInit();
 
+#if 0
     DMX_DRV_ModInit();
 
     OTP_DRV_ModInit();
 #endif
+#endif
 
+#if 0
 #if !defined(HI_LOADER_APPLOADER) && !defined(HI_LOADER_RECOVERY)
     PMOC_DRV_ModInit();
 

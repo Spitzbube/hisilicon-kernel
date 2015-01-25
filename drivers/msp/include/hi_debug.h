@@ -57,38 +57,38 @@ extern "C"{
 
 
 /**Default level of the output debugging information*/
-/**CNcomment: Ä¬ÈÏµÄµ÷ÊÔÐÅÏ¢Êä³ö¼¶±ð*/
-#define HI_LOG_LEVEL_DEFAULT HI_LOG_LEVEL_ERROR
+/**CNcomment: Ä¬ï¿½ÏµÄµï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½*/
+#define HI_LOG_LEVEL_DEFAULT HI_LOG_LEVEL_DBG //HI_LOG_LEVEL_ERROR
 
 /**Level of the output debugging information*/
-/**CNcomment: µ÷ÊÔÐÅÏ¢Êä³ö¼¶±ð*/
+/**CNcomment: ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½*/
 typedef enum hiLOG_LEVEL_E
 {
     HI_LOG_LEVEL_FATAL   = 0,     /**<Fatal error. It indicates that a critical problem occurs in the system. Therefore, you must pay attention to it.*/
-                                  /**<CNcomment: ÖÂÃü´íÎó, ´ËÀà´íÎóÐèÒªÌØ±ð¹Ø×¢£¬Ò»°ã³öÏÖ´ËÀà´íÎó´ú±íÏµÍ³³öÏÖÁËÖØ´óÎÊÌâ */
+                                  /**<CNcomment: ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½, ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Òªï¿½Ø±ï¿½ï¿½×¢ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½Ö´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÏµÍ³ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ø´ï¿½ï¿½ï¿½ï¿½ï¿½ */
     HI_LOG_LEVEL_ERROR   = 1,     /**<Major error. It indicates that a major problem occurs in the system and the system cannot run.*/
-                                  /**<CNcomment: Ò»°ã´íÎó, Ò»°ã³öÏÖ´ËÀà´íÎó´ú±íÏµÍ³³öÏÖÁË±È½Ï´óµÄÎÊÌâ£¬²»ÄÜÔÙÕý³£ÔËÐÐ */
+                                  /**<CNcomment: Ò»ï¿½ï¿½ï¿½ï¿½ï¿½, Ò»ï¿½ï¿½ï¿½ï¿½Ö´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÏµÍ³ï¿½ï¿½ï¿½ï¿½ï¿½Ë±È½Ï´ï¿½ï¿½ï¿½ï¿½ï¿½â£¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ */
     HI_LOG_LEVEL_WARNING = 2,     /**<Warning. It indicates that a minor problem occurs in the system, but the system still can run properly.*/
-                                  /**<CNcomment: ¸æ¾¯ÐÅÏ¢, Ò»°ã³öÏÖ´ËÀàÐÅÏ¢´ú±íÏµÍ³¿ÉÄÜ³öÏÖÎÊÌâ£¬µ«ÊÇ»¹ÄÜ¼ÌÐøÔËÐÐ */
+                                  /**<CNcomment: ï¿½æ¾¯ï¿½ï¿½Ï¢, Ò»ï¿½ï¿½ï¿½ï¿½Ö´ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½ÏµÍ³ï¿½ï¿½ï¿½Ü³ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½â£¬ï¿½ï¿½ï¿½Ç»ï¿½ï¿½Ü¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ */
     HI_LOG_LEVEL_INFO    = 3,     /**<Message. It is used to prompt users. Users can open the message when locating problems. It is recommended to disable this message in general.*/
-                                  /**<CNcomment: ÌáÊ¾ÐÅÏ¢, Ò»°ãÊÇÎªÌáÐÑÓÃ»§¶øÊä³ö£¬ÔÚ¶¨Î»ÎÊÌâµÄÊ±ºò¿ÉÒÔ´ò¿ª£¬Ò»°ãÇé¿öÏÂ½¨Òé¹Ø±Õ */
+                                  /**<CNcomment: ï¿½ï¿½Ê¾ï¿½ï¿½Ï¢, Ò»ï¿½ï¿½ï¿½ï¿½Îªï¿½ï¿½ï¿½ï¿½ï¿½Ã»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ú¶ï¿½Î»ï¿½ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½Ô´ò¿ª£ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Â½ï¿½ï¿½ï¿½Ø±ï¿½ */
     HI_LOG_LEVEL_DBG     = 4,     /**<Debug. It is used to prompt developers. Developers can open the message when locating problems. It is recommended to disable this message in general.*/
-                                  /**<CNcomment: ÌáÊ¾ÐÅÏ¢, Ò»°ãÊÇÎª¿ª·¢ÈËÔ±µ÷ÊÔÎÊÌâ¶øÉè¶¨µÄ´òÓ¡¼¶±ð£¬Ò»°ãÇé¿öÏÂ½¨Òé¹Ø±Õ */
+                                  /**<CNcomment: ï¿½ï¿½Ê¾ï¿½ï¿½Ï¢, Ò»ï¿½ï¿½ï¿½ï¿½Îªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½è¶¨ï¿½Ä´ï¿½Ó¡ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Â½ï¿½ï¿½ï¿½Ø±ï¿½ */
 
     HI_LOG_LEVEL_BUTT
 } HI_LOG_LEVEL_E;
 
 /** @} */
 
-/**Just only for fatal level print.   */   /**CNcomment: ÎªÁË´òÓ¡ÖÂÃüÐÅÏ¢¶øÖÆ¶¨µÄºê´òÓ¡¼¶±ð */
+/**Just only for fatal level print.   */   /**CNcomment: Îªï¿½Ë´ï¿½Ó¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½Æ¶ï¿½ï¿½Äºï¿½ï¿½Ó¡ï¿½ï¿½ï¿½ï¿½ */
 #define HI_TRACE_LEVEL_FATAL    (0)
-/**Just only for error level print.   */   /**CNcomment: ÎªÁË´òÓ¡´íÎóÐÅÏ¢¶øÖÆ¶¨µÄºê´òÓ¡¼¶±ð */
+/**Just only for error level print.   */   /**CNcomment: Îªï¿½Ë´ï¿½Ó¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½Æ¶ï¿½ï¿½Äºï¿½ï¿½Ó¡ï¿½ï¿½ï¿½ï¿½ */
 #define HI_TRACE_LEVEL_ERROR    (1)
-/**Just only for warning level print. */   /**CNcomment: ÎªÁË´òÓ¡¾¯¸æÐÅÏ¢¶øÖÆ¶¨µÄºê´òÓ¡¼¶±ð */
+/**Just only for warning level print. */   /**CNcomment: Îªï¿½Ë´ï¿½Ó¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½Æ¶ï¿½ï¿½Äºï¿½ï¿½Ó¡ï¿½ï¿½ï¿½ï¿½ */
 #define HI_TRACE_LEVEL_WARN     (2)
-/**Just only for info level print.    */   /**CNcomment: ÎªÁË´òÓ¡ÐÅÏ¢¼¶±ð¶øÖÆ¶¨µÄºê´òÓ¡¼¶±ð */
+/**Just only for info level print.    */   /**CNcomment: Îªï¿½Ë´ï¿½Ó¡ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ¶ï¿½ï¿½Äºï¿½ï¿½Ó¡ï¿½ï¿½ï¿½ï¿½ */
 #define HI_TRACE_LEVEL_INFO     (3)
-/**Just only for debug level print.   */   /**CNcomment: ÎªÁË´òÓ¡µ÷ÊÔÐÅÏ¢¶øÖÆ¶¨µÄºê´òÓ¡¼¶±ð */
+/**Just only for debug level print.   */   /**CNcomment: Îªï¿½Ë´ï¿½Ó¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½Æ¶ï¿½ï¿½Äºï¿½ï¿½Ó¡ï¿½ï¿½ï¿½ï¿½ */
 #define HI_TRACE_LEVEL_DBG      (4)
 
 #ifndef HI_LOG_LEVEL
@@ -97,7 +97,7 @@ typedef enum hiLOG_LEVEL_E
 
 
 /**Just only debug output,MUST BE NOT calling it. */
-/**CNcomment: µ÷ÊÔÊä³öÐÅÏ¢½Ó¿Ú£¬²»ÍÆ¼öÖ±½Óµ÷ÓÃ´Ë½Ó¿Ú */
+/**CNcomment: ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½Ó¿Ú£ï¿½ï¿½ï¿½ï¿½Æ¼ï¿½Ö±ï¿½Óµï¿½ï¿½Ã´Ë½Ó¿ï¿½ */
 extern HI_VOID HI_LogOut(HI_U32 u32Level, HI_MOD_ID_E enModId,
             HI_U8 *pFuncName, HI_U32 u32LineNum, const char *format, ...);
 
@@ -131,9 +131,9 @@ extern HI_VOID HI_LogOut(HI_U32 u32Level, HI_MOD_ID_E enModId,
 
 
 /**Supported for debug output to serial/network/u-disk. */
-/**CNcomment: ¸÷¸öÄ£¿éÐèÒªµ÷ÓÃÒÔÏÂºê½øÐÐÊä³öµ÷ÊÔÐÅÏ¢¡¢¿ÉÊä³öµ½´®¿Ú¡¢Íø¿Ú¡¢UÅÌ´æ´¢µÈ */
+/**CNcomment: ï¿½ï¿½ï¿½ï¿½Ä£ï¿½ï¿½ï¿½ï¿½Òªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Âºï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ú¡ï¿½ï¿½ï¿½Ú¡ï¿½Uï¿½Ì´æ´¢ï¿½ï¿½ */
 /**Just only reserve the fatal level output. */
-/**CNcomment: ½ö½ö±£ÁôÖÂÃüµÄµ÷ÊÔÐÅÏ¢ */
+/**CNcomment: ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Äµï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ */
 #if (HI_LOG_LEVEL == HI_TRACE_LEVEL_FATAL)
 #define HI_FATAL_PRINT(module_id, fmt...)   HI_TRACE(HI_TRACE_LEVEL_FATAL,    module_id, fmt)
 #define HI_ERR_PRINT(  module_id, fmt...)
@@ -141,7 +141,7 @@ extern HI_VOID HI_LogOut(HI_U32 u32Level, HI_MOD_ID_E enModId,
 #define HI_INFO_PRINT( module_id, fmt...)
 #define HI_DBG_PRINT(  module_id, fmt...)
 /**Just only reserve the fatal/error level output. */
-/**CNcomment: ½ö½ö±£ÁôÖÂÃüµÄºÍ´íÎó¼¶±ðµÄµ÷ÊÔÐÅÏ¢ */
+/**CNcomment: ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÄºÍ´ï¿½ï¿½ó¼¶±ï¿½Äµï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ */
 #elif (HI_LOG_LEVEL == HI_TRACE_LEVEL_ERROR)
 #define HI_FATAL_PRINT(module_id, fmt...)   HI_TRACE(HI_TRACE_LEVEL_FATAL,    module_id, fmt)
 #define HI_ERR_PRINT(  module_id, fmt...)   HI_TRACE(HI_TRACE_LEVEL_ERROR,    module_id, fmt)
@@ -149,7 +149,7 @@ extern HI_VOID HI_LogOut(HI_U32 u32Level, HI_MOD_ID_E enModId,
 #define HI_INFO_PRINT( module_id, fmt...)
 #define HI_DBG_PRINT(  module_id, fmt...)
 /**Just only reserve the fatal/error/warning level output. */
-/**CNcomment: ½ö½ö±£ÁôÖÂÃüµÄ¡¢´íÎóµÄ¡¢¾¯¸æ¼¶±ðµÄµ÷ÊÔÐÅÏ¢ */
+/**CNcomment: ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¡ï¿½ï¿½ï¿½ï¿½ï¿½Ä¡ï¿½ï¿½ï¿½ï¿½æ¼¶ï¿½ï¿½Äµï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ */
 #elif (HI_LOG_LEVEL == HI_TRACE_LEVEL_WARN)
 #define HI_FATAL_PRINT(module_id, fmt...)   HI_TRACE(HI_TRACE_LEVEL_FATAL,    module_id, fmt)
 #define HI_ERR_PRINT(  module_id, fmt...)   HI_TRACE(HI_TRACE_LEVEL_ERROR,    module_id, fmt)
@@ -157,7 +157,7 @@ extern HI_VOID HI_LogOut(HI_U32 u32Level, HI_MOD_ID_E enModId,
 #define HI_INFO_PRINT( module_id, fmt...)
 #define HI_DBG_PRINT(  module_id, fmt...)
 /**Just only reserve the fatal/error/warning/info level output. */
-/**CNcomment: ½ö½ö±£ÁôÖÂÃüµÄ¡¢´íÎóµÄ¡¢¾¯¸æºÍÐÅÏ¢¼¶±ðµÄµ÷ÊÔÐÅÏ¢ */
+/**CNcomment: ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¡ï¿½ï¿½ï¿½ï¿½ï¿½Ä¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½ï¿½Äµï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ */
 #elif (HI_LOG_LEVEL == HI_TRACE_LEVEL_INFO)
 #define HI_FATAL_PRINT(module_id, fmt...)   HI_TRACE(HI_TRACE_LEVEL_FATAL,    module_id, fmt)
 #define HI_ERR_PRINT(  module_id, fmt...)   HI_TRACE(HI_TRACE_LEVEL_ERROR,    module_id, fmt)
@@ -166,7 +166,7 @@ extern HI_VOID HI_LogOut(HI_U32 u32Level, HI_MOD_ID_E enModId,
 #define HI_DBG_PRINT(  module_id, fmt...)
 #else
 /**Reserve all the levels output. */
-/**CNcomment: ±£ÁôËùÓÐ¼¶±ðµ÷ÊÔÐÅÏ¢ */
+/**CNcomment: ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ */
 #define HI_FATAL_PRINT(module_id, fmt...)   HI_TRACE(HI_TRACE_LEVEL_FATAL,    module_id, fmt)
 #define HI_ERR_PRINT(  module_id, fmt...)   HI_TRACE(HI_TRACE_LEVEL_ERROR,    module_id, fmt)
 #define HI_WARN_PRINT( module_id, fmt...)   HI_TRACE(HI_TRACE_LEVEL_WARN,     module_id, fmt)
@@ -195,7 +195,7 @@ extern HI_VOID HI_LogOut(HI_U32 u32Level, HI_MOD_ID_E enModId,
 
 
 /**Initialize a user module.*/
-/**CNcomment: ÓÃ»§Ä£¿é³õÊ¼»¯ */
+/**CNcomment: ï¿½Ã»ï¿½Ä£ï¿½ï¿½ï¿½Ê¼ï¿½ï¿½ */
 #define HI_MODULE_DECLARE(MODULE_NAME)	\
 	static HI_U32 g_u32ModuleId = HI_INVALID_MODULE_ID;	\
 	static HI_S32 __attribute__((constructor(200))) init_module_id() \
@@ -208,11 +208,11 @@ extern HI_VOID HI_LogOut(HI_U32 u32Level, HI_MOD_ID_E enModId,
     }
 
 /**Defines a user module ID.*/
-/**CNcomment: ÓÃ»§Ä£¿éIDºê¶¨Òå */
+/**CNcomment: ï¿½Ã»ï¿½Ä£ï¿½ï¿½IDï¿½ê¶¨ï¿½ï¿½ */
 #define MODULE_ID (g_u32ModuleId)
 
 /**Defines the command of the user module different level log print.*/
-/**CNcomment: ÓÃ»§Ä£¿éÈÕÖ¾Êä³öºê¶¨Òå */
+/**CNcomment: ï¿½Ã»ï¿½Ä£ï¿½ï¿½ï¿½ï¿½Ö¾ï¿½ï¿½ï¿½ï¿½ê¶¨ï¿½ï¿½ */
 #define HI_MODULE_FATAL(pszFormat...)  HI_FATAL_PRINT(MODULE_ID,pszFormat)
 #define HI_MODULE_ERROR(pszFormat...)  HI_ERR_PRINT(MODULE_ID,pszFormat)
 #define HI_MODULE_WARN(pszFormat...)   HI_WARN_PRINT(MODULE_ID,pszFormat)
@@ -220,7 +220,7 @@ extern HI_VOID HI_LogOut(HI_U32 u32Level, HI_MOD_ID_E enModId,
 #define HI_MODULE_INFO(pszFormat...)   HI_INFO_PRINT(MODULE_ID,pszFormat)
 
 /**Defines the memory allocate and free command used by user module.*/
-/**CNcomment: ÓÃ»§Ä£¿éÄÚ´æ·ÖÅäºê¶¨Òå */
+/**CNcomment: ï¿½Ã»ï¿½Ä£ï¿½ï¿½ï¿½Ú´ï¿½ï¿½ï¿½ï¿½ê¶¨ï¿½ï¿½ */
 #define HI_MODULE_MALLOC(u32Size)               HI_MEM_Malloc(MODULE_ID, u32Size)
 #define HI_MODULE_FREE(pMemAddr)                HI_MEM_Free(MODULE_ID, pMemAddr)
 #define HI_MODULE_CALLOC(u32MemBlock, u32Size)  HI_MEM_Calloc(MODULE_ID, u32MemBlock, u32Size)

@@ -1,6 +1,7 @@
 
 ccflags-y += -Idrivers/msp/include
 ccflags-y += -Idrivers/msp/adsp/adsp_v1_1/include
+ccflags-y += -Idrivers/msp/demux
 ccflags-y += -Idrivers/msp/frontend/include
 ccflags-y += -Idrivers/msp/frontend/demod/AVL_DVBSx_SDK/AVL_DVBSx/include
 ccflags-y += -Idrivers/msp/frontend/demod/AVL_DVBSx_SDK/BSP
@@ -9,6 +10,12 @@ ccflags-y += -DCHIP_TYPE_hi3798cv100
 ccflags-y += -DLOG_UDISK_SUPPORT
 ccflags-y += -DHI_PROC_SUPPORT
 ccflags-y += -DHI_GPIOI2C_SUPPORT
+
+#ccflags-y += -DCFG_HI_DEMUX_POOLBUF_SIZE=0x200000
+#ccflags-y += -DHI_DEMUX_PROC_SUPPORT
+#ccflags-y += -DDMX_FILTER_DEPTH_SUPPORT
+#ccflags-y += -DDMX_SECTION_PARSE_NOPUSI_SUPPORT
+
 ccflags-y += -DDEMOD_DEV_TYPE_HI3130
 ccflags-y += -DDEMOD_DEV_TYPE_HI3137
 ccflags-y += -DDEMOD_DEV_TYPE_J83B
@@ -38,12 +45,20 @@ obj-y += drv_mmz_intf.o
 			#obj-y += drv_mmz_userdev.o
 obj-y += drv_mutils.o
 obj-y += drv_osal.o
+obj-y += drv_proc_ext.o
 obj-y += drv_proc_ext_k.o
 obj-y += drv_reg_common.o
 obj-y += drv_stat_ext_k.o
 obj-y += drv_sys_ext_k.o
 
 obj-y += base/hi_init.o
+
+#obj-y += demux/hal_demux.o
+#obj-y += demux/drv_demux.o
+#obj-y += demux/drv_demux_bitstream.o
+#obj-y += demux/drv_demux_func.o
+#obj-y += demux/drv_demux_index.o
+#obj-y += demux/drv_demux_scd.o
 
 obj-y += frontend/drv_tuner.o
 obj-y += frontend/tuner_intf.o

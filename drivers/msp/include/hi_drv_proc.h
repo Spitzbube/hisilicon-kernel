@@ -80,8 +80,8 @@ ssize_t HI_DRV_PROC_ModuleWrite(struct file * file,
 DRV_PROC_ITEM_S* HI_DRV_PROC_AddModule(HI_CHAR *,DRV_PROC_EX_S*, HI_VOID *);
 HI_VOID HI_DRV_PROC_RemoveModule(HI_CHAR *);
 
-HI_VOID HI_DRV_PROC_EchoHelper(const HI_CHAR *string);
-HI_VOID HI_DRV_PROC_EchoHelperVargs(HI_CHAR *buf, HI_U32 size, const HI_CHAR * fmt, ...);
+HI_VOID HI_DRV_PROC_EchoHelper(const HI_CHAR *string, ...);
+HI_VOID HI_DRV_PROC_EchoHelperVargs(HI_CHAR *buf, HI_U32 size, const HI_CHAR * fmt, va_list args);
 
 
 /** @} */

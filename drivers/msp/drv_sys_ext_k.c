@@ -146,7 +146,7 @@ HI_S32 HI_DRV_SYS_GetTimeStampMs(HI_U32 *pu32TimeMs)
 
     if (HI_NULL == pu32TimeMs)
     {
-        HI_ERR_SYS("null pointer error\n");
+        HI_ERR_SYS("null pointer error\n"); //194
         return HI_FAILURE;
     }
 

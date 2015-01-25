@@ -55,26 +55,19 @@ static int __INIT__ COMMON_DRV_ModInit(void)
     ret = DRV_PM_ModInit();
     if(HI_SUCCESS != ret)
     {
-        printk("DRV_PM_ModInit failed:%#x!\n", ret); //56
         HI_ERR_SYS("DRV_PM_ModInit failed:%#x!\n", ret); //56
         return HI_FAILURE;
     }
 
-#if 0
-#warning TODO
-#else
     ret = DRV_MMZ_ModInit();
     if(HI_SUCCESS != ret)
     {
-        HI_ERR_SYS("DRV_MMZ_ModInit failed:%#x!\n", ret);
+        HI_ERR_SYS("DRV_MMZ_ModInit failed:%#x!\n", ret); //63
         goto ErrorExit_MMZ;
     }
 #endif
-#endif
 
-#if 1
-#warning TODO
-#else
+#if 0
 #if !defined (HI_MCE_SUPPORT) && !defined(HI_KEYLED_CT1642_KERNEL_SUPPORT)
     ret = HI_DRV_CommonInit();
     if(HI_SUCCESS != ret)
@@ -83,14 +76,18 @@ static int __INIT__ COMMON_DRV_ModInit(void)
         goto ErrorExit_Common;
     }
 #endif
+#endif
 
     ret = HI_DRV_PROC_Init();
     if(HI_SUCCESS != ret)
     {
-        HI_ERR_SYS("HI_DRV_PROC_Init failed:%#x!\n", ret);
+        HI_ERR_SYS("HI_DRV_PROC_Init failed:%#x!\n", ret); //80
         goto ErrorExit_PROC;
     }
 
+#if 1
+#warning TODO
+#else
     ret = HI_DRV_LOG_Init();
     if(HI_SUCCESS != ret)
     {
@@ -166,8 +163,10 @@ ErrorExit_SYS:
 
 ErrorExit_LOG:
     HI_DRV_PROC_Exit();
+#endif
 
 ErrorExit_PROC:
+#if 0
 #if !defined (HI_MCE_SUPPORT) && !defined(KEYLED_CT1642_KERNEL_SUPPORT)
     HI_DRV_CommonExit();
 
