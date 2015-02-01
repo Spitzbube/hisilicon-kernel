@@ -446,7 +446,7 @@ static HI_S32 CMPI_Module_Ioctl(struct inode *inode, struct file *file,HI_U32 cm
         }
         break;
         default:
-            HI_ERR_MODULE("================cmd:%#x\n", cmd);
+            HI_ERR_MODULE("================cmd:%#x\n", cmd); //449
             s32Ret = HI_SUCCESS;
         break;
     }
@@ -636,7 +636,7 @@ HI_S32 MMNGR_DRV_ModInit(HI_U32 u32ModuleCount, HI_U32 u32ModuleMemCount)
     s32Ret |= HI_DRV_MODULE_Register(HI_ID_MEM,    "HI_MEM",      HI_NULL);
     if (HI_SUCCESS != s32Ret)
     {
-        HI_ERR_MODULE("Reg basic module err:%#x.\n", s32Ret);
+        HI_ERR_MODULE("Reg basic module err:%#x.\n", s32Ret); //639
     }
 
     HI_OSAL_Snprintf(g_stModuleDev.devfs_name, sizeof(g_stModuleDev.devfs_name), "%s", UMAP_DEVNAME_MODULE);

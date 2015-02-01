@@ -316,7 +316,7 @@ extern "C"{
 #define HI_MOD_MODULE                   "module"
 #define UMAP_DEVNAME_MODULE             UMAP_NAME HI_MOD_MODULE
 #define UMAP_DEV_NUM_MODULE             1
-#define UMAP_MIN_MINOR_MODULE          (UMAP_MAX_MINOR_MEM2+ 1)
+#define UMAP_MIN_MINOR_MODULE          (UMAP_MAX_MINOR_MEM2+ 1) //56 ok
 #define UMAP_MAX_MINOR_MODULE           (UMAP_MIN_MINOR_MODULE + UMAP_DEV_NUM_MODULE - 1)
 
 #define HI_MOD_MLOG                   "mlog"

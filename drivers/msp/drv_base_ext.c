@@ -106,16 +106,16 @@ static int __INIT__ COMMON_DRV_ModInit(void)
         goto ErrorExit_STAT;
     }
 
-#if 1
-#warning TODO
-#else
     ret = MMNGR_DRV_ModInit(HI_KMODULE_MAX_COUNT, HI_KMODULE_MEM_MAX_COUNT);
     if (HI_SUCCESS != ret)
     {
-        HI_ERR_SYS("KModuleMgr_Init failed:%#x!\n", ret);
+        HI_ERR_SYS("KModuleMgr_Init failed:%#x!\n", ret); //108
         goto ErrorExit_Module;
     }
 
+#if 1
+#warning TODO
+#else
     ret = MEMDEV_DRV_ModInit();
     if (HI_SUCCESS != ret)
     {
@@ -151,10 +151,10 @@ ErrorExit_USRPROC:
 
 ErrorExit_MEMDEV:
     MMNGR_DRV_ModExit();
+#endif
 
 ErrorExit_Module:
     HI_DRV_STAT_Exit();
-#endif
 
 ErrorExit_STAT:
     HI_DRV_SYS_Exit();
