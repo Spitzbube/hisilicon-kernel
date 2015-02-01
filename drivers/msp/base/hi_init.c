@@ -87,7 +87,7 @@ HI_S32 HI_DRV_LoadModules(HI_VOID)
 #else
     I2C_DRV_ModInit();
 
-//    TUNER_DRV_ModInit();
+    TUNER_DRV_ModInit();
 
 #if 0
     DMX_DRV_ModInit();

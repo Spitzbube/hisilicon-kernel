@@ -85,30 +85,30 @@ static int __INIT__ COMMON_DRV_ModInit(void)
         goto ErrorExit_PROC;
     }
 
-#if 1
-#warning TODO
-#else
     ret = HI_DRV_LOG_Init();
     if(HI_SUCCESS != ret)
     {
-        HI_ERR_SYS("HI_DRV_LOG_Init failed:%#x!\n", ret);
+        HI_ERR_SYS("HI_DRV_LOG_Init failed:%#x!\n", ret); //87
         goto ErrorExit_LOG;
     }
 
     ret = HI_DRV_SYS_Init();
     if(HI_SUCCESS != ret)
     {
-        HI_ERR_SYS("HI_DRV_SYS_Init failed:%#x!\n", ret);
+        HI_ERR_SYS("HI_DRV_SYS_Init failed:%#x!\n", ret); //94
         goto ErrorExit_SYS;
     }
 
     ret = HI_DRV_STAT_Init();
     if(HI_SUCCESS != ret)
     {
-        HI_ERR_SYS("HI_DRV_STAT_Init failed:%#x!\n", ret);
+        HI_ERR_SYS("HI_DRV_STAT_Init failed:%#x!\n", ret); //101
         goto ErrorExit_STAT;
     }
 
+#if 1
+#warning TODO
+#else
     ret = MMNGR_DRV_ModInit(HI_KMODULE_MAX_COUNT, HI_KMODULE_MEM_MAX_COUNT);
     if (HI_SUCCESS != ret)
     {
@@ -154,6 +154,7 @@ ErrorExit_MEMDEV:
 
 ErrorExit_Module:
     HI_DRV_STAT_Exit();
+#endif
 
 ErrorExit_STAT:
     HI_DRV_SYS_Exit();
@@ -163,7 +164,6 @@ ErrorExit_SYS:
 
 ErrorExit_LOG:
     HI_DRV_PROC_Exit();
-#endif
 
 ErrorExit_PROC:
 #if 0

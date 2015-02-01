@@ -28,7 +28,7 @@
 /** Global config structure */
 typedef struct hiSYS_CONF_S
 {
-    HI_U32 u32Reverse;  /**<Not used, reserved for extension*/ /**<CNcomment: ÔÝÊ±Ã»ÓÐÊ¹ÓÃ£¬Áô´ýÀ©Õ¹*/
+    HI_U32 u32Reverse;  /**<Not used, reserved for extension*/ /**<CNcomment: ï¿½ï¿½Ê±Ã»ï¿½ï¿½Ê¹ï¿½Ã£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Õ¹*/
 
 }HI_SYS_CONF_S;
 
@@ -48,7 +48,13 @@ typedef enum hiCHIP_TYPE_E
     HI_CHIP_TYPE_HI3718C,
     HI_CHIP_TYPE_HI3719M,
     HI_CHIP_TYPE_HI3719C,
-    HI_CHIP_TYPE_HI3719M_A,
+    HI_CHIP_TYPE_HI3719M_A, //11
+
+    HI_CHIP_TYPE_HI3796C = 32,
+    HI_CHIP_TYPE_HI3798C = 33,
+
+    HI_CHIP_TYPE_HI3796C_A = 64,
+    HI_CHIP_TYPE_HI3798C_A = 65,
     
     HI_CHIP_TYPE_BUTT
 }HI_CHIP_TYPE_E;
@@ -60,24 +66,25 @@ typedef enum hiCHIP_VERSION_E
     HI_CHIP_VERSION_V101 = 0x101,
     HI_CHIP_VERSION_V200 = 0x200,
     HI_CHIP_VERSION_V300 = 0x300,
+    HI_CHIP_VERSION_V400 = 0x400,
     HI_CHIP_VERSION_BUTT
 }HI_CHIP_VERSION_E;
 
 /**System version, that is, the version of the software developer's kit (SDK)*/
 typedef struct hiSYS_VERSION_S
 {
-    HI_CHIP_TYPE_E  enChipTypeSoft;      /**<Chip type corresponding to the SDK*/ /**<CNcomment:  SDKÈí¼þ¶ÔÓ¦µÄÐ¾Æ¬ÀàÐÍ */
-    HI_CHIP_TYPE_E  enChipTypeHardWare;  /**<Chip type that is detected when the SDK is running*/ /**<CNcomment:  SDKÔËÐÐÊ±¼ì²âµ½µÄÐ¾Æ¬ÀàÐÍ */
-    HI_CHIP_VERSION_E enChipVersion;     /**<Chip version that is detected when the SDK is running*/ /**<CNcomment: SDKÔËÐÐÊ±¼ì²âµ½Ð¾Æ¬°æ±¾ºÅ */
-    HI_CHAR         aVersion[80];        /**<Version string of the SDK*/ /**<CNcomment:  SDKÈí¼þ°æ±¾ºÅ×Ö·û´® */
-    HI_CHAR         BootVersion[80];     /**<Version string of the Boot*/ /**<CNcomment:  Boot°æ±¾ºÅ×Ö·û´® */
+    HI_CHIP_TYPE_E  enChipTypeSoft;      /**<Chip type corresponding to the SDK*/ /**<CNcomment:  SDKï¿½ï¿½ï¿½ï¿½ï¿½Ó¦ï¿½ï¿½Ð¾Æ¬ï¿½ï¿½ï¿½ï¿½ */
+    HI_CHIP_TYPE_E  enChipTypeHardWare;  /**<Chip type that is detected when the SDK is running*/ /**<CNcomment:  SDKï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½âµ½ï¿½ï¿½Ð¾Æ¬ï¿½ï¿½ï¿½ï¿½ */
+    HI_CHIP_VERSION_E enChipVersion;     /**<Chip version that is detected when the SDK is running*/ /**<CNcomment: SDKï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½âµ½Ð¾Æ¬ï¿½æ±¾ï¿½ï¿½ */
+    HI_CHAR         aVersion[80];        /**<Version string of the SDK*/ /**<CNcomment:  SDKï¿½ï¿½ï¿½ï¿½æ±¾ï¿½ï¿½ï¿½Ö·ï¿½ */
+    HI_CHAR         BootVersion[80];     /**<Version string of the Boot*/ /**<CNcomment:  Bootï¿½æ±¾ï¿½ï¿½ï¿½Ö·ï¿½ */
 }HI_SYS_VERSION_S;
 
 
 /** Define the chip attributes */
 typedef struct hiSYS_CHIP_ATTR_S
 {
-    HI_BOOL bDolbySupport;              /**<Whether this chip support dolby or not*//**<CNcomment:Ð¾Æ¬ÊÇ·ñÖ§³Ö¶Å±È*/
+    HI_BOOL bDolbySupport;              /**<Whether this chip support dolby or not*//**<CNcomment:Ð¾Æ¬ï¿½Ç·ï¿½Ö§ï¿½Ö¶Å±ï¿½*/
 }HI_SYS_CHIP_ATTR_S;
 
 /** Maximum bytes of a buffer name */
@@ -86,13 +93,13 @@ typedef struct hiSYS_CHIP_ATTR_S
 /**Structure of an MMZ buffer*/
 typedef struct hiMMZ_BUF_S
 {
-    HI_CHAR bufname[MAX_BUFFER_NAME_SIZE];  /**<Strings of an MMZ buffer name*/ /**<CNcomment:  MMZ bufferÃû×Ö×Ö·û´® */
-    HI_U32  phyaddr;                /**<Physical address of an MMZ buffer*/ /**<CNcomment:  MMZ bufferÎïÀíµØÖ· */
-    HI_U8  *kernel_viraddr;         /**<Kernel-state virtual address of an MMZ buffer*/ /**<CNcomment:  MMZ bufferÄÚºËÌ¬ÐéÄâµØÖ· */
-    HI_U8  *user_viraddr;           /**<User-state virtual address of an MMZ buffer*/ /**<CNcomment:  MMZ bufferÓÃ»§Ì¬ÐéÄâµØÖ· */
-    HI_U32  bufsize;                /**<Size of an MMZ buffer*/ /**<CNcomment:  MMZ buffer´óÐ¡ */
-    HI_U32  overflow_threshold;     /**<Overflow threshold of an MMZ buffer, in percentage. For example, the value 100 indicates 100%.*/ /**<CNcomment:  MMZ bufferÉÏÒçË®Ïß£¬°´°Ù·Ö±ÈÉèÖÃ£¬ÀýÈç: 100 indicates 100%.*/
-    HI_U32  underflow_threshold;    /**<Underflow threshold of an MMZ buffer, in percentage. For example, the value 0 indicates 0%.*/ /**<CNcomment:  MMZ bufferÏÂÒçË®Ïß£¬°´°Ù·Ö±ÈÉèÖÃ£¬ÀýÈç: 0 indicates 0%.*/
+    HI_CHAR bufname[MAX_BUFFER_NAME_SIZE];  /**<Strings of an MMZ buffer name*/ /**<CNcomment:  MMZ bufferï¿½ï¿½ï¿½ï¿½ï¿½Ö·ï¿½ */
+    HI_U32  phyaddr;                /**<Physical address of an MMZ buffer*/ /**<CNcomment:  MMZ bufferï¿½ï¿½ï¿½ï¿½ï¿½Ö· */
+    HI_U8  *kernel_viraddr;         /**<Kernel-state virtual address of an MMZ buffer*/ /**<CNcomment:  MMZ bufferï¿½Úºï¿½Ì¬ï¿½ï¿½ï¿½ï¿½ï¿½Ö· */
+    HI_U8  *user_viraddr;           /**<User-state virtual address of an MMZ buffer*/ /**<CNcomment:  MMZ bufferï¿½Ã»ï¿½Ì¬ï¿½ï¿½ï¿½ï¿½ï¿½Ö· */
+    HI_U32  bufsize;                /**<Size of an MMZ buffer*/ /**<CNcomment:  MMZ bufferï¿½ï¿½Ð¡ */
+    HI_U32  overflow_threshold;     /**<Overflow threshold of an MMZ buffer, in percentage. For example, the value 100 indicates 100%.*/ /**<CNcomment:  MMZ bufferï¿½ï¿½ï¿½ï¿½Ë®ï¿½ß£ï¿½ï¿½ï¿½ï¿½Ù·Ö±ï¿½ï¿½ï¿½ï¿½Ã£ï¿½ï¿½ï¿½ï¿½ï¿½: 100 indicates 100%.*/
+    HI_U32  underflow_threshold;    /**<Underflow threshold of an MMZ buffer, in percentage. For example, the value 0 indicates 0%.*/ /**<CNcomment:  MMZ bufferï¿½ï¿½ï¿½ï¿½Ë®ï¿½ß£ï¿½ï¿½ï¿½ï¿½Ù·Ö±ï¿½ï¿½ï¿½ï¿½Ã£ï¿½ï¿½ï¿½ï¿½ï¿½: 0 indicates 0%.*/
 }HI_MMZ_BUF_S;
 
 typedef struct hiRECT_S
@@ -105,40 +112,40 @@ typedef struct hiRECT_S
 
 typedef enum hiLAYER_ZORDER_E
 {
-    HI_LAYER_ZORDER_MOVETOP = 0,  /**<Move to the top*/ /**<CNcomment:  ÒÆµ½×î¶¥²¿ */
-    HI_LAYER_ZORDER_MOVEUP,       /**<Move up*/ /**<CNcomment:  ÏòÉÏÒÆµ½ */
-    HI_LAYER_ZORDER_MOVEBOTTOM,   /**<Move to the bottom*/ /**<CNcomment:  ÒÆµ½×îµ×²¿ */
-    HI_LAYER_ZORDER_MOVEDOWN,     /**<Move down*/ /**<CNcomment:  ÏòÏÂÒÆµ½ */
+    HI_LAYER_ZORDER_MOVETOP = 0,  /**<Move to the top*/ /**<CNcomment:  ï¿½Æµï¿½ï¿½î¶¥ï¿½ï¿½ */
+    HI_LAYER_ZORDER_MOVEUP,       /**<Move up*/ /**<CNcomment:  ï¿½ï¿½ï¿½ï¿½ï¿½Æµï¿½ */
+    HI_LAYER_ZORDER_MOVEBOTTOM,   /**<Move to the bottom*/ /**<CNcomment:  ï¿½Æµï¿½ï¿½ï¿½×²ï¿½ */
+    HI_LAYER_ZORDER_MOVEDOWN,     /**<Move down*/ /**<CNcomment:  ï¿½ï¿½ï¿½ï¿½ï¿½Æµï¿½ */
     HI_LAYER_ZORDER_BUTT
 } HI_LAYER_ZORDER_E;
 
 /** Defines user mode proc show buffer */
-/**CNcomment: ÓÃ»§Ì¬PROC buffer¶¨Òå */
+/**CNcomment: ï¿½Ã»ï¿½Ì¬PROC bufferï¿½ï¿½ï¿½ï¿½ */
 typedef struct hiPROC_SHOW_BUFFER_S
 {
-    HI_U8* pu8Buf;                  /**<Buffer address*/  /**<CNcomment: BufferµØÖ· */
-    HI_U32 u32Size;                 /**<Buffer size*/     /**<CNcomment: Buffer´óÐ¡ */
-    HI_U32 u32Offset;               /**<Offset*/          /**<CNcomment: ´òÓ¡Æ«ÒÆµØÖ· */
+    HI_U8* pu8Buf;                  /**<Buffer address*/  /**<CNcomment: Bufferï¿½ï¿½Ö· */
+    HI_U32 u32Size;                 /**<Buffer size*/     /**<CNcomment: Bufferï¿½ï¿½Ð¡ */
+    HI_U32 u32Offset;               /**<Offset*/          /**<CNcomment: ï¿½ï¿½Ó¡Æ«ï¿½Æµï¿½Ö· */
 }HI_PROC_SHOW_BUFFER_S;
 
 /** Proc show function */
-/**CNcomment: ProcÐÅÏ¢ÏÔÊ¾»Øµ÷º¯Êý */
+/**CNcomment: Procï¿½ï¿½Ï¢ï¿½ï¿½Ê¾ï¿½Øµï¿½ï¿½ï¿½ï¿½ï¿½ */
 typedef HI_S32 (* HI_PROC_SHOW_FN)(HI_PROC_SHOW_BUFFER_S * pstBuf, HI_VOID *pPrivData);
 
 /** Proc command function */
-/**CNcomment: Proc¿ØÖÆ»Øµ÷º¯Êý */
+/**CNcomment: Procï¿½ï¿½ï¿½Æ»Øµï¿½ï¿½ï¿½ï¿½ï¿½ */
 typedef HI_S32 (* HI_PROC_CMD_FN)(HI_PROC_SHOW_BUFFER_S * pstBuf, HI_U32 u32Argc, HI_U8 *pu8Argv[], HI_VOID *pPrivData);
 
 /** Defines user mode proc entry */
-/**CNcomment: ÓÃ»§Ì¬PROCÈë¿Ú¶¨Òå */
+/**CNcomment: ï¿½Ã»ï¿½Ì¬PROCï¿½ï¿½Ú¶ï¿½ï¿½ï¿½ */
 typedef struct hiPROC_ENTRY_S
 {
-    HI_CHAR *pszEntryName;          /**<Entry name*/            /**<CNcomment: Èë¿ÚÎÄ¼þÃû */
+    HI_CHAR *pszEntryName;          /**<Entry name*/            /**<CNcomment: ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½ï¿½ */
     HI_CHAR *pszDirectory;          /**<Directory name. If null, the entry will be added to /proc/hisi directory*/
-                                    /**<CNcomment: Ä¿Â¼Ãû£¬Èç¹ûÎª¿Õ£¬½«´´½¨µ½/proc/hisiÄ¿Â¼ÏÂ */
-    HI_PROC_SHOW_FN pfnShowProc;    /**<Proc show function*/    /**<CNcomment: ProcÐÅÏ¢ÏÔÊ¾»Øµ÷º¯Êý */
-    HI_PROC_CMD_FN pfnCmdProc;      /**<Proc command function*/ /**<CNcomment: Proc¿ØÖÆ»Øµ÷º¯Êý */
-    HI_VOID *pPrivData;             /**<Private data*/          /**<CNcomment: BufferµØÖ· */
+                                    /**<CNcomment: Ä¿Â¼ï¿½ï¿½ï¿½ï¿½ï¿½Îªï¿½Õ£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½/proc/hisiÄ¿Â¼ï¿½ï¿½ */
+    HI_PROC_SHOW_FN pfnShowProc;    /**<Proc show function*/    /**<CNcomment: Procï¿½ï¿½Ï¢ï¿½ï¿½Ê¾ï¿½Øµï¿½ï¿½ï¿½ï¿½ï¿½ */
+    HI_PROC_CMD_FN pfnCmdProc;      /**<Proc command function*/ /**<CNcomment: Procï¿½ï¿½ï¿½Æ»Øµï¿½ï¿½ï¿½ï¿½ï¿½ */
+    HI_VOID *pPrivData;             /**<Private data*/          /**<CNcomment: Bufferï¿½ï¿½Ö· */
 }HI_PROC_ENTRY_S;
 
 #ifndef __KERNEL__
@@ -151,578 +158,578 @@ typedef struct hiPROC_ENTRY_S
 /** @{ */  /** <!-- [COMMON] */
 
 /**
-@brief Initializes the system. CNcomment: ÏµÍ³³õÊ¼»¯ CNend
+@brief Initializes the system. CNcomment: ÏµÍ³ï¿½ï¿½Ê¼ï¿½ï¿½ CNend
 @attention \n
 You must call this API to initialize the system before using the APIs of all modules.
 Though you can call other APIs successfully before calling this API, the subsequent operations may fail.\n
-CNcomment: ÔÚÊ¹ÓÃËùÓÐÄ£¿éµÄ½Ó¿ÚÖ®Ç°¶¼ÐèÒªÏÈµ÷ÓÃ´Ë½Ó¿Ú¶ÔÏµÍ³½øÐÐ³õÊ¼»¯\n
-ÔÚµ÷ÓÃÕâ¸ö½Ó¿ÚÖ®Ç°µ÷ÓÃÆäËû½Ó¿Ú£¬²»»á·µ»ØÊ§°Ü£¬µ«ÊÇ²»±£Ö¤Ö´ÐÐµÄÕýÈ·ÐÔ CNend
-@param N/A CNcomment: ÎÞ CNend
-@retval ::HI_SUCCESS Success CNcomment: ³É¹¦ CNend
-@retval ::HI_FAILURE Calling this API fails. CNcomment: APIÏµÍ³µ÷ÓÃÊ§°Ü CNend
+CNcomment: ï¿½ï¿½Ê¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä£ï¿½ï¿½Ä½Ó¿ï¿½Ö®Ç°ï¿½ï¿½ï¿½ï¿½Òªï¿½Èµï¿½ï¿½Ã´Ë½Ó¿Ú¶ï¿½ÏµÍ³ï¿½ï¿½ï¿½Ð³ï¿½Ê¼ï¿½ï¿½\n
+ï¿½Úµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó¿ï¿½Ö®Ç°ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó¿Ú£ï¿½ï¿½ï¿½ï¿½á·µï¿½ï¿½Ê§ï¿½Ü£ï¿½ï¿½ï¿½ï¿½Ç²ï¿½ï¿½ï¿½Ö¤Ö´ï¿½Ðµï¿½ï¿½ï¿½È·ï¿½ï¿½ CNend
+@param N/A CNcomment: ï¿½ï¿½ CNend
+@retval ::HI_SUCCESS Success CNcomment: ï¿½É¹ï¿½ CNend
+@retval ::HI_FAILURE Calling this API fails. CNcomment: APIÏµÍ³ï¿½ï¿½ï¿½ï¿½Ê§ï¿½ï¿½ CNend
 @see \n
-N/A CNcomment: ÎÞ CNend
+N/A CNcomment: ï¿½ï¿½ CNend
 */
 HI_S32 HI_SYS_Init(HI_VOID);
 
 /**
-@brief Deinitializes the system. CNcomment: ÏµÍ³È¥³õÊ¼»¯ CNend
+@brief Deinitializes the system. CNcomment: ÏµÍ³È¥ï¿½ï¿½Ê¼ï¿½ï¿½ CNend
 @attention \n
 If all modules are not used, you need to call this API to deinitialize the system.\n
-CNcomment: ËùÓÐÄ£¿é¶¼²»ÔÙÊ¹ÓÃºóµ÷ÓÃ´Ë½Ó¿ÚÈ¥³õÊ¼»¯ CNend
-@param N/A CNcomment: ÎÞ CNend
-@retval ::HI_SUCCESS Success CNcomment: ³É¹¦ CNend
-@retval ::HI_FAILURE Calling this API fails. CNcomment: APIÏµÍ³µ÷ÓÃÊ§°Ü CNend
+CNcomment: ï¿½ï¿½ï¿½ï¿½Ä£ï¿½é¶¼ï¿½ï¿½ï¿½ï¿½Ê¹ï¿½Ãºï¿½ï¿½ï¿½Ã´Ë½Ó¿ï¿½È¥ï¿½ï¿½Ê¼ï¿½ï¿½ CNend
+@param N/A CNcomment: ï¿½ï¿½ CNend
+@retval ::HI_SUCCESS Success CNcomment: ï¿½É¹ï¿½ CNend
+@retval ::HI_FAILURE Calling this API fails. CNcomment: APIÏµÍ³ï¿½ï¿½ï¿½ï¿½Ê§ï¿½ï¿½ CNend
 @see \n
-N/A CNcomment: ÎÞ CNend
+N/A CNcomment: ï¿½ï¿½ CNend
 */
 HI_S32 HI_SYS_DeInit(HI_VOID);
 
 
 /**
-@brief Obtains the compiled time of a version. CNcomment: »ñÈ¡°æ±¾µÄ±àÒëÊ±¼ä CNend
+@brief Obtains the compiled time of a version. CNcomment: ï¿½ï¿½È¡ï¿½æ±¾ï¿½Ä±ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ CNend
 @attention \n
 The compiled time is the time during which the common module is made again.
-CNcomment: Ê±¼äÎª½øÐÐcommonÄ£¿éÖØÐÂmakeµÄÊ±¼ä CNend
-@param[out] pstTime Pointer to the compiled time of a version (output). CNcomment: Ö¸ÕëÀàÐÍ£¬Êä³ö°æ±¾±àÒëµÄÊ±¼ä¡£ CNend
-@retval ::HI_SUCCESS Success CNcomment: ³É¹¦ CNend
-@retval ::HI_FAILURE Calling this API fails. CNcomment: APIÏµÍ³µ÷ÓÃÊ§°Ü CNend
+CNcomment: Ê±ï¿½ï¿½Îªï¿½ï¿½ï¿½ï¿½commonÄ£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½makeï¿½ï¿½Ê±ï¿½ï¿½ CNend
+@param[out] pstTime Pointer to the compiled time of a version (output). CNcomment: Ö¸ï¿½ï¿½ï¿½ï¿½ï¿½Í£ï¿½ï¿½ï¿½ï¿½ï¿½æ±¾ï¿½ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ä¡£ CNend
+@retval ::HI_SUCCESS Success CNcomment: ï¿½É¹ï¿½ CNend
+@retval ::HI_FAILURE Calling this API fails. CNcomment: APIÏµÍ³ï¿½ï¿½ï¿½ï¿½Ê§ï¿½ï¿½ CNend
 @see \n
-N/A CNcomment: ÎÞ CNend
+N/A CNcomment: ï¿½ï¿½ CNend
 */
 HI_S32 HI_SYS_GetBuildTime(struct tm * pstTime);
 
 
 /**
-@brief Obtains the version number. CNcomment: »ñÈ¡°æ±¾ºÅ CNend
+@brief Obtains the version number. CNcomment: ï¿½ï¿½È¡ï¿½æ±¾ï¿½ï¿½ CNend
 @attention \n
-N/A CNcomment: ÎÞ CNend
-@param[out] pstVersion Pointer to the version number (output). CNcomment: Ö¸ÕëÀàÐÍ£¬Êä³ö°æ±¾ºÅ¡£ CNend
-@retval ::HI_SUCCESS Success CNcomment: ³É¹¦ CNend
-@retval ::HI_FAILURE Calling this API fails. CNcomment: APIÏµÍ³µ÷ÓÃÊ§°Ü CNend
+N/A CNcomment: ï¿½ï¿½ CNend
+@param[out] pstVersion Pointer to the version number (output). CNcomment: Ö¸ï¿½ï¿½ï¿½ï¿½ï¿½Í£ï¿½ï¿½ï¿½ï¿½ï¿½æ±¾ï¿½Å¡ï¿½ CNend
+@retval ::HI_SUCCESS Success CNcomment: ï¿½É¹ï¿½ CNend
+@retval ::HI_FAILURE Calling this API fails. CNcomment: APIÏµÍ³ï¿½ï¿½ï¿½ï¿½Ê§ï¿½ï¿½ CNend
 @see \n
-N/A CNcomment: ÎÞ CNend
+N/A CNcomment: ï¿½ï¿½ CNend
 */
 HI_S32 HI_SYS_GetVersion(HI_SYS_VERSION_S *pstVersion);
 
 
 /**
-@brief Obtains the chip attributes. CNcomment: »ñÈ¡Ð¾Æ¬ÊôÐÔ CNend
+@brief Obtains the chip attributes. CNcomment: ï¿½ï¿½È¡Ð¾Æ¬ï¿½ï¿½ï¿½ï¿½ CNend
 @attention \n
-N/A CNcomment: ÎÞ CNend
-@param[out] pstChipAttr Pointer to the chip attributes(output). CNcomment: Ö¸ÕëÀàÐÍ£¬Êä³öÐ¾Æ¬ÊôÐÔ CNend
-@retval ::HI_SUCCESS Success CNcomment: ³É¹¦ CNend
-@retval ::HI_FAILURE Calling this API fails. CNcomment: APIÏµÍ³µ÷ÓÃÊ§°Ü CNend
+N/A CNcomment: ï¿½ï¿½ CNend
+@param[out] pstChipAttr Pointer to the chip attributes(output). CNcomment: Ö¸ï¿½ï¿½ï¿½ï¿½ï¿½Í£ï¿½ï¿½ï¿½ï¿½Ð¾Æ¬ï¿½ï¿½ï¿½ï¿½ CNend
+@retval ::HI_SUCCESS Success CNcomment: ï¿½É¹ï¿½ CNend
+@retval ::HI_FAILURE Calling this API fails. CNcomment: APIÏµÍ³ï¿½ï¿½ï¿½ï¿½Ê§ï¿½ï¿½ CNend
 @see \n
-N/A CNcomment: ÎÞ CNend
+N/A CNcomment: ï¿½ï¿½ CNend
 */
 
 HI_S32 HI_SYS_GetChipAttr(HI_SYS_CHIP_ATTR_S *pstChipAttr);
 
 /**
-@brief Performs global system configuration. CNcomment: ÉèÖÃÏµÍ³µÄÈ«¾ÖÅäÖÃ CNend
+@brief Performs global system configuration. CNcomment: ï¿½ï¿½ï¿½ï¿½ÏµÍ³ï¿½ï¿½È«ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ CNend
 @attention \n
-N/A CNcomment: ÎÞ CNend
-@param[in] pstSysConf Pointer to the address for system configuration CNcomment: Ö¸ÕëÀàÐÍ£¬ÏµÍ³ÅäÖÃÖ¸ÕëµØÖ·¡£ CNend
-@retval ::HI_SUCCESS Success CNcomment: ³É¹¦ CNend
-@retval ::HI_FAILURE Calling this API fails. CNcomment: APIÏµÍ³µ÷ÓÃÊ§°Ü CNend
+N/A CNcomment: ï¿½ï¿½ CNend
+@param[in] pstSysConf Pointer to the address for system configuration CNcomment: Ö¸ï¿½ï¿½ï¿½ï¿½ï¿½Í£ï¿½ÏµÍ³ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½ï¿½Ö·ï¿½ï¿½ CNend
+@retval ::HI_SUCCESS Success CNcomment: ï¿½É¹ï¿½ CNend
+@retval ::HI_FAILURE Calling this API fails. CNcomment: APIÏµÍ³ï¿½ï¿½ï¿½ï¿½Ê§ï¿½ï¿½ CNend
 @see \n
-N/A CNcomment: ÎÞ CNend
+N/A CNcomment: ï¿½ï¿½ CNend
 */
 HI_S32 HI_SYS_SetConf(const HI_SYS_CONF_S *pstSysConf);
 
 /**
-@brief Obtains global system configuration. CNcomment: »ñÈ¡ÏµÍ³µÄÈ«¾ÖÅäÖÃ CNend
+@brief Obtains global system configuration. CNcomment: ï¿½ï¿½È¡ÏµÍ³ï¿½ï¿½È«ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ CNend
 @attention \n
-N/A CNcomment: ÎÞ CNend
-@param[out] pstSysConf Pointer to the system configuration (output). CNcomment: Ö¸ÕëÀàÐÍ£¬Êä³öÏµÍ³ÅäÖÃ¡£ CNend
-@retval ::HI_SUCCESS Success CNcomment: ³É¹¦ CNend
-@retval ::HI_FAILURE Calling this API fails. CNcomment: APIÏµÍ³µ÷ÓÃÊ§°Ü CNend
+N/A CNcomment: ï¿½ï¿½ CNend
+@param[out] pstSysConf Pointer to the system configuration (output). CNcomment: Ö¸ï¿½ï¿½ï¿½ï¿½ï¿½Í£ï¿½ï¿½ï¿½ï¿½ÏµÍ³ï¿½ï¿½ï¿½Ã¡ï¿½ CNend
+@retval ::HI_SUCCESS Success CNcomment: ï¿½É¹ï¿½ CNend
+@retval ::HI_FAILURE Calling this API fails. CNcomment: APIÏµÍ³ï¿½ï¿½ï¿½ï¿½Ê§ï¿½ï¿½ CNend
 @see \n
-N/A CNcomment: ÎÞ CNend
+N/A CNcomment: ï¿½ï¿½ CNend
 */
 HI_S32 HI_SYS_GetConf(HI_SYS_CONF_S *pstSysConf);
 
 /**
-@brief Sets the debugging information level of a module. CNcomment: ÉèÖÃÄ£¿éµÄµ÷ÊÔÐÅÏ¢¼¶±ð CNend
+@brief Sets the debugging information level of a module. CNcomment: ï¿½ï¿½ï¿½ï¿½Ä£ï¿½ï¿½Äµï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½ï¿½ CNend
 @attention \n
-N/A CNcomment: ÎÞ CNend
-@param[in] enModId Debugging ID of a module CNcomment: Ä£¿éµÄµ÷ÊÔID¡£ CNend
-@param[in] enLogLevel Debugging information level of a module CNcomment: Ä£¿éµÄµ÷ÊÔÐÅÏ¢¼¶±ð¡£ CNend
-@retval ::HI_SUCCESS Success CNcomment: ³É¹¦ CNend
-@retval ::HI_FAILURE Calling this API fails. CNcomment: APIÏµÍ³µ÷ÓÃÊ§°Ü CNend
+N/A CNcomment: ï¿½ï¿½ CNend
+@param[in] enModId Debugging ID of a module CNcomment: Ä£ï¿½ï¿½Äµï¿½ï¿½ï¿½IDï¿½ï¿½ CNend
+@param[in] enLogLevel Debugging information level of a module CNcomment: Ä£ï¿½ï¿½Äµï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½ï¿½ CNend
+@retval ::HI_SUCCESS Success CNcomment: ï¿½É¹ï¿½ CNend
+@retval ::HI_FAILURE Calling this API fails. CNcomment: APIÏµÍ³ï¿½ï¿½ï¿½ï¿½Ê§ï¿½ï¿½ CNend
 @see \n
 */
 HI_S32 HI_SYS_SetLogLevel(HI_MOD_ID_E enModId,  HI_LOG_LEVEL_E enLogLevel);
 
 /**
-@brief Sets the debugging information file path for U-disk. CNcomment: ÉèÖÃÈÕÖ¾´æ´¢Â·¾¶ CNend
+@brief Sets the debugging information file path for U-disk. CNcomment: ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¾ï¿½æ´¢Â·ï¿½ï¿½ CNend
 @attention \n
-N/A CNcomment: ÎÞ CNend
-@param[in]  pszLogPath Debugging information file path. CNcomment: ÈÕÖ¾µÄ´æ´¢Â·¾¶ CNend
-@retval ::HI_SUCCESS Success CNcomment: ³É¹¦ CNend
-@retval ::HI_FAILURE Calling this API fails. CNcomment: APIÏµÍ³µ÷ÓÃÊ§°Ü CNend
+N/A CNcomment: ï¿½ï¿½ CNend
+@param[in]  pszLogPath Debugging information file path. CNcomment: ï¿½ï¿½Ö¾ï¿½Ä´æ´¢Â·ï¿½ï¿½ CNend
+@retval ::HI_SUCCESS Success CNcomment: ï¿½É¹ï¿½ CNend
+@retval ::HI_FAILURE Calling this API fails. CNcomment: APIÏµÍ³ï¿½ï¿½ï¿½ï¿½Ê§ï¿½ï¿½ CNend
 @see \n
 */
 HI_S32 HI_SYS_SetLogPath(const HI_CHAR* pszLogPath);
 
 /**
-@brief Sets the debugging files(may be stream, YUV data, image...) save path. CNcomment: ÉèÖÃµ÷ÊÔÎÄ¼þ´æ´¢Â·¾¶ CNend
+@brief Sets the debugging files(may be stream, YUV data, image...) save path. CNcomment: ï¿½ï¿½ï¿½Ãµï¿½ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½æ´¢Â·ï¿½ï¿½ CNend
 @attention \n
-N/A CNcomment: ÎÞ CNend
-@param[in]  pszPath Debugging files path. CNcomment: µ÷ÊÔÎÄ¼þµÄ´æ´¢Â·¾¶ CNend
-@retval ::HI_SUCCESS Success CNcomment: ³É¹¦ CNend
-@retval ::HI_FAILURE Calling this API fails. CNcomment: APIÏµÍ³µ÷ÓÃÊ§°Ü CNend
+N/A CNcomment: ï¿½ï¿½ CNend
+@param[in]  pszPath Debugging files path. CNcomment: ï¿½ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½Ä´æ´¢Â·ï¿½ï¿½ CNend
+@retval ::HI_SUCCESS Success CNcomment: ï¿½É¹ï¿½ CNend
+@retval ::HI_FAILURE Calling this API fails. CNcomment: APIÏµÍ³ï¿½ï¿½ï¿½ï¿½Ê§ï¿½ï¿½ CNend
 @see \n
 */
 HI_S32 HI_SYS_SetStorePath(const HI_CHAR* pszPath);
 
 /**
-@brief Writes to a register or a memory. CNcomment:  Ð´¼Ä´æÆ÷»òÄÚ´æ CNend
+@brief Writes to a register or a memory. CNcomment:  Ð´ï¿½Ä´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ú´ï¿½ CNend
 @attention \n
-N/A CNcomment: ÎÞ CNend
-@param[in] u32RegAddr Physical address of a register or a memory CNcomment: ¼Ä´æÆ÷»òÄÚ´æµÄÎïÀíµØÖ·¡£ CNend
-@param[in] u32Value Value of a register CNcomment:  ¼Ä´æÆ÷µÄÖµ¡£ CNend
-@retval ::HI_SUCCESS Success CNcomment: ³É¹¦ CNend
-@retval ::HI_FAILURE Calling this API fails. CNcomment: APIÏµÍ³µ÷ÓÃÊ§°Ü CNend
+N/A CNcomment: ï¿½ï¿½ CNend
+@param[in] u32RegAddr Physical address of a register or a memory CNcomment: ï¿½Ä´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ú´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö·ï¿½ï¿½ CNend
+@param[in] u32Value Value of a register CNcomment:  ï¿½Ä´ï¿½ï¿½ï¿½ï¿½ï¿½Öµï¿½ï¿½ CNend
+@retval ::HI_SUCCESS Success CNcomment: ï¿½É¹ï¿½ CNend
+@retval ::HI_FAILURE Calling this API fails. CNcomment: APIÏµÍ³ï¿½ï¿½ï¿½ï¿½Ê§ï¿½ï¿½ CNend
 @see \n
-N/A CNcomment: ÎÞ CNend
+N/A CNcomment: ï¿½ï¿½ CNend
 */
 HI_S32 HI_SYS_WriteRegister(HI_U32 u32RegAddr, HI_U32 u32Value);
 
 /**
-@brief Reads a register or a memory. CNcomment: ¶Á¼Ä´æÆ÷»òÄÚ´æ CNend
+@brief Reads a register or a memory. CNcomment: ï¿½ï¿½ï¿½Ä´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ú´ï¿½ CNend
 @attention \n
-N/A CNcomment: ÎÞ CNend
-@param[in] u32RegAddr Physical address of a register or a memory CNcomment: ¼Ä´æÆ÷»òÄÚ´æµÄÎïÀíµØÖ·¡£ CNend
-@param[out] pu32Value Pointer to the register value (output) CNcomment:  Ö¸ÕëÀàÐÍ£¬Êä³ö¼Ä´æÆ÷µÄÖµ¡£ CNend
-@retval ::HI_SUCCESS Success CNcomment: ³É¹¦ CNend
-@retval ::HI_FAILURE Calling this API fails. CNcomment: APIÏµÍ³µ÷ÓÃÊ§°Ü CNend
+N/A CNcomment: ï¿½ï¿½ CNend
+@param[in] u32RegAddr Physical address of a register or a memory CNcomment: ï¿½Ä´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ú´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö·ï¿½ï¿½ CNend
+@param[out] pu32Value Pointer to the register value (output) CNcomment:  Ö¸ï¿½ï¿½ï¿½ï¿½ï¿½Í£ï¿½ï¿½ï¿½ï¿½ï¿½Ä´ï¿½ï¿½ï¿½ï¿½ï¿½Öµï¿½ï¿½ CNend
+@retval ::HI_SUCCESS Success CNcomment: ï¿½É¹ï¿½ CNend
+@retval ::HI_FAILURE Calling this API fails. CNcomment: APIÏµÍ³ï¿½ï¿½ï¿½ï¿½Ê§ï¿½ï¿½ CNend
 @see \n
-N/A CNcomment: ÎÞ CNend
+N/A CNcomment: ï¿½ï¿½ CNend
 */
 HI_S32 HI_SYS_ReadRegister(HI_U32 u32RegAddr, HI_U32 *pu32Value);
 
 /**
-@brief Map registers address. CNcomment:  Ó³Éä¼Ä´æÆ÷µØÖ· CNend
+@brief Map registers address. CNcomment:  Ó³ï¿½ï¿½Ä´ï¿½ï¿½ï¿½ï¿½ï¿½Ö· CNend
 @attention \n
-N/A CNcomment: ÎÞ CNend
-@param[in] u32RegAddr The start physical address of registers. CNcomment: ¼Ä´æÆ÷µÄÆðÊ¼ÎïÀíµØÖ·¡£ CNend
-@param[in] u32Length  Length of the registers want to map CNcomment:   ¼Ä´æÆ÷³¤¶È¡£ CNend
-@param[out] pVirAddr  Virtual address CNcomment:   Ó³ÉäºóµÄÐéÄâµØÖ·¡£ CNend
-@retval ::HI_SUCCESS Success CNcomment: ³É¹¦ CNend
-@retval ::HI_FAILURE Calling this API fails. CNcomment: APIÏµÍ³µ÷ÓÃÊ§°Ü CNend
+N/A CNcomment: ï¿½ï¿½ CNend
+@param[in] u32RegAddr The start physical address of registers. CNcomment: ï¿½Ä´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½ï¿½Ö·ï¿½ï¿½ CNend
+@param[in] u32Length  Length of the registers want to map CNcomment:   ï¿½Ä´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È¡ï¿½ CNend
+@param[out] pVirAddr  Virtual address CNcomment:   Ó³ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö·ï¿½ï¿½ CNend
+@retval ::HI_SUCCESS Success CNcomment: ï¿½É¹ï¿½ CNend
+@retval ::HI_FAILURE Calling this API fails. CNcomment: APIÏµÍ³ï¿½ï¿½ï¿½ï¿½Ê§ï¿½ï¿½ CNend
 @see \n
-N/A CNcomment: ÎÞ CNend
+N/A CNcomment: ï¿½ï¿½ CNend
 */
 HI_S32 HI_SYS_MapRegister(HI_U32 u32RegAddr, HI_U32 u32Length, HI_VOID *pVirAddr);
 
 /**
-@brief Unmap registers address. CNcomment:  ½â³ý¼Ä´æÆ÷µØÖ·Ó³Éä CNend
+@brief Unmap registers address. CNcomment:  ï¿½ï¿½ï¿½Ä´ï¿½ï¿½ï¿½ï¿½ï¿½Ö·Ó³ï¿½ï¿½ CNend
 @attention \n
-N/A CNcomment: ÎÞ CNend
-@param[in] pVirAddr The virtual address to be unmapped CNcomment: Òª½â³ýÓ³ÉäµÄÐéÄâµØÖ·¡£ CNend
-@retval ::HI_SUCCESS Success CNcomment: ³É¹¦ CNend
-@retval ::HI_FAILURE Calling this API fails. CNcomment: APIÏµÍ³µ÷ÓÃÊ§°Ü CNend
+N/A CNcomment: ï¿½ï¿½ CNend
+@param[in] pVirAddr The virtual address to be unmapped CNcomment: Òªï¿½ï¿½ï¿½Ó³ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö·ï¿½ï¿½ CNend
+@retval ::HI_SUCCESS Success CNcomment: ï¿½É¹ï¿½ CNend
+@retval ::HI_FAILURE Calling this API fails. CNcomment: APIÏµÍ³ï¿½ï¿½ï¿½ï¿½Ê§ï¿½ï¿½ CNend
 @see \n
-N/A CNcomment: ÎÞ CNend
+N/A CNcomment: ï¿½ï¿½ CNend
 */
 HI_S32 HI_SYS_UnmapRegister(HI_VOID *pVirAddr);
 
 /**
-@brief Get timestamp. CNcomment: »ñÈ¡Ê±¼ä´Á¡£ CNend
+@brief Get timestamp. CNcomment: ï¿½ï¿½È¡Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ CNend
 @attention \n
-N/A CNcomment: ÎÞ CNend
-@param[out] pu32TimeMs Pointer to the timestamp value (output) CNcomment: Êä³öÊ±¼ä´Á¡£ CNend
-@retval ::HI_SUCCESS Success CNcomment: ³É¹¦ CNend
-@retval ::HI_FAILURE Calling this API fails. CNcomment: APIÏµÍ³µ÷ÓÃÊ§°Ü CNend
+N/A CNcomment: ï¿½ï¿½ CNend
+@param[out] pu32TimeMs Pointer to the timestamp value (output) CNcomment: ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ CNend
+@retval ::HI_SUCCESS Success CNcomment: ï¿½É¹ï¿½ CNend
+@retval ::HI_FAILURE Calling this API fails. CNcomment: APIÏµÍ³ï¿½ï¿½ï¿½ï¿½Ê§ï¿½ï¿½ CNend
 @see \n
-N/A CNcomment: ÎÞ CNend
+N/A CNcomment: ï¿½ï¿½ CNend
 */
 HI_S32 HI_SYS_GetTimeStampMs(HI_U32 *pu32TimeMs);
 
 /**
 @brief Applies for a media memory zone (MMZ) and maps the user-state address.
-CNcomment:  ÉêÇëmmzÄÚ´æ£¬²¢Ó³ÉäÓÃ»§Ì¬µØÖ· CNend
+CNcomment:  ï¿½ï¿½ï¿½ï¿½mmzï¿½Ú´æ£¬ï¿½ï¿½Ó³ï¿½ï¿½ï¿½Ã»ï¿½Ì¬ï¿½ï¿½Ö· CNend
 @attention \n
-N/A CNcomment: ÎÞ CNend
+N/A CNcomment: ï¿½ï¿½ CNend
 @param[in/out] pstBuf Structure of the buffer information. Bufname and bufsize are inputs, and the physical address and user-state virtual address are outputs.
-                    CNcomment: bufferÐÅÏ¢½á¹¹£¬bufnameºÍbufsize×÷ÎªÊäÈë,ÎïÀíµØÖ·ºÍÓÃ»§Ì¬ÐéÄâµØÖ·×÷ÎªÊä³ö CNend
-@retval ::HI_SUCCESS Success CNcomment: ³É¹¦ CNend
-@retval ::HI_FAILURE Calling this API fails. CNcomment: APIÏµÍ³µ÷ÓÃÊ§°Ü CNend
+                    CNcomment: bufferï¿½ï¿½Ï¢ï¿½á¹¹ï¿½ï¿½bufnameï¿½ï¿½bufsizeï¿½ï¿½Îªï¿½ï¿½ï¿½ï¿½,ï¿½ï¿½ï¿½ï¿½ï¿½Ö·ï¿½ï¿½ï¿½Ã»ï¿½Ì¬ï¿½ï¿½ï¿½ï¿½ï¿½Ö·ï¿½ï¿½Îªï¿½ï¿½ï¿½ CNend
+@retval ::HI_SUCCESS Success CNcomment: ï¿½É¹ï¿½ CNend
+@retval ::HI_FAILURE Calling this API fails. CNcomment: APIÏµÍ³ï¿½ï¿½ï¿½ï¿½Ê§ï¿½ï¿½ CNend
 @see \n
-N/A CNcomment: ÎÞ CNend
+N/A CNcomment: ï¿½ï¿½ CNend
 */
 HI_S32 HI_MMZ_Malloc(HI_MMZ_BUF_S *pstBuf);
 
 /**
-@brief Unmaps the user-state address and releases the MMZ. CNcomment: ½â³ýÓÃ»§Ì¬µØÖ·µÄÓ³Éä£¬²¢ÊÍ·ÅmmzÄÚ´æ CNend
+@brief Unmaps the user-state address and releases the MMZ. CNcomment: ï¿½ï¿½ï¿½ï¿½Ã»ï¿½Ì¬ï¿½ï¿½Ö·ï¿½ï¿½Ó³ï¿½ä£¬ï¿½ï¿½ï¿½Í·ï¿½mmzï¿½Ú´ï¿½ CNend
 @attention \n
 Ensure that the lengths of the transferred physical address and user-state virtual address are correct.
-CNcomment: ±£Ö¤´«ÈëµÄÎïÀíµØÖ·¡¢ÓÃ»§Ì¬ÐéÄâµØÖ·ºÍ³¤¶ÈÕýÈ· CNend
-@param[in] pstBuf Structure of the buffer information CNcomment: bufferÐÅÏ¢½á¹¹ CNend
-@retval ::HI_SUCCESS Success CNcomment: ³É¹¦ CNend
-@retval ::HI_FAILURE Calling this API fails. CNcomment: APIÏµÍ³µ÷ÓÃÊ§°Ü CNend
+CNcomment: ï¿½ï¿½Ö¤ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö·ï¿½ï¿½ï¿½Ã»ï¿½Ì¬ï¿½ï¿½ï¿½ï¿½ï¿½Ö·ï¿½Í³ï¿½ï¿½ï¿½ï¿½ï¿½È· CNend
+@param[in] pstBuf Structure of the buffer information CNcomment: bufferï¿½ï¿½Ï¢ï¿½á¹¹ CNend
+@retval ::HI_SUCCESS Success CNcomment: ï¿½É¹ï¿½ CNend
+@retval ::HI_FAILURE Calling this API fails. CNcomment: APIÏµÍ³ï¿½ï¿½ï¿½ï¿½Ê§ï¿½ï¿½ CNend
 @see \n
-N/A CNcomment: ÎÞ CNend
+N/A CNcomment: ï¿½ï¿½ CNend
 */
 HI_S32 HI_MMZ_Free(HI_MMZ_BUF_S *pstBuf);
 
 /**
-@brief pplies for an MMZ with a specified name and obtains its physical address. CNcomment: Ö¸¶¨mmzµÄÃû×ÖÉêÇëmmzÄÚ´æ£¬·µ»ØÎïÀíµØÖ· CNend
+@brief pplies for an MMZ with a specified name and obtains its physical address. CNcomment: Ö¸ï¿½ï¿½mmzï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½mmzï¿½Ú´æ£¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö· CNend
 @attention \n
-N/A CNcomment: ÎÞ CNend
-@param[in] u32Size Buffer size CNcomment: buffer´óÐ¡ CNend
-@param[in] u32Align Alignment mode CNcomment: ¶ÔÆë·½Ê½ CNend
-@param[in] ps8MMZName Name of an MMZ in the buffer. If the MMZ name is set to NULL, an MMZ is anonymously applied for. CNcomment: buffer·ÖÇøµÄÃû×Ö£¬´«ÈëNULLÄäÃûÉêÇë CNend
-@param[in] ps8MMBName Buffer name CNcomment: buffer¿éµÄÃû×Ö CNend
-@retval ::NULL The application fails. CNcomment: ÉêÇëÊ§°Ü CNend
-@retval Physical address CNcomment: ÎïÀíµØÖ· CNend
+N/A CNcomment: ï¿½ï¿½ CNend
+@param[in] u32Size Buffer size CNcomment: bufferï¿½ï¿½Ð¡ CNend
+@param[in] u32Align Alignment mode CNcomment: ï¿½ï¿½ï¿½ë·½Ê½ CNend
+@param[in] ps8MMZName Name of an MMZ in the buffer. If the MMZ name is set to NULL, an MMZ is anonymously applied for. CNcomment: bufferï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö£ï¿½ï¿½ï¿½ï¿½ï¿½NULLï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ CNend
+@param[in] ps8MMBName Buffer name CNcomment: bufferï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ CNend
+@retval ::NULL The application fails. CNcomment: ï¿½ï¿½ï¿½ï¿½Ê§ï¿½ï¿½ CNend
+@retval Physical address CNcomment: ï¿½ï¿½ï¿½ï¿½ï¿½Ö· CNend
 @see \n
-N/A CNcomment: ÎÞ CNend
+N/A CNcomment: ï¿½ï¿½ CNend
 */
 HI_VOID *HI_MMZ_New(HI_U32 u32Size , HI_U32 u32Align, HI_CHAR *ps8MMZName, HI_CHAR *ps8MMBName);
 
 
 /**
-@brief Releases an MMZ based on its physical address. CNcomment: Í¨¹ýÎïÀíµØÖ·ÊÍ·ÅmmzÄÚ´æ CNend
+@brief Releases an MMZ based on its physical address. CNcomment: Í¨ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö·ï¿½Í·ï¿½mmzï¿½Ú´ï¿½ CNend
 @attention \n
-N/A CNcomment: ÎÞ CNend
-@param[in] u32PhysAddr Physical address of a buffer CNcomment: bufferÎïÀíµØÖ· CNend
-@retval ::HI_SUCCESS Success CNcomment: ³É¹¦ CNend
-@retval ::HI_FAILURE Calling this API fails. CNcomment: APIÏµÍ³µ÷ÓÃÊ§°Ü CNend
+N/A CNcomment: ï¿½ï¿½ CNend
+@param[in] u32PhysAddr Physical address of a buffer CNcomment: bufferï¿½ï¿½ï¿½ï¿½ï¿½Ö· CNend
+@retval ::HI_SUCCESS Success CNcomment: ï¿½É¹ï¿½ CNend
+@retval ::HI_FAILURE Calling this API fails. CNcomment: APIÏµÍ³ï¿½ï¿½ï¿½ï¿½Ê§ï¿½ï¿½ CNend
 @see \n
-N/A CNcomment: ÎÞ CNend
+N/A CNcomment: ï¿½ï¿½ CNend
 */
 HI_S32 HI_MMZ_Delete(HI_U32 u32PhysAddr);
 
 /**
 @brief Maps the physical address of an MMZ applied for to a user-state virtual address. You can determine whether to cache the address.
-CNcomment: ½«mmzÉêÇëµÄÎïÀíµØÖ·Ó³Éä³ÉÓÃ»§Ì¬ÐéÄâµØÖ·£¬¿ÉÒÔÖ¸¶¨ÊÇ·ñcached CNend
+CNcomment: ï¿½ï¿½mmzï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö·Ó³ï¿½ï¿½ï¿½ï¿½Ã»ï¿½Ì¬ï¿½ï¿½ï¿½ï¿½ï¿½Ö·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½ï¿½Ç·ï¿½cached CNend
 @attention \n
-N/A CNcomment: ÎÞ CNend
-@param[in] u32PhysAddr Physical address of a buffer CNcomment: bufferÎïÀíµØÖ· CNend
-@param[in] u32Cached Whether to cache the address. 0: no; 1: yes CNcomment: ÊÇ·ñÊ¹ÓÃcache£¬0²»Ê¹ÓÃ£¬1Ê¹ÓÃ CNend
-@retval ::NULL The application fails. CNcomment: ÉêÇëÊ§°Ü CNend
-@retval User-state virtual address CNcomment: ÓÃ»§Ì¬ÐéµØÖ· CNend
+N/A CNcomment: ï¿½ï¿½ CNend
+@param[in] u32PhysAddr Physical address of a buffer CNcomment: bufferï¿½ï¿½ï¿½ï¿½ï¿½Ö· CNend
+@param[in] u32Cached Whether to cache the address. 0: no; 1: yes CNcomment: ï¿½Ç·ï¿½Ê¹ï¿½ï¿½cacheï¿½ï¿½0ï¿½ï¿½Ê¹ï¿½Ã£ï¿½1Ê¹ï¿½ï¿½ CNend
+@retval ::NULL The application fails. CNcomment: ï¿½ï¿½ï¿½ï¿½Ê§ï¿½ï¿½ CNend
+@retval User-state virtual address CNcomment: ï¿½Ã»ï¿½Ì¬ï¿½ï¿½ï¿½Ö· CNend
 @see \n
-N/A CNcomment: ÎÞ CNend
+N/A CNcomment: ï¿½ï¿½ CNend
 */
 HI_VOID *HI_MMZ_Map(HI_U32 u32PhysAddr, HI_U32 u32Cached);
 
 /**
-@brief Unmaps the user-state address of an MMZ. CNcomment: ½â³ýmmzÄÚ´æÓÃ»§Ì¬µØÖ·µÄÓ³Éä CNend
+@brief Unmaps the user-state address of an MMZ. CNcomment: ï¿½ï¿½ï¿½mmzï¿½Ú´ï¿½ï¿½Ã»ï¿½Ì¬ï¿½ï¿½Ö·ï¿½ï¿½Ó³ï¿½ï¿½ CNend
 @attention \n
-N/A CNcomment: ÎÞ CNend
-@param[in] u32PhysAddr Physical address of a buffer CNcomment: bufferÎïÀíµØÖ· CNend
-@retval ::HI_SUCCESS Success CNcomment: ³É¹¦ CNend
-@retval ::HI_FAILURE Calling this API fails. CNcomment: APIÏµÍ³µ÷ÓÃÊ§°Ü CNend
+N/A CNcomment: ï¿½ï¿½ CNend
+@param[in] u32PhysAddr Physical address of a buffer CNcomment: bufferï¿½ï¿½ï¿½ï¿½ï¿½Ö· CNend
+@retval ::HI_SUCCESS Success CNcomment: ï¿½É¹ï¿½ CNend
+@retval ::HI_FAILURE Calling this API fails. CNcomment: APIÏµÍ³ï¿½ï¿½ï¿½ï¿½Ê§ï¿½ï¿½ CNend
 @see \n
-N/A CNcomment: ÎÞ CNend
+N/A CNcomment: ï¿½ï¿½ CNend
 */
 HI_S32 HI_MMZ_Unmap(HI_U32 u32PhysAddr);
 
 
 /**
-@brief Flushes D-cache to the cached MMZ. CNcomment: ¶ÔÓÚcachedÀàÐÍMMZ£¬Ë¢Dcacheµ½ÄÚ´æ CNend
+@brief Flushes D-cache to the cached MMZ. CNcomment: ï¿½ï¿½ï¿½ï¿½cachedï¿½ï¿½ï¿½ï¿½MMZï¿½ï¿½Ë¢Dcacheï¿½ï¿½ï¿½Ú´ï¿½ CNend
 @attention \n
 If the value 0 is transferred, all D-caches are refreshed; otherwise, only the transferred memory is refreshed.
-CNcomment: Èç¹û´«Èë0£¬ÔòË¢ÐÂËùÓÐµÄDcache£»·ñÔòÖ»Ë¢´«ÈëµÄÄÇ¿éÄÚ´æ CNend
-@param[in] u32PhysAddr Physical address of a buffer CNcomment: bufferÎïÀíµØÖ· CNend
-@retval ::HI_SUCCESS Success CNcomment: ³É¹¦ CNend
-@retval ::HI_FAILURE Calling this API fails. CNcomment: APIÏµÍ³µ÷ÓÃÊ§°Ü CNend
+CNcomment: ï¿½ï¿½ï¿½ï¿½ï¿½0ï¿½ï¿½ï¿½ï¿½Ë¢ï¿½ï¿½ï¿½ï¿½ï¿½Ðµï¿½Dcacheï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö»Ë¢ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç¿ï¿½ï¿½Ú´ï¿½ CNend
+@param[in] u32PhysAddr Physical address of a buffer CNcomment: bufferï¿½ï¿½ï¿½ï¿½ï¿½Ö· CNend
+@retval ::HI_SUCCESS Success CNcomment: ï¿½É¹ï¿½ CNend
+@retval ::HI_FAILURE Calling this API fails. CNcomment: APIÏµÍ³ï¿½ï¿½ï¿½ï¿½Ê§ï¿½ï¿½ CNend
 @see \n
-N/A CNcomment: ÎÞ CNend
+N/A CNcomment: ï¿½ï¿½ CNend
 */
 HI_S32 HI_MMZ_Flush(HI_U32 u32PhysAddr);
 
 
 /**
-@brief Maps a physical address to a user-state virtual address. CNcomment: ½«ÎïÀíµØÖ·Ó³Éä³ÉÓÃ»§Ì¬ÐéÄâµØÖ· CNend
+@brief Maps a physical address to a user-state virtual address. CNcomment: ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö·Ó³ï¿½ï¿½ï¿½ï¿½Ã»ï¿½Ì¬ï¿½ï¿½ï¿½ï¿½ï¿½Ö· CNend
 @attention \n
-N/A CNcomment: ÎÞ CNend
-@param[in] u32PhyAddr Physical address of a buffer CNcomment: bufferÎïÀíµØÖ· CNend
-@param[in] u32Size Buffer size CNcomment: bufferµÄ´óÐ¡ CNend
-@retval ::NULL The application fails. CNcomment: ÉêÇëÊ§°Ü CNend
-@retval User-state virtual address CNcomment: ÓÃ»§Ì¬ÐéµØÖ· CNend
+N/A CNcomment: ï¿½ï¿½ CNend
+@param[in] u32PhyAddr Physical address of a buffer CNcomment: bufferï¿½ï¿½ï¿½ï¿½ï¿½Ö· CNend
+@param[in] u32Size Buffer size CNcomment: bufferï¿½Ä´ï¿½Ð¡ CNend
+@retval ::NULL The application fails. CNcomment: ï¿½ï¿½ï¿½ï¿½Ê§ï¿½ï¿½ CNend
+@retval User-state virtual address CNcomment: ï¿½Ã»ï¿½Ì¬ï¿½ï¿½ï¿½Ö· CNend
 @see \n
-N/A CNcomment: ÎÞ CNend
+N/A CNcomment: ï¿½ï¿½ CNend
 */
 HI_VOID *HI_MEM_Map(HI_U32 u32PhyAddr, HI_U32 u32Size);
 
 
 /**
-@brief Unmaps a user-state address. CNcomment: ½â³ýÓÃ»§Ì¬µØÖ·µÄÓ³Éä CNend
+@brief Unmaps a user-state address. CNcomment: ï¿½ï¿½ï¿½ï¿½Ã»ï¿½Ì¬ï¿½ï¿½Ö·ï¿½ï¿½Ó³ï¿½ï¿½ CNend
 @attention \n
-N/A CNcomment: ÎÞ CNend
-@param[in] pAddrMapped User-state virtual address of a buffer. CNcomment: bufferµÄÓÃ»§Ì¬ÐéµØÖ· CNend
-@retval ::HI_SUCCESS Success CNcomment: ³É¹¦ CNend
-@retval ::HI_FAILURE Calling this API fails. CNcomment: APIÏµÍ³µ÷ÓÃÊ§°Ü CNend
+N/A CNcomment: ï¿½ï¿½ CNend
+@param[in] pAddrMapped User-state virtual address of a buffer. CNcomment: bufferï¿½ï¿½ï¿½Ã»ï¿½Ì¬ï¿½ï¿½ï¿½Ö· CNend
+@retval ::HI_SUCCESS Success CNcomment: ï¿½É¹ï¿½ CNend
+@retval ::HI_FAILURE Calling this API fails. CNcomment: APIÏµÍ³ï¿½ï¿½ï¿½ï¿½Ê§ï¿½ï¿½ CNend
 @see \n
-N/A CNcomment: ÎÞ CNend
+N/A CNcomment: ï¿½ï¿½ CNend
 */
 HI_S32 HI_MEM_Unmap(HI_VOID *pAddrMapped);
 
 /**
-@brief Obtains the physical address and size based on the virtual address. CNcomment: ¸ù¾ÝÐéÄâµØÖ·»ñÈ¡ÎïÀíµØÖ·£¬ÒÔ¼°´óÐ¡ CNend
+@brief Obtains the physical address and size based on the virtual address. CNcomment: ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö·ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½ï¿½Ö·ï¿½ï¿½ï¿½Ô¼ï¿½ï¿½ï¿½Ð¡ CNend
 @attention \n
-N/A CNcomment: ÎÞ CNend
-@param[in] pVir User-state virtual address CNcomment: ÓÃ»§Ì¬ÐéµØÖ· CNend
-@param[out] pu32Phyaddr Physical address  CNcomment: ÎïÀíµØÖ· CNend
-@param[out] pu32Size Size CNcomment: ´óÐ¡ CNend
-@retval ::HI_SUCCESS Success CNcomment: ³É¹¦ CNend
-@retval ::HI_FAILURE Calling this API fails. CNcomment: APIÏµÍ³µ÷ÓÃÊ§°Ü CNend
+N/A CNcomment: ï¿½ï¿½ CNend
+@param[in] pVir User-state virtual address CNcomment: ï¿½Ã»ï¿½Ì¬ï¿½ï¿½ï¿½Ö· CNend
+@param[out] pu32Phyaddr Physical address  CNcomment: ï¿½ï¿½ï¿½ï¿½ï¿½Ö· CNend
+@param[out] pu32Size Size CNcomment: ï¿½ï¿½Ð¡ CNend
+@retval ::HI_SUCCESS Success CNcomment: ï¿½É¹ï¿½ CNend
+@retval ::HI_FAILURE Calling this API fails. CNcomment: APIÏµÍ³ï¿½ï¿½ï¿½ï¿½Ê§ï¿½ï¿½ CNend
 @see \n
-N/A CNcomment: ÎÞ CNend
+N/A CNcomment: ï¿½ï¿½ CNend
 */
 HI_S32 HI_MMZ_GetPhyaddr(HI_VOID * pVir, HI_U32 *pu32Phyaddr, HI_U32 *pu32Size);
 
 /**
-@brief Register one module to manager. CNcomment:Ä£¿é×¢²á£¬ÓÃÓÚ¹ÜÀí CNend
-@attention Before manager someone module, calling this interface. CNcomment:ÈçÐè¹ÜÀíÄ£¿é£¬ÓÃ´Ë½Ó¿ÚÏÈ×¢²á CNend
-@param[in] pszModuleName The module name CNcomment:Ä£¿éÃû³Æ CNend
-@param[in] u32ModuleID   The module ID. CNcomment:Ä£¿éID CNend
-@retval ::HI_SUCCESS Success CNcomment:³É¹¦ CNend
-@retval ::HI_FAILURE Failure CNcomment:Ê§°Ü CNend
+@brief Register one module to manager. CNcomment:Ä£ï¿½ï¿½×¢ï¿½á£¬ï¿½ï¿½ï¿½Ú¹ï¿½ï¿½ï¿½ CNend
+@attention Before manager someone module, calling this interface. CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä£ï¿½é£¬ï¿½Ã´Ë½Ó¿ï¿½ï¿½ï¿½×¢ï¿½ï¿½ CNend
+@param[in] pszModuleName The module name CNcomment:Ä£ï¿½ï¿½ï¿½ï¿½ï¿½ CNend
+@param[in] u32ModuleID   The module ID. CNcomment:Ä£ï¿½ï¿½ID CNend
+@retval ::HI_SUCCESS Success CNcomment:ï¿½É¹ï¿½ CNend
+@retval ::HI_FAILURE Failure CNcomment:Ê§ï¿½ï¿½ CNend
 @see \n
-N/A CNcomment:ÎÞ CNend
+N/A CNcomment:ï¿½ï¿½ CNend
 */
 HI_S32 HI_MODULE_Register(HI_U32 u32ModuleID, const HI_CHAR * pszModuleName);
 
 /**
-@brief Register one moudle by name. CNcomment:Ä£¿é×¢²á£¬IDÓÉÏµÍ³·ÖÅä CNend
-@attention Before manager someone module, calling this interface. CNcomment:ÈçÐè¹ÜÀíÄ£¿é£¬ÓÃ´Ë½Ó¿ÚÏÈ×¢²á CNend
-@param[in] pszModuleName The module name CNcomment:Ä£¿éÃû³Æ CNend
-@param[out] pu32ModuleID The module id allocated by system. CNcomment:ÏµÍ³·ÖÅäµÄÄ£¿éID CNend
-@retval ::HI_SUCCESS Success CNcomment:³É¹¦ CNend
-@retval ::HI_FAILURE Failure CNcomment:Ê§°Ü CNend
+@brief Register one moudle by name. CNcomment:Ä£ï¿½ï¿½×¢ï¿½á£¬IDï¿½ï¿½ÏµÍ³ï¿½ï¿½ï¿½ï¿½ CNend
+@attention Before manager someone module, calling this interface. CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä£ï¿½é£¬ï¿½Ã´Ë½Ó¿ï¿½ï¿½ï¿½×¢ï¿½ï¿½ CNend
+@param[in] pszModuleName The module name CNcomment:Ä£ï¿½ï¿½ï¿½ï¿½ï¿½ CNend
+@param[out] pu32ModuleID The module id allocated by system. CNcomment:ÏµÍ³ï¿½ï¿½ï¿½ï¿½ï¿½Ä£ï¿½ï¿½ID CNend
+@retval ::HI_SUCCESS Success CNcomment:ï¿½É¹ï¿½ CNend
+@retval ::HI_FAILURE Failure CNcomment:Ê§ï¿½ï¿½ CNend
 @see \n
-N/A CNcomment:ÎÞ CNend
+N/A CNcomment:ï¿½ï¿½ CNend
 */
 HI_S32 HI_MODULE_RegisterByName(const HI_CHAR * pszModuleName, HI_U32* pu32ModuleID);
 
 /**
-@brief UnRegister one module to trace. CNcomment:Ä£¿éÒÆ³ý CNend
-@attention Before stopping to manage someone module, calling this interface. CNcomment:²»ÐèÒª¹ÜÀí´ËÄ£¿éÊ±£¬Ê¹ÓÃ´Ë½Ó¿ÚÒÆ³ýÄ£¿é CNend
-@param[in] u32ModuleID The module ID. CNcomment:Ä£¿éID CNend
-@param[out] None CNcomment:ÎÞ CNend
-@retval ::HI_SUCCESS Success CNcomment:³É¹¦ CNend
-@retval ::HI_FAILURE Failure CNcomment:Ê§°Ü CNend
+@brief UnRegister one module to trace. CNcomment:Ä£ï¿½ï¿½ï¿½Æ³ï¿½ CNend
+@attention Before stopping to manage someone module, calling this interface. CNcomment:ï¿½ï¿½ï¿½ï¿½Òªï¿½ï¿½ï¿½ï¿½ï¿½Ä£ï¿½ï¿½Ê±ï¿½ï¿½Ê¹ï¿½Ã´Ë½Ó¿ï¿½ï¿½Æ³ï¿½Ä£ï¿½ï¿½ CNend
+@param[in] u32ModuleID The module ID. CNcomment:Ä£ï¿½ï¿½ID CNend
+@param[out] None CNcomment:ï¿½ï¿½ CNend
+@retval ::HI_SUCCESS Success CNcomment:ï¿½É¹ï¿½ CNend
+@retval ::HI_FAILURE Failure CNcomment:Ê§ï¿½ï¿½ CNend
 @see \n
-N/A CNcomment:ÎÞ CNend
+N/A CNcomment:ï¿½ï¿½ CNend
 */
 HI_S32 HI_MODULE_UnRegister(HI_U32 u32ModuleID);
 
 /**
-@brief User mode proc cretea directory. CNcomment:ÓÃ»§Ì¬proc´´½¨Ä¿Â¼ CNend
-@attention You need register module before calling this API. Only support create one level directory. CNcomment:ÐèÒªÏÈ×¢²áÄ£¿é£¬Ö»Ö§³Ö´´½¨Ò»¼¶Ä¿Â¼ CNend
-@param[in] pszName The directory name. CNcomment:Ä¿Â¼Ãû CNend
-@param[out] None CNcomment:ÎÞ CNend
-@retval ::HI_SUCCESS Success CNcomment:³É¹¦ CNend
-@retval ::HI_FAILURE Failure CNcomment:Ê§°Ü CNend
+@brief User mode proc cretea directory. CNcomment:ï¿½Ã»ï¿½Ì¬procï¿½ï¿½ï¿½ï¿½Ä¿Â¼ CNend
+@attention You need register module before calling this API. Only support create one level directory. CNcomment:ï¿½ï¿½Òªï¿½ï¿½×¢ï¿½ï¿½Ä£ï¿½é£¬Ö»Ö§ï¿½Ö´ï¿½ï¿½ï¿½Ò»ï¿½ï¿½Ä¿Â¼ CNend
+@param[in] pszName The directory name. CNcomment:Ä¿Â¼ï¿½ï¿½ CNend
+@param[out] None CNcomment:ï¿½ï¿½ CNend
+@retval ::HI_SUCCESS Success CNcomment:ï¿½É¹ï¿½ CNend
+@retval ::HI_FAILURE Failure CNcomment:Ê§ï¿½ï¿½ CNend
 @see \n
-N/A CNcomment:ÎÞ CNend
+N/A CNcomment:ï¿½ï¿½ CNend
 */
 HI_S32 HI_PROC_AddDir(const HI_CHAR *pszName);
 
 /**
-@brief User mode proc remove directory. CNcomment:ÓÃ»§Ì¬procÉ¾³ýÄ¿Â¼ CNend
-@attention It will return fail if there are entries in the directory. CNcomment:Èç¹ûÄ¿Â¼ÏÂ»¹ÓÐÈë¿ÚÎÄ¼þ,½«»áÉ¾³ýÊ§°Ü CNend
-@param[in] pszName The directory name. CNcomment:Ä¿Â¼Ãû CNend
-@retval ::HI_SUCCESS Success CNcomment:³É¹¦ CNend
-@retval ::HI_FAILURE Failure CNcomment:Ê§°Ü CNend
+@brief User mode proc remove directory. CNcomment:ï¿½Ã»ï¿½Ì¬procÉ¾ï¿½ï¿½Ä¿Â¼ CNend
+@attention It will return fail if there are entries in the directory. CNcomment:ï¿½ï¿½ï¿½Ä¿Â¼ï¿½Â»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½,ï¿½ï¿½ï¿½ï¿½É¾ï¿½ï¿½Ê§ï¿½ï¿½ CNend
+@param[in] pszName The directory name. CNcomment:Ä¿Â¼ï¿½ï¿½ CNend
+@retval ::HI_SUCCESS Success CNcomment:ï¿½É¹ï¿½ CNend
+@retval ::HI_FAILURE Failure CNcomment:Ê§ï¿½ï¿½ CNend
 @see \n
-N/A CNcomment:ÎÞ CNend
+N/A CNcomment:ï¿½ï¿½ CNend
 */
 HI_S32 HI_PROC_RemoveDir(const HI_CHAR *pszName);
 
 /**
-@brief User mode proc add entry. CNcomment:ÓÃ»§Ì¬proc´´½¨Èë¿Ú CNend
+@brief User mode proc add entry. CNcomment:ï¿½Ã»ï¿½Ì¬procï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ CNend
 @attention \n
-N/A CNcomment: ÎÞ CNend
-@param[in] u32ModuleID Module ID. CNcomment:Ä£¿éID CNend
-@param[in] pstEntry Parameter of entry. CNcomment:´´½¨Èë¿Ú²ÎÊý CNend
-@retval ::HI_SUCCESS Success CNcomment:³É¹¦ CNend
-@retval ::HI_FAILURE Failure CNcomment:Ê§°Ü CNend
+N/A CNcomment: ï¿½ï¿½ CNend
+@param[in] u32ModuleID Module ID. CNcomment:Ä£ï¿½ï¿½ID CNend
+@param[in] pstEntry Parameter of entry. CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ú²ï¿½ï¿½ï¿½ CNend
+@retval ::HI_SUCCESS Success CNcomment:ï¿½É¹ï¿½ CNend
+@retval ::HI_FAILURE Failure CNcomment:Ê§ï¿½ï¿½ CNend
 @see \n
-N/A CNcomment:ÎÞ CNend
+N/A CNcomment:ï¿½ï¿½ CNend
 */
 HI_S32 HI_PROC_AddEntry(HI_U32 u32ModuleID, const HI_PROC_ENTRY_S* pstEntry);
 
 /**
-@brief User mode proc remove entry. CNcomment:ÓÃ»§Ì¬procÉ¾³ýÈë¿Ú CNend
+@brief User mode proc remove entry. CNcomment:ï¿½Ã»ï¿½Ì¬procÉ¾ï¿½ï¿½ï¿½ï¿½ï¿½ CNend
 @attention \n
-N/A CNcomment: ÎÞ CNend
-@param[in] u32ModuleID Module ID. CNcomment:Ä£¿éID CNend
-@param[in] pstEntry Parameter of entry. CNcomment:É¾³ýÈë¿Ú²ÎÊý CNend
-@retval ::HI_SUCCESS Success CNcomment:³É¹¦ CNend
-@retval ::HI_FAILURE Failure CNcomment:Ê§°Ü CNend
+N/A CNcomment: ï¿½ï¿½ CNend
+@param[in] u32ModuleID Module ID. CNcomment:Ä£ï¿½ï¿½ID CNend
+@param[in] pstEntry Parameter of entry. CNcomment:É¾ï¿½ï¿½ï¿½ï¿½Ú²ï¿½ï¿½ï¿½ CNend
+@retval ::HI_SUCCESS Success CNcomment:ï¿½É¹ï¿½ CNend
+@retval ::HI_FAILURE Failure CNcomment:Ê§ï¿½ï¿½ CNend
 @see \n
-N/A CNcomment:ÎÞ CNend
+N/A CNcomment:ï¿½ï¿½ CNend
 */
 HI_S32 HI_PROC_RemoveEntry(HI_U32 u32ModuleID, const HI_PROC_ENTRY_S* pstEntry);
 
 /**
-@brief User mode proc print function. CNcomment:ÓÃ»§Ì¬proc´òÓ¡ÄÚÈÝµÄº¯Êý CNend
+@brief User mode proc print function. CNcomment:ï¿½Ã»ï¿½Ì¬procï¿½ï¿½Ó¡ï¿½ï¿½ï¿½ÝµÄºï¿½ï¿½ï¿½ CNend
 @attention \n
-N/A CNcomment: ÎÞ CNend
-@param[in] pstBuf Output buffer parameter. CNcomment:Êä³öbuffer²ÎÊý CNend
-@param[in] pFmt   Format parameter. CNcomment:´òÓ¡¸ñÊ½»¯²ÎÊý CNend
-@retval ::HI_SUCCESS Success CNcomment:³É¹¦ CNend
-@retval ::HI_FAILURE Failure CNcomment:Ê§°Ü CNend
+N/A CNcomment: ï¿½ï¿½ CNend
+@param[in] pstBuf Output buffer parameter. CNcomment:ï¿½ï¿½ï¿½bufferï¿½ï¿½ï¿½ï¿½ CNend
+@param[in] pFmt   Format parameter. CNcomment:ï¿½ï¿½Ó¡ï¿½ï¿½Ê½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ CNend
+@retval ::HI_SUCCESS Success CNcomment:ï¿½É¹ï¿½ CNend
+@retval ::HI_FAILURE Failure CNcomment:Ê§ï¿½ï¿½ CNend
 @see \n
-N/A CNcomment:ÎÞ CNend
+N/A CNcomment:ï¿½ï¿½ CNend
 */
 HI_S32 HI_PROC_Printf(HI_PROC_SHOW_BUFFER_S *pstBuf, const HI_CHAR *pFmt, ...);
 
 /**
-@brief malloc the pointed size from system heap. CNcomment:´ÓÏµÍ³ÖÐ·ÖÅäÖ¸¶¨´óÐ¡µÄÄÚ´æ CNend
-@attention None CNcomment:ÎÞ CNend
-@param[in] u32ModuleID The module ID, who need to request memory. CNcomment:Ä£¿éID CNend
-@param[in] u32Size The size of requesting. CNcomment:ÇëÇó·ÖÅäµÄ´óÐ¡£¬µ¥Î»ÊÇ×Ö½Ú CNend
-@param[out] None CNcomment:ÎÞ CNend
-@retval ::Valid memory address Success CNcomment:³É¹¦·µ»Ø·ÖÅäµ½µÄ¿Õ¼äÊ×µØÖ· CNend
-@retval ::NULL Failure CNcomment:Ê§°Ü·µ»ØNULL CNend
+@brief malloc the pointed size from system heap. CNcomment:ï¿½ï¿½ÏµÍ³ï¿½Ð·ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½ï¿½ï¿½Ð¡ï¿½ï¿½ï¿½Ú´ï¿½ CNend
+@attention None CNcomment:ï¿½ï¿½ CNend
+@param[in] u32ModuleID The module ID, who need to request memory. CNcomment:Ä£ï¿½ï¿½ID CNend
+@param[in] u32Size The size of requesting. CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä´ï¿½Ð¡ï¿½ï¿½ï¿½ï¿½Î»ï¿½ï¿½ï¿½Ö½ï¿½ CNend
+@param[out] None CNcomment:ï¿½ï¿½ CNend
+@retval ::Valid memory address Success CNcomment:ï¿½É¹ï¿½ï¿½ï¿½ï¿½Ø·ï¿½ï¿½äµ½ï¿½Ä¿Õ¼ï¿½ï¿½×µï¿½Ö· CNend
+@retval ::NULL Failure CNcomment:Ê§ï¿½Ü·ï¿½ï¿½ï¿½NULL CNend
 @see \n
-N/A CNcomment:ÎÞ CNend
+N/A CNcomment:ï¿½ï¿½ CNend
 */
 HI_VOID* HI_MEM_Malloc(HI_U32 u32ModuleID, HI_U32 u32Size);
 
 
 /**
-@brief Free the requsted memory by hi_malloc. CNcomment:ÊÍ·Å·ÖÅäµÄÄÚ´æ CNend
-@attention when stopping to use the memory, calling this interface. CNcomment:²»ÔÙÐèÒªÕâ¿éÄÚ´æÊ±£¬Ê¹ÓÃ´Ë½Ó¿Ú½øÐÐÊÍ·Å CNend
-@param[in] u32ModuleID The module ID, who need to free memory. CNcomment:Ä£¿éID CNend
-@param[in] pMemAddr The memory address to free CNcomment:ÊÍ·Å¿Õ¼äµÄÊ×µØÖ· CNend
-@param[out] None CNcomment:ÎÞ CNend
-@retval ::None CNcomment:ÎÞ CNend
+@brief Free the requsted memory by hi_malloc. CNcomment:ï¿½Í·Å·ï¿½ï¿½ï¿½ï¿½ï¿½Ú´ï¿½ CNend
+@attention when stopping to use the memory, calling this interface. CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Òªï¿½ï¿½ï¿½ï¿½Ú´ï¿½Ê±ï¿½ï¿½Ê¹ï¿½Ã´Ë½Ó¿Ú½ï¿½ï¿½ï¿½ï¿½Í·ï¿½ CNend
+@param[in] u32ModuleID The module ID, who need to free memory. CNcomment:Ä£ï¿½ï¿½ID CNend
+@param[in] pMemAddr The memory address to free CNcomment:ï¿½Í·Å¿Õ¼ï¿½ï¿½ï¿½×µï¿½Ö· CNend
+@param[out] None CNcomment:ï¿½ï¿½ CNend
+@retval ::None CNcomment:ï¿½ï¿½ CNend
 @see \n
-N/A CNcomment:ÎÞ CNend
+N/A CNcomment:ï¿½ï¿½ CNend
 */
 HI_VOID HI_MEM_Free(HI_U32 u32ModuleID, HI_VOID* pMemAddr);
 
 /**
-@brief Calloc memory, with u32MemBlock blocks and u32Size size per. CNcomment:·ÖÅäÁ¬Ðø´óÐ¡µÄÄÚ´æ¿é CNend
-@attention None CNcomment:ÎÞ CNend
-@param[in] u32ModuleID The module id, who need to calloc memory. CNcomment:Ä£¿éID CNend
-@param[in] u32MemBlock The requesting block number. CNcomment:·ÖÅäµÄ¿éÊý CNend
-@param[in] u32Size The requesting size per block. CNcomment:Ã¿¿éµÄ´óÐ¡£¬µ¥Î»ÊÇ×Ö½Ú CNend
-@param[out] None CNcomment:ÎÞ CNend
-@retval ::Valid memory address Success CNcomment:³É¹¦Ôò·µ»Ø·ÖÅäµ½µÄÄÚ´æÊ×µØÖ· CNend
-@retval ::NULL Failure CNcomment:Ê§°Ü·µ»ØNULL CNend
+@brief Calloc memory, with u32MemBlock blocks and u32Size size per. CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð¡ï¿½ï¿½ï¿½Ú´ï¿½ï¿½ CNend
+@attention None CNcomment:ï¿½ï¿½ CNend
+@param[in] u32ModuleID The module id, who need to calloc memory. CNcomment:Ä£ï¿½ï¿½ID CNend
+@param[in] u32MemBlock The requesting block number. CNcomment:ï¿½ï¿½ï¿½ï¿½Ä¿ï¿½ï¿½ï¿½ CNend
+@param[in] u32Size The requesting size per block. CNcomment:Ã¿ï¿½ï¿½Ä´ï¿½Ð¡ï¿½ï¿½ï¿½ï¿½Î»ï¿½ï¿½ï¿½Ö½ï¿½ CNend
+@param[out] None CNcomment:ï¿½ï¿½ CNend
+@retval ::Valid memory address Success CNcomment:ï¿½É¹ï¿½ï¿½ò·µ»Ø·ï¿½ï¿½äµ½ï¿½ï¿½ï¿½Ú´ï¿½ï¿½×µï¿½Ö· CNend
+@retval ::NULL Failure CNcomment:Ê§ï¿½Ü·ï¿½ï¿½ï¿½NULL CNend
 @see \n
-N/A CNcomment: ÎÞ CNend
+N/A CNcomment: ï¿½ï¿½ CNend
 */
 HI_VOID* HI_MEM_Calloc(HI_U32 u32ModuleID, HI_U32 u32MemBlock, HI_U32 u32Size);
 
 /**
-@brief Realloc memory CNcomment:ÖØÐÂ·ÖÅä¿Õ¼ä CNend
-@attention None CNcomment:ÎÞ CNend
-@param[in] pMemAddr The memory address, which has been requested from system heap. CNcomment:Òª¸Ä±äµÄÄÚ´æ´óÐ¡µÄµØÖ· CNend
-@param[in] u32Size The newer memory size to request. CNcomment:ÐÂµÄÄÚ´æ¿Õ¼ä´óÐ¡£¬µ¥Î»×Ö½Ú CNend
-@param[out] None CNcomment:ÎÞ CNend
-@retval ::Valid memory address Success CNcomment:³É¹¦Ôò·µ»ØÐÂµÄÄÚ´æ¿Õ¼äÊ×µØÖ· CNend
-@retval ::NULL Failure CNcomment:Ê§°ÜÔò·µ»ØNULL. CNend
+@brief Realloc memory CNcomment:ï¿½ï¿½ï¿½Â·ï¿½ï¿½ï¿½Õ¼ï¿½ CNend
+@attention None CNcomment:ï¿½ï¿½ CNend
+@param[in] pMemAddr The memory address, which has been requested from system heap. CNcomment:Òªï¿½Ä±ï¿½ï¿½ï¿½Ú´ï¿½ï¿½Ð¡ï¿½Äµï¿½Ö· CNend
+@param[in] u32Size The newer memory size to request. CNcomment:ï¿½Âµï¿½ï¿½Ú´ï¿½Õ¼ï¿½ï¿½Ð¡ï¿½ï¿½ï¿½ï¿½Î»ï¿½Ö½ï¿½ CNend
+@param[out] None CNcomment:ï¿½ï¿½ CNend
+@retval ::Valid memory address Success CNcomment:ï¿½É¹ï¿½ï¿½ò·µ»ï¿½ï¿½Âµï¿½ï¿½Ú´ï¿½Õ¼ï¿½ï¿½×µï¿½Ö· CNend
+@retval ::NULL Failure CNcomment:Ê§ï¿½ï¿½ï¿½ò·µ»ï¿½NULL. CNend
 @see \n
-N/A CNcomment:ÎÞ CNend
+N/A CNcomment:ï¿½ï¿½ CNend
 */
 HI_VOID* HI_MEM_Realloc(HI_U32 u32ModuleID, HI_VOID *pMemAddr, HI_U32 u32Size);
 
 
 #ifdef MMZ_V2_SUPPORT
 /**
-@brief pplies for an MMZ with a specified name and obtains its physical address. CNcomment: Ö¸¶¨mmzµÄÃû×ÖÉêÇëmmzÄÚ´æ£¬·µ»ØÎïÀíµØÖ· CNend
+@brief pplies for an MMZ with a specified name and obtains its physical address. CNcomment: Ö¸ï¿½ï¿½mmzï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½mmzï¿½Ú´æ£¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö· CNend
 @attention \n
-N/A CNcomment: ÎÞ CNend
-@param[in] u32Size Buffer size CNcomment: buffer´óÐ¡ CNend
-@param[in] u32Align Alignment mode CNcomment: ¶ÔÆë·½Ê½ CNend
-@param[in] ps8MMZName Name of an MMZ in the buffer. If the MMZ name is set to NULL, an MMZ is anonymously applied for. CNcomment: buffer·ÖÇøµÄÃû×Ö£¬´«ÈëNULLÄäÃûÉêÇë CNend
-@param[in] ps8MMBName Buffer name CNcomment: buffer¿éµÄÃû×Ö CNend
-@retval ::NULL The application fails. CNcomment: ÉêÇëÊ§°Ü CNend
-@retval Physical address CNcomment: ÎïÀíµØÖ· CNend
+N/A CNcomment: ï¿½ï¿½ CNend
+@param[in] u32Size Buffer size CNcomment: bufferï¿½ï¿½Ð¡ CNend
+@param[in] u32Align Alignment mode CNcomment: ï¿½ï¿½ï¿½ë·½Ê½ CNend
+@param[in] ps8MMZName Name of an MMZ in the buffer. If the MMZ name is set to NULL, an MMZ is anonymously applied for. CNcomment: bufferï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö£ï¿½ï¿½ï¿½ï¿½ï¿½NULLï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ CNend
+@param[in] ps8MMBName Buffer name CNcomment: bufferï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ CNend
+@retval ::NULL The application fails. CNcomment: ï¿½ï¿½ï¿½ï¿½Ê§ï¿½ï¿½ CNend
+@retval Physical address CNcomment: ï¿½ï¿½ï¿½ï¿½ï¿½Ö· CNend
 @see \n
-N/A CNcomment: ÎÞ CNend
+N/A CNcomment: ï¿½ï¿½ CNend
 */
 HI_VOID *HI_MMZ_New_Share(HI_U32 u32Size , HI_U32 u32Align, HI_CHAR *ps8MMZName, HI_CHAR *ps8MMBName);
 
 
 /**
-@brief pplies for an MMZ with a specified name and obtains its physical address. CNcomment: Ö¸¶¨mmzµÄÃû×ÖÉêÇëmmzÄÚ´æ£¬·µ»ØÎïÀíµØÖ· CNend
+@brief pplies for an MMZ with a specified name and obtains its physical address. CNcomment: Ö¸ï¿½ï¿½mmzï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½mmzï¿½Ú´æ£¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö· CNend
 @attention \n
-N/A CNcomment: ÎÞ CNend
-@param[in] u32Size Buffer size CNcomment: buffer´óÐ¡ CNend
-@param[in] u32Align Alignment mode CNcomment: ¶ÔÆë·½Ê½ CNend
-@param[in] ps8MMZName Name of an MMZ in the buffer. If the MMZ name is set to NULL, an MMZ is anonymously applied for. CNcomment: buffer·ÖÇøµÄÃû×Ö£¬´«ÈëNULLÄäÃûÉêÇë CNend
-@param[in] ps8MMBName Buffer name CNcomment: buffer¿éµÄÃû×Ö CNend
-@retval ::NULL The application fails. CNcomment: ÉêÇëÊ§°Ü CNend
-@retval Physical address CNcomment: ÎïÀíµØÖ· CNend
+N/A CNcomment: ï¿½ï¿½ CNend
+@param[in] u32Size Buffer size CNcomment: bufferï¿½ï¿½Ð¡ CNend
+@param[in] u32Align Alignment mode CNcomment: ï¿½ï¿½ï¿½ë·½Ê½ CNend
+@param[in] ps8MMZName Name of an MMZ in the buffer. If the MMZ name is set to NULL, an MMZ is anonymously applied for. CNcomment: bufferï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö£ï¿½ï¿½ï¿½ï¿½ï¿½NULLï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ CNend
+@param[in] ps8MMBName Buffer name CNcomment: bufferï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ CNend
+@retval ::NULL The application fails. CNcomment: ï¿½ï¿½ï¿½ï¿½Ê§ï¿½ï¿½ CNend
+@retval Physical address CNcomment: ï¿½ï¿½ï¿½ï¿½ï¿½Ö· CNend
 @see \n
-N/A CNcomment: ÎÞ CNend
+N/A CNcomment: ï¿½ï¿½ CNend
 */
 HI_VOID *HI_MMZ_New_Shm_Com(HI_U32 u32Size , HI_U32 u32Align, HI_CHAR *ps8MMZName, HI_CHAR *ps8MMBName);
 
 
 /**
-@brief Get physical address and size of chm or com type MMZ. CNcomment: »ñÈ¡shm»òcomÐÍMMZÎïÀíµØÖ·ºÍ´óÐ¡ CNend
+@brief Get physical address and size of chm or com type MMZ. CNcomment: ï¿½ï¿½È¡shmï¿½ï¿½comï¿½ï¿½MMZï¿½ï¿½ï¿½ï¿½ï¿½Ö·ï¿½Í´ï¿½Ð¡ CNend
 @attention \n
-N/A CNcomment: ÎÞ CNend
-@param[out] pu32PhysAddr Physical address of the buffer CNcomment: bufferÎïÀíµØÖ· CNend
-@param[out] pu32Size     Size of the buffer             CNcomment: buffer´óÐ¡ CNend
-@retval ::HI_SUCCESS Success CNcomment: ³É¹¦ CNend
-@retval ::HI_FAILURE Calling this API fails. CNcomment: APIÏµÍ³µ÷ÓÃÊ§°Ü CNend
+N/A CNcomment: ï¿½ï¿½ CNend
+@param[out] pu32PhysAddr Physical address of the buffer CNcomment: bufferï¿½ï¿½ï¿½ï¿½ï¿½Ö· CNend
+@param[out] pu32Size     Size of the buffer             CNcomment: bufferï¿½ï¿½Ð¡ CNend
+@retval ::HI_SUCCESS Success CNcomment: ï¿½É¹ï¿½ CNend
+@retval ::HI_FAILURE Calling this API fails. CNcomment: APIÏµÍ³ï¿½ï¿½ï¿½ï¿½Ê§ï¿½ï¿½ CNend
 @see \n
-N/A CNcomment: ÎÞ CNend
+N/A CNcomment: ï¿½ï¿½ CNend
 */
 HI_S32 HI_MMZ_Get_Shm_Com(HI_U32 *pu32PhysAddr, HI_U32 *pu32Size);
 
 
 /**
-@brief Force releases an MMZ based on its physical address. CNcomment: Í¨¹ýÎïÀíµØÖ·Ç¿ÐÐÊÍ·ÅmmzÄÚ´æ CNend
+@brief Force releases an MMZ based on its physical address. CNcomment: Í¨ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö·Ç¿ï¿½ï¿½ï¿½Í·ï¿½mmzï¿½Ú´ï¿½ CNend
 @attention \n
-N/A CNcomment: ÎÞ CNend
-@param[in] u32PhysAddr Physical address of a buffer CNcomment: bufferÎïÀíµØÖ· CNend
-@retval ::HI_SUCCESS Success CNcomment: ³É¹¦ CNend
-@retval ::HI_FAILURE Calling this API fails. CNcomment: APIÏµÍ³µ÷ÓÃÊ§°Ü CNend
+N/A CNcomment: ï¿½ï¿½ CNend
+@param[in] u32PhysAddr Physical address of a buffer CNcomment: bufferï¿½ï¿½ï¿½ï¿½ï¿½Ö· CNend
+@retval ::HI_SUCCESS Success CNcomment: ï¿½É¹ï¿½ CNend
+@retval ::HI_FAILURE Calling this API fails. CNcomment: APIÏµÍ³ï¿½ï¿½ï¿½ï¿½Ê§ï¿½ï¿½ CNend
 @see \n
-N/A CNcomment: ÎÞ CNend
+N/A CNcomment: ï¿½ï¿½ CNend
 */
 HI_S32 HI_MMZ_Force_Delete(HI_U32 u32PhysAddr);
 
 
 /**
-@brief Flushes MMZ. CNcomment: Flush MMZÊý¾Ý CNend
+@brief Flushes MMZ. CNcomment: Flush MMZï¿½ï¿½ï¿½ CNend
 @attention \n
-@param[in] u32PhysAddr Physical address of a buffer CNcomment: bufferÎïÀíµØÖ· CNend
-@param[in] u32VirtAddr Virtual address of a buffer  CNcomment: bufferÐéÄâµØÖ· CNend
-@param[in] u32Size     Size of a buffer             CNcomment: buffer¿Õ¼ä´óÐ¡ CNend
-@retval ::HI_SUCCESS Success CNcomment: ³É¹¦ CNend
-@retval ::HI_FAILURE Fail. CNcomment: Ê§°Ü CNend
+@param[in] u32PhysAddr Physical address of a buffer CNcomment: bufferï¿½ï¿½ï¿½ï¿½ï¿½Ö· CNend
+@param[in] u32VirtAddr Virtual address of a buffer  CNcomment: bufferï¿½ï¿½ï¿½ï¿½ï¿½Ö· CNend
+@param[in] u32Size     Size of a buffer             CNcomment: bufferï¿½Õ¼ï¿½ï¿½Ð¡ CNend
+@retval ::HI_SUCCESS Success CNcomment: ï¿½É¹ï¿½ CNend
+@retval ::HI_FAILURE Fail. CNcomment: Ê§ï¿½ï¿½ CNend
 @see \n
-N/A CNcomment: ÎÞ CNend
+N/A CNcomment: ï¿½ï¿½ CNend
 */
 HI_S32 HI_MMZ_Flush_Dirty(HI_U32 u32PhysAddr, HI_U32 u32VirtAddr, HI_U32 u32Size);
 
 
 /**
-@brief Open MMZ. CNcomment: ´ò¿ªMMZ CNend
+@brief Open MMZ. CNcomment: ï¿½ï¿½MMZ CNend
 @attention \n
-@param  None CNcomment: ÎÞ CNend
-@retval ::HI_SUCCESS Success CNcomment: ³É¹¦ CNend
-@retval ::HI_FAILURE Fail. CNcomment: Ê§°Ü CNend
+@param  None CNcomment: ï¿½ï¿½ CNend
+@retval ::HI_SUCCESS Success CNcomment: ï¿½É¹ï¿½ CNend
+@retval ::HI_FAILURE Fail. CNcomment: Ê§ï¿½ï¿½ CNend
 @see \n
-N/A CNcomment: ÎÞ CNend
+N/A CNcomment: ï¿½ï¿½ CNend
 */
 HI_S32 HI_MMZ_open(HI_VOID);
 
 
 /**
-@brief Close MMZ. CNcomment: ¹Ø±ÕMMZ CNend
+@brief Close MMZ. CNcomment: ï¿½Ø±ï¿½MMZ CNend
 @attention \n
-@param  None CNcomment: ÎÞ CNend
-@retval ::HI_SUCCESS Success CNcomment: ³É¹¦ CNend
-@retval ::HI_FAILURE Fail. CNcomment: Ê§°Ü CNend
+@param  None CNcomment: ï¿½ï¿½ CNend
+@retval ::HI_SUCCESS Success CNcomment: ï¿½É¹ï¿½ CNend
+@retval ::HI_FAILURE Fail. CNcomment: Ê§ï¿½ï¿½ CNend
 @see \n
-N/A CNcomment: ÎÞ CNend
+N/A CNcomment: ï¿½ï¿½ CNend
 */
 HI_S32 HI_MMZ_close(HI_VOID);
 #endif /* endif MMZ_V2_SUPPORT */

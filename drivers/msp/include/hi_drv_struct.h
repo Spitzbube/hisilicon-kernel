@@ -43,7 +43,7 @@ extern "C"{
 #define HI_MOD_LOG                  "log"
 #define UMAP_DEVNAME_LOG            UMAP_NAME HI_MOD_LOG
 #define UMAP_DEV_NUM_LOG            1
-#define UMAP_MIN_MINOR_LOG          (UMAP_MAX_MINOR_SYS + 1)
+#define UMAP_MIN_MINOR_LOG          (UMAP_MAX_MINOR_SYS + 1) //2 ok
 #define UMAP_MAX_MINOR_LOG          (UMAP_MIN_MINOR_LOG + UMAP_DEV_NUM_LOG -1)
 
 
@@ -56,7 +56,7 @@ extern "C"{
 #define HI_MOD_STAT                 "stat"
 #define UMAP_DEVNAME_STAT           UMAP_NAME HI_MOD_STAT
 #define UMAP_DEV_NUM_STAT           1
-#define UMAP_MIN_MINOR_STAT         (UMAP_MAX_MINOR_EVENT + 1)
+#define UMAP_MIN_MINOR_STAT         (UMAP_MAX_MINOR_EVENT + 1) //4 ok
 #define UMAP_MAX_MINOR_STAT         (UMAP_MIN_MINOR_STAT + UMAP_DEV_NUM_STAT -1)
 
 

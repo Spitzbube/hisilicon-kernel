@@ -7,9 +7,12 @@ ccflags-y += -Idrivers/msp/frontend/demod/AVL_DVBSx_SDK/AVL_DVBSx/include
 ccflags-y += -Idrivers/msp/frontend/demod/AVL_DVBSx_SDK/BSP
 ccflags-y += -Idrivers/msp/mce/include
 ccflags-y += -DCHIP_TYPE_hi3798cv100
+#ccflags-y += -DSDK_VERSION="HiSTBLinuxV100R002C00SPC011"
+ccflags-y += -DSDK_VERSION="HiSTBAndroidV600R001C00SPC020_v2014072118"
 ccflags-y += -DLOG_UDISK_SUPPORT
 ccflags-y += -DHI_PROC_SUPPORT
 ccflags-y += -DHI_GPIOI2C_SUPPORT
+#ccflags-y += -DHI_STAT_ISR_SUPPORTED
 
 #ccflags-y += -DCFG_HI_DEMUX_POOLBUF_SIZE=0x200000
 #ccflags-y += -DHI_DEMUX_PROC_SUPPORT
@@ -36,6 +39,7 @@ obj-y += drv_base_ext.o
 obj-y += drv_base_ext_k.o
 obj-y += drv_dev_ext_k.o
 obj-y += drv_file_ext.o
+obj-y += drv_log_ext.o
 obj-y += drv_log_ext_k.o
              #obj-y += drv_media_mem.o
 obj-y += drv_module_ext.o
@@ -49,7 +53,9 @@ obj-y += drv_proc_ext.o
 obj-y += drv_proc_ext_k.o
 obj-y += drv_reg_common.o
 obj-y += drv_stat_ext_k.o
+obj-y += drv_stat_ext.o
 obj-y += drv_sys_ext_k.o
+obj-y += drv_sys_ext.o
 
 obj-y += base/hi_init.o
 

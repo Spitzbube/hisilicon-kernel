@@ -840,6 +840,37 @@ typedef union
 
 } U_PERI_CHIP_INFO4;
 
+/* Define the union U_PERI_SOC_FUSE */
+typedef union
+{
+    /* Define the struct bits */
+    struct
+    {
+        unsigned int    otp_control_cpu       : 1   ; /* [0]  */
+        unsigned int    reserved_3            : 2   ; /* [2..1]  */
+        unsigned int    otp_control_gpu       : 2   ; /* [4..3]  */
+        unsigned int    otp_ddr_st            : 2   ; /* [6..5]  */
+        unsigned int    otp_vd_st             : 1   ; /* [7]  */
+        unsigned int    reserved_2            : 1   ; /* [8]  */
+        unsigned int    otp_pvr_tsi2_cken     : 1   ; /* [9]  */
+        unsigned int    otp_spdif_ctrl        : 1   ; /* [10]  */
+        unsigned int    reserved_1            : 1   ; /* [11]  */
+        unsigned int    otp_ctrl_vdac         : 4   ; /* [15..12]  */
+        unsigned int    chip_id               : 5   ; /* [20..16]  */
+        unsigned int    reserved_0            : 3   ; /* [23..21]  */
+        unsigned int    mven                  : 1   ; /* [24]  */
+        unsigned int    vedu_chip_id          : 2   ; /* [26..25]  */
+        unsigned int    vdac_bgtrim_sel       : 1   ; /* [27]  */
+        unsigned int    vdac_bgtrim           : 2   ; /* [29..28]  */
+        unsigned int    caboot_en             : 1   ; /* [30]  */
+        unsigned int    gpu_pwractive         : 1   ; /* [31]  */
+    } bits;
+
+    /* Define an unsigned member */
+    unsigned int    u32;
+
+} U_PERI_SOC_FUSE;
+
 typedef union
 {
     /* Define the struct bits */
@@ -935,7 +966,9 @@ typedef struct
     volatile unsigned int           PERI_DSP0_5              ; /* 0x414 */
     volatile unsigned int           PERI_DSP0_6              ; /* 0x418 */
     volatile unsigned int           PERI_DSP0_7              ; /* 0x41c */
-    volatile unsigned int           fill_0x420[273]          ; /* 0x420 */
+    volatile unsigned int           fill_0x420[264]          ; /* 0x420 */
+    volatile U_PERI_SOC_FUSE        PERI_SOC_FUSE            ; /* 0x840 */
+    volatile unsigned int           fill_0x844[8]            ; /* 0x844 */
     volatile U_PERI_0x864           PERI_0x864               ; /* 0x864 */
 } S_PERICTRL_REGS_TYPE;
 

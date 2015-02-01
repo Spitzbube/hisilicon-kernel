@@ -37,6 +37,7 @@ extern HI_VOID HI_DRV_SYS_GetChipVersion(HI_CHIP_TYPE_E *penChipType, HI_CHIP_VE
 extern HI_S32  HI_DRV_SYS_GetTimeStampMs(HI_U32 *pu32TimeMs);
 extern HI_S32 HI_DRV_SYS_GetDolbySupport(HI_U32 *pu32Support);
 extern HI_S32 HI_DRV_SYS_GetDtsSupport(HI_U32 *pu32Support);
+extern HI_S32 HI_DRV_SYS_GetAdvcaSupport(HI_U32 *pu32Support);
 extern HI_S32 HI_DRV_SYS_GetRoviSupport(HI_U32 *pu32Support);
 
 #endif /* __HI_DRV_SYS_H__ */

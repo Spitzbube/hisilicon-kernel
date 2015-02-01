@@ -27,8 +27,7 @@
     || defined(CHIP_TYPE_hi3718mv100)   \
     || defined(CHIP_TYPE_hi3719cv100)   \
     || defined(CHIP_TYPE_hi3719mv100)   \
-    || defined(CHIP_TYPE_hi3719mv100_a) \
-    || defined(CHIP_TYPE_hi3798cv100)
+    || defined(CHIP_TYPE_hi3719mv100_a)
 
 #define GET_CHIP_INFO(type, version) do{                  \
     if (0x37160200 == g_pstRegSysCtrl->SC_SYSID)          \
@@ -79,11 +78,7 @@
  */
 HI_S32 HI_DRV_SYS_GetRoviSupport(HI_U32 *pu32Support)
 {
-#if 1
-#warning TODO
-#else
     *pu32Support = g_pstRegPeri->PERI_SOC_FUSE.bits.mven;
-#endif
 
     return HI_SUCCESS;
 }
@@ -111,7 +106,34 @@ HI_S32 HI_DRV_SYS_GetRoviSupport(HI_U32 *pu32Support)
 
     return HI_SUCCESS;
 }
+
+#elif defined(CHIP_TYPE_hi3798cv100)
     
+#define GET_CHIP_INFO(type, version) do{            \
+    if (0x19050100 == g_pstRegSysCtrl->SC_SYSID)    \
+    {                                               \
+        switch (g_pstRegPeri->PERI_SOC_FUSE.bits.chip_id) \
+        {                                                 \
+            case 0x18:                                     \
+				type = (g_pstRegSysCtrl->SC_GPIO_OD_CTRL.bits.gpio5_0_od_sel)? HI_CHIP_TYPE_HI3796C: HI_CHIP_TYPE_HI3796C_A; \
+                version = HI_CHIP_VERSION_V100;           \
+                break;                                    \
+            case 0x1c:                                    \
+				type = (g_pstRegSysCtrl->SC_GPIO_OD_CTRL.bits.gpio5_0_od_sel)? HI_CHIP_TYPE_HI3798C: HI_CHIP_TYPE_HI3798C_A; \
+                version = HI_CHIP_VERSION_V100;           \
+                break;                                    \
+            default:                                      \
+                type    = HI_CHIP_TYPE_HI3796C;           \
+                version = HI_CHIP_VERSION_V100;           \
+                break;                                    \
+        }                                                 \
+    }                                               \
+    else                                            \
+    {                                               \
+        HI_ERR_SYS("Unknown chip ID.\n");           \
+    }                                               \
+} while(0)
+
 #else
 
 #error "Unkown chip type!"
@@ -120,24 +142,33 @@ HI_S32 HI_DRV_SYS_GetRoviSupport(HI_U32 *pu32Support)
 
 HI_VOID HI_DRV_SYS_GetChipVersion(HI_CHIP_TYPE_E *penChipType, HI_CHIP_VERSION_E *penChipVersion)
 {
-#if 1
-#warning TODO
-#else
     HI_CHIP_TYPE_E enChipType = HI_CHIP_TYPE_BUTT;
     HI_CHIP_VERSION_E enChipVersion = HI_CHIP_VERSION_BUTT;
 
     /* penChipType or penChipVersion maybe NULL, but not both */
     if (HI_NULL == penChipType && HI_NULL == penChipVersion)
     {
-        HI_ERR_SYS("invalid input parameter.\n");
+        HI_ERR_SYS("invalid input parameter.\n"); //138
         return;
     }
     
     penChipType    = penChipType ? penChipType : &enChipType;
     penChipVersion = penChipVersion ? penChipVersion : &enChipVersion;
 
-    GET_CHIP_INFO(*penChipType, *penChipVersion);
-#endif
+    GET_CHIP_INFO(*penChipType, *penChipVersion); //145
+}
+
+HI_S32 HI_DRV_SYS_GetChipPackageType(HI_U32* p)
+{
+	if (HI_NULL == p)
+	{
+		HI_ERR_SYS("invalid input parameter\n"); //152
+		return HI_FAILURE;
+	}
+
+	*p = 0;
+
+	return HI_FAILURE;
 }
 
 HI_S32 HI_DRV_SYS_GetTimeStampMs(HI_U32 *pu32TimeMs)
@@ -165,11 +196,7 @@ HI_S32 HI_DRV_SYS_GetTimeStampMs(HI_U32 *pu32TimeMs)
  */
 HI_S32 HI_DRV_SYS_GetDolbySupport(HI_U32 *pu32Support)
 {
-#if 1
-#warning TODO
-#else
     *pu32Support = !(g_pstRegPeri->PERI_CHIP_INFO4.bits.dolby_flag);
-#endif
 
     return HI_SUCCESS;
 }
@@ -179,16 +206,34 @@ HI_S32 HI_DRV_SYS_GetDolbySupport(HI_U32 *pu32Support)
  */
 HI_S32 HI_DRV_SYS_GetDtsSupport(HI_U32 *pu32Support)
 {
-#if 1
-#warning TODO
-#else
     *pu32Support = g_pstRegPeri->PERI_CHIP_INFO4.bits.dts_flag;
-#endif
 
     return HI_SUCCESS;
 }
 
+#if defined(CHIP_TYPE_hi3798cv100)
 
+/*
+ * 1:support; 0:not_support
+ */
+HI_S32 HI_DRV_SYS_GetRoviSupport(HI_U32 *pu32Support)
+{
+    *pu32Support = g_pstRegPeri->PERI_SOC_FUSE.bits.mven;
+
+    return HI_SUCCESS;
+}
+
+/*
+ * 1:support; 0:not_support
+ */
+HI_S32 HI_DRV_SYS_GetAdvcaSupport(HI_U32 *pu32Support)
+{
+	*pu32Support = 0;
+
+	return HI_SUCCESS;
+}
+
+#endif
 
 HI_S32 HI_DRV_SYS_KInit(HI_VOID)
 {
