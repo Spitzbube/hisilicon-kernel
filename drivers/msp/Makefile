@@ -43,6 +43,7 @@ obj-y += drv_log_ext.o
 obj-y += drv_log_ext_k.o
              #obj-y += drv_media_mem.o
 obj-y += drv_module_ext.o
+obj-y += drv_memdev.o
 obj-y += drv_mmz_intf.o
 obj-y += drv_mmz_ext_k.o
 obj-y += drv_mmz_intf.o
@@ -56,6 +57,7 @@ obj-y += drv_stat_ext_k.o
 obj-y += drv_stat_ext.o
 obj-y += drv_sys_ext_k.o
 obj-y += drv_sys_ext.o
+obj-y += drv_userproc.o
 
 obj-y += base/hi_init.o
 

@@ -113,23 +113,23 @@ static int __INIT__ COMMON_DRV_ModInit(void)
         goto ErrorExit_Module;
     }
 
-#if 1
-#warning TODO
-#else
     ret = MEMDEV_DRV_ModInit();
     if (HI_SUCCESS != ret)
     {
-        HI_ERR_SYS("memdev init failed:%#x!\n", ret);
+        HI_ERR_SYS("memdev init failed:%#x!\n", ret); //115
         goto ErrorExit_MEMDEV;
     }
 
     ret = USRPROC_DRV_ModInit();
     if (HI_SUCCESS != ret)
     {
-        HI_ERR_SYS("userproc init failed:%#x!\n", ret);
+        HI_ERR_SYS("userproc init failed:%#x!\n", ret); //122
         goto ErrorExit_USRPROC;
     }
     
+#if 1
+#warning TODO
+#else
 #ifdef CMN_TEST_SUPPORTED
     HI_DRV_TEST_Init();
 #endif
@@ -143,15 +143,11 @@ static int __INIT__ COMMON_DRV_ModInit(void)
 
     return HI_SUCCESS;
 
-#if 1
-#warning TODO
-#else
 ErrorExit_USRPROC:
     MEMDEV_DRV_ModExit();
 
 ErrorExit_MEMDEV:
     MMNGR_DRV_ModExit();
-#endif
 
 ErrorExit_Module:
     HI_DRV_STAT_Exit();
