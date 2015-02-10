@@ -49,8 +49,6 @@ static int __INIT__ COMMON_DRV_ModInit(void)
 {
     HI_S32 ret;
 
-    printk("--> COMMON_DRV_ModInit");
-
 #ifndef MODULE
     ret = DRV_PM_ModInit();
     if(HI_SUCCESS != ret)
@@ -127,9 +125,6 @@ static int __INIT__ COMMON_DRV_ModInit(void)
         goto ErrorExit_USRPROC;
     }
     
-#if 1
-#warning TODO
-#else
 #ifdef CMN_TEST_SUPPORTED
     HI_DRV_TEST_Init();
 #endif
@@ -137,9 +132,6 @@ static int __INIT__ COMMON_DRV_ModInit(void)
 #if defined(MODULE)
     HI_PRINT("Load hi_common.ko success.\t(%s)\n", VERSION_STRING);
 #endif
-#endif
-
-    printk("<-- COMMON_DRV_ModInit");
 
     return HI_SUCCESS;
 
