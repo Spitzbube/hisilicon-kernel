@@ -1,4 +1,5 @@
 
+ccflags-y += -Ifs
 ccflags-y += -Idrivers/msp/include
 ccflags-y += -Idrivers/msp/adsp/adsp_v1_1/include
 ccflags-y += -Idrivers/msp/demux
