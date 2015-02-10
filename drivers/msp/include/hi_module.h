@@ -30,7 +30,7 @@ typedef enum hiMOD_ID_E
     HI_ID_PROC        ,
     HI_ID_MEM         ,
     HI_ID_STAT        ,
-    HI_ID_PDM         ,
+    HI_ID_PDM         , //7
     HI_ID_MEMDEV      , //8
 
     HI_ID_DEMUX       = 0x0A,

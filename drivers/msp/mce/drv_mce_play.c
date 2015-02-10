@@ -1557,10 +1557,9 @@ extern HI_S32 VFMW_DRV_Init(HI_VOID);
 
 HI_S32 MCE_ModuleInit(HI_VOID)
 {
-#if 1
     HI_S32      Ret;
 
-    printk("--> MCE_ModuleInit");
+    printk("--> MCE_ModuleInit\n");
 
 #if 0
 	Ret = HI_DRV_MMZ_Init();
@@ -1708,19 +1707,18 @@ HI_S32 MCE_ModuleInit(HI_VOID)
         HI_ERR_MCE("ERR: HI_DRV_ADSP_Init!\n");
         return Ret;
 	}
+#endif
 
     Ret = hifb_init_module_k();
     if(HI_SUCCESS != Ret)
     {
-        HI_ERR_MCE("ERR: hifb_init_module_k!\n");
+        HI_ERR_MCE("ERR: hifb_init_module_k!\n"); //1724
         return Ret;
     }     
 
     return Ret;
-#endif
-#endif
 
-    printk("--> MCE_ModuleInit");
+    printk("<-- MCE_ModuleInit\n");
 
     return HI_SUCCESS;
 }

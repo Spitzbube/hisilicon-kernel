@@ -36,8 +36,6 @@ HI_S32 HI_DRV_CommonInit(HI_VOID)
 {
     HI_S32 ret;
 
-    printk("--> HI_DRV_CommonInit\n");
-
     ret = HI_DRV_MMZ_Init();
     if(HI_SUCCESS != ret)
     {
@@ -87,8 +85,6 @@ HI_S32 HI_DRV_CommonInit(HI_VOID)
         HI_ERR_SYS("KModuleMgr_Init failed:%#x!\n", ret); //85
         goto ErrExit_SYS;
     }
-
-    printk("<-- HI_DRV_CommonInit\n");
 
     return HI_SUCCESS;
 
