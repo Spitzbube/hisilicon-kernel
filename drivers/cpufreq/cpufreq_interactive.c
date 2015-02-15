@@ -65,10 +65,10 @@ typedef struct cpufreq_interactive_tunables
 	spinlock_t Data_12/*target_loads_lock*/; //12
 	int* Data_16/*target_loads*/; //16
 	int Data_20/*ntarget_loads*/; //20
-	int Data_24; //24
+	unsigned long Data_24/*min_sample_time*/; //24
 	int Data_28/*timer_rate*/; //28
-	spinlock_t Data_32; //32
-	int* Data_36; //36
+	spinlock_t Data_32/*above_hispeed_delay_lock*/; //32
+	unsigned int* Data_36/*above_hispeed_delay*/; //36
 	int Data_40/*nabove_hispeed_delay*/; //40
 	int Data_44/*boost_val*/; //44
 	int Data_48/*boostpulse_duration_val*/; //48
@@ -199,21 +199,27 @@ static inline cputime64_t get_cpu_idle_time(unsigned int cpu,
 static void cpufreq_interactive_timer_resched(
 	struct cpufreq_interactive_cpuinfo *pcpu)
 {
-	unsigned long expires = jiffies + usecs_to_jiffies(timer_rate);
+	struct cpufreq_interactive_tunables *tunables =
+		pcpu->policy->governor_data;
+	unsigned long expires;
 	unsigned long flags;
-
-	mod_timer_pinned(&pcpu->cpu_timer, expires);
-	if (timer_slack_val >= 0 && pcpu->target_freq > pcpu->policy->min) {
-		expires += usecs_to_jiffies(timer_slack_val);
-		mod_timer_pinned(&pcpu->cpu_slack_timer, expires);
-	}
 
 	spin_lock_irqsave(&pcpu->load_lock, flags);
 	pcpu->time_in_idle =
 		get_cpu_idle_time(smp_processor_id(),
-				     &pcpu->time_in_idle_timestamp, /*TODO*/0);
+				  &pcpu->time_in_idle_timestamp,
+				  tunables->io_is_busy);
 	pcpu->cputime_speedadj = 0;
 	pcpu->cputime_speedadj_timestamp = pcpu->time_in_idle_timestamp;
+	expires = jiffies + usecs_to_jiffies(tunables->Data_28/*timer_rate*/);
+	mod_timer_pinned(&pcpu->cpu_timer, expires);
+
+	if (tunables->Data_64/*timer_slack_val*/ >= 0 &&
+	    pcpu->target_freq > pcpu->policy->min) {
+		expires += usecs_to_jiffies(tunables->Data_64/*timer_slack_val*/);
+		mod_timer_pinned(&pcpu->cpu_slack_timer, expires);
+	}
+
 	spin_unlock_irqrestore(&pcpu->load_lock, flags);
 }
 
@@ -401,7 +407,6 @@ static u64 update_load(int cpu)
 
 static void cpufreq_interactive_timer(unsigned long data)
 {
-#if 1 //STC2HI: TODO
 	u64 now;
 	unsigned int delta_time;
 	u64 cputime_speedadj;
@@ -435,7 +440,6 @@ static void cpufreq_interactive_timer(unsigned long data)
 	cpu_load = loadadjfreq / pcpu->target_freq;
 	boosted = tunables->Data_44/*boost_val*/ || now < tunables->boostpulse_endtime;
 
-#if 1 //STC2HI: TODO
 	if (cpu_load >= tunables->Data_8/*go_hispeed_load*/ || boosted) {
 		if (pcpu->target_freq < tunables->hispeed_freq) {
 			new_freq = tunables->hispeed_freq;
@@ -448,7 +452,6 @@ static void cpufreq_interactive_timer(unsigned long data)
 	} else {
 		new_freq = choose_freq(pcpu, loadadjfreq);
 	}
-#endif
 
 	if (pcpu->target_freq >= tunables->hispeed_freq &&
 	    new_freq > pcpu->target_freq &&
@@ -465,8 +468,10 @@ static void cpufreq_interactive_timer(unsigned long data)
 	if (cpufreq_frequency_table_target(pcpu->policy, pcpu->freq_table,
 					   new_freq, CPUFREQ_RELATION_L,
 					   &index)) {
+#if 0
 		pr_warn_once("timer %d: cpufreq_frequency_table_target error\n",
 			     (int) data);
+#endif
 		goto rearm;
 	}
 
@@ -477,7 +482,8 @@ static void cpufreq_interactive_timer(unsigned long data)
 	 * floor frequency for the minimum sample time since last validated.
 	 */
 	if (new_freq < pcpu->floor_freq) {
-		if (now - pcpu->floor_validate_time < min_sample_time) {
+		if (now - pcpu->floor_validate_time <
+				tunables->Data_24/*min_sample_time*/) {
 			trace_cpufreq_interactive_notyet(
 				data, cpu_load, pcpu->target_freq,
 				pcpu->policy->cur, new_freq);
@@ -528,7 +534,6 @@ rearm:
 
 exit:
 	up_read(&pcpu->enable_sem);
-#endif
 	return;
 }
 
@@ -1228,41 +1233,21 @@ static struct attribute *interactive_attributes[] = {
 	NULL,
 };
 
+#if 0
 static struct attribute_group interactive_attr_group = {
 	.attrs = interactive_attributes,
 	.name = "interactive",
 };
-
-static int cpufreq_interactive_idle_notifier(struct notifier_block *nb,
-					     unsigned long val,
-					     void *data)
-{
-#if 1 //STC2HI: TODO
-	switch (val) {
-	case IDLE_START:
-		cpufreq_interactive_idle_start();
-		break;
-	case IDLE_END:
-		cpufreq_interactive_idle_end();
-		break;
-	}
 #endif
-
-	return 0;
-}
 
 static struct attribute_group interactive_attr_group_gov_sys = {
 	.attrs = interactive_attributes, //dbs_attributes_gov_sys,
-	.name = "conservative",
+	.name = "interactive",
 };
 
 static struct attribute_group interactive_attr_group_gov_pol = {
 	.attrs = interactive_attributes, //dbs_attributes_gov_pol,
-	.name = "conservative",
-};
-
-static struct notifier_block cpufreq_interactive_idle_nb = { //80f9c860
-	.notifier_call = cpufreq_interactive_idle_notifier,
+	.name = "interactive",
 };
 
 static struct attribute_group *get_sysfs_attr(void)
@@ -1272,6 +1257,26 @@ static struct attribute_group *get_sysfs_attr(void)
 	else
 		return &interactive_attr_group_gov_sys;
 }
+
+static int cpufreq_interactive_idle_notifier(struct notifier_block *nb,
+					     unsigned long val,
+					     void *data)
+{
+	switch (val) {
+	case IDLE_START:
+		cpufreq_interactive_idle_start();
+		break;
+	case IDLE_END:
+		cpufreq_interactive_idle_end();
+		break;
+	}
+
+	return 0;
+}
+
+static struct notifier_block cpufreq_interactive_idle_nb = { //80f9c860
+	.notifier_call = cpufreq_interactive_idle_notifier,
+};
 
 static int cpufreq_governor_interactive(struct cpufreq_policy *policy,
 		unsigned int event)
