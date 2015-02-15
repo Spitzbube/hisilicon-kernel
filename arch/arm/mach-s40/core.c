@@ -182,6 +182,29 @@ error:
 #undef EQUAL_MARK
 }
 
+int pdm_free_reserve_mem(u32 PhyAddr, u32 Len)
+{
+	u32      pfn_start;
+	u32      pfn_end;
+	u32      pages = 0;
+
+	pfn_start = __phys_to_pfn(PhyAddr);
+	pfn_end = __phys_to_pfn(PhyAddr + Len);
+
+	for (; pfn_start < pfn_end; pfn_start++)
+	{
+		struct page *page = pfn_to_page(pfn_start);
+		ClearPageReserved(page);
+		init_page_count(page);
+		__free_page(page);
+		pages++;
+	}
+
+	totalram_pages += pages;
+
+	return 0;
+}
+
 void __init s40_map_io(void)
 {
 	int i;
