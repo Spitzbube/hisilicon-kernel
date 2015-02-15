@@ -7,6 +7,7 @@ ccflags-y += -Idrivers/msp/frontend/include
 ccflags-y += -Idrivers/msp/frontend/demod/AVL_DVBSx_SDK/AVL_DVBSx/include
 ccflags-y += -Idrivers/msp/frontend/demod/AVL_DVBSx_SDK/BSP
 ccflags-y += -Idrivers/msp/mce/include
+ccflags-y += -Idrivers/msp/pdm/db
 ccflags-y += -DCHIP_TYPE_hi3798cv100
 #ccflags-y += -DSDK_VERSION="HiSTBLinuxV100R002C00SPC011"
 ccflags-y += -DSDK_VERSION="HiSTBAndroidV600R001C00SPC020_v2014072118"
@@ -115,3 +116,9 @@ obj-y += hifb/hifb_main_k.o
 
 obj-y += mce/drv_mce_intf.o
 obj-y += mce/drv_mce_play.o
+
+obj-y += pdm/drv_pdm_intf.o
+obj-y += pdm/drv_pdm.o
+obj-y += pdm/db/hi_db.o
+
+

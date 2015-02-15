@@ -334,7 +334,7 @@ extern "C"{
 #define HI_MOD_PDM                   "pdm"
 #define UMAP_DEVNAME_PDM             UMAP_NAME HI_MOD_PDM
 #define UMAP_DEV_NUM_PDM             1
-#define UMAP_MIN_MINOR_PDM          (UMAP_MAX_MINOR_MCE+ 1)
+#define UMAP_MIN_MINOR_PDM          (UMAP_MAX_MINOR_MCE+ 1) //59 ok
 #define UMAP_MAX_MINOR_PDM          (UMAP_MIN_MINOR_PDM + UMAP_DEV_NUM_PDM - 1)
 
 #define UMAP_DEV_NUM_TDE		1

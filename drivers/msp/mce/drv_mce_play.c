@@ -1623,14 +1623,18 @@ HI_S32 MCE_ModuleInit(HI_VOID)
         HI_ERR_MCE("ERR: VFMW_DRV_Init!\n");
         return Ret;
     }
+#endif
 
     Ret = HI_DRV_PDM_Init();
     if(HI_SUCCESS != Ret)
     {
-        HI_ERR_MCE("ERR: HI_DRV_PDM_Init!\n");
+        HI_ERR_MCE("ERR: HI_DRV_PDM_Init!\n"); //1639
         return Ret;
     } 
 	
+#if 1
+#warning TODO
+#else
     Ret = HI_DRV_PQ_Init();
     if(HI_SUCCESS != Ret)
     {

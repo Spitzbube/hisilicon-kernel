@@ -112,6 +112,19 @@ typedef struct hiMCE_PARAM_S
     HI_UNF_MCE_PLAY_PARAM_S     stPlayParam;
 }HI_MCE_PARAM_S;
 
+typedef struct hiSOUND_PARAM_S
+{
+	unsigned Data_0; //0
+	struct hiSOUND_PARAM_S_Inner2
+	{
+		int Data_0; //0
+		HI_UNF_I2S_ATTR_S Data_4; //4 +32
+		//36
+	} Data_4[16/*????*/]; //4
+	int Data_580[16/*???*/]; //850
+
+}HI_SOUND_PARAM_S;
+
 #define HI_FLASH_NAME_LEN   32
 
 /*Flash pation info for mce use*/
@@ -130,6 +143,8 @@ HI_S32 HI_DRV_PDM_GetMceParam(HI_MCE_PARAM_S *pMceParam);
 HI_S32 HI_DRV_PDM_GetMceData(HI_U32 u32Size, HI_U32 *pAddr);
 HI_S32 HI_DRV_PDM_ReleaseReserveMem(const HI_CHAR *BufName);
 HI_S32 HI_DRV_PDM_GetData(const HI_CHAR *BufName, HI_U32 *pu32DataAddr, HI_U32 *pu32DataLen);
+HI_S32 HI_DRV_PDM_GetSoundParam(HI_UNF_SND_E enSound, HI_SOUND_PARAM_S* pSoundParam);
+HI_S32 HI_DRV_PDM_GetSoundParamEx(HI_UNF_SND_E enSound, HI_SOUND_PARAM_S* pSoundParam, HI_U32 *pu32Data);
 
 /************** reserve mem ***************/
 //void pdm_reserve_mem(void);

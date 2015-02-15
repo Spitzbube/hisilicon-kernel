@@ -39,33 +39,33 @@ extern "C" {
 /** @{ */  /** <!-- [DISPLAY] */
 
 /**enum define about DISPLAY channel*/
-/**CNcomment:¶¨ÒåDISPLAYÍ¨µÀÃ¶¾Ù*/
+/**CNcomment:ï¿½ï¿½ï¿½ï¿½DISPLAYÍ¨ï¿½ï¿½Ã¶ï¿½ï¿½*/
 typedef enum hiUNF_DISP_E
 {
-    HI_UNF_DISPLAY0 = 0x0,  /**< DISPLAY0,Compatible with SD */ /**<CNcomment:¸ßÇåDISPLAY0£¬¼æÈÝ±êÇå */
-    HI_UNF_DISPLAY1,        /**< DISPLAY1 *//**<CNcomment: ¸ßÇåDISPLAY1 */
-    HI_UNF_DISPLAY2,        /**< DISPLAY2 *//**<CNcomment: ¸ßÇåDISPLAY2 */
+    HI_UNF_DISPLAY0 = 0x0,  /**< DISPLAY0,Compatible with SD */ /**<CNcomment:ï¿½ï¿½ï¿½ï¿½DISPLAY0ï¿½ï¿½ï¿½ï¿½ï¿½Ý±ï¿½ï¿½ï¿½ */
+    HI_UNF_DISPLAY1,        /**< DISPLAY1 *//**<CNcomment: ï¿½ï¿½ï¿½ï¿½DISPLAY1 */
+    HI_UNF_DISPLAY2,        /**< DISPLAY2 *//**<CNcomment: ï¿½ï¿½ï¿½ï¿½DISPLAY2 */
     HI_UNF_DISPLAY_BUTT
 }HI_UNF_DISP_E;
 
 /**max DAC count*/
-/**CNcomment:×î´óµÄDACÊýÄ¿*/
+/**CNcomment:ï¿½ï¿½ï¿½ï¿½DACï¿½ï¿½Ä¿*/
 #define MAX_DAC_NUM ( 6 )
 
 /**define the LCD data format*/
-/**CNcomment:¶¨ÒåLCDµÄÊý¾Ý¸ñÊ½*/
+/**CNcomment:ï¿½ï¿½ï¿½ï¿½LCDï¿½ï¿½ï¿½ï¿½Ý¸ï¿½Ê½*/
 typedef enum hiHI_UNF_DISP_INTF_DATA_FMT
 {
-    HI_UNF_DISP_INTF_DATA_FMT_YUV422   = 0,         /**<YUV422,data width is 16*//**<CNcomment:YUV422£¬Î»¿íÎª16*/
-    HI_UNF_DISP_INTF_DATA_FMT_RGB565   = 0x8,       /**<RGB565,data width is 16*//**<CNcomment:RGB565£¬Î»¿íÎª16*/
-    HI_UNF_DISP_INTF_DATA_FMT_RGB444   = 0xa,       /**<RGB444,data width is 16*//**<CNcomment:RGB444£¬Î»¿íÎª16*/
-    HI_UNF_DISP_INTF_DATA_FMT_RGB666   = 0xb,       /**<RGB666,data width is 24*//**<CNcomment:RGB666£¬Î»¿íÎª24*/
-    HI_UNF_DISP_INTF_DATA_FMT_RGB888   = 0xc,       /**<RGB888,data widht is 24*//**<CNcomment:RGB888£¬Î»¿íÎª24*/
+    HI_UNF_DISP_INTF_DATA_FMT_YUV422   = 0,         /**<YUV422,data width is 16*//**<CNcomment:YUV422ï¿½ï¿½Î»ï¿½ï¿½Îª16*/
+    HI_UNF_DISP_INTF_DATA_FMT_RGB565   = 0x8,       /**<RGB565,data width is 16*//**<CNcomment:RGB565ï¿½ï¿½Î»ï¿½ï¿½Îª16*/
+    HI_UNF_DISP_INTF_DATA_FMT_RGB444   = 0xa,       /**<RGB444,data width is 16*//**<CNcomment:RGB444ï¿½ï¿½Î»ï¿½ï¿½Îª16*/
+    HI_UNF_DISP_INTF_DATA_FMT_RGB666   = 0xb,       /**<RGB666,data width is 24*//**<CNcomment:RGB666ï¿½ï¿½Î»ï¿½ï¿½Îª24*/
+    HI_UNF_DISP_INTF_DATA_FMT_RGB888   = 0xc,       /**<RGB888,data widht is 24*//**<CNcomment:RGB888ï¿½ï¿½Î»ï¿½ï¿½Îª24*/
     HI_UNF_DISP_INTF_DATA_FMT_BUTT
 }HI_UNF_DISP_INTF_DATA_FMT_E;
 
 /**define LCD output data width*/
-/**CNcomment:¶¨ÒåLCDÊä³öµÄÊý¾ÝÎ»¿í*/
+/**CNcomment:ï¿½ï¿½ï¿½ï¿½LCDï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Î»ï¿½ï¿½*/
 typedef enum hiUNF_DISP_INTF_DATA_WIDTH_E
 {
     HI_UNF_DISP_INTF_DATA_WIDTH8 = 0,       /**<8 bits*//**<CNcomment:8Î»*/
@@ -75,271 +75,272 @@ typedef enum hiUNF_DISP_INTF_DATA_WIDTH_E
 }HI_UNF_DISP_INTF_DATA_WIDTH_E;
 
 /**define LCD timing */
-/**CNcomment:¶¨ÒåLCDµÄÊ±Ðò²ÎÊý*/
+/**CNcomment:ï¿½ï¿½ï¿½ï¿½LCDï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½*/
 typedef struct hiUNF_DISP_TIMING_S
 {
-    HI_U32                        VFB;            /**<vertical front blank*//**<CNcomment:´¹Ö±Ç°ÏûÒþ*/
-    HI_U32                        VBB;            /**<vertical back blank*//**<CNcomment:´¹Ö±ºóÏûÒþ*/
-    HI_U32                        VACT;           /**<vertical active area*//**<CNcomment:´¹Ö±ÓÐÐ§Çø*/
-    HI_U32                        HFB;            /**<horizonal front blank*//**<CNcomment:Ë®Æ½Ç°ÏûÒþ*/
-    HI_U32                        HBB;            /**<horizonal back blank*//**<CNcomment:Ë®Æ½ºóÏûÒþ*/
-    HI_U32                        HACT;           /**<horizonal active area*/ /**<CNcomment:Ë®Æ½ÓÐÐ§Çø*/
-    HI_U32                        VPW;            /**<vertical sync pluse width*//**<CNcomment:´¹Ö±Âö³å¿í¶È*/
-    HI_U32                        HPW;            /**<horizonal sync pluse width*/ /**<CNcomment:Ë®Æ½Âö³å¿í¶È*/
-    HI_BOOL                       IDV;            /**< flag of data valid signal is needed flip*//**<CNcomment:ÓÐÐ§Êý¾ÝÐÅºÅÊÇ·ñ·­×ª*/
-    HI_BOOL                       IHS;            /**<flag of horizonal sync pluse is needed flip*//**<CNcomment:Ë®Æ½Í¬²½Âö³åÐÅºÅÊÇ·ñ·­×ª*/
-    HI_BOOL                       IVS;            /**<flag of vertical sync pluse is needed flip*//**<CNcomment:´¹Ö±Í¬²½Âö³åÐÅºÅÊÇ·ñ·­×ª*/
-    HI_BOOL                       ClockReversal;  /**<flag of clock is needed flip*//**<CNcomment:Ê±ÖÓÊÇ·ñ·­×ª*/
-    HI_UNF_DISP_INTF_DATA_WIDTH_E DataWidth;      /**<data width*/ /**<CNcomment:Êý¾ÝÎ»¿í*/
-    HI_UNF_DISP_INTF_DATA_FMT_E   ItfFormat;      /**<data format.*//**<CNcomment:Êý¾Ý¸ñÊ½.*/
+    HI_U32                        VFB;            /**<vertical front blank*//**<CNcomment:ï¿½ï¿½Ö±Ç°ï¿½ï¿½ï¿½ï¿½*/
+    HI_U32                        VBB;            /**<vertical back blank*//**<CNcomment:ï¿½ï¿½Ö±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½*/
+    HI_U32                        VACT;           /**<vertical active area*//**<CNcomment:ï¿½ï¿½Ö±ï¿½ï¿½Ð§ï¿½ï¿½*/
+    HI_U32                        HFB;            /**<horizonal front blank*//**<CNcomment:Ë®Æ½Ç°ï¿½ï¿½ï¿½ï¿½*/
+    HI_U32                        HBB;            /**<horizonal back blank*//**<CNcomment:Ë®Æ½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½*/
+    HI_U32                        HACT;           /**<horizonal active area*/ /**<CNcomment:Ë®Æ½ï¿½ï¿½Ð§ï¿½ï¿½*/
+    HI_U32                        VPW;            /**<vertical sync pluse width*//**<CNcomment:ï¿½ï¿½Ö±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½*/
+    HI_U32                        HPW;            /**<horizonal sync pluse width*/ /**<CNcomment:Ë®Æ½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½*/
+    HI_BOOL                       IDV;            /**< flag of data valid signal is needed flip*//**<CNcomment:ï¿½ï¿½Ð§ï¿½ï¿½ï¿½ï¿½Åºï¿½ï¿½Ç·ï¿½×ª*/
+    HI_BOOL                       IHS;            /**<flag of horizonal sync pluse is needed flip*//**<CNcomment:Ë®Æ½Í¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Åºï¿½ï¿½Ç·ï¿½×ª*/
+    HI_BOOL                       IVS;            /**<flag of vertical sync pluse is needed flip*//**<CNcomment:ï¿½ï¿½Ö±Í¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Åºï¿½ï¿½Ç·ï¿½×ª*/
+    HI_BOOL                       ClockReversal;  /**<flag of clock is needed flip*//**<CNcomment:Ê±ï¿½ï¿½ï¿½Ç·ï¿½×ª*/
+    HI_UNF_DISP_INTF_DATA_WIDTH_E DataWidth;      /**<data width*/ /**<CNcomment:ï¿½ï¿½ï¿½Î»ï¿½ï¿½*/
+    HI_UNF_DISP_INTF_DATA_FMT_E   ItfFormat;      /**<data format.*//**<CNcomment:ï¿½ï¿½Ý¸ï¿½Ê½.*/
 
-    HI_BOOL DitherEnable;                           /**< flag of is enable Dither*//**<CNcomment:Êý¾Ý¸ñÊ½.*/
-    HI_U32  ClkPara0;                               /**<PLL  register SC_VPLL1FREQCTRL0  value *//**<CNcomment:PLL  SC_VPLL1FREQCTRL0  ¼Ä´æÆ÷*/
-    HI_U32  ClkPara1;                               /**<PLL  register SC_VPLL1FREQCTRL1 value*//**<CNcomment:PLL   SC_VPLL1FREQCTRL1¼Ä´æÆ÷*/
+    HI_BOOL DitherEnable;                           /**< flag of is enable Dither*//**<CNcomment:ï¿½ï¿½Ý¸ï¿½Ê½.*/
+    HI_U32  ClkPara0;                               /**<PLL  register SC_VPLL1FREQCTRL0  value *//**<CNcomment:PLL  SC_VPLL1FREQCTRL0  ï¿½Ä´ï¿½ï¿½ï¿½*/
+    HI_U32  ClkPara1;                               /**<PLL  register SC_VPLL1FREQCTRL1 value*//**<CNcomment:PLL   SC_VPLL1FREQCTRL1ï¿½Ä´ï¿½ï¿½ï¿½*/
 
-    HI_BOOL bInterlace;                             /**<progressive or interlace*//**<CNcomment:ÖðÐÐ»òÕß¸ôÐÐ*/
-    HI_U32  PixFreq;                                /**<pixel clock*//**<CNcomment:ÏñËØÊ±ÖÓ*/
-    HI_U32  VertFreq;                               /**<display rate*//**<CNcomment:Ë¢ÐÂÂÊ*/
-    HI_U32  AspectRatioW;                           /**<width of screen*//**<CNcomment:ÆÁÄ»¿í¶È*/
-    HI_U32  AspectRatioH;                           /**<height of screen*//**<CNcomment:ÆÁÄ»¸ß¶È*/
-    HI_BOOL bUseGamma;                              /**<gamma modulation*//**<CNcomment:Ù¤Âíµ÷½Ú*/
-    HI_U32  Reserve0;                               /**<reserved byte*//**<CNcomment:±£ÁôÎ»*/
-    HI_U32  Reserve1;                               /**<reserved byte*//**<CNcomment:±£ÁôÎ»*/
+    HI_BOOL bInterlace;                             /**<progressive or interlace*//**<CNcomment:ï¿½ï¿½ï¿½Ð»ï¿½ï¿½ß¸ï¿½ï¿½ï¿½*/
+    HI_U32  PixFreq;                                /**<pixel clock*//**<CNcomment:ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½*/
+    HI_U32  VertFreq;                               /**<display rate*//**<CNcomment:Ë¢ï¿½ï¿½ï¿½ï¿½*/
+    HI_U32  AspectRatioW;                           /**<width of screen*//**<CNcomment:ï¿½ï¿½Ä»ï¿½ï¿½ï¿½*/
+    HI_U32  AspectRatioH;                           /**<height of screen*//**<CNcomment:ï¿½ï¿½Ä»ï¿½ß¶ï¿½*/
+    HI_BOOL bUseGamma;                              /**<gamma modulation*//**<CNcomment:Ù¤ï¿½ï¿½ï¿½ï¿½ï¿½*/
+    HI_U32  Reserve0;                               /**<reserved byte*//**<CNcomment:ï¿½ï¿½ï¿½ï¿½Î»*/
+    HI_U32  Reserve1;                               /**<reserved byte*//**<CNcomment:ï¿½ï¿½ï¿½ï¿½Î»*/
 } HI_UNF_DISP_TIMING_S;
 
 /**define video and graphics layers */
-/**CNcomment:ÊÓÆµºÍÍ¼ÐÎ²ã*/
+/**CNcomment:ï¿½ï¿½Æµï¿½ï¿½Í¼ï¿½Î²ï¿½*/
 typedef enum hiUNF_DISP_LAYER_E
 {
-    HI_UNF_DISP_LAYER_VIDEO = 0,                   /**<video layer *//**<CNcomment:ÊÓÆµ²ã*/
-    HI_UNF_DISP_LAYER_GFX,                  /**<graphics layer *//**<CNcomment:Í¼ÐÎ²ã*/
+    HI_UNF_DISP_LAYER_VIDEO = 0,                   /**<video layer *//**<CNcomment:ï¿½ï¿½Æµï¿½ï¿½*/
+    HI_UNF_DISP_LAYER_GFX,                  /**<graphics layer *//**<CNcomment:Í¼ï¿½Î²ï¿½*/
     HI_UNF_DISP_LAYER_BUTT
 }HI_UNF_DISP_LAYER_E;
 
 /**bt1120 interface ID */
-/**CNcomment:bt1120 ½Ó¿ÚID  */
+/**CNcomment:bt1120 ï¿½Ó¿ï¿½ID  */
 typedef enum hiUNF_DISP_BT1120_E
 {
-    HI_UNF_DISP_BT1120_0,    /**<BT1120 interface 0 *//**<CNcomment:BT1120½Ó¿Ú0 */
+    HI_UNF_DISP_BT1120_0,    /**<BT1120 interface 0 *//**<CNcomment:BT1120ï¿½Ó¿ï¿½0 */
     HI_UNF_DISP_BT1120_BUTT,
 }HI_UNF_DISP_BT1120_E;
 
 /**BT656 interface ID */
-/**CNcomment:BT656 ½Ó¿ÚID  */
+/**CNcomment:BT656 ï¿½Ó¿ï¿½ID  */
 typedef enum hiUNF_DISP_BT656_E
 {
-    HI_UNF_DISP_BT656_0,    /**<BT656 interface 0 *//**<CNcomment:BT656½Ó¿Ú0 */
+    HI_UNF_DISP_BT656_0,    /**<BT656 interface 0 *//**<CNcomment:BT656ï¿½Ó¿ï¿½0 */
     HI_UNF_DISP_BT656_BUTT,
 }HI_UNF_DISP_BT656_E;
 
 /**LCD interface ID */
-/**CNcomment:LCD ½Ó¿ÚID  */
+/**CNcomment:LCD ï¿½Ó¿ï¿½ID  */
 typedef enum hiUNF_LCD_E
 {
-    HI_UNF_DISP_LCD_0,    /**<LCD interface 0 *//**<CNcomment:LCD½Ó¿Ú0 */
+    HI_UNF_DISP_LCD_0,    /**<LCD interface 0 *//**<CNcomment:LCDï¿½Ó¿ï¿½0 */
     HI_UNF_DISP_LCD_BUTT,
 }HI_UNF_DISP_LCD_E;
 
 /**define the type of interface*/
-/**CNcomment:¶¨Òå½Ó¿ÚÀàÐÍ*/
+/**CNcomment:ï¿½ï¿½ï¿½ï¿½Ó¿ï¿½ï¿½ï¿½ï¿½ï¿½*/
 typedef enum  hiUNF_DISP_INTF_TYPE_E
 {
-    HI_UNF_DISP_INTF_TYPE_HDMI,     /**<HDMI interface type *//**<CNcomment:HDMI½Ó¿ÚÀàÐÍ*/
-    HI_UNF_DISP_INTF_TYPE_LCD,      /**<LCD interface type *//**<CNcomment:LCD½Ó¿ÚÀàÐÍ*/
-    HI_UNF_DISP_INTF_TYPE_BT1120,   /**<bt1120 digital interface type *//**<CNcomment:BT1120Êý×Ö½Ó¿ÚÀàÐÍ*/
-    HI_UNF_DISP_INTF_TYPE_BT656,    /**<bt656 digital interface type*//**<CNcomment:BT656Êý×Ö½Ó¿ÚÀàÐÍ*/
-    HI_UNF_DISP_INTF_TYPE_YPBPR,    /**<YPBPR interface type*//**<CNcomment:YPBPR½Ó¿ÚÀàÐÍ*/
-    HI_UNF_DISP_INTF_TYPE_RGB,      /**<RGB interface type*//**<CNcomment:RGB½Ó¿ÚÀàÐÍ*/
-    HI_UNF_DISP_INTF_TYPE_CVBS,     /**<CVBS interface type*//**<CNcomment:CVBS½Ó¿ÚÀàÐÍ*/
-    HI_UNF_DISP_INTF_TYPE_SVIDEO,   /**<SVIDEO interface type*//**<CNcomment:SVIDEO½Ó¿ÚÀàÐÍ*/
+    HI_UNF_DISP_INTF_TYPE_HDMI,     /**<HDMI interface type *//**<CNcomment:HDMIï¿½Ó¿ï¿½ï¿½ï¿½ï¿½ï¿½*/
+    HI_UNF_DISP_INTF_TYPE_LCD,      /**<LCD interface type *//**<CNcomment:LCDï¿½Ó¿ï¿½ï¿½ï¿½ï¿½ï¿½*/
+    HI_UNF_DISP_INTF_TYPE_BT1120,   /**<bt1120 digital interface type *//**<CNcomment:BT1120ï¿½ï¿½ï¿½Ö½Ó¿ï¿½ï¿½ï¿½ï¿½ï¿½*/
+    HI_UNF_DISP_INTF_TYPE_BT656,    /**<bt656 digital interface type*//**<CNcomment:BT656ï¿½ï¿½ï¿½Ö½Ó¿ï¿½ï¿½ï¿½ï¿½ï¿½*/
+    HI_UNF_DISP_INTF_TYPE_YPBPR,    /**<YPBPR interface type*//**<CNcomment:YPBPRï¿½Ó¿ï¿½ï¿½ï¿½ï¿½ï¿½*/
+    HI_UNF_DISP_INTF_TYPE_RGB,      /**<RGB interface type*//**<CNcomment:RGBï¿½Ó¿ï¿½ï¿½ï¿½ï¿½ï¿½*/
+    HI_UNF_DISP_INTF_TYPE_CVBS,     /**<CVBS interface type*//**<CNcomment:CVBSï¿½Ó¿ï¿½ï¿½ï¿½ï¿½ï¿½*/
+    HI_UNF_DISP_INTF_TYPE_SVIDEO,   /**<SVIDEO interface type*//**<CNcomment:SVIDEOï¿½Ó¿ï¿½ï¿½ï¿½ï¿½ï¿½*/
+    HI_UNF_DISP_INTF_TYPE_VGA,
     HI_UNF_DISP_INTF_TYPE_BUTT
 }HI_UNF_DISP_INTF_TYPE_E;
 
 /**define the YPBPR type struct of interface*/
-/**CNcomment:¶¨ÒåYPBPR½Ó¿Ú½á¹¹*/
+/**CNcomment:ï¿½ï¿½ï¿½ï¿½YPBPRï¿½Ó¿Ú½á¹¹*/
 typedef struct  hiUNF_DISP_INTF_YPBPR_S
 {
-    HI_U8 u8DacY;             /**<DAC num of Y  *//**<CNcomment:Y·ÖÁ¿dac¶Ë¿ÚºÅ*/
-    HI_U8 u8DacPb;            /**<DAC num of Pb  *//**<CNcomment:Pb·ÖÁ¿dac¶Ë¿ÚºÅ*/
-    HI_U8 u8DacPr;            /**<DAC num of Pr  *//**<CNcomment:Pr·ÖÁ¿dac¶Ë¿ÚºÅ*/
+    HI_U8 u8DacY;             /**<DAC num of Y  *//**<CNcomment:Yï¿½ï¿½ï¿½ï¿½dacï¿½Ë¿Úºï¿½*/
+    HI_U8 u8DacPb;            /**<DAC num of Pb  *//**<CNcomment:Pbï¿½ï¿½ï¿½ï¿½dacï¿½Ë¿Úºï¿½*/
+    HI_U8 u8DacPr;            /**<DAC num of Pr  *//**<CNcomment:Prï¿½ï¿½ï¿½ï¿½dacï¿½Ë¿Úºï¿½*/
 }HI_UNF_DISP_INTF_YPBPR_S;
 
 /**define the RGB type struct of interface*/
-/**CNcomment:¶¨ÒåRGB½Ó¿Ú½á¹¹*/
+/**CNcomment:ï¿½ï¿½ï¿½ï¿½RGBï¿½Ó¿Ú½á¹¹*/
 typedef struct  hiUNF_DISP_INTF_RGB_S
 {
-    HI_U8  u8DacR;            /**<DAC num of R  *//**<CNcomment:R·ÖÁ¿dac¶Ë¿ÚºÅ*/
-    HI_U8  u8DacG;            /**<DAC num of G  *//**<CNcomment:G·ÖÁ¿dac¶Ë¿ÚºÅ*/
-    HI_U8  u8DacB;            /**<DAC num of B  *//**<CNcomment:B·ÖÁ¿dac¶Ë¿ÚºÅ*/
-    HI_BOOL bDacSync;         /**<G without sync signal  *//**<CNcomment:G·ÖÁ¿²»´øÍ¬²½ÐÅºÅ*/
+    HI_U8  u8DacR;            /**<DAC num of R  *//**<CNcomment:Rï¿½ï¿½ï¿½ï¿½dacï¿½Ë¿Úºï¿½*/
+    HI_U8  u8DacG;            /**<DAC num of G  *//**<CNcomment:Gï¿½ï¿½ï¿½ï¿½dacï¿½Ë¿Úºï¿½*/
+    HI_U8  u8DacB;            /**<DAC num of B  *//**<CNcomment:Bï¿½ï¿½ï¿½ï¿½dacï¿½Ë¿Úºï¿½*/
+    HI_BOOL bDacSync;         /**<G without sync signal  *//**<CNcomment:Gï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¬ï¿½ï¿½ï¿½Åºï¿½*/
 }HI_UNF_DISP_INTF_RGB_S;
 
 /**define the CVBS type struct of interface*/
-/**CNcomment:¶¨ÒåCVBS½Ó¿Ú½á¹¹*/
+/**CNcomment:ï¿½ï¿½ï¿½ï¿½CVBSï¿½Ó¿Ú½á¹¹*/
 typedef struct  hiUNF_DISP_INTF_CVBS_S
 {
-    HI_U8 u8Dac;              /**<DAC num of CVBS  *//**<CNcomment:CVBS¶Ë×Ódac¶Ë¿ÚºÅ*/
+    HI_U8 u8Dac;              /**<DAC num of CVBS  *//**<CNcomment:CVBSï¿½ï¿½ï¿½ï¿½dacï¿½Ë¿Úºï¿½*/
 }HI_UNF_DISP_INTF_CVBS_S;
 
 /**define the SVIDEO type struct of interface*/
-/**CNcomment:¶¨ÒåSVIDEO½Ó¿Ú½á¹¹*/
+/**CNcomment:ï¿½ï¿½ï¿½ï¿½SVIDEOï¿½Ó¿Ú½á¹¹*/
 typedef struct  hiUNF_DISP_INTF_SVIDEO_S
 {
-    HI_U8 u8DacY;             /**<DAC num of Y  *//**<CNcomment:Y·ÖÁ¿dac¶Ë¿ÚºÅ*/
-    HI_U8 u8DacC;             /**<DAC num of C   *//**<CNcomment:C·ÖÁ¿dac¶Ë¿ÚºÅ*/
+    HI_U8 u8DacY;             /**<DAC num of Y  *//**<CNcomment:Yï¿½ï¿½ï¿½ï¿½dacï¿½Ë¿Úºï¿½*/
+    HI_U8 u8DacC;             /**<DAC num of C   *//**<CNcomment:Cï¿½ï¿½ï¿½ï¿½dacï¿½Ë¿Úºï¿½*/
 }HI_UNF_DISP_INTF_SVIDEO_S;
 
 /**define display interface struct*/
-/**CNcomment:¶¨ÒåÏÔÊ¾½Ó¿Ú½á¹¹*/
+/**CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¾ï¿½Ó¿Ú½á¹¹*/
 typedef struct  hiUNF_DISP_INTF_S
 {
-    HI_UNF_DISP_INTF_TYPE_E enIntfType;         /**<interface type *//**<CNcomment:½Ó¿ÚÀàÐÍ*/
+    HI_UNF_DISP_INTF_TYPE_E enIntfType;         /**<interface type *//**<CNcomment:ï¿½Ó¿ï¿½ï¿½ï¿½ï¿½ï¿½*/
     union
     {
-        HI_UNF_HDMI_ID_E        enHdmi;         /**<hdmi id *//**<CNcomment:HDMI ÐòºÅ*/
-        HI_UNF_DISP_BT1120_E    enBT1120;       /**<bt1120 id *//**<CNcomment:BT1120ÐòºÅ*/
-        HI_UNF_DISP_BT656_E     enBT656;        /**<bt656 id *//**<CNcomment:BT656ÐòºÅ*/
-        HI_UNF_DISP_LCD_E       enLcd;          /**<lcd id *//**<CNcomment:LCDÐòºÅ*/
+        HI_UNF_HDMI_ID_E        enHdmi;         /**<hdmi id *//**<CNcomment:HDMI ï¿½ï¿½ï¿½*/
+        HI_UNF_DISP_BT1120_E    enBT1120;       /**<bt1120 id *//**<CNcomment:BT1120ï¿½ï¿½ï¿½*/
+        HI_UNF_DISP_BT656_E     enBT656;        /**<bt656 id *//**<CNcomment:BT656ï¿½ï¿½ï¿½*/
+        HI_UNF_DISP_LCD_E       enLcd;          /**<lcd id *//**<CNcomment:LCDï¿½ï¿½ï¿½*/
 
-        HI_UNF_DISP_INTF_YPBPR_S    stYPbPr;    /**<intf config of YPBPR  *//**<CNcomment:YPBPR½Ó¿ÚÅäÖÃ*/
-        HI_UNF_DISP_INTF_RGB_S      stRGB;      /**<intf config of RGB  *//**<CNcomment:RGB½Ó¿ÚÅäÖÃ*/
-        HI_UNF_DISP_INTF_CVBS_S     stCVBS;     /**<intf config of CVBS  *//**<CNcomment:CVBS½Ó¿ÚÅäÖÃ*/
-        HI_UNF_DISP_INTF_SVIDEO_S   stSVideo;   /**<intf config of SVIDEO  *//**<CNcomment:SVIDEO½Ó¿ÚÅäÖÃ*/
+        HI_UNF_DISP_INTF_YPBPR_S    stYPbPr;    /**<intf config of YPBPR  *//**<CNcomment:YPBPRï¿½Ó¿ï¿½ï¿½ï¿½ï¿½ï¿½*/
+        HI_UNF_DISP_INTF_RGB_S      stRGB;      /**<intf config of RGB  *//**<CNcomment:RGBï¿½Ó¿ï¿½ï¿½ï¿½ï¿½ï¿½*/
+        HI_UNF_DISP_INTF_CVBS_S     stCVBS;     /**<intf config of CVBS  *//**<CNcomment:CVBSï¿½Ó¿ï¿½ï¿½ï¿½ï¿½ï¿½*/
+        HI_UNF_DISP_INTF_SVIDEO_S   stSVideo;   /**<intf config of SVIDEO  *//**<CNcomment:SVIDEOï¿½Ó¿ï¿½ï¿½ï¿½ï¿½ï¿½*/
     }unIntf;
 }HI_UNF_DISP_INTF_S;
 
 /**Defines the device aspect ratio.*/
-/**CNcomment: ¶¨ÒåÉè±¸¿í¸ß±ÈÃ¶¾Ù*/
+/**CNcomment: ï¿½ï¿½ï¿½ï¿½ï¿½è±¸ï¿½ï¿½ß±ï¿½Ã¶ï¿½ï¿½*/
 typedef enum hiUNF_DISP_ASPECT_RATIO_E
 {
-    HI_UNF_DISP_ASPECT_RATIO_AUTO,              /**<aspect ratio as device Resolution*//**<CNcomment: ¿í¸ß±ÈÓëÉè±¸·Ö±æÂÊÒ»ÖÂ*/
-    HI_UNF_DISP_ASPECT_RATIO_4TO3,              /**<4:3*//**<CNcomment: 4±È3*/
-    HI_UNF_DISP_ASPECT_RATIO_16TO9,             /**<16:9*//**<CNcomment: 16±È9*/
-    HI_UNF_DISP_ASPECT_RATIO_221TO1,            /**<221:100*//**<CNcomment: 221±È100*/
-    HI_UNF_DISP_ASPECT_RATIO_USER,              /**<user define*//**<CNcomment: ÓÃ»§¶¨Òå*/
+    HI_UNF_DISP_ASPECT_RATIO_AUTO,              /**<aspect ratio as device Resolution*//**<CNcomment: ï¿½ï¿½ß±ï¿½ï¿½ï¿½ï¿½è±¸ï¿½Ö±ï¿½ï¿½ï¿½Ò»ï¿½ï¿½*/
+    HI_UNF_DISP_ASPECT_RATIO_4TO3,              /**<4:3*//**<CNcomment: 4ï¿½ï¿½3*/
+    HI_UNF_DISP_ASPECT_RATIO_16TO9,             /**<16:9*//**<CNcomment: 16ï¿½ï¿½9*/
+    HI_UNF_DISP_ASPECT_RATIO_221TO1,            /**<221:100*//**<CNcomment: 221ï¿½ï¿½100*/
+    HI_UNF_DISP_ASPECT_RATIO_USER,              /**<user define*//**<CNcomment: ï¿½Ã»ï¿½ï¿½ï¿½ï¿½ï¿½*/
 
     HI_UNF_DISP_ASPECT_RATIO_BUTT
 }HI_UNF_DISP_ASPECT_RATIO_E;
 
 /**Defines the device aspect ratio struct.*/
-/**CNcomment: ¶¨ÒåÉè±¸¿í¸ß±È½á¹¹*/
+/**CNcomment: ï¿½ï¿½ï¿½ï¿½ï¿½è±¸ï¿½ï¿½ß±È½á¹¹*/
 typedef struct hiUNF_DISP_ASPECT_RATIO_S
 {
-    HI_UNF_DISP_ASPECT_RATIO_E enDispAspectRatio;   /**<aspect ratio type of device*//**<CNcomment: Éè±¸¿í¸ß±ÈÀàÐÍ*/
-    HI_U32                     u32UserAspectWidth;  /**<user define width of device*//**<CNcomment: ÓÃ»§¶¨ÒåÉè±¸¿í¶È*/
-    HI_U32                     u32UserAspectHeight; /**<user define height of device*//**<CNcomment: ÓÃ»§¶¨ÒåÉè±¸¸ß¶È*/
+    HI_UNF_DISP_ASPECT_RATIO_E enDispAspectRatio;   /**<aspect ratio type of device*//**<CNcomment: ï¿½è±¸ï¿½ï¿½ß±ï¿½ï¿½ï¿½ï¿½ï¿½*/
+    HI_U32                     u32UserAspectWidth;  /**<user define width of device*//**<CNcomment: ï¿½Ã»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½è±¸ï¿½ï¿½ï¿½*/
+    HI_U32                     u32UserAspectHeight; /**<user define height of device*//**<CNcomment: ï¿½Ã»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½è±¸ï¿½ß¶ï¿½*/
 }HI_UNF_DISP_ASPECT_RATIO_S;
 
 /**Defines algorithmic  control struct of display device.*/
-/**CNcomment: ¶¨ÒåÏÔÊ¾Éè±¸Ëã·¨¿ØÖÆ½á¹¹*/
+/**CNcomment: ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¾ï¿½è±¸ï¿½ã·¨ï¿½ï¿½ï¿½Æ½á¹¹*/
 typedef struct hiUNF_DISP_ALG_CFG_S
 {
-    HI_BOOL bAccEnable;                             /**<acc alg*//**<CNcomment: accËã·¨*/
-    HI_BOOL bSharpEnable;                           /**<sharp alg*//**<CNcomment: sharpËã·¨*/
+    HI_BOOL bAccEnable;                             /**<acc alg*//**<CNcomment: accï¿½ã·¨*/
+    HI_BOOL bSharpEnable;                           /**<sharp alg*//**<CNcomment: sharpï¿½ã·¨*/
 }HI_UNF_DISP_ALG_CFG_S;
 
 /**Defines VBI type.*/
-/**CNcomment: ¶¨ÒåVBIÊý¾ÝÀàÐÍ*/
+/**CNcomment: ï¿½ï¿½ï¿½ï¿½VBIï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½*/
 typedef enum hiUNF_DISP_VBI_TYPE_E
 {
-    HI_UNF_DISP_VBI_TYPE_TTX = 0,                   /**<teltext type*//**<CNcomment:teltextÀàÐÍ*/
-    HI_UNF_DISP_VBI_TYPE_CC,                        /**<closed caption type*//**<CNcomment: Òþ²Ø×ÖÄ»ÀàÐÍ*/
-    HI_UNF_DISP_VBI_TYPE_VCHIP,                     /**<v-chip type*//**<CNcomment: v-chipÀàÐÍ*/
-    HI_UNF_DISP_VBI_TYPE_WSS,                       /**<wide screen signal*//**<CNcomment:¿íÆÁÐÅÁî*/
+    HI_UNF_DISP_VBI_TYPE_TTX = 0,                   /**<teltext type*//**<CNcomment:teltextï¿½ï¿½ï¿½ï¿½*/
+    HI_UNF_DISP_VBI_TYPE_CC,                        /**<closed caption type*//**<CNcomment: ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä»ï¿½ï¿½ï¿½ï¿½*/
+    HI_UNF_DISP_VBI_TYPE_VCHIP,                     /**<v-chip type*//**<CNcomment: v-chipï¿½ï¿½ï¿½ï¿½*/
+    HI_UNF_DISP_VBI_TYPE_WSS,                       /**<wide screen signal*//**<CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½*/
     HI_UNF_DISP_VBI_TYPE_BUTT
 } HI_UNF_DISP_VBI_TYPE_E;
 
 /**Defines VBI config struct.*/
-/**CNcomment: ¶¨ÒåVBIÅäÖÃ½á¹¹*/
+/**CNcomment: ï¿½ï¿½ï¿½ï¿½VBIï¿½ï¿½ï¿½Ã½á¹¹*/
 typedef struct hiUNF_DISP_VBI_CFG_S
 {
-    HI_UNF_DISP_VBI_TYPE_E  enType;                  /**<VBI type*//**<CNcomment: VBI ÀàÐÍ*/
-    HI_U32                  u32InBufferSize;        /**<VBI data(pes) buffer size,more than 4K,suggest 4K*//**<CNcomment:VBI pes Êý¾ÝÊäÈë»º³å´óÐ¡,²»Ð¡ÓÚ4K£¬ÍÆ¼öÖµ4K*/
-    HI_U32                  u32WorkBufferSize;      /**<VBI data buffer size used in driver,more than 2K,suggest 2K*//**<CNcomment:VBI½âÎöºóÊý¾ÝÔÚÇý¶¯ÖÐ½ÓÊÕ»º³å´óÐ¡²»Ð¡ÓÚ2K£¬ÍÆ¼öÖµ2K*/
+    HI_UNF_DISP_VBI_TYPE_E  enType;                  /**<VBI type*//**<CNcomment: VBI ï¿½ï¿½ï¿½ï¿½*/
+    HI_U32                  u32InBufferSize;        /**<VBI data(pes) buffer size,more than 4K,suggest 4K*//**<CNcomment:VBI pes ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ë»ºï¿½ï¿½ï¿½Ð¡,ï¿½ï¿½Ð¡ï¿½ï¿½4Kï¿½ï¿½ï¿½Æ¼ï¿½Öµ4K*/
+    HI_U32                  u32WorkBufferSize;      /**<VBI data buffer size used in driver,more than 2K,suggest 2K*//**<CNcomment:VBIï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð½ï¿½ï¿½Õ»ï¿½ï¿½ï¿½ï¿½Ð¡ï¿½ï¿½Ð¡ï¿½ï¿½2Kï¿½ï¿½ï¿½Æ¼ï¿½Öµ2K*/
 } HI_UNF_DISP_VBI_CFG_S;
 
 /** define VBI information structure*/
-/**CNcomment: ¶¨ÒåVBIÐÅÏ¢Êý¾Ý½á¹¹*/
+/**CNcomment: ï¿½ï¿½ï¿½ï¿½VBIï¿½ï¿½Ï¢ï¿½ï¿½Ý½á¹¹*/
 typedef struct hiUNF_DISP_VBI_DATA_S
 {
-    HI_UNF_DISP_VBI_TYPE_E  enType;                  /**<VBI type*//**<CNcomment: VBI ÀàÐÍ*/
-    HI_U8                   *pu8DataAddr;           /**<Vbi data buffer virtual address*//**<CNcomment:VbiÊý¾ÝÓÃ»§ÐéÄâµØÖ·*/
-    HI_U32                  u32DataLen;             /**<Vbi data lenght*//**<CNcomment:VbiÊý¾Ý³¤¶È*/
+    HI_UNF_DISP_VBI_TYPE_E  enType;                  /**<VBI type*//**<CNcomment: VBI ï¿½ï¿½ï¿½ï¿½*/
+    HI_U8                   *pu8DataAddr;           /**<Vbi data buffer virtual address*//**<CNcomment:Vbiï¿½ï¿½ï¿½ï¿½Ã»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö·*/
+    HI_U32                  u32DataLen;             /**<Vbi data lenght*//**<CNcomment:Vbiï¿½ï¿½Ý³ï¿½ï¿½ï¿½*/
 } HI_UNF_DISP_VBI_DATA_S;
 
 /**Defines the MAX buffer number.*/ 
-/** CNcomment:¶¨Òå×î´óµÄbuffer ·ÖÅäÊý*/
+/** CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½buffer ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½*/
 #define HI_DISP_CAST_BUFFER_MAX_NUMBER ( 16 )                                
 
 /**define CAST config */
-/**CNcomment:¶¨ÒåÆÁÄ»Í¶Ó°ÅäÖÃ*/
+/**CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä»Í¶Ó°ï¿½ï¿½ï¿½ï¿½*/
 typedef struct hiUNF_DISP_CAST_ATTR_S
 {
-    HI_UNF_VIDEO_FORMAT_E enFormat;                                        /**<the output video format.*//**<CNcomment:¶¨ÒåÊä³öÊÓÆµ¸ñÊ½*/
-    HI_U32                u32Width;                                       /**<the output video width.*//**<CNcomment:¶¨ÒåÊä³öÊÓÆµµÄ¿í*/
-    HI_U32                u32Height;                                      /**<the output video height.*//**<CNcomment:¶¨ÒåÊä³öÊÓÆµµÄ¸ß*/
-    HI_BOOL               bLowDelay;                                      /**<work at low delay mode.*//**<CNcomment:ÆôÓÃµÍÑÓ³ÙÄ£Ê½*/
-    HI_U32                u32BufNum;                                      /**<the buffer number.*//**<CNcomment:¶¨Òå·ÖÅäbuffer Êý*/
-    HI_BOOL               bUserAlloc;                                     /**<whether is user alloc memory*/  	/**<CNcomment:¶¨ÒåÊÇ·ñÓÃ»§·ÖÅäÄÚ´æ*/
-    HI_U32                u32BufSize;                                     /**<each the buffer size.*//**<CNcomment:¶¨ÒåÓÃ»§·ÖÅäÃ¿¸öbuffer ´óÐ¡*/
-    HI_U32                u32BufStride;                                   /**<the horizonal stride.*//**<CNcomment:¶¨ÒåÐÐ¶ÔÆë*/
-    HI_U32                u32BufPhyAddr[HI_DISP_CAST_BUFFER_MAX_NUMBER];  /**<the buffer physics address.*//**<CNcomment:·ÖÅäÄÚ´æbuffer ³ÉÔ±µÄÎïÀíµØÖ·*/
-    HI_BOOL               bCrop;                                          /**<whether enable crop .*//**<CNcomment:¶¨ÒåÊÇ·ñ½øÐÐcrop*/
-    HI_UNF_CROP_RECT_S    stCropRect;                                     /**<the crop wise .*//**<CNcomment:¶¨Òåcrop ·¶Î§*/
+    HI_UNF_VIDEO_FORMAT_E enFormat;                                        /**<the output video format.*//**<CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æµï¿½ï¿½Ê½*/
+    HI_U32                u32Width;                                       /**<the output video width.*//**<CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æµï¿½Ä¿ï¿½*/
+    HI_U32                u32Height;                                      /**<the output video height.*//**<CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æµï¿½Ä¸ï¿½*/
+    HI_BOOL               bLowDelay;                                      /**<work at low delay mode.*//**<CNcomment:ï¿½ï¿½ï¿½Ãµï¿½ï¿½Ó³ï¿½Ä£Ê½*/
+    HI_U32                u32BufNum;                                      /**<the buffer number.*//**<CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½buffer ï¿½ï¿½*/
+    HI_BOOL               bUserAlloc;                                     /**<whether is user alloc memory*/  	/**<CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ï¿½Ã»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ú´ï¿½*/
+    HI_U32                u32BufSize;                                     /**<each the buffer size.*//**<CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½Ã»ï¿½ï¿½ï¿½ï¿½ï¿½Ã¿ï¿½ï¿½buffer ï¿½ï¿½Ð¡*/
+    HI_U32                u32BufStride;                                   /**<the horizonal stride.*//**<CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½Ð¶ï¿½ï¿½ï¿½*/
+    HI_U32                u32BufPhyAddr[HI_DISP_CAST_BUFFER_MAX_NUMBER];  /**<the buffer physics address.*//**<CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½Ú´ï¿½buffer ï¿½ï¿½Ô±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö·*/
+    HI_BOOL               bCrop;                                          /**<whether enable crop .*//**<CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ï¿½ï¿½ï¿½crop*/
+    HI_UNF_CROP_RECT_S    stCropRect;                                     /**<the crop wise .*//**<CNcomment:ï¿½ï¿½ï¿½ï¿½crop ï¿½ï¿½Î§*/
 } HI_UNF_DISP_CAST_ATTR_S;
 
 /**define color setting */
-/**CNcomment:¶¨ÒåÉ«²ÊÉèÖÃ*/
+/**CNcomment:ï¿½ï¿½ï¿½ï¿½É«ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½*/
 typedef struct hiUNF_DISP_COLOR_SETTING_S
 {
-    HI_BOOL bGammaEnable;         /**<whether Gamma enable.*//**<CNcomment:¶¨ÒåGamma Ê¹ÄÜ*/
-    HI_BOOL bUseCustGammaTable;   /**<whether use custom GammaTable.*//**<CNcomment:ÊÇ·ñÊ¹ÓÃÓÃ»§Gamma±í*/
-    HI_BOOL bColorCorrectEnable;  /**<whether Color Correct.*//**<CNcomment:ÊÇ·ñÉ«²ÊÐ£Õý*/
-    HI_S32  s32ColorTemp;         /**<color Temp.*//**<CNcomment:É«ÎÂ*/
-    HI_U32  u32Reserve;           /**<Reserve.*//**<CNcomment:±£Áô*/
-    HI_VOID *pPrivate;            /**<Private.*//**<CNcomment:Ë½ÓÐÌåÖ¸Õë*/
+    HI_BOOL bGammaEnable;         /**<whether Gamma enable.*//**<CNcomment:ï¿½ï¿½ï¿½ï¿½Gamma Ê¹ï¿½ï¿½*/
+    HI_BOOL bUseCustGammaTable;   /**<whether use custom GammaTable.*//**<CNcomment:ï¿½Ç·ï¿½Ê¹ï¿½ï¿½ï¿½Ã»ï¿½Gammaï¿½ï¿½*/
+    HI_BOOL bColorCorrectEnable;  /**<whether Color Correct.*//**<CNcomment:ï¿½Ç·ï¿½É«ï¿½ï¿½Ð£ï¿½ï¿½*/
+    HI_S32  s32ColorTemp;         /**<color Temp.*//**<CNcomment:É«ï¿½ï¿½*/
+    HI_U32  u32Reserve;           /**<Reserve.*//**<CNcomment:ï¿½ï¿½ï¿½ï¿½*/
+    HI_VOID *pPrivate;            /**<Private.*//**<CNcomment:Ë½ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½*/
 }HI_UNF_DISP_COLOR_SETTING_S;
 
 /**define the struct about color */
-/**CNcomment:¶¨ÒåÏÔÊ¾ÑÕÉ«µÄ½á¹¹Ìå */
+/**CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¾ï¿½ï¿½É«ï¿½Ä½á¹¹ï¿½ï¿½ */
 typedef struct  hiUNF_DISP_BG_COLOR_S
 {
-    HI_U8 u8Red;                  /**<red *//**<CNcomment:ºìÉ«·ÖÁ¿*/
-    HI_U8 u8Green;                /**<green*//**<CNcomment:ÂÌÉ«·ÖÁ¿*/
-    HI_U8 u8Blue;                 /**<blue*//**<CNcomment:À¶É«·ÖÁ¿*/
+    HI_U8 u8Red;                  /**<red *//**<CNcomment:ï¿½ï¿½É«ï¿½ï¿½ï¿½ï¿½*/
+    HI_U8 u8Green;                /**<green*//**<CNcomment:ï¿½ï¿½É«ï¿½ï¿½ï¿½ï¿½*/
+    HI_U8 u8Blue;                 /**<blue*//**<CNcomment:ï¿½ï¿½É«ï¿½ï¿½ï¿½ï¿½*/
 } HI_UNF_DISP_BG_COLOR_S;
 
 /********************************ENCODER STRUCT********************************/
 /** define the enum of Macrovision output type*/
-/** CNcomment:ÏÔÊ¾Êä³öMacrovisionÄ£Ê½Ã¶¾Ù¶¨Òå*/
+/** CNcomment:ï¿½ï¿½Ê¾ï¿½ï¿½ï¿½MacrovisionÄ£Ê½Ã¶ï¿½Ù¶ï¿½ï¿½ï¿½*/
 typedef enum hiUNF_DISP_MACROVISION_MODE_E
 {
-    HI_UNF_DISP_MACROVISION_MODE_TYPE0,     /**<type 0 *//**<CNcomment:µäÐÍÅäÖÃ0 */
-    HI_UNF_DISP_MACROVISION_MODE_TYPE1,     /**<type 1 *//**<CNcomment:µäÐÍÅäÖÃ1 */
-    HI_UNF_DISP_MACROVISION_MODE_TYPE2,     /**<type 2 *//**<CNcomment:µäÐÍÅäÖÃ2 */
-    HI_UNF_DISP_MACROVISION_MODE_TYPE3,     /**<type 3 *//**<CNcomment:µäÐÍÅäÖÃ3 */
-    HI_UNF_DISP_MACROVISION_MODE_CUSTOM,    /**<type of configure by user *//**<CNcomment:ÓÃ»§×Ô¶¨ÒåÅäÖÃ */
+    HI_UNF_DISP_MACROVISION_MODE_TYPE0,     /**<type 0 *//**<CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½0 */
+    HI_UNF_DISP_MACROVISION_MODE_TYPE1,     /**<type 1 *//**<CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½1 */
+    HI_UNF_DISP_MACROVISION_MODE_TYPE2,     /**<type 2 *//**<CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½2 */
+    HI_UNF_DISP_MACROVISION_MODE_TYPE3,     /**<type 3 *//**<CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½3 */
+    HI_UNF_DISP_MACROVISION_MODE_CUSTOM,    /**<type of configure by user *//**<CNcomment:ï¿½Ã»ï¿½ï¿½Ô¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ */
     HI_UNF_DISP_MACROVISION_MODE_BUTT
 } HI_UNF_DISP_MACROVISION_MODE_E;
 
 /** CGMS type select */
-/**CNcomment:CGMS ÀàÐÍÑ¡Ôñ*/
+/**CNcomment:CGMS ï¿½ï¿½ï¿½ï¿½Ñ¡ï¿½ï¿½*/
 typedef enum hiUNF_DISP_CGMS_TYPE_E
 {
-    HI_UNF_DISP_CGMS_TYPE_A = 0x00,     /**<CGMS type  A*//**<CNcomment:CGMS ÀàÐÍA*/
-    HI_UNF_DISP_CGMS_TYPE_B,            /**<CGMS type  B*//**<CNcomment:CGMS ÀàÐÍB*/
+    HI_UNF_DISP_CGMS_TYPE_A = 0x00,     /**<CGMS type  A*//**<CNcomment:CGMS ï¿½ï¿½ï¿½ï¿½A*/
+    HI_UNF_DISP_CGMS_TYPE_B,            /**<CGMS type  B*//**<CNcomment:CGMS ï¿½ï¿½ï¿½ï¿½B*/
 
     HI_UNF_DISP_CGMS_TYPE_BUTT
 }HI_UNF_DISP_CGMS_TYPE_E;
 
 /** definition of CGMS mode */
-/**CNcomment:¶¨ÒåCGMS Ä£Ê½*/
+/**CNcomment:ï¿½ï¿½ï¿½ï¿½CGMS Ä£Ê½*/
 typedef enum hiUNF_DISP_CGMS_MODE_E
 {
-    HI_UNF_DISP_CGMS_MODE_COPY_FREELY  = 0,     /**<copying is permitted without restriction *//**<CNcomment:ÎÞÏÞÖÆ¿½±´*/
-    HI_UNF_DISP_CGMS_MODE_COPY_NO_MORE = 0x01,  /**<No more copies are allowed (one generation copy has been made)*//**<CNcomment:¿½±´Ò»´Îºó²»ÔÊÐíÔÙ±»¿½±´*/
-    HI_UNF_DISP_CGMS_MODE_COPY_ONCE	   = 0x02,  /**<One generation of copies may be made *//**<CNcomment:½öÔÊÐí¿½±´Ò»´Î*/
-    HI_UNF_DISP_CGMS_MODE_COPY_NEVER   = 0x03,  /**<No copying is permitted *//**<CNcomment:²»ÔÊÐí¿½±´*/
+    HI_UNF_DISP_CGMS_MODE_COPY_FREELY  = 0,     /**<copying is permitted without restriction *//**<CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½Æ¿ï¿½ï¿½ï¿½*/
+    HI_UNF_DISP_CGMS_MODE_COPY_NO_MORE = 0x01,  /**<No more copies are allowed (one generation copy has been made)*//**<CNcomment:ï¿½ï¿½ï¿½ï¿½Ò»ï¿½Îºï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ù±ï¿½ï¿½ï¿½ï¿½ï¿½*/
+    HI_UNF_DISP_CGMS_MODE_COPY_ONCE	   = 0x02,  /**<One generation of copies may be made *//**<CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½?ï¿½ï¿½Ò»ï¿½ï¿½*/
+    HI_UNF_DISP_CGMS_MODE_COPY_NEVER   = 0x03,  /**<No copying is permitted *//**<CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½?ï¿½ï¿½*/
 
     HI_UNF_DISP_CGMS_MODE_BUTT
 }HI_UNF_DISP_CGMS_MODE_E;
@@ -347,58 +348,58 @@ typedef enum hiUNF_DISP_CGMS_MODE_E
 /** definition of CGMS configuration */
 typedef struct hiUNF_DISP_CGMS_CFG_S
 {
-    HI_BOOL					bEnable;            /**<HI_TRUE:CGMS is enabled; HI_FALSE:CGMS is disabled *//**<CNcomment:CGMS Ê¹ÄÜÑ¡Ïî*/
-    HI_UNF_DISP_CGMS_TYPE_E enType;             /**<type-A or type-B or None(BUTT) *//**<CNcomment:CGMS ÀàÐÍ*/
+    HI_BOOL					bEnable;            /**<HI_TRUE:CGMS is enabled; HI_FALSE:CGMS is disabled *//**<CNcomment:CGMS Ê¹ï¿½ï¿½Ñ¡ï¿½ï¿½*/
+    HI_UNF_DISP_CGMS_TYPE_E enType;             /**<type-A or type-B or None(BUTT) *//**<CNcomment:CGMS ï¿½ï¿½ï¿½ï¿½*/
     HI_UNF_DISP_CGMS_MODE_E enMode;             /**<CGMS mode. *//**<CNcomment:CGMS Ä£Ê½*/
 }HI_UNF_DISP_CGMS_CFG_S;
 
 /**define WSS information structure*/
-/**CNcomment:¶¨ÒåÍ¼ÎÄÐÅÏ¢Êý¾Ý½á¹¹ */
+/**CNcomment:ï¿½ï¿½ï¿½ï¿½Í¼ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½Ý½á¹¹ */
 typedef struct hiUNF_DISP_WSS_DATA_S
 {
-    HI_BOOL bEnable;                            /**<WSS configure enable HI_TRUE: enable,HI_FALSE: disnable*//**<CNcomment:WSSÅäÖÃÊ¹ÄÜ¡£HI_TRUE£ºÊ¹ÄÜ£»HI_FALSE£º½ûÖ¹*/
-    HI_U16  u16Data;                            /**<Wss data */ /**<CNcomment:WssÊý¾Ý*/
+    HI_BOOL bEnable;                            /**<WSS configure enable HI_TRUE: enable,HI_FALSE: disnable*//**<CNcomment:WSSï¿½ï¿½ï¿½ï¿½Ê¹ï¿½Ü¡ï¿½HI_TRUEï¿½ï¿½Ê¹ï¿½Ü£ï¿½HI_FALSEï¿½ï¿½ï¿½ï¿½Ö¹*/
+    HI_U16  u16Data;                            /**<Wss data */ /**<CNcomment:Wssï¿½ï¿½ï¿½*/
 }HI_UNF_DISP_WSS_DATA_S;
 
 /**define display attribute stucture*/
-/**CNcomment:¶¨ÒåÏÔÊ¾ÊôÐÔ½á¹¹Ìå */
+/**CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¾ï¿½ï¿½ï¿½Ô½á¹¹ï¿½ï¿½ */
 typedef struct hiUNF_DISP_ATTR_S
 {
-    HI_UNF_ENC_FMT_E       enEncodingFormat;   /**<format of display device *//**<CNcomment:ÏÔÊ¾Éè±¸ÖÆÊ½*/
-    HI_UNF_DISP_TIMING_S   stLcdPara;          /**<lcd para *//**<CNcomment:LCD²ÎÊý*/
-    HI_U32                 u32Brightness;      /**<Brightness *//**<CNcomment:ÁÁ¶È*/
-    HI_U32                 u32Contrast;        /**<Contrast *//**<CNcomment:¶Ô±È¶È*/
-    HI_U32                 u32Saturation;      /**<Saturation *//**<CNcomment:±¥ºÍ¶È*/
-    HI_U32                 u32HuePlus;         /**<HuePlus *//**<CNcomment:É«µ÷*/
-    HI_BOOL                bGammaEnable;       /**<gamma *//**<CNcomment:Ù¤Âí*/
-    HI_UNF_DISP_BG_COLOR_S stBgColor;          /**<background clor *//**<CNcomment:±³¾°É«*/
-    HI_VOID                *pRevData;          /**<reserved data *//**<CNcomment:±£ÁôÊý¾Ý*/
+    HI_UNF_ENC_FMT_E       enEncodingFormat;   /**<format of display device *//**<CNcomment:ï¿½ï¿½Ê¾ï¿½è±¸ï¿½ï¿½Ê½*/
+    HI_UNF_DISP_TIMING_S   stLcdPara;          /**<lcd para *//**<CNcomment:LCDï¿½ï¿½ï¿½ï¿½*/
+    HI_U32                 u32Brightness;      /**<Brightness *//**<CNcomment:ï¿½ï¿½ï¿½ï¿½*/
+    HI_U32                 u32Contrast;        /**<Contrast *//**<CNcomment:ï¿½Ô±È¶ï¿½*/
+    HI_U32                 u32Saturation;      /**<Saturation *//**<CNcomment:ï¿½ï¿½ï¿½Í¶ï¿½*/
+    HI_U32                 u32HuePlus;         /**<HuePlus *//**<CNcomment:É«ï¿½ï¿½*/
+    HI_BOOL                bGammaEnable;       /**<gamma *//**<CNcomment:Ù¤ï¿½ï¿½*/
+    HI_UNF_DISP_BG_COLOR_S stBgColor;          /**<background clor *//**<CNcomment:ï¿½ï¿½ï¿½ï¿½É«*/
+    HI_VOID                *pRevData;          /**<reserved data *//**<CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½*/
 }HI_UNF_DISP_ATTR_S;
 
 /**define display 3D mode stucture*/
-/**CNcomment:¶¨ÒåÏÔÊ¾Ä£Ê½½á¹¹Ìå */
+/**CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¾Ä£Ê½ï¿½á¹¹ï¿½ï¿½ */
 typedef enum hiUNF_DISP_3D_E
 {
     HI_UNF_DISP_3D_NONE = 0,
-    HI_UNF_DISP_3D_FRAME_PACKING,                   /**<3d type:Frame Packing*//**<CNcomment:3d Ä£Ê½:Ö¡·â×°*/
-    HI_UNF_DISP_3D_SIDE_BY_SIDE_HALF,               /**<3d type:Side by side half*//**<CNcomment:3d Ä£Ê½:²¢ÅÅÊ½ ×óÓÒ°ë±ß*/
-    HI_UNF_DISP_3D_TOP_AND_BOTTOM,                  /**<3d type:Top and Bottom*//**<CNcomment:3d Ä£Ê½:ÉÏÏÂÄ£Ê½*/
-    HI_UNF_DISP_3D_FIELD_ALTERNATIVE,               /**<3d type:Field alternative*//**<CNcomment:3d Ä£Ê½:³¡½»´í*/
-    HI_UNF_DISP_3D_LINE_ALTERNATIVE,                /**<3d type:Field alternative*//**<CNcomment:3d Ä£Ê½:ÐÐ½»´í*/
-    HI_UNF_DISP_3D_SIDE_BY_SIDE_FULL,               /**<3d type:Side by side full*//**<CNcomment:3d Ä£Ê½:²¢ÅÅÊ½ ×óÓÒÈ«³¡*/
+    HI_UNF_DISP_3D_FRAME_PACKING,                   /**<3d type:Frame Packing*//**<CNcomment:3d Ä£Ê½:Ö¡ï¿½ï¿½×°*/
+    HI_UNF_DISP_3D_SIDE_BY_SIDE_HALF,               /**<3d type:Side by side half*//**<CNcomment:3d Ä£Ê½:ï¿½ï¿½ï¿½ï¿½Ê½ ï¿½ï¿½ï¿½Ò°ï¿½ï¿½*/
+    HI_UNF_DISP_3D_TOP_AND_BOTTOM,                  /**<3d type:Top and Bottom*//**<CNcomment:3d Ä£Ê½:ï¿½ï¿½ï¿½ï¿½Ä£Ê½*/
+    HI_UNF_DISP_3D_FIELD_ALTERNATIVE,               /**<3d type:Field alternative*//**<CNcomment:3d Ä£Ê½:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½*/
+    HI_UNF_DISP_3D_LINE_ALTERNATIVE,                /**<3d type:Field alternative*//**<CNcomment:3d Ä£Ê½:ï¿½Ð½ï¿½ï¿½ï¿½*/
+    HI_UNF_DISP_3D_SIDE_BY_SIDE_FULL,               /**<3d type:Side by side full*//**<CNcomment:3d Ä£Ê½:ï¿½ï¿½ï¿½ï¿½Ê½ ï¿½ï¿½ï¿½ï¿½È«ï¿½ï¿½*/
     HI_UNF_DISP_3D_L_DEPTH,                         /**<3d type:L+depth*//**<CNcomment:3d Ä£Ê½:L+DEPTH*/
     HI_UNF_DISP_3D_L_DEPTH_GRAPHICS_GRAPHICS_DEPTH, /**<3d type:L+depth+Graphics+Graphics-depth*//**<CNcomment:3d Ä£Ê½:L+depth+Graphics+Graphics-depth*/
     HI_UNF_DISP_3D_BUTT
 }HI_UNF_DISP_3D_E;
 
 /**define display margin stucture*/
-/**CNcomment:¶¨ÒåÏÔÊ¾¿Õ°×ÇøÓò½á¹¹Ìå */
+/**CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¾ï¿½Õ°ï¿½ï¿½ï¿½ï¿½ï¿½á¹¹ï¿½ï¿½ */
 typedef struct hiUNF_DISP_OFFSET_S
 {
-    HI_U32 u32Left;    /**<left offset *//**<CNcomment:×ó²àÆ«ÒÆ*/
-    HI_U32 u32Top;     /**<top offset *//**<CNcomment:ÉÏ·½Æ«ÒÆ*/
-    HI_U32 u32Right;   /**<right offset *//**<CNcomment:ÓÒ²àÆ«ÒÆ*/
-    HI_U32 u32Bottom;  /**<bottom offset *//**<CNcomment:ÏÂ·½Æ«ÒÆ*/
+    HI_U32 u32Left;    /**<left offset *//**<CNcomment:ï¿½ï¿½ï¿½Æ«ï¿½ï¿½*/
+    HI_U32 u32Top;     /**<top offset *//**<CNcomment:ï¿½Ï·ï¿½Æ«ï¿½ï¿½*/
+    HI_U32 u32Right;   /**<right offset *//**<CNcomment:ï¿½Ò²ï¿½Æ«ï¿½ï¿½*/
+    HI_U32 u32Bottom;  /**<bottom offset *//**<CNcomment:ï¿½Â·ï¿½Æ«ï¿½ï¿½*/
 }HI_UNF_DISP_OFFSET_S;
 
 /** @} */  /** <!-- ==== Structure Definition end ==== */
@@ -409,958 +410,958 @@ typedef struct hiUNF_DISP_OFFSET_S
 
 
 /**
-   \brief Initiallization DISP module.CNcomment:³õÊ¼»¯DISPÄ£¿é CNend
+   \brief Initiallization DISP module.CNcomment:ï¿½ï¿½Ê¼ï¿½ï¿½DISPÄ£ï¿½ï¿½ CNend
    \attention \n
    Please call this API function, before call anyother API of DISP module.
-   CNcomment:µ÷ÓÃDISPÄ£¿éÆäËü½Ó¿ÚÇ°ÒªÇóÊ×ÏÈµ÷ÓÃ±¾½Ó¿Ú CNend
-   \param  none.CNcomment:ÎÞ CNend
-   \retval ::HI_SUCCESS  operation success.CNcomment:³É¹¦ CNend
-   \retval ::HI_ERR_DISP_DEV_NOT_EXIST DISP device not exist.CNcomment:Éè±¸²»´æÔÚ CNend
-   \retval ::HI_ERR_DISP_NOT_DEV_FILE  DISP  not device file .CNcomment:·ÇÉè±¸ CNend
-   \retval ::HI_ERR_DISP_DEV_OPEN_ERR  DISP  open fail.CNcomment:´ò¿ªÊ§°Ü CNend
+   CNcomment:ï¿½ï¿½ï¿½ï¿½DISPÄ£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó¿ï¿½Ç°Òªï¿½ï¿½ï¿½ï¿½ï¿½Èµï¿½ï¿½Ã±ï¿½ï¿½Ó¿ï¿½ CNend
+   \param  none.CNcomment:ï¿½ï¿½ CNend
+   \retval ::HI_SUCCESS  operation success.CNcomment:ï¿½É¹ï¿½ CNend
+   \retval ::HI_ERR_DISP_DEV_NOT_EXIST DISP device not exist.CNcomment:ï¿½è±¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ CNend
+   \retval ::HI_ERR_DISP_NOT_DEV_FILE  DISP  not device file .CNcomment:ï¿½ï¿½ï¿½è±¸ CNend
+   \retval ::HI_ERR_DISP_DEV_OPEN_ERR  DISP  open fail.CNcomment:ï¿½ï¿½Ê§ï¿½ï¿½ CNend
    \see \n
-   none.CNcomment:ÎÞ CNend
+   none.CNcomment:ï¿½ï¿½ CNend
  */
 HI_S32 HI_UNF_DISP_Init( HI_VOID );
 
 
 /**
-   \brief deinital.CNcomment:È¥³õÊ¼»¯DISPÄ£¿é CNend
+   \brief deinital.CNcomment:È¥ï¿½ï¿½Ê¼ï¿½ï¿½DISPÄ£ï¿½ï¿½ CNend
    \attention \n
    please call API HI_UNF_DISP_Close and open all the DISP device, before call this API.
-   CNcomment:ÔÚµ÷ÓÃ::HI_UNF_DISP_Close½Ó¿Ú¹Ø±ÕËùÓÐ´ò¿ªµÄDISPºóµ÷ÓÃ±¾½Ó¿Ú CNend
-   \param none.CNcomment:ÎÞ CNend
-   \retval ::HI_SUCCESS success.CNcomment:³É¹¦ CNend
-   \retval ::HI_ERR_DISP_DEV_CLOSE_ERR  DISP close fail.CNcomment:¹Ø±ÕÊ§°Ü CNend
+   CNcomment:ï¿½Úµï¿½ï¿½ï¿½::HI_UNF_DISP_Closeï¿½Ó¿Ú¹Ø±ï¿½ï¿½ï¿½ï¿½Ð´ò¿ªµï¿½DISPï¿½ï¿½ï¿½ï¿½Ã±ï¿½ï¿½Ó¿ï¿½ CNend
+   \param none.CNcomment:ï¿½ï¿½ CNend
+   \retval ::HI_SUCCESS success.CNcomment:ï¿½É¹ï¿½ CNend
+   \retval ::HI_ERR_DISP_DEV_CLOSE_ERR  DISP close fail.CNcomment:ï¿½Ø±ï¿½Ê§ï¿½ï¿½ CNend
    \see \n
-   none.CNcomment:ÎÞ CNend
+   none.CNcomment:ï¿½ï¿½ CNend
  */
 HI_S32 HI_UNF_DISP_DeInit( HI_VOID );
 
 
 /**
-   \brief Attach one DISP channel to anoter.CNcomment:½«Á½¸öDISPÍ¨µÀ°ó¶¨ CNend
+   \brief Attach one DISP channel to anoter.CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½DISPÍ¨ï¿½ï¿½ï¿½ï¿½ CNend
    \attention \n
    Please finish the attach operation before the DISP channel has been open, and currently we only support HD channel attach to SD channel.
-   CNcomment:Ä¿Ç°Ö§³Ö½«¸ßÇåDISP°ó¶¨µ½±êÇåDISPÍ¨µÀÉÏ£¬°ó¶¨ÔÚ´ò¿ªDISPÍ¨µÀÇ°±ØÐëÍê³É°ó¶¨²Ù×÷¡£ CNend
-   \param[in] enDstDisp   Destination DISP channel.CNcomment:Ä¿±êDISPÍ¨µÀºÅ CNend
-   \param[in] enSrcDisp   source DISP channel.CNcomment:  Ô´DISPÍ¨µÀºÅ CNend
-   \retval ::HI_SUCCESS  operation success.CNcomment:³É¹¦ CNend
-   \retval ::HI_ERR_DISP_DEV_NO_INIT  display not be initialization.CNcomment:DISPÎ´³õÊ¼»¯ CNend
-   \retval ::HI_ERR_DISP_INVALID_PARA  invalid input parameter.CNcomment:ÊäÈë²ÎÊý·Ç·¨ CNend
-   \retval ::HI_ERR_DISP_INVALID_OPT   invalid opeation.CNcomment:²Ù×÷·Ç·¨ CNend
+   CNcomment:Ä¿Ç°Ö§ï¿½Ö½ï¿½ï¿½ï¿½ï¿½ï¿½DISPï¿½ó¶¨µï¿½ï¿½ï¿½ï¿½ï¿½DISPÍ¨ï¿½ï¿½ï¿½Ï£ï¿½ï¿½ï¿½ï¿½Ú´ï¿½DISPÍ¨ï¿½ï¿½Ç°ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½É°ó¶¨²ï¿½ï¿½ï¿½ï¿½ï¿½ CNend
+   \param[in] enDstDisp   Destination DISP channel.CNcomment:Ä¿ï¿½ï¿½DISPÍ¨ï¿½ï¿½ï¿½ï¿½ CNend
+   \param[in] enSrcDisp   source DISP channel.CNcomment:  Ô´DISPÍ¨ï¿½ï¿½ï¿½ï¿½ CNend
+   \retval ::HI_SUCCESS  operation success.CNcomment:ï¿½É¹ï¿½ CNend
+   \retval ::HI_ERR_DISP_DEV_NO_INIT  display not be initialization.CNcomment:DISPÎ´ï¿½ï¿½Ê¼ï¿½ï¿½ CNend
+   \retval ::HI_ERR_DISP_INVALID_PARA  invalid input parameter.CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ CNend
+   \retval ::HI_ERR_DISP_INVALID_OPT   invalid opeation.CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ CNend
    \see \n
-   none.CNcomment:ÎÞ CNend
+   none.CNcomment:ï¿½ï¿½ CNend
  */
 HI_S32 HI_UNF_DISP_Attach( HI_UNF_DISP_E enDstDisp, HI_UNF_DISP_E enSrcDisp );
 
 
 /**
-   \brief dettach DISP.CNcomment:½«Á½¸öDISPÍ¨µÀ½â°ó¶¨ CNend
+   \brief dettach DISP.CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½DISPÍ¨ï¿½ï¿½ï¿½ï¿½ï¿½ CNend
    \attention \n
    should  close the DISP channels, before do detach operation.
-   CNcomment:Ö»ÓÐÔÚ¹Ø±ÕÁ½¸öDISPÍ¨µÀºó²ÅÄÜ½øÐÐ½â°ó¶¨²Ù×÷¡£ CNend
-   \param[in] enDstDisp   Destination DISP channel.CNcomment:Ä¿±êDISPÍ¨µÀºÅ CNend
-   \param[in] enSrcDisp    source DISP channel.CNcomment: Ô´DISPÍ¨µÀºÅ CNend
-   \retval ::HI_SUCCESS  success.CNcomment:³É¹¦ CNend
-   \retval ::HI_ERR_DISP_DEV_NO_INIT   DISP uninitialization.CNcomment:DISPÎ´³õÊ¼»¯ CNend
-   \retval ::HI_ERR_DISP_INVALID_PARA  invalid input parameter.CNcomment:ÊäÈë²ÎÊý·Ç·¨ CNend
-   \retval ::HI_ERR_DISP_INVALID_OPT   invalid operation.CNcomment:²Ù×÷·Ç·¨ CNend
+   CNcomment:Ö»ï¿½ï¿½ï¿½Ú¹Ø±ï¿½ï¿½ï¿½ï¿½ï¿½DISPÍ¨ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ü½ï¿½ï¿½Ð½ï¿½ó¶¨²ï¿½ï¿½ï¿½ï¿½ï¿½ CNend
+   \param[in] enDstDisp   Destination DISP channel.CNcomment:Ä¿ï¿½ï¿½DISPÍ¨ï¿½ï¿½ï¿½ï¿½ CNend
+   \param[in] enSrcDisp    source DISP channel.CNcomment: Ô´DISPÍ¨ï¿½ï¿½ï¿½ï¿½ CNend
+   \retval ::HI_SUCCESS  success.CNcomment:ï¿½É¹ï¿½ CNend
+   \retval ::HI_ERR_DISP_DEV_NO_INIT   DISP uninitialization.CNcomment:DISPÎ´ï¿½ï¿½Ê¼ï¿½ï¿½ CNend
+   \retval ::HI_ERR_DISP_INVALID_PARA  invalid input parameter.CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ CNend
+   \retval ::HI_ERR_DISP_INVALID_OPT   invalid operation.CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ CNend
    \see \n
-   none.CNcomment:ÎÞ CNend
+   none.CNcomment:ï¿½ï¿½ CNend
  */
 HI_S32 HI_UNF_DISP_Detach( HI_UNF_DISP_E enDstDisp, HI_UNF_DISP_E enSrcDisp );
 
 
 /**
-   \brief open DISP channel.CNcomment:´ò¿ªÖ¸¶¨DISPÍ¨µÀ CNend
+   \brief open DISP channel.CNcomment:ï¿½ï¿½Ö¸ï¿½ï¿½DISPÍ¨ï¿½ï¿½ CNend
    \attention \n
    Please config the valid parameters before open DISP.
-   CNcomment:ÔÚ´ò¿ªDISPÖ®Ç°£¬ÏÈÍê³É¶ÔÆäµÄ²ÎÊýÉèÖÃ£¬±ÜÃâ»­ÃæÉÁË¸ CNend
-   \param[in] enDisp   DISP channel ID, please reference the define of HI_UNF_DISP_E.CNcomment:DISPÍ¨µÀºÅ£¬Çë²Î¼û::HI_UNF_DISP_E CNend
-   \retval ::HI_SUCCESS success.CNcomment:³É¹¦ CNend
-   \retval ::HI_ERR_DISP_DEV_NO_INIT   DISP uninitialization.CNcomment:DISPÎ´³õÊ¼»¯ CNend
-   \retval ::HI_ERR_DISP_INVALID_PARA  invalid input parameter.CNcomment:ÊäÈë²ÎÊý·Ç·¨ CNend
-   \retval ::HI_ERR_DISP_CREATE_ERR    DISP create fail.CNcomment:DISP´´½¨Ê§°Ü CNend
+   CNcomment:ï¿½Ú´ï¿½DISPÖ®Ç°ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½É¶ï¿½ï¿½ï¿½Ä²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã£ï¿½ï¿½ï¿½ï¿½â»­ï¿½ï¿½ï¿½ï¿½Ë¸ CNend
+   \param[in] enDisp   DISP channel ID, please reference the define of HI_UNF_DISP_E.CNcomment:DISPÍ¨ï¿½ï¿½ï¿½Å£ï¿½ï¿½ï¿½Î¼ï¿½::HI_UNF_DISP_E CNend
+   \retval ::HI_SUCCESS success.CNcomment:ï¿½É¹ï¿½ CNend
+   \retval ::HI_ERR_DISP_DEV_NO_INIT   DISP uninitialization.CNcomment:DISPÎ´ï¿½ï¿½Ê¼ï¿½ï¿½ CNend
+   \retval ::HI_ERR_DISP_INVALID_PARA  invalid input parameter.CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ CNend
+   \retval ::HI_ERR_DISP_CREATE_ERR    DISP create fail.CNcomment:DISPï¿½ï¿½ï¿½ï¿½Ê§ï¿½ï¿½ CNend
    \see \n
-   none.CNcomment:ÎÞ CNend
+   none.CNcomment:ï¿½ï¿½ CNend
  */
 HI_S32 HI_UNF_DISP_Open( HI_UNF_DISP_E enDisp );
 
 
 /**
-   \brief  coase DISP channel.CNcomment:¹Ø±ÕÖ¸¶¨DISP CNend
+   \brief  coase DISP channel.CNcomment:ï¿½Ø±ï¿½Ö¸ï¿½ï¿½DISP CNend
    \attention \n
    none.
-   CNcomment:ÎÞ CNend
-   \param[in] enDisp DISP channel ID.CNcomment:DISPÍ¨µÀºÅ CNend
-   \retval ::HI_SUCCESS success. CNcomment:³É¹¦ CNend
-   \retval ::HI_ERR_DISP_DEV_NO_INIT DISP uninitialization.CNcomment:DISPÎ´³õÊ¼»¯ CNend
-   \retval ::HI_ERR_DISP_INVALID_PARA invalid input parameter.CNcomment:ÊäÈë²ÎÊý·Ç·¨ CNend
+   CNcomment:ï¿½ï¿½ CNend
+   \param[in] enDisp DISP channel ID.CNcomment:DISPÍ¨ï¿½ï¿½ï¿½ï¿½ CNend
+   \retval ::HI_SUCCESS success. CNcomment:ï¿½É¹ï¿½ CNend
+   \retval ::HI_ERR_DISP_DEV_NO_INIT DISP uninitialization.CNcomment:DISPÎ´ï¿½ï¿½Ê¼ï¿½ï¿½ CNend
+   \retval ::HI_ERR_DISP_INVALID_PARA invalid input parameter.CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ CNend
    \see \n
-   none.CNcomment:ÎÞ CNend
+   none.CNcomment:ï¿½ï¿½ CNend
  */
 HI_S32 HI_UNF_DISP_Close( HI_UNF_DISP_E enDisp );
 
 
 /**
-   \brief  set DISP interface parameter.CNcomment:ÉèÖÃDISPµÄ½Ó¿Ú²ÎÊý CNend
+   \brief  set DISP interface parameter.CNcomment:ï¿½ï¿½ï¿½ï¿½DISPï¿½Ä½Ó¿Ú²ï¿½ï¿½ï¿½ CNend
    \attention \n
    The API is uesed for set  interface attach .If the interface has been attached,must be detach it ,or return HI_ERR_DISP_INVALID_OPT;\n
    There are 4 DAC provided by SOC 3712 v300. suggest, DAC 0/1/2 used by HD channel, DAC3 used by SD channel CVBS. \n
    There are 6 DAC provided by SOC 3716 v100/v200/v300. suggest, DAC 0/1/2 used by HD channel, DAC3/4/5 used by SD channel.
-   CNcomment:¸ÃAPI ÓÃÀ´ÉèÖÃÊä³ö½Ó¿ÚµÄ°ó¶¨¹ØÏµ£¬Èç¹ûÉèÖÃÒÑ±»°ó¶¨¹ýµÄ½Ó¿Ú£¬ÔòÐèÒªÏÈ½øÐÐDetach²Ù×÷\n
-   ½â³ý°ó¶¨¹ØÏµ£¬·ñÔò·µ»Ø´íÎóHI_ERR_DISP_INVALID_OPT;\n 
-   3712 v300 Ð¾Æ¬¹²ÓÐ4¸öDAC£¬ÍÆ¼ö0£¬1£¬2ÓÃ×÷¸ßÇåÊä³ö£¬3ÓÃ×÷±êÇåCVBSÊä³ö¡£\n
-   3716 v100/v200/v300 Ð¾Æ¬¹²ÓÐ6¸öDAC£¬ÍÆ¼ö0£¬1£¬2ÓÃ×÷¸ßÇåÊä³ö£¬3£¬4£¬5ÓÃ×÷±êÇåÊä³ö¡£CNend
-   \param[in] enDisp      DISP channel ID.CNcomment:DISPÍ¨µÀºÅ CNend
-   \param[in] u32IntfNum  DISP intf num of DISP channel.CNcomment:DISPÍ¨µÀÉÏµÄ½Ó¿ÚÊýÄ¿ CNend
-   \param[in] pstIntf  DISP intf para.CNcomment:DISP½Ó¿Ú²ÎÊý CNend
-   \retval ::HI_SUCCESS   success.CNcomment:³É¹¦ CNend
-   \retval ::HI_ERR_DISP_DEV_NO_INIT   DISP uninitialization.CNcomment:DISPÎ´³õÊ¼»¯ CNend
-   \retval ::HI_ERR_DISP_NULL_PTR      Input pointer is NULL.CNcomment:ÊäÈëÖ¸ÕëÎª¿Õ CNend
-   \retval ::HI_ERR_DISP_INVALID_PARA  invalid input parameter.CNcomment:ÊäÈë²ÎÊý·Ç·¨ CNend
-   \retval ::HI_ERR_DISP_INVALID_OPT   invalid operation.CNcomment:²Ù×÷·Ç·¨ CNend
+   CNcomment:ï¿½ï¿½API ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó¿ÚµÄ°ó¶¨¹ï¿½Ïµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ñ±ï¿½ï¿½ó¶¨¹ï¿½Ä½Ó¿Ú£ï¿½ï¿½ï¿½ï¿½ï¿½Òªï¿½È½ï¿½ï¿½ï¿½Detachï¿½ï¿½ï¿½ï¿½\n
+   ï¿½ï¿½ï¿½ó¶¨¹ï¿½Ïµï¿½ï¿½ï¿½ï¿½ï¿½ò·µ»Ø´ï¿½ï¿½ï¿½HI_ERR_DISP_INVALID_OPT;\n 
+   3712 v300 Ð¾Æ¬ï¿½ï¿½ï¿½ï¿½4ï¿½ï¿½DACï¿½ï¿½ï¿½Æ¼ï¿½0ï¿½ï¿½1ï¿½ï¿½2ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½3ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½CVBSï¿½ï¿½ï¿½ï¿½ï¿½\n
+   3716 v100/v200/v300 Ð¾Æ¬ï¿½ï¿½ï¿½ï¿½6ï¿½ï¿½DACï¿½ï¿½ï¿½Æ¼ï¿½0ï¿½ï¿½1ï¿½ï¿½2ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½3ï¿½ï¿½4ï¿½ï¿½5ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½CNend
+   \param[in] enDisp      DISP channel ID.CNcomment:DISPÍ¨ï¿½ï¿½ï¿½ï¿½ CNend
+   \param[in] u32IntfNum  DISP intf num of DISP channel.CNcomment:DISPÍ¨ï¿½ï¿½ï¿½ÏµÄ½Ó¿ï¿½ï¿½ï¿½Ä¿ CNend
+   \param[in] pstIntf  DISP intf para.CNcomment:DISPï¿½Ó¿Ú²ï¿½ï¿½ï¿½ CNend
+   \retval ::HI_SUCCESS   success.CNcomment:ï¿½É¹ï¿½ CNend
+   \retval ::HI_ERR_DISP_DEV_NO_INIT   DISP uninitialization.CNcomment:DISPÎ´ï¿½ï¿½Ê¼ï¿½ï¿½ CNend
+   \retval ::HI_ERR_DISP_NULL_PTR      Input pointer is NULL.CNcomment:ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½Îªï¿½ï¿½ CNend
+   \retval ::HI_ERR_DISP_INVALID_PARA  invalid input parameter.CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ CNend
+   \retval ::HI_ERR_DISP_INVALID_OPT   invalid operation.CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ CNend
    \see \n
-   none.CNcomment:ÎÞ CNend
+   none.CNcomment:ï¿½ï¿½ CNend
  */
 HI_S32 HI_UNF_DISP_AttachIntf( HI_UNF_DISP_E enDisp, HI_UNF_DISP_INTF_S *pstIntf, HI_U32 u32IntfNum );
 
 
 /**
-   \brief cancel DISP interface parameter.CNcomment:È¡ÏûDISPµÄ½Ó¿Ú²ÎÊý CNend
+   \brief cancel DISP interface parameter.CNcomment:È¡ï¿½ï¿½DISPï¿½Ä½Ó¿Ú²ï¿½ï¿½ï¿½ CNend
    \attention \n
    The API is uesed to  detach  interface.
-   CNcomment:Õâ¸öAPI ÓÃÀ´½â³ý½Ó¿ÚµÄ°ó¶¨¹ØÏµ¡£ CNend
-   \param[in] enDisp        DISP channel ID.CNcomment:DISPÍ¨µÀºÅ CNend
-   \param[in] u32IntfNum  DISP interface number of DISP channel.CNcomment:DISPÍ¨µÀÉÏµÄ½Ó¿ÚÊýÄ¿ CNend
-   \param[in] pstIntf  DISP interface para.CNcomment:DISP½Ó¿Ú²ÎÊý CNend
-   \retval ::HI_SUCCESS   success. CNcomment:³É¹¦ CNend
-   \retval ::HI_ERR_DISP_DEV_NO_INIT   DISP uninitialization.CNcomment:DISPÎ´³õÊ¼»¯ CNend
-   \retval ::HI_ERR_DISP_NULL_PTR        Input pointer is NULL.CNcomment:ÊäÈëÖ¸ÕëÎª¿Õ CNend
-   \retval ::HI_ERR_DISP_INVALID_PARA  invalid input parameter.CNcomment:ÊäÈë²ÎÊý·Ç·¨ CNend
-   \retval ::HI_ERR_DISP_INVALID_OPT   invalid operation.CNcomment:²Ù×÷·Ç·¨ CNend
+   CNcomment:ï¿½ï¿½ï¿½API ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó¿ÚµÄ°ó¶¨¹ï¿½Ïµï¿½ï¿½ CNend
+   \param[in] enDisp        DISP channel ID.CNcomment:DISPÍ¨ï¿½ï¿½ï¿½ï¿½ CNend
+   \param[in] u32IntfNum  DISP interface number of DISP channel.CNcomment:DISPÍ¨ï¿½ï¿½ï¿½ÏµÄ½Ó¿ï¿½ï¿½ï¿½Ä¿ CNend
+   \param[in] pstIntf  DISP interface para.CNcomment:DISPï¿½Ó¿Ú²ï¿½ï¿½ï¿½ CNend
+   \retval ::HI_SUCCESS   success. CNcomment:ï¿½É¹ï¿½ CNend
+   \retval ::HI_ERR_DISP_DEV_NO_INIT   DISP uninitialization.CNcomment:DISPÎ´ï¿½ï¿½Ê¼ï¿½ï¿½ CNend
+   \retval ::HI_ERR_DISP_NULL_PTR        Input pointer is NULL.CNcomment:ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½Îªï¿½ï¿½ CNend
+   \retval ::HI_ERR_DISP_INVALID_PARA  invalid input parameter.CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ CNend
+   \retval ::HI_ERR_DISP_INVALID_OPT   invalid operation.CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ CNend
    \see \n
-   none.CNcomment:ÎÞ CNend
+   none.CNcomment:ï¿½ï¿½ CNend
  */
 HI_S32 HI_UNF_DISP_DetachIntf( HI_UNF_DISP_E enDisp, HI_UNF_DISP_INTF_S *pstIntf, HI_U32 u32IntfNum );
 
 
 /**
-   \brief set DISP output format.CNcomment:ÉèÖÃDISPµÄÖÆÊ½ CNend
+   \brief set DISP output format.CNcomment:ï¿½ï¿½ï¿½ï¿½DISPï¿½ï¿½ï¿½ï¿½Ê½ CNend
    \attention \n
    for HD DISP channel please set HD display format, and for SD DISP channel please set SD display format.\n
    for scenario of HD,SD use same source, only support format which frame rate is 50Hz or 60Hz.
-   CNcomment:¶Ô¸ßÇåµÄDISP£¬Ö»ÄÜÉèÖÃ¸ßÇåµÄÖÆÊ½£»¶Ô±êÇåµÄDISP£¬Ö»ÄÜÉèÖÃ±êÇåµÄÖÆÊ½¡£\n
-   ÔÚÍ¬Ô´ÏÔÊ¾³¡¾°ÏÂ£¬ÔÝ²»Ö§³ÖË¢ÐÂÂÊ·Ç50Hz/60HzµÄÖÆÊ½£¬Èç£ºÔÝ²»Ö§³Ö1080P24/1080P25/1080P30 CNend
-   \param[in] enDisp               DISP channel ID.CNcomment:DISPÍ¨µÀºÅ CNend
-   \param[in] enEncodingFormat    DISP format.CNcomment:DISPµÄÖÆÊ½ CNend
-   \retval ::HI_SUCCESS  success.CNcomment:³É¹¦ CNend
-   \retval ::HI_ERR_DISP_DEV_NO_INIT    DISP uninitialization.CNcomment:DISPÎ´³õÊ¼»¯ CNend
-   \retval ::HI_ERR_DISP_NULL_PTR          Input pointer is NULL.CNcomment:ÊäÈëÖ¸ÕëÎª¿Õ CNend
-   \retval ::HI_ERR_DISP_INVALID_PARA   invalid input parameter.CNcomment:ÊäÈë²ÎÊý·Ç·¨ CNend
-   \retval ::HI_ERR_DISP_INVALID_OPT    invalid operation.CNcomment:²Ù×÷·Ç·¨ CNend
+   CNcomment:ï¿½Ô¸ï¿½ï¿½ï¿½ï¿½DISPï¿½ï¿½Ö»ï¿½ï¿½ï¿½ï¿½ï¿½Ã¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê½ï¿½ï¿½ï¿½Ô±ï¿½ï¿½ï¿½ï¿½DISPï¿½ï¿½Ö»ï¿½ï¿½ï¿½ï¿½ï¿½Ã±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê½ï¿½ï¿½\n
+   ï¿½ï¿½Í¬Ô´ï¿½ï¿½Ê¾ï¿½ï¿½ï¿½ï¿½ï¿½Â£ï¿½ï¿½Ý²ï¿½Ö§ï¿½ï¿½Ë¢ï¿½ï¿½ï¿½Ê·ï¿½50Hz/60Hzï¿½ï¿½ï¿½ï¿½Ê½ï¿½ï¿½ï¿½ç£ºï¿½Ý²ï¿½Ö§ï¿½ï¿½1080P24/1080P25/1080P30 CNend
+   \param[in] enDisp               DISP channel ID.CNcomment:DISPÍ¨ï¿½ï¿½ï¿½ï¿½ CNend
+   \param[in] enEncodingFormat    DISP format.CNcomment:DISPï¿½ï¿½ï¿½ï¿½Ê½ CNend
+   \retval ::HI_SUCCESS  success.CNcomment:ï¿½É¹ï¿½ CNend
+   \retval ::HI_ERR_DISP_DEV_NO_INIT    DISP uninitialization.CNcomment:DISPÎ´ï¿½ï¿½Ê¼ï¿½ï¿½ CNend
+   \retval ::HI_ERR_DISP_NULL_PTR          Input pointer is NULL.CNcomment:ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½Îªï¿½ï¿½ CNend
+   \retval ::HI_ERR_DISP_INVALID_PARA   invalid input parameter.CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ CNend
+   \retval ::HI_ERR_DISP_INVALID_OPT    invalid operation.CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ CNend
    \see \n
-   none.CNcomment:ÎÞ CNend
+   none.CNcomment:ï¿½ï¿½ CNend
  */
 HI_S32 HI_UNF_DISP_SetFormat( HI_UNF_DISP_E enDisp, HI_UNF_ENC_FMT_E enEncodingFormat );
 
 
 /**
-   \brief get DISP format.CNcomment:»ñÈ¡DISPµÄÖÆÊ½ CNend
+   \brief get DISP format.CNcomment:ï¿½ï¿½È¡DISPï¿½ï¿½ï¿½ï¿½Ê½ CNend
    \attention \n
-   none.CNcomment:ÎÞ CNend
-   \param[in] enDisp               DISP channel ID.CNcomment:DISPÍ¨µÀºÅ CNend
-   \param[in] penEncodingFormat    poiner of DISP format.DCNcomment:ISPµÄÖÆÊ½Ö¸Õë CNend
-   \retval ::HI_SUCCESS  success.CNcomment:³É¹¦ CNend
-   \retval ::HI_ERR_DISP_DEV_NO_INIT    DISP uninitialization.CNcomment:DISPÎ´³õÊ¼»¯ CNend
-   \retval ::HI_ERR_DISP_NULL_PTR          Input pointer is NULL.CNcomment:ÊäÈëÖ¸ÕëÎª¿Õ CNend
-   \retval ::HI_ERR_DISP_INVALID_PARA   invalid input parameter.CNcomment:ÊäÈë²ÎÊý·Ç·¨ CNend
-   \retval ::HI_ERR_DISP_INVALID_OPT    invalid operation.CNcomment:²Ù×÷·Ç·¨ CNend
+   none.CNcomment:ï¿½ï¿½ CNend
+   \param[in] enDisp               DISP channel ID.CNcomment:DISPÍ¨ï¿½ï¿½ï¿½ï¿½ CNend
+   \param[in] penEncodingFormat    poiner of DISP format.DCNcomment:ISPï¿½ï¿½ï¿½ï¿½Ê½Ö¸ï¿½ï¿½ CNend
+   \retval ::HI_SUCCESS  success.CNcomment:ï¿½É¹ï¿½ CNend
+   \retval ::HI_ERR_DISP_DEV_NO_INIT    DISP uninitialization.CNcomment:DISPÎ´ï¿½ï¿½Ê¼ï¿½ï¿½ CNend
+   \retval ::HI_ERR_DISP_NULL_PTR          Input pointer is NULL.CNcomment:ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½Îªï¿½ï¿½ CNend
+   \retval ::HI_ERR_DISP_INVALID_PARA   invalid input parameter.CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ CNend
+   \retval ::HI_ERR_DISP_INVALID_OPT    invalid operation.CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ CNend
    \see \n
-   none.CNcomment:ÎÞ CNend
+   none.CNcomment:ï¿½ï¿½ CNend
  */
 HI_S32 HI_UNF_DISP_GetFormat( HI_UNF_DISP_E enDisp, HI_UNF_ENC_FMT_E *penEncodingFormat );
 
 
 /**
-   \brief set user define LCD clock parameter.CNcomment:ÉèÖÃÓÃ»§¶¨ÒåµÄLCDÊ±Ðò²ÎÊý CNend
+   \brief set user define LCD clock parameter.CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½Ã»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½LCDÊ±ï¿½ï¿½ï¿½ï¿½ï¿½ CNend
    \attention \n
    only 3716 v100 v200 is  supported LCD.
-   CNcomment:Ö»ÓÐ3716 v100 v200 Ö§³ÖLCD CNend
-   \param[in] enDisp               DISP channel ID.CNcomment:DISPÍ¨µÀºÅ CNend
-   \param[in] pstTiming    poiner of DISP format.CNcomment:LCDÊ±Ðò²ÎÊý CNend
-   \retval ::HI_SUCCESS  success.CNcomment:³É¹¦ CNend
-   \retval ::HI_ERR_DISP_DEV_NO_INIT    DISP uninitialization.CNcomment:DISPÎ´³õÊ¼»¯ CNend
-   \retval ::HI_ERR_DISP_NULL_PTR          Input pointer is NULL.CNcomment:ÊäÈëÖ¸ÕëÎª¿Õ CNend
-   \retval ::HI_ERR_DISP_INVALID_PARA   invalid input parameter.CNcomment:ÊäÈë²ÎÊý·Ç·¨ CNend
-   \retval ::HI_ERR_DISP_INVALID_OPT    invalid operation.CNcomment:²Ù×÷·Ç·¨ CNend
+   CNcomment:Ö»ï¿½ï¿½3716 v100 v200 Ö§ï¿½ï¿½LCD CNend
+   \param[in] enDisp               DISP channel ID.CNcomment:DISPÍ¨ï¿½ï¿½ï¿½ï¿½ CNend
+   \param[in] pstTiming    poiner of DISP format.CNcomment:LCDÊ±ï¿½ï¿½ï¿½ï¿½ï¿½ CNend
+   \retval ::HI_SUCCESS  success.CNcomment:ï¿½É¹ï¿½ CNend
+   \retval ::HI_ERR_DISP_DEV_NO_INIT    DISP uninitialization.CNcomment:DISPÎ´ï¿½ï¿½Ê¼ï¿½ï¿½ CNend
+   \retval ::HI_ERR_DISP_NULL_PTR          Input pointer is NULL.CNcomment:ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½Îªï¿½ï¿½ CNend
+   \retval ::HI_ERR_DISP_INVALID_PARA   invalid input parameter.CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ CNend
+   \retval ::HI_ERR_DISP_INVALID_OPT    invalid operation.CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ CNend
    \see \n
-   none.CNcomment:ÎÞ CNend
+   none.CNcomment:ï¿½ï¿½ CNend
  */
 HI_S32 HI_UNF_DISP_SetCustomTiming( HI_UNF_DISP_E enDisp, HI_UNF_DISP_TIMING_S *pstTiming );
 
 
 /**
-   \brief  get LCD parameter which had been config.CNcomment:»ñÈ¡DISPµÄLCD²ÎÊý CNend
+   \brief  get LCD parameter which had been config.CNcomment:ï¿½ï¿½È¡DISPï¿½ï¿½LCDï¿½ï¿½ï¿½ï¿½ CNend
    \attention \n
    only 3716 v100 v200 is  supported LCD.
-   CNcomment:Ö»ÓÐ3716 v100 v200 Ö§³ÖLCD CNend
-   \param[in] enDisp          DISP channel ID.CNcomment:DISPÍ¨µÀºÅ CNend
-   \param[in] pstTiming      pointer of LCD paramter.CNcomment:Ö¸ÕëÀàÐÍ£¬LCD²ÎÊý CNend
-   \retval ::HI_SUCCESS success.CNcomment: ³É¹¦ CNend
-   \retval ::HI_ERR_DISP_DEV_NO_INIT    DISP uninitialization.CNcomment:DISPÎ´³õÊ¼»¯ CNend
-   \retval ::HI_ERR_DISP_NULL_PTR          Input pointer is NULL.CNcomment:ÊäÈëÖ¸ÕëÎª¿Õ CNend
-   \retval ::HI_ERR_DISP_INVALID_PARA   invalid input parameter.CNcomment:ÊäÈë²ÎÊý·Ç·¨ CNend
-   \retval ::HI_ERR_DISP_INVALID_OPT    invalid operation.CNcomment:²Ù×÷·Ç·¨ CNend
+   CNcomment:Ö»ï¿½ï¿½3716 v100 v200 Ö§ï¿½ï¿½LCD CNend
+   \param[in] enDisp          DISP channel ID.CNcomment:DISPÍ¨ï¿½ï¿½ï¿½ï¿½ CNend
+   \param[in] pstTiming      pointer of LCD paramter.CNcomment:Ö¸ï¿½ï¿½ï¿½ï¿½ï¿½Í£ï¿½LCDï¿½ï¿½ï¿½ï¿½ CNend
+   \retval ::HI_SUCCESS success.CNcomment: ï¿½É¹ï¿½ CNend
+   \retval ::HI_ERR_DISP_DEV_NO_INIT    DISP uninitialization.CNcomment:DISPÎ´ï¿½ï¿½Ê¼ï¿½ï¿½ CNend
+   \retval ::HI_ERR_DISP_NULL_PTR          Input pointer is NULL.CNcomment:ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½Îªï¿½ï¿½ CNend
+   \retval ::HI_ERR_DISP_INVALID_PARA   invalid input parameter.CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ CNend
+   \retval ::HI_ERR_DISP_INVALID_OPT    invalid operation.CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ CNend
    \see \n
-   none.CNcomment:ÎÞ CNend
+   none.CNcomment:ï¿½ï¿½ CNend
  */
 HI_S32 HI_UNF_DISP_GetCustomTiming( HI_UNF_DISP_E enDisp, HI_UNF_DISP_TIMING_S *pstTiming );
 
 
 /**
-   \brief   set DISP layers Z order.CNcomment:ÉèÖÃDISPÉÏµþ¼Ó²ãµÄZÐò CNend
+   \brief   set DISP layers Z order.CNcomment:ï¿½ï¿½ï¿½ï¿½DISPï¿½Ïµï¿½ï¿½Ó²ï¿½ï¿½Zï¿½ï¿½ CNend
    \attention \n
    only 3716 v100 v200 is  supported LCD.
-   CNcomment:Ö»ÓÐ3716 v100 v200 Ö§³ÖLCD CNend
-   \param[in] enDisp          DISP channel ID.CNcomment: DISPÍ¨µÀºÅ CNend
-   \param[in] enLayer        layer ID which needed overlay to the DISP channel.CNcomment: DISPÉÏµÄµþ¼Ó²ã CNend
-   \param[in] enZFlag        the way of overlay.CNcomment:ZÐòµ÷½Ú·½Ê½ CNend
-   \retval ::HI_SUCCESS  success.CNcomment:³É¹¦ CNend
-   \retval ::HI_ERR_DISP_DEV_NO_INIT    DISP uninitialization.CNcomment:DISPÎ´³õÊ¼»¯ CNend
-   \retval ::HI_ERR_DISP_NULL_PTR          Input pointer is NULL.CNcomment:ÊäÈëÖ¸ÕëÎª¿Õ CNend
-   \retval ::HI_ERR_DISP_INVALID_PARA   invalid input parameter.CNcomment:ÊäÈë²ÎÊý·Ç·¨ CNend
-   \retval ::HI_ERR_DISP_INVALID_OPT    invalid operation.CNcomment:²Ù×÷·Ç·¨ CNend
+   CNcomment:Ö»ï¿½ï¿½3716 v100 v200 Ö§ï¿½ï¿½LCD CNend
+   \param[in] enDisp          DISP channel ID.CNcomment: DISPÍ¨ï¿½ï¿½ï¿½ï¿½ CNend
+   \param[in] enLayer        layer ID which needed overlay to the DISP channel.CNcomment: DISPï¿½ÏµÄµï¿½ï¿½Ó²ï¿½ CNend
+   \param[in] enZFlag        the way of overlay.CNcomment:Zï¿½ï¿½ï¿½ï¿½Ú·ï¿½Ê½ CNend
+   \retval ::HI_SUCCESS  success.CNcomment:ï¿½É¹ï¿½ CNend
+   \retval ::HI_ERR_DISP_DEV_NO_INIT    DISP uninitialization.CNcomment:DISPÎ´ï¿½ï¿½Ê¼ï¿½ï¿½ CNend
+   \retval ::HI_ERR_DISP_NULL_PTR          Input pointer is NULL.CNcomment:ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½Îªï¿½ï¿½ CNend
+   \retval ::HI_ERR_DISP_INVALID_PARA   invalid input parameter.CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ CNend
+   \retval ::HI_ERR_DISP_INVALID_OPT    invalid operation.CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ CNend
    \see \n
-   none.CNcomment:ÎÞ CNend
+   none.CNcomment:ï¿½ï¿½ CNend
  */
 HI_S32 HI_UNF_DISP_SetLayerZorder( HI_UNF_DISP_E enDisp, HI_UNF_DISP_LAYER_E enLayer, HI_LAYER_ZORDER_E enZFlag );
 
 
 /**
-   \brief  get DISP overlay z order.CNcomment:»ñÈ¡DISPÉÏµþ¼Ó²ãµÄZÐò CNend
+   \brief  get DISP overlay z order.CNcomment:ï¿½ï¿½È¡DISPï¿½Ïµï¿½ï¿½Ó²ï¿½ï¿½Zï¿½ï¿½ CNend
    \attention \n
    In the case of HD atach to SD. the Z order configuration of HD will auto sync to SD, also the configuration of SD will auto sync to HD.
-   CNcomment:ÔÚ¸ß±êÇå°ó¶¨Çé¿öÏÂ£¬¸ßÇåDISPµÄÉèÖÃ»á×Ô¶¯Í¬²½µ½±êÇåDISP£»±êÇåDISPµÄÉèÖÃ»á×Ô¶¯Í¬²½µ½¸ßÇåDISP¡£ CNend
-   \param[in] enDisp            DISP channel ID.CNcomment:DISPÍ¨µÀºÅ CNend
-   \param[in] enLayer           CNcomment:DISPÉÏµÄµþ¼Ó²ã CNend
-   \param[in] pu32Zorder        CNcomment:µþ¼Ó²ãZÐòÊýÖµ£¬ÊýÖµÔ½´óÓÅÏÈ¼¶Ô½¸ß CNend
-   \retval ::HI_SUCCESS success.CNcomment: ³É¹¦ CNend
-   \retval ::HI_ERR_DISP_DEV_NO_INIT    DISP uninitialization.CNcomment:DISPÎ´³õÊ¼»¯ CNend
-   \retval ::HI_ERR_DISP_NULL_PTR          Input pointer is NULL.CNcomment:ÊäÈëÖ¸ÕëÎª¿Õ CNend
-   \retval ::HI_ERR_DISP_INVALID_PARA   invalid input parameter.CNcomment:ÊäÈë²ÎÊý·Ç·¨ CNend
-   \retval ::HI_ERR_DISP_INVALID_OPT    invalid operation.CNcomment:²Ù×÷·Ç·¨ CNend
+   CNcomment:ï¿½Ú¸ß±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Â£ï¿½ï¿½ï¿½ï¿½ï¿½DISPï¿½ï¿½ï¿½ï¿½ï¿½Ã»ï¿½ï¿½Ô¶ï¿½Í¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½DISPï¿½ï¿½ï¿½ï¿½ï¿½ï¿½DISPï¿½ï¿½ï¿½ï¿½ï¿½Ã»ï¿½ï¿½Ô¶ï¿½Í¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½DISPï¿½ï¿½ CNend
+   \param[in] enDisp            DISP channel ID.CNcomment:DISPÍ¨ï¿½ï¿½ï¿½ï¿½ CNend
+   \param[in] enLayer           CNcomment:DISPï¿½ÏµÄµï¿½ï¿½Ó²ï¿½ CNend
+   \param[in] pu32Zorder        CNcomment:ï¿½ï¿½ï¿½Ó²ï¿½Zï¿½ï¿½ï¿½ï¿½Öµï¿½ï¿½ï¿½ï¿½ÖµÔ½ï¿½ï¿½ï¿½ï¿½ï¿½È¼ï¿½Ô½ï¿½ï¿½ CNend
+   \retval ::HI_SUCCESS success.CNcomment: ï¿½É¹ï¿½ CNend
+   \retval ::HI_ERR_DISP_DEV_NO_INIT    DISP uninitialization.CNcomment:DISPÎ´ï¿½ï¿½Ê¼ï¿½ï¿½ CNend
+   \retval ::HI_ERR_DISP_NULL_PTR          Input pointer is NULL.CNcomment:ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½Îªï¿½ï¿½ CNend
+   \retval ::HI_ERR_DISP_INVALID_PARA   invalid input parameter.CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ CNend
+   \retval ::HI_ERR_DISP_INVALID_OPT    invalid operation.CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ CNend
    \see \n
-   none.CNcomment:ÎÞ CNend
+   none.CNcomment:ï¿½ï¿½ CNend
  */
 HI_S32 HI_UNF_DISP_GetLayerZorder( HI_UNF_DISP_E enDisp, HI_UNF_DISP_LAYER_E enLayer, HI_U32 *pu32Zorder );
 
 
 /**
-   \brief set DISP back ground color.CNcomment:ÉèÖÃDISP±³¾°É« CNend
+   \brief set DISP back ground color.CNcomment:ï¿½ï¿½ï¿½ï¿½DISPï¿½ï¿½ï¿½ï¿½É« CNend
    \attention \n
    none.
-   CNcomment:ÎÞ CNend
-   \param[in] enDisp       CNcomment:DISPÍ¨µÀºÅ CNend
-   \param[in] pstBgColor   CNcomment:Ö¸ÕëÀàÐÍ£¬´ýÅäÖÃµÄÏÔÊ¾Êä³ö±³¾°É«¡£Çë²Î¼û::HI_UNF_BG_COLOR_S CNend
-   \retval ::HI_SUCCESS  success.CNcomment:³É¹¦ CNend
-   \retval ::HI_ERR_DISP_DEV_NO_INIT    DISP uninitialization.CNcomment:DISPÎ´³õÊ¼»¯ CNend
-   \retval ::HI_ERR_DISP_NULL_PTR          Input pointer is NULL.CNcomment:ÊäÈëÖ¸ÕëÎª¿Õ CNend
-   \retval ::HI_ERR_DISP_INVALID_PARA   invalid input parameter.CNcomment:ÊäÈë²ÎÊý·Ç·¨ CNend
-   \retval ::HI_ERR_DISP_INVALID_OPT    invalid operation. CNcomment:²Ù×÷·Ç·¨ CNend
+   CNcomment:ï¿½ï¿½ CNend
+   \param[in] enDisp       CNcomment:DISPÍ¨ï¿½ï¿½ï¿½ï¿½ CNend
+   \param[in] pstBgColor   CNcomment:Ö¸ï¿½ï¿½ï¿½ï¿½ï¿½Í£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ãµï¿½ï¿½ï¿½Ê¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½É«ï¿½ï¿½ï¿½ï¿½Î¼ï¿½::HI_UNF_BG_COLOR_S CNend
+   \retval ::HI_SUCCESS  success.CNcomment:ï¿½É¹ï¿½ CNend
+   \retval ::HI_ERR_DISP_DEV_NO_INIT    DISP uninitialization.CNcomment:DISPÎ´ï¿½ï¿½Ê¼ï¿½ï¿½ CNend
+   \retval ::HI_ERR_DISP_NULL_PTR          Input pointer is NULL.CNcomment:ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½Îªï¿½ï¿½ CNend
+   \retval ::HI_ERR_DISP_INVALID_PARA   invalid input parameter.CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ CNend
+   \retval ::HI_ERR_DISP_INVALID_OPT    invalid operation. CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ CNend
    \see \n
-   none.CNcomment:ÎÞ CNend
+   none.CNcomment:ï¿½ï¿½ CNend
  */
 HI_S32 HI_UNF_DISP_SetBgColor( HI_UNF_DISP_E enDisp, const HI_UNF_DISP_BG_COLOR_S *pstBgColor );
 
 
 /**
-   \brief  set DISP back ground color.CNcomment:»ñÈ¡DISP±³¾°É« CNend
+   \brief  set DISP back ground color.CNcomment:ï¿½ï¿½È¡DISPï¿½ï¿½ï¿½ï¿½É« CNend
    \attention \n
    In the case of HD atach to SD. the Z order configuration of HD will auto sync to SD, also the configuration of SD will auto sync to HD.
-   CNcomment:ÔÚ¸ß±êÇå°ó¶¨Çé¿öÏÂ£¬¸ßÇåDISPµÄÉèÖÃ»á×Ô¶¯Í¬²½µ½±êÇåDISP£»±êÇåDISPµÄÉèÖÃ»á×Ô¶¯Í¬²½µ½¸ßÇåDISP¡£ CNend
-   \param[in] enDisp          DISP channel ID.CNcomment:DISPÍ¨µÀºÅ CNend
-   \param[out] pstBgColor   pointer of back ground color.CNcomment: Ö¸ÕëÀàÐÍ£¬ÏÔÊ¾Êä³ö±³¾°É« CNend
-   \retval ::HI_SUCCESS  success.CNcomment:³É¹¦ CNend
-   \retval ::HI_ERR_DISP_DEV_NO_INIT    DISP uninitialization.CNcomment:DISPÎ´³õÊ¼»¯ CNend
-   \retval ::HI_ERR_DISP_NULL_PTR          Input pointer is NULL.CNcomment:ÊäÈëÖ¸ÕëÎª¿Õ CNend
-   \retval ::HI_ERR_DISP_INVALID_PARA   invalid input parameter.CNcomment:ÊäÈë²ÎÊý·Ç·¨ CNend
-   \retval ::HI_ERR_DISP_INVALID_OPT    invalid operation. CNcomment:²Ù×÷·Ç·¨ CNend
+   CNcomment:ï¿½Ú¸ß±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Â£ï¿½ï¿½ï¿½ï¿½ï¿½DISPï¿½ï¿½ï¿½ï¿½ï¿½Ã»ï¿½ï¿½Ô¶ï¿½Í¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½DISPï¿½ï¿½ï¿½ï¿½ï¿½ï¿½DISPï¿½ï¿½ï¿½ï¿½ï¿½Ã»ï¿½ï¿½Ô¶ï¿½Í¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½DISPï¿½ï¿½ CNend
+   \param[in] enDisp          DISP channel ID.CNcomment:DISPÍ¨ï¿½ï¿½ï¿½ï¿½ CNend
+   \param[out] pstBgColor   pointer of back ground color.CNcomment: Ö¸ï¿½ï¿½ï¿½ï¿½ï¿½Í£ï¿½ï¿½ï¿½Ê¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½É« CNend
+   \retval ::HI_SUCCESS  success.CNcomment:ï¿½É¹ï¿½ CNend
+   \retval ::HI_ERR_DISP_DEV_NO_INIT    DISP uninitialization.CNcomment:DISPÎ´ï¿½ï¿½Ê¼ï¿½ï¿½ CNend
+   \retval ::HI_ERR_DISP_NULL_PTR          Input pointer is NULL.CNcomment:ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½Îªï¿½ï¿½ CNend
+   \retval ::HI_ERR_DISP_INVALID_PARA   invalid input parameter.CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ CNend
+   \retval ::HI_ERR_DISP_INVALID_OPT    invalid operation. CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ CNend
    \see \n
-   none.CNcomment:ÎÞ CNend
+   none.CNcomment:ï¿½ï¿½ CNend
  */
 HI_S32 HI_UNF_DISP_GetBgColor( HI_UNF_DISP_E enDisp, HI_UNF_DISP_BG_COLOR_S *pstBgColor );
 
 
 /**
-   \brief  set DISP brightness.CNcomment:ÉèÖÃDISPÁÁ¶È CNend
+   \brief  set DISP brightness.CNcomment:ï¿½ï¿½ï¿½ï¿½DISPï¿½ï¿½ï¿½ï¿½ CNend
    \attention \n
-   if the value seted more than 100, we clip it to 100.CNcomment:´óÓÚ100µÄÖµ°´100´¦Àí CNend
-   \param[in] enDisp            DISP channel ID.CNcomment:DISPÍ¨µÀºÅ CNend
+   if the value seted more than 100, we clip it to 100.CNcomment:ï¿½ï¿½ï¿½ï¿½100ï¿½ï¿½Öµï¿½ï¿½100ï¿½ï¿½ï¿½ï¿½ CNend
+   \param[in] enDisp            DISP channel ID.CNcomment:DISPÍ¨ï¿½ï¿½ï¿½ï¿½ CNend
    \param[in] u32Brightness   brightness value. the range is 0~100, 0 means the min brightness value.
-   CNcomment:´ýÉèÖÃµÄÏÔÊ¾Êä³öÁÁ¶ÈÖµ¡£È¡Öµ·¶Î§Îª0¡«100¡£0£º×îÐ¡ÁÁ¶È£»100£º×î´óÁÁ¶È CNend
-   \retval ::HI_SUCCESS  success.CNcomment:³É¹¦ CNend
-   \retval ::HI_ERR_DISP_DEV_NO_INIT    DISP uninitialization.CNcomment:DISPÎ´³õÊ¼»¯ CNend
-   \retval ::HI_ERR_DISP_NULL_PTR          Input pointer is NULL.CNcomment:ÊäÈëÖ¸ÕëÎª¿Õ CNend
-   \retval ::HI_ERR_DISP_INVALID_PARA   invalid input parameter.CNcomment:ÊäÈë²ÎÊý·Ç·¨ CNend
-   \retval ::HI_ERR_DISP_INVALID_OPT    invalid operation. CNcomment:²Ù×÷·Ç·¨ CNend
+   CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½Ãµï¿½ï¿½ï¿½Ê¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Öµï¿½ï¿½È¡Öµï¿½ï¿½Î§Îª0ï¿½ï¿½100ï¿½ï¿½0ï¿½ï¿½ï¿½ï¿½Ð¡ï¿½ï¿½ï¿½È£ï¿½100ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ CNend
+   \retval ::HI_SUCCESS  success.CNcomment:ï¿½É¹ï¿½ CNend
+   \retval ::HI_ERR_DISP_DEV_NO_INIT    DISP uninitialization.CNcomment:DISPÎ´ï¿½ï¿½Ê¼ï¿½ï¿½ CNend
+   \retval ::HI_ERR_DISP_NULL_PTR          Input pointer is NULL.CNcomment:ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½Îªï¿½ï¿½ CNend
+   \retval ::HI_ERR_DISP_INVALID_PARA   invalid input parameter.CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ CNend
+   \retval ::HI_ERR_DISP_INVALID_OPT    invalid operation. CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ CNend
    \see \n
-   none.CNcomment:ÎÞ CNend
+   none.CNcomment:ï¿½ï¿½ CNend
  */
 HI_S32 HI_UNF_DISP_SetBrightness( HI_UNF_DISP_E enDisp, HI_U32 u32Brightness );
 
 
 /**
-   \brief   get the DISP brightness.CNcomment:»ñÈ¡DISPÁÁ¶È CNend
+   \brief   get the DISP brightness.CNcomment:ï¿½ï¿½È¡DISPï¿½ï¿½ï¿½ï¿½ CNend
    \attention \n
    In the case of HD atach to SD. the Z order configuration of HD will auto sync to SD, also the configuration of SD will auto sync to HD.
-   CNcomment:²éÑ¯µÄÄ¬ÈÏÁÁ¶ÈÖµÎª50¡£\n 
-   ÔÚ¸ß±êÇå°ó¶¨Çé¿öÏÂ£¬¸ßÇåDISPµÄÉèÖÃ»á×Ô¶¯Í¬²½µ½±êÇåDISP£»±êÇåDISPµÄÉèÖÃ»á×Ô¶¯Í¬²½µ½¸ßÇåDISP¡£ CNend
-   \param[in] enDisp              DISP channel ID.CNcomment:DISPÍ¨µÀºÅ CNend
-   \param[out] pu32Brightness    pointer of brightness. CNcomment:Ö¸ÕëÀàÐÍ£¬ÏÔÊ¾Êä³öÁÁ¶ÈÖµ CNend
-   \retval ::HI_SUCCESS  success.CNcomment:³É¹¦ CNend
-   \retval ::HI_ERR_DISP_DEV_NO_INIT    DISP uninitialization.CNcomment:DISPÎ´³õÊ¼»¯ CNend
-   \retval ::HI_ERR_DISP_NULL_PTR          Input pointer is NULL.CNcomment:ÊäÈëÖ¸ÕëÎª¿Õ CNend
-   \retval ::HI_ERR_DISP_INVALID_PARA   invalid input parameter.CNcomment:ÊäÈë²ÎÊý·Ç·¨ CNend
-   \retval ::HI_ERR_DISP_INVALID_OPT    invalid operation. CNcomment:²Ù×÷·Ç·¨ CNend
+   CNcomment:ï¿½ï¿½Ñ¯ï¿½ï¿½Ä¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÖµÎª50ï¿½ï¿½\n 
+   ï¿½Ú¸ß±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Â£ï¿½ï¿½ï¿½ï¿½ï¿½DISPï¿½ï¿½ï¿½ï¿½ï¿½Ã»ï¿½ï¿½Ô¶ï¿½Í¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½DISPï¿½ï¿½ï¿½ï¿½ï¿½ï¿½DISPï¿½ï¿½ï¿½ï¿½ï¿½Ã»ï¿½ï¿½Ô¶ï¿½Í¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½DISPï¿½ï¿½ CNend
+   \param[in] enDisp              DISP channel ID.CNcomment:DISPÍ¨ï¿½ï¿½ï¿½ï¿½ CNend
+   \param[out] pu32Brightness    pointer of brightness. CNcomment:Ö¸ï¿½ï¿½ï¿½ï¿½ï¿½Í£ï¿½ï¿½ï¿½Ê¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Öµ CNend
+   \retval ::HI_SUCCESS  success.CNcomment:ï¿½É¹ï¿½ CNend
+   \retval ::HI_ERR_DISP_DEV_NO_INIT    DISP uninitialization.CNcomment:DISPÎ´ï¿½ï¿½Ê¼ï¿½ï¿½ CNend
+   \retval ::HI_ERR_DISP_NULL_PTR          Input pointer is NULL.CNcomment:ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½Îªï¿½ï¿½ CNend
+   \retval ::HI_ERR_DISP_INVALID_PARA   invalid input parameter.CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ CNend
+   \retval ::HI_ERR_DISP_INVALID_OPT    invalid operation. CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ CNend
    \see \n
-   none.CNcomment:ÎÞ CNend
+   none.CNcomment:ï¿½ï¿½ CNend
  */
 HI_S32 HI_UNF_DISP_GetBrightness( HI_UNF_DISP_E enDisp, HI_U32 *pu32Brightness );
 
 
 /**
-   \brief  set DISP contrast value.CNcomment:ÉèÖÃDISP¶Ô±È¶È CNend
+   \brief  set DISP contrast value.CNcomment:ï¿½ï¿½ï¿½ï¿½DISPï¿½Ô±È¶ï¿½ CNend
    \attention \n
    If the value is more than 100, we clip it to 100.
-   CNcomment:´óÓÚ100µÄÖµ°´100´¦Àí CNend
-   \param[in] enDisp          DISP channel ID.CNcomment:DISPÍ¨µÀºÅ CNend
+   CNcomment:ï¿½ï¿½ï¿½ï¿½100ï¿½ï¿½Öµï¿½ï¿½100ï¿½ï¿½ï¿½ï¿½ CNend
+   \param[in] enDisp          DISP channel ID.CNcomment:DISPÍ¨ï¿½ï¿½ï¿½ï¿½ CNend
    \param[in] u32Contrast    contrast value. the range is 0~100, 0 means the min contrast value. \n
-   CNcomment:´ýÉèÖÃµÄÏÔÊ¾Êä³ö¶Ô±È¶ÈÖµ¡£È¡Öµ·¶Î§Îª0¡«100¡£0£º×îÐ¡¶Ô±È¶È£»100£º×î´ó¶Ô±È¶È CNend
-   \retval ::HI_SUCCESS  success.CNcomment:³É¹¦ CNend
-   \retval ::HI_ERR_DISP_DEV_NO_INIT    DISP uninitialization.CNcomment:DISPÎ´³õÊ¼»¯ CNend
-   \retval ::HI_ERR_DISP_NULL_PTR          Input pointer is NULL.CNcomment:ÊäÈëÖ¸ÕëÎª¿Õ CNend
-   \retval ::HI_ERR_DISP_INVALID_PARA   invalid input parameter.CNcomment:ÊäÈë²ÎÊý·Ç·¨ CNend
-   \retval ::HI_ERR_DISP_INVALID_OPT    invalid operation. CNcomment:²Ù×÷·Ç·¨ CNend
+   CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½Ãµï¿½ï¿½ï¿½Ê¾ï¿½ï¿½ï¿½ï¿½Ô±È¶ï¿½Öµï¿½ï¿½È¡Öµï¿½ï¿½Î§Îª0ï¿½ï¿½100ï¿½ï¿½0ï¿½ï¿½ï¿½ï¿½Ð¡ï¿½Ô±È¶È£ï¿½100ï¿½ï¿½ï¿½ï¿½ï¿½Ô±È¶ï¿½ CNend
+   \retval ::HI_SUCCESS  success.CNcomment:ï¿½É¹ï¿½ CNend
+   \retval ::HI_ERR_DISP_DEV_NO_INIT    DISP uninitialization.CNcomment:DISPÎ´ï¿½ï¿½Ê¼ï¿½ï¿½ CNend
+   \retval ::HI_ERR_DISP_NULL_PTR          Input pointer is NULL.CNcomment:ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½Îªï¿½ï¿½ CNend
+   \retval ::HI_ERR_DISP_INVALID_PARA   invalid input parameter.CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ CNend
+   \retval ::HI_ERR_DISP_INVALID_OPT    invalid operation. CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ CNend
    \see \n
-   none.CNcomment:ÎÞ CNend
+   none.CNcomment:ï¿½ï¿½ CNend
  */
 HI_S32 HI_UNF_DISP_SetContrast( HI_UNF_DISP_E enDisp, HI_U32 u32Contrast );
 
 
 /**
-   \brief  get DISP contrast value.CNcomment:»ñÈ¡DISP¶Ô±È¶È CNend
+   \brief  get DISP contrast value.CNcomment:ï¿½ï¿½È¡DISPï¿½Ô±È¶ï¿½ CNend
    \attention \n
    In the case of HD atach to SD. the Z order configuration of HD will auto sync to SD, also the configuration of SD will auto sync to HD.\n
-   CNcomment:²éÑ¯µÄÄ¬ÈÏ¶Ô±È¶ÈÖµÎª50¡£\n
-   ÔÚ¸ß±êÇå°ó¶¨Çé¿öÏÂ£¬¸ßÇåDISPµÄÉèÖÃ»á×Ô¶¯Í¬²½µ½±êÇåDISP£»±êÇåDISPµÄÉèÖÃ»á×Ô¶¯Í¬²½µ½¸ßÇåDISP¡£ CNend
-   \param[in] enDisp           DISP channel ID.CNcomment:DISPÍ¨µÀºÅ CNend
-   \param[out] pu32Contrast   pointer of contrast. CNcomment:Ö¸ÕëÀàÐÍ£¬ÏÔÊ¾Êä³ö¶Ô±È¶ÈÖµ CNend
-   \retval ::HI_SUCCESS  success.CNcomment:³É¹¦ CNend
-   \retval ::HI_ERR_DISP_DEV_NO_INIT    DISP uninitialization.CNcomment:DISPÎ´³õÊ¼»¯ CNend
-   \retval ::HI_ERR_DISP_NULL_PTR          Input pointer is NULL.CNcomment:ÊäÈëÖ¸ÕëÎª¿Õ CNend
-   \retval ::HI_ERR_DISP_INVALID_PARA   invalid input parameter.CNcomment:ÊäÈë²ÎÊý·Ç·¨ CNend
-   \retval ::HI_ERR_DISP_INVALID_OPT    invalid operation. CNcomment:²Ù×÷·Ç·¨ CNend
+   CNcomment:ï¿½ï¿½Ñ¯ï¿½ï¿½Ä¬ï¿½Ï¶Ô±È¶ï¿½ÖµÎª50ï¿½ï¿½\n
+   ï¿½Ú¸ß±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Â£ï¿½ï¿½ï¿½ï¿½ï¿½DISPï¿½ï¿½ï¿½ï¿½ï¿½Ã»ï¿½ï¿½Ô¶ï¿½Í¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½DISPï¿½ï¿½ï¿½ï¿½ï¿½ï¿½DISPï¿½ï¿½ï¿½ï¿½ï¿½Ã»ï¿½ï¿½Ô¶ï¿½Í¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½DISPï¿½ï¿½ CNend
+   \param[in] enDisp           DISP channel ID.CNcomment:DISPÍ¨ï¿½ï¿½ï¿½ï¿½ CNend
+   \param[out] pu32Contrast   pointer of contrast. CNcomment:Ö¸ï¿½ï¿½ï¿½ï¿½ï¿½Í£ï¿½ï¿½ï¿½Ê¾ï¿½ï¿½ï¿½ï¿½Ô±È¶ï¿½Öµ CNend
+   \retval ::HI_SUCCESS  success.CNcomment:ï¿½É¹ï¿½ CNend
+   \retval ::HI_ERR_DISP_DEV_NO_INIT    DISP uninitialization.CNcomment:DISPÎ´ï¿½ï¿½Ê¼ï¿½ï¿½ CNend
+   \retval ::HI_ERR_DISP_NULL_PTR          Input pointer is NULL.CNcomment:ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½Îªï¿½ï¿½ CNend
+   \retval ::HI_ERR_DISP_INVALID_PARA   invalid input parameter.CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ CNend
+   \retval ::HI_ERR_DISP_INVALID_OPT    invalid operation. CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ CNend
    \see \n
-   none.CNcomment:ÎÞ CNend
+   none.CNcomment:ï¿½ï¿½ CNend
  */
 HI_S32 HI_UNF_DISP_GetContrast( HI_UNF_DISP_E enDisp, HI_U32 *pu32Contrast );
 
 
 /**
-   \brief   set DISP saturation.CNcomment:ÉèÖÃDISP±¥ºÍ¶È CNend
+   \brief   set DISP saturation.CNcomment:ï¿½ï¿½ï¿½ï¿½DISPï¿½ï¿½ï¿½Í¶ï¿½ CNend
    \attention \n
    If the value is more than 100, we clip it to 100.
-   CNcomment:´óÓÚ100µÄÖµ°´100´¦Àí CNend
-   \param[in] enDisp             DISP channel ID.CNcomment:DISPÍ¨µÀºÅ CNend
+   CNcomment:ï¿½ï¿½ï¿½ï¿½100ï¿½ï¿½Öµï¿½ï¿½100ï¿½ï¿½ï¿½ï¿½ CNend
+   \param[in] enDisp             DISP channel ID.CNcomment:DISPÍ¨ï¿½ï¿½ï¿½ï¿½ CNend
    \param[in] u32Saturation      saturation value. the range is 0~100, 0 means the min saturation value. \n
-   CNcomment:´ýÉèÖÃµÄÏÔÊ¾Êä³ö±¥ºÍ¶ÈÖµ¡£È¡Öµ·¶Î§Îª0¡«100¡£0£º×îÐ¡±¥ºÍ¶È£»100£º×î´ó±¥ºÍ¶È CNend
-   \retval ::HI_SUCCESS CNcomment: success.³É¹¦ CNend
-   \retval ::HI_ERR_DISP_DEV_NO_INIT    DISP uninitialization.CNcomment:DISPÎ´³õÊ¼»¯ CNend
-   \retval ::HI_ERR_DISP_NULL_PTR          Input pointer is NULL.CNcomment:ÊäÈëÖ¸ÕëÎª¿Õ CNend
-   \retval ::HI_ERR_DISP_INVALID_PARA   invalid input parameter.CNcomment:ÊäÈë²ÎÊý·Ç·¨ CNend
-   \retval ::HI_ERR_DISP_INVALID_OPT    invalid operation. CNcomment:²Ù×÷·Ç·¨ CNend
+   CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½Ãµï¿½ï¿½ï¿½Ê¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¶ï¿½Öµï¿½ï¿½È¡Öµï¿½ï¿½Î§Îª0ï¿½ï¿½100ï¿½ï¿½0ï¿½ï¿½ï¿½ï¿½Ð¡ï¿½ï¿½ï¿½Í¶È£ï¿½100ï¿½ï¿½ï¿½ï¿½ó±¥ºÍ¶ï¿½ CNend
+   \retval ::HI_SUCCESS CNcomment: success.ï¿½É¹ï¿½ CNend
+   \retval ::HI_ERR_DISP_DEV_NO_INIT    DISP uninitialization.CNcomment:DISPÎ´ï¿½ï¿½Ê¼ï¿½ï¿½ CNend
+   \retval ::HI_ERR_DISP_NULL_PTR          Input pointer is NULL.CNcomment:ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½Îªï¿½ï¿½ CNend
+   \retval ::HI_ERR_DISP_INVALID_PARA   invalid input parameter.CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ CNend
+   \retval ::HI_ERR_DISP_INVALID_OPT    invalid operation. CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ CNend
    \see \n
-   none.CNcomment:ÎÞ CNend
+   none.CNcomment:ï¿½ï¿½ CNend
 */
 HI_S32 HI_UNF_DISP_SetSaturation( HI_UNF_DISP_E enDisp, HI_U32 u32Saturation );
 
 
 /**
-   \brief   get DISP saturation.CNcomment:»ñÈ¡DISP±¥ºÍ¶È CNend
+   \brief   get DISP saturation.CNcomment:ï¿½ï¿½È¡DISPï¿½ï¿½ï¿½Í¶ï¿½ CNend
    \attention \n
    In the case of HD atach to SD. the Z order configuration of HD will auto sync to SD, also the configuration of SD will auto sync to HD.\n
-   CNcomment:²éÑ¯µÄÄ¬ÈÏ±¥ºÍ¶ÈÖµÎª50¡£\n
-   ÔÚ¸ß±êÇå°ó¶¨Çé¿öÏÂ£¬¸ßÇåDISPµÄÉèÖÃ»á×Ô¶¯Í¬²½µ½±êÇåDISP£»±êÇåDISPµÄÉèÖÃ»á×Ô¶¯Í¬²½µ½¸ßÇåDISP¡£ CNend
-   \param[in] enDisp                 DISP channel ID.CNcomment:DISPÍ¨µÀºÅ CNend
-   \param[out] pu32Saturation    pointer of saturation. CNcomment:Ö¸ÕëÀàÐÍ£¬ÏÔÊ¾Êä³ö±¥ºÍ¶ÈÖµ CNend
-   \retval ::HI_SUCCESS CNcomment: success.³É¹¦ CNend
-   \retval ::HI_ERR_DISP_DEV_NO_INIT    DISP uninitialization.CNcomment:DISPÎ´³õÊ¼»¯ CNend
-   \retval ::HI_ERR_DISP_NULL_PTR          Input pointer is NULL.CNcomment:ÊäÈëÖ¸ÕëÎª¿Õ CNend
-   \retval ::HI_ERR_DISP_INVALID_PARA   invalid input parameter.CNcomment:ÊäÈë²ÎÊý·Ç·¨ CNend
-   \retval ::HI_ERR_DISP_INVALID_OPT    invalid operation. CNcomment:²Ù×÷·Ç·¨ CNend
+   CNcomment:ï¿½ï¿½Ñ¯ï¿½ï¿½Ä¬ï¿½Ï±ï¿½ï¿½Í¶ï¿½ÖµÎª50ï¿½ï¿½\n
+   ï¿½Ú¸ß±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Â£ï¿½ï¿½ï¿½ï¿½ï¿½DISPï¿½ï¿½ï¿½ï¿½ï¿½Ã»ï¿½ï¿½Ô¶ï¿½Í¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½DISPï¿½ï¿½ï¿½ï¿½ï¿½ï¿½DISPï¿½ï¿½ï¿½ï¿½ï¿½Ã»ï¿½ï¿½Ô¶ï¿½Í¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½DISPï¿½ï¿½ CNend
+   \param[in] enDisp                 DISP channel ID.CNcomment:DISPÍ¨ï¿½ï¿½ï¿½ï¿½ CNend
+   \param[out] pu32Saturation    pointer of saturation. CNcomment:Ö¸ï¿½ï¿½ï¿½ï¿½ï¿½Í£ï¿½ï¿½ï¿½Ê¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¶ï¿½Öµ CNend
+   \retval ::HI_SUCCESS CNcomment: success.ï¿½É¹ï¿½ CNend
+   \retval ::HI_ERR_DISP_DEV_NO_INIT    DISP uninitialization.CNcomment:DISPÎ´ï¿½ï¿½Ê¼ï¿½ï¿½ CNend
+   \retval ::HI_ERR_DISP_NULL_PTR          Input pointer is NULL.CNcomment:ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½Îªï¿½ï¿½ CNend
+   \retval ::HI_ERR_DISP_INVALID_PARA   invalid input parameter.CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ CNend
+   \retval ::HI_ERR_DISP_INVALID_OPT    invalid operation. CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ CNend
    \see \n
-   none.CNcomment:ÎÞ CNend
+   none.CNcomment:ï¿½ï¿½ CNend
  */
 HI_S32 HI_UNF_DISP_GetSaturation( HI_UNF_DISP_E enDisp, HI_U32 *pu32Saturation );
 
 
 /**
-   \brief  set DISP hueplus.CNcomment:ÉèÖÃDISPÉ«µ÷ CNend
+   \brief  set DISP hueplus.CNcomment:ï¿½ï¿½ï¿½ï¿½DISPÉ«ï¿½ï¿½ CNend
    \attention \n
-   none.CNcomment:ÎÞ CNend
-   \param[in] enDisp              DISP channel ID.CNcomment:DISPÍ¨µÀºÅ CNend
+   none.CNcomment:ï¿½ï¿½ CNend
+   \param[in] enDisp              DISP channel ID.CNcomment:DISPÍ¨ï¿½ï¿½ï¿½ï¿½ CNend
    \param[in] u32HuePlus       hueplus value. the range is 0~100, 0 means the min hueplus value. \n
-   CNcomment:ÏÔÊ¾Êä³öÉ«µ÷ÔöÒæÖµ¡£·¶Î§Îª0¡«100¡£0£º±íÊ¾×îÐ¡É«µ÷ÔöÒæ£»100£º±íÊ¾×î´óÉ«µ÷ÔöÒæ CNend
-   \retval ::HI_SUCCESS CNcomment: success.³É¹¦ CNend
-   \retval ::HI_ERR_DISP_DEV_NO_INIT    DISP uninitialization.CNcomment:DISPÎ´³õÊ¼»¯ CNend
-   \retval ::HI_ERR_DISP_NULL_PTR          Input pointer is NULL.CNcomment:ÊäÈëÖ¸ÕëÎª¿Õ CNend
-   \retval ::HI_ERR_DISP_INVALID_PARA   invalid input parameter.CNcomment:ÊäÈë²ÎÊý·Ç·¨ CNend
-   \retval ::HI_ERR_DISP_INVALID_OPT    invalid operation. CNcomment:²Ù×÷·Ç·¨ CNend
+   CNcomment:ï¿½ï¿½Ê¾ï¿½ï¿½ï¿½É«ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Öµï¿½ï¿½ï¿½ï¿½Î§Îª0ï¿½ï¿½100ï¿½ï¿½0ï¿½ï¿½ï¿½ï¿½Ê¾ï¿½ï¿½Ð¡É«ï¿½ï¿½ï¿½ï¿½ï¿½æ£»100ï¿½ï¿½ï¿½ï¿½Ê¾ï¿½ï¿½ï¿½É«ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ CNend
+   \retval ::HI_SUCCESS CNcomment: success.ï¿½É¹ï¿½ CNend
+   \retval ::HI_ERR_DISP_DEV_NO_INIT    DISP uninitialization.CNcomment:DISPÎ´ï¿½ï¿½Ê¼ï¿½ï¿½ CNend
+   \retval ::HI_ERR_DISP_NULL_PTR          Input pointer is NULL.CNcomment:ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½Îªï¿½ï¿½ CNend
+   \retval ::HI_ERR_DISP_INVALID_PARA   invalid input parameter.CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ CNend
+   \retval ::HI_ERR_DISP_INVALID_OPT    invalid operation. CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ CNend
    \see \n
-   none.CNcomment:ÎÞ CNend
+   none.CNcomment:ï¿½ï¿½ CNend
  */
 HI_S32 HI_UNF_DISP_SetHuePlus( HI_UNF_DISP_E enDisp, HI_U32 u32HuePlus );
 
 
 /**
-   \brief get DISP hueplus.CNcomment:»ñÈ¡DISPÉ«µ÷ CNend
+   \brief get DISP hueplus.CNcomment:ï¿½ï¿½È¡DISPÉ«ï¿½ï¿½ CNend
    \attention \n
    In the case of HD atach to SD. the Z order configuration of HD will auto sync to SD, also the configuration of SD will auto sync to HD.\n
-   CNcomment:²éÑ¯µÄÄ¬ÈÏÉ«µ÷ÖµÎª50¡£\n
-   ÔÚ¸ß±êÇå°ó¶¨Çé¿öÏÂ£¬¸ßÇåDISPµÄÉèÖÃ»á×Ô¶¯Í¬²½µ½±êÇåDISP£»±êÇåDISPµÄÉèÖÃ»á×Ô¶¯Í¬²½µ½¸ßÇåDISP¡£ CNend
-   \param[in] enDisp          DISP channel ID.CNcomment: DISPÍ¨µÀºÅ CNend
-   \param[out] pu32HuePlus     pointer of hueplus. CNcomment:Ö¸ÕëÀàÐÍ£¬ÏÔÊ¾Êä³öÉ«µ÷ÔöÒæÖµ CNend
-   \retval ::HI_SUCCESS CNcomment: success.³É¹¦ CNend
-   \retval ::HI_ERR_DISP_DEV_NO_INIT    DISP uninitialization.CNcomment:DISPÎ´³õÊ¼»¯ CNend
-   \retval ::HI_ERR_DISP_NULL_PTR          Input pointer is NULL.CNcomment:ÊäÈëÖ¸ÕëÎª¿Õ CNend
-   \retval ::HI_ERR_DISP_INVALID_PARA   invalid input parameter.CNcomment:ÊäÈë²ÎÊý·Ç·¨ CNend
-   \retval ::HI_ERR_DISP_INVALID_OPT    invalid operation. CNcomment:²Ù×÷·Ç·¨ CNend
+   CNcomment:ï¿½ï¿½Ñ¯ï¿½ï¿½Ä¬ï¿½ï¿½É«ï¿½ï¿½ÖµÎª50ï¿½ï¿½\n
+   ï¿½Ú¸ß±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Â£ï¿½ï¿½ï¿½ï¿½ï¿½DISPï¿½ï¿½ï¿½ï¿½ï¿½Ã»ï¿½ï¿½Ô¶ï¿½Í¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½DISPï¿½ï¿½ï¿½ï¿½ï¿½ï¿½DISPï¿½ï¿½ï¿½ï¿½ï¿½Ã»ï¿½ï¿½Ô¶ï¿½Í¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½DISPï¿½ï¿½ CNend
+   \param[in] enDisp          DISP channel ID.CNcomment: DISPÍ¨ï¿½ï¿½ï¿½ï¿½ CNend
+   \param[out] pu32HuePlus     pointer of hueplus. CNcomment:Ö¸ï¿½ï¿½ï¿½ï¿½ï¿½Í£ï¿½ï¿½ï¿½Ê¾ï¿½ï¿½ï¿½É«ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Öµ CNend
+   \retval ::HI_SUCCESS CNcomment: success.ï¿½É¹ï¿½ CNend
+   \retval ::HI_ERR_DISP_DEV_NO_INIT    DISP uninitialization.CNcomment:DISPÎ´ï¿½ï¿½Ê¼ï¿½ï¿½ CNend
+   \retval ::HI_ERR_DISP_NULL_PTR          Input pointer is NULL.CNcomment:ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½Îªï¿½ï¿½ CNend
+   \retval ::HI_ERR_DISP_INVALID_PARA   invalid input parameter.CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ CNend
+   \retval ::HI_ERR_DISP_INVALID_OPT    invalid operation. CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ CNend
    \see \n
-   none.CNcomment:ÎÞ CNend
+   none.CNcomment:ï¿½ï¿½ CNend
  */
 HI_S32 HI_UNF_DISP_GetHuePlus( HI_UNF_DISP_E enDisp, HI_U32 *pu32HuePlus );
 
 
 /**
-   \brief  set Wss.CNcomment:Ö±½ÓÉèÖÃWSS£¨Wide Screen Singnalling£©Êý¾Ý CNend
+   \brief  set Wss.CNcomment:Ö±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½WSSï¿½ï¿½Wide Screen Singnallingï¿½ï¿½ï¿½ï¿½ï¿½ CNend
    \attention \n
-   none. CNcomment:ÎÞ CNend
-   \param[in] enDisp           DISP channel ID.CNcomment:DISPÍ¨µÀºÅ CNend
-   \param[in] pstWssData        pointer of Wss data description structure.CNcomment:Ö¸ÕëÀàÐÍ£¬Ö¸ÏòWSSÊý¾ÝµÄÖ¸Õë CNend
-   \retval ::HI_SUCCESS CNcomment: success.³É¹¦ CNend
-   \retval ::HI_ERR_DISP_DEV_NO_INIT    DISP uninitialization.CNcomment:DISPÎ´³õÊ¼»¯ CNend
-   \retval ::HI_ERR_DISP_NULL_PTR          Input pointer is NULL.CNcomment:ÊäÈëÖ¸ÕëÎª¿Õ CNend
-   \retval ::HI_ERR_DISP_INVALID_PARA   invalid input parameter.CNcomment:ÊäÈë²ÎÊý·Ç·¨ CNend
-   \retval ::HI_ERR_DISP_INVALID_OPT    invalid operation. CNcomment:²Ù×÷·Ç·¨ CNend
+   none. CNcomment:ï¿½ï¿½ CNend
+   \param[in] enDisp           DISP channel ID.CNcomment:DISPÍ¨ï¿½ï¿½ï¿½ï¿½ CNend
+   \param[in] pstWssData        pointer of Wss data description structure.CNcomment:Ö¸ï¿½ï¿½ï¿½ï¿½ï¿½Í£ï¿½Ö¸ï¿½ï¿½WSSï¿½ï¿½Ýµï¿½Ö¸ï¿½ï¿½ CNend
+   \retval ::HI_SUCCESS CNcomment: success.ï¿½É¹ï¿½ CNend
+   \retval ::HI_ERR_DISP_DEV_NO_INIT    DISP uninitialization.CNcomment:DISPÎ´ï¿½ï¿½Ê¼ï¿½ï¿½ CNend
+   \retval ::HI_ERR_DISP_NULL_PTR          Input pointer is NULL.CNcomment:ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½Îªï¿½ï¿½ CNend
+   \retval ::HI_ERR_DISP_INVALID_PARA   invalid input parameter.CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ CNend
+   \retval ::HI_ERR_DISP_INVALID_OPT    invalid operation. CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ CNend
    \see \n
-   none.CNcomment:ÎÞ CNend
+   none.CNcomment:ï¿½ï¿½ CNend
  */
 HI_S32 HI_UNF_DISP_SetWss( HI_UNF_DISP_E enDisp, const HI_UNF_DISP_WSS_DATA_S *pstWssData );
 
 
 /**
-   \brief  set Macrovision mode.CNcomment:ÉèÖÃMacrovisionÄ£Ê½ CNend
+   \brief  set Macrovision mode.CNcomment:ï¿½ï¿½ï¿½ï¿½MacrovisionÄ£Ê½ CNend
    \attention \n
-   none.CNcomment:ÎÞ CNend
-   \param[in] enDisp          DISP channel ID.CNcomment:DISPÍ¨µÀºÅ CNend
-   \param[in] enMode        Macrovision mode.  CNcomment:MacrovisionÄ£Ê½£¬Çë²Î¼û::HI_UNF_MACROVISION_MODE_E CNend
-   \param[in] pData          pointer of Macrovision control data CNcomment: Ö¸ÕëÀàÐÍ£¬×Ô¶¨ÒåµÄMacrovision¿ØÖÆÊý¾Ý CNend
-   \retval ::HI_SUCCESS CNcomment: success.³É¹¦ CNend
-   \retval ::HI_ERR_DISP_DEV_NO_INIT    DISP uninitialization.CNcomment:DISPÎ´³õÊ¼»¯ CNend
-   \retval ::HI_ERR_DISP_NULL_PTR          Input pointer is NULL.CNcomment:ÊäÈëÖ¸ÕëÎª¿Õ CNend
-   \retval ::HI_ERR_DISP_INVALID_PARA   invalid input parameter.CNcomment:ÊäÈë²ÎÊý·Ç·¨ CNend
-   \retval ::HI_ERR_DISP_INVALID_OPT    invalid operation. CNcomment:²Ù×÷·Ç·¨ CNend
+   none.CNcomment:ï¿½ï¿½ CNend
+   \param[in] enDisp          DISP channel ID.CNcomment:DISPÍ¨ï¿½ï¿½ï¿½ï¿½ CNend
+   \param[in] enMode        Macrovision mode.  CNcomment:MacrovisionÄ£Ê½ï¿½ï¿½ï¿½ï¿½Î¼ï¿½::HI_UNF_MACROVISION_MODE_E CNend
+   \param[in] pData          pointer of Macrovision control data CNcomment: Ö¸ï¿½ï¿½ï¿½ï¿½ï¿½Í£ï¿½ï¿½Ô¶ï¿½ï¿½ï¿½ï¿½Macrovisionï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ CNend
+   \retval ::HI_SUCCESS CNcomment: success.ï¿½É¹ï¿½ CNend
+   \retval ::HI_ERR_DISP_DEV_NO_INIT    DISP uninitialization.CNcomment:DISPÎ´ï¿½ï¿½Ê¼ï¿½ï¿½ CNend
+   \retval ::HI_ERR_DISP_NULL_PTR          Input pointer is NULL.CNcomment:ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½Îªï¿½ï¿½ CNend
+   \retval ::HI_ERR_DISP_INVALID_PARA   invalid input parameter.CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ CNend
+   \retval ::HI_ERR_DISP_INVALID_OPT    invalid operation. CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ CNend
    \see \n
-   none.CNcomment:ÎÞ CNend
+   none.CNcomment:ï¿½ï¿½ CNend
  */
 HI_S32 HI_UNF_DISP_SetMacrovision( HI_UNF_DISP_E enDisp, HI_UNF_DISP_MACROVISION_MODE_E enMode, const HI_VOID *pData );
 
 
 /**
-   \brief get Macrovision mode.CNcomment: »ñÈ¡MacrovisionÄ£Ê½ CNend
+   \brief get Macrovision mode.CNcomment: ï¿½ï¿½È¡MacrovisionÄ£Ê½ CNend
    \attention \n
-   none. CNcomment:ÎÞ CNend
-   \param[in] enDisp      DISP channel ID.CNcomment:DISPÍ¨µÀºÅ CNend
-   \param[out] penMode    pointer of Macrovision mode. CNcomment:Ö¸ÕëÀàÐÍ£¬MACROVISIONÄ£Ê½ CNend
+   none. CNcomment:ï¿½ï¿½ CNend
+   \param[in] enDisp      DISP channel ID.CNcomment:DISPÍ¨ï¿½ï¿½ï¿½ï¿½ CNend
+   \param[out] penMode    pointer of Macrovision mode. CNcomment:Ö¸ï¿½ï¿½ï¿½ï¿½ï¿½Í£ï¿½MACROVISIONÄ£Ê½ CNend
    \param[out] pData      a data pointer only valid whenpenMode=HI_MACROVISION_MODE_CUSTOM.\n
-   CNcomment:Ö¸ÕëÀàÐÍ£¬½öµ±penMode=HI_MACROVISION_MODE_CUSTOMÊ±ÓÐÐ§ CNend
-   \retval ::HI_SUCCESS CNcomment: success.³É¹¦ CNend
-   \retval ::HI_ERR_DISP_DEV_NO_INIT    DISP uninitialization.CNcomment:DISPÎ´³õÊ¼»¯ CNend
-   \retval ::HI_ERR_DISP_NULL_PTR          Input pointer is NULL.CNcomment:ÊäÈëÖ¸ÕëÎª¿Õ CNend
-   \retval ::HI_ERR_DISP_INVALID_PARA   invalid input parameter.CNcomment:ÊäÈë²ÎÊý·Ç·¨ CNend
-   \retval ::HI_ERR_DISP_INVALID_OPT    invalid operation. CNcomment:²Ù×÷·Ç·¨ CNend
+   CNcomment:Ö¸ï¿½ï¿½ï¿½ï¿½ï¿½Í£ï¿½ï¿½ï¿½ï¿½ï¿½penMode=HI_MACROVISION_MODE_CUSTOMÊ±ï¿½ï¿½Ð§ CNend
+   \retval ::HI_SUCCESS CNcomment: success.ï¿½É¹ï¿½ CNend
+   \retval ::HI_ERR_DISP_DEV_NO_INIT    DISP uninitialization.CNcomment:DISPÎ´ï¿½ï¿½Ê¼ï¿½ï¿½ CNend
+   \retval ::HI_ERR_DISP_NULL_PTR          Input pointer is NULL.CNcomment:ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½Îªï¿½ï¿½ CNend
+   \retval ::HI_ERR_DISP_INVALID_PARA   invalid input parameter.CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ CNend
+   \retval ::HI_ERR_DISP_INVALID_OPT    invalid operation. CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ CNend
    \see \n
-   none.CNcomment:ÎÞ CNend
+   none.CNcomment:ï¿½ï¿½ CNend
  */
 HI_S32 HI_UNF_DISP_GetMacrovision( HI_UNF_DISP_E enDisp, HI_UNF_DISP_MACROVISION_MODE_E *penMode, const HI_VOID *pData );
 
 
 /**
-   \brief   set CGMS data.CNcomment:ÉèÖÃCGMS£¨Copy Generation Management System£©Êý¾Ý CNend
+   \brief   set CGMS data.CNcomment:ï¿½ï¿½ï¿½ï¿½CGMSï¿½ï¿½Copy Generation Management Systemï¿½ï¿½ï¿½ï¿½ï¿½ CNend
    \attention \n
-   none. CNcomment:ÎÞ CNend
-   \param[in] enDisp                   DISP channel ID.CNcomment:DISPÍ¨µÀºÅ CNend
-   \param[in] pstCgmsCfg             pointer of CGMS configuration  CNcomment:Ö¸ÕëÀàÐÍ£¬Ö¸ÏòCGMSÅäÖÃÊý¾ÝµÄÖ¸Õë CNend
-   \retval ::HI_SUCCESS CNcomment: success.³É¹¦ CNend
-   \retval ::HI_ERR_DISP_DEV_NO_INIT    DISP uninitialization.CNcomment:DISPÎ´³õÊ¼»¯ CNend
-   \retval ::HI_ERR_DISP_NULL_PTR          Input pointer is NULL.CNcomment:ÊäÈëÖ¸ÕëÎª¿Õ CNend
-   \retval ::HI_ERR_DISP_INVALID_PARA   invalid input parameter.CNcomment:ÊäÈë²ÎÊý·Ç·¨ CNend
-   \retval ::HI_ERR_DISP_INVALID_OPT    invalid operation. CNcomment:²Ù×÷·Ç·¨ CNend
+   none. CNcomment:ï¿½ï¿½ CNend
+   \param[in] enDisp                   DISP channel ID.CNcomment:DISPÍ¨ï¿½ï¿½ï¿½ï¿½ CNend
+   \param[in] pstCgmsCfg             pointer of CGMS configuration  CNcomment:Ö¸ï¿½ï¿½ï¿½ï¿½ï¿½Í£ï¿½Ö¸ï¿½ï¿½CGMSï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ýµï¿½Ö¸ï¿½ï¿½ CNend
+   \retval ::HI_SUCCESS CNcomment: success.ï¿½É¹ï¿½ CNend
+   \retval ::HI_ERR_DISP_DEV_NO_INIT    DISP uninitialization.CNcomment:DISPÎ´ï¿½ï¿½Ê¼ï¿½ï¿½ CNend
+   \retval ::HI_ERR_DISP_NULL_PTR          Input pointer is NULL.CNcomment:ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½Îªï¿½ï¿½ CNend
+   \retval ::HI_ERR_DISP_INVALID_PARA   invalid input parameter.CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ CNend
+   \retval ::HI_ERR_DISP_INVALID_OPT    invalid operation. CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ CNend
    \see \n
-   none.CNcomment:ÎÞ CNend
+   none.CNcomment:ï¿½ï¿½ CNend
  */
 HI_S32 HI_UNF_DISP_SetCgms( HI_UNF_DISP_E enDisp, const HI_UNF_DISP_CGMS_CFG_S *pstCgmsCfg );
 
 
 /**
-   \brief chip do or not support Macrovision.CNcomment: »ñÈ¡Ð¾Æ¬ÊÇ·ñÖ§³ÖMacrovision CNend
+   \brief chip do or not support Macrovision.CNcomment: ï¿½ï¿½È¡Ð¾Æ¬ï¿½Ç·ï¿½Ö§ï¿½ï¿½Macrovision CNend
    \attention \n
-   none.CNcomment:ÎÞ CNend
-   \param[in] enDisp      DISP channel ID.CNcomment:DISPÍ¨µÀºÅ CNend
-   \param[out] pbSupport    pointer of Macrovision flag. CNcomment:Ö¸ÕëÀàÐÍ£¬Macrovision ±êÖ¾ CNend
-   \retval ::HI_SUCCESS CNcomment: success.³É¹¦ CNend
-   \retval ::HI_ERR_DISP_DEV_NO_INIT    DISP uninitialization.CNcomment:DISPÎ´³õÊ¼»¯ CNend
-   \retval ::HI_ERR_DISP_NULL_PTR          Input pointer is NULL.CNcomment:ÊäÈëÖ¸ÕëÎª¿Õ CNend
-   \retval ::HI_ERR_DISP_INVALID_PARA   invalid input parameter.CNcomment:ÊäÈë²ÎÊý·Ç·¨ CNend
-   \retval ::HI_ERR_DISP_INVALID_OPT    invalid operation. CNcomment:²Ù×÷·Ç·¨ CNend
+   none.CNcomment:ï¿½ï¿½ CNend
+   \param[in] enDisp      DISP channel ID.CNcomment:DISPÍ¨ï¿½ï¿½ï¿½ï¿½ CNend
+   \param[out] pbSupport    pointer of Macrovision flag. CNcomment:Ö¸ï¿½ï¿½ï¿½ï¿½ï¿½Í£ï¿½Macrovision ï¿½ï¿½Ö¾ CNend
+   \retval ::HI_SUCCESS CNcomment: success.ï¿½É¹ï¿½ CNend
+   \retval ::HI_ERR_DISP_DEV_NO_INIT    DISP uninitialization.CNcomment:DISPÎ´ï¿½ï¿½Ê¼ï¿½ï¿½ CNend
+   \retval ::HI_ERR_DISP_NULL_PTR          Input pointer is NULL.CNcomment:ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½Îªï¿½ï¿½ CNend
+   \retval ::HI_ERR_DISP_INVALID_PARA   invalid input parameter.CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ CNend
+   \retval ::HI_ERR_DISP_INVALID_OPT    invalid operation. CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ CNend
    \see \n
-   none.CNcomment:ÎÞ CNend
+   none.CNcomment:ï¿½ï¿½ CNend
  */
 HI_S32 HI_UNF_DISP_GetMacrovisionSupport( HI_UNF_DISP_E enDisp, HI_BOOL *pbSupport );
 
 /**
-   \brief set aspect ratio attribute of display device.CNcomment: ÉèÖÃÉè±¸¿í¸ß±È CNend
+   \brief set aspect ratio attribute of display device.CNcomment: ï¿½ï¿½ï¿½ï¿½ï¿½è±¸ï¿½ï¿½ß±ï¿½ CNend
    \attention \n
    If set AspectRatio USER mode ,must be set u32UserAspectWidth and u32UserAspectHeight \n
    (theWidth/Height range is 1/64~64,if set zero means using current screen AspectRatio.) \n
    If not AspectRatio USER mode ,it will be set value by enumeration means;In this mode u32UserAspectWidth and u32UserAspectHeight are invalid ;\n
    If set AspectRatio AUTO mode , use current screen AspectRatio;
-   CNcomment:Èç¹ûÉèÖÃUSERÄ£Ê½ÔòÐèÉèÖÃu32UserAspectWidth ºÍu32UserAspectHeightµÄÖµ£¬\n
-   ¸³Öµ·¶Î§ÎªÁ½Õß±ÈÖµ1/64~64,Èç¹ûÉèÖÃ0Ôò±íÊ¾Ê¹ÓÃµ±Ç°ÆÁÄ»µÄ¿í¸ß±È£»\n
-   ·ÇUSERÄ£Ê½Ôò°´ÕÕ¶ÔÓ¦µÄ±ÈÖµÆðÐ§u32UserAspectWidth ºÍu32UserAspectHeightµÄÖµÎÞÐ§\n
-   ÆäÖÐÉèÖÃAUTOÄ£Ê½ÔòÉè±¸¿í¸ß±ÈÖµ×Ô¶¯ÉèÖÃÎªµ±Ç°ÆÁÄ»µÄ¿í¸ß±È¡£ CNend
-   \param[in] enDisp      DISP channel ID.CNcomment:DISPÍ¨µÀºÅ CNend
-   \param[in] pstDispAspectRatio    pointer of aspect ratio attribute of display device . CNcomment:Ö¸ÕëÀàÐÍ£¬ÏÔÊ¾Éè±¸¿í¸ß±ÈÐÅÏ¢ CNend
-   \retval ::HI_SUCCESS CNcomment: success.³É¹¦ CNend
-   \retval ::HI_ERR_DISP_DEV_NO_INIT    DISP uninitialization.CNcomment:DISPÎ´³õÊ¼»¯ CNend
-   \retval ::HI_ERR_DISP_NULL_PTR          Input pointer is NULL.CNcomment:ÊäÈëÖ¸ÕëÎª¿Õ CNend
-   \retval ::HI_ERR_DISP_INVALID_PARA   invalid input parameter.CNcomment:ÊäÈë²ÎÊý·Ç·¨ CNend
-   \retval ::HI_ERR_DISP_INVALID_OPT    invalid operation. CNcomment:²Ù×÷·Ç·¨ CNend
+   CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½USERÄ£Ê½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½u32UserAspectWidth ï¿½ï¿½u32UserAspectHeightï¿½ï¿½Öµï¿½ï¿½\n
+   ï¿½ï¿½Öµï¿½ï¿½Î§Îªï¿½ï¿½ï¿½ß±ï¿½Öµ1/64~64,ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½0ï¿½ï¿½ï¿½Ê¾Ê¹ï¿½Ãµï¿½Ç°ï¿½ï¿½Ä»ï¿½Ä¿ï¿½ß±È£ï¿½\n
+   ï¿½ï¿½USERÄ£Ê½ï¿½ï¿½ï¿½Õ¶ï¿½Ó¦ï¿½Ä±ï¿½Öµï¿½ï¿½Ð§u32UserAspectWidth ï¿½ï¿½u32UserAspectHeightï¿½ï¿½Öµï¿½ï¿½Ð§\n
+   ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½AUTOÄ£Ê½ï¿½ï¿½ï¿½è±¸ï¿½ï¿½ß±ï¿½Öµï¿½Ô¶ï¿½ï¿½ï¿½ï¿½ï¿½Îªï¿½ï¿½Ç°ï¿½ï¿½Ä»ï¿½Ä¿ï¿½ß±È¡ï¿½ CNend
+   \param[in] enDisp      DISP channel ID.CNcomment:DISPÍ¨ï¿½ï¿½ï¿½ï¿½ CNend
+   \param[in] pstDispAspectRatio    pointer of aspect ratio attribute of display device . CNcomment:Ö¸ï¿½ï¿½ï¿½ï¿½ï¿½Í£ï¿½ï¿½ï¿½Ê¾ï¿½è±¸ï¿½ï¿½ß±ï¿½ï¿½ï¿½Ï¢ CNend
+   \retval ::HI_SUCCESS CNcomment: success.ï¿½É¹ï¿½ CNend
+   \retval ::HI_ERR_DISP_DEV_NO_INIT    DISP uninitialization.CNcomment:DISPÎ´ï¿½ï¿½Ê¼ï¿½ï¿½ CNend
+   \retval ::HI_ERR_DISP_NULL_PTR          Input pointer is NULL.CNcomment:ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½Îªï¿½ï¿½ CNend
+   \retval ::HI_ERR_DISP_INVALID_PARA   invalid input parameter.CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ CNend
+   \retval ::HI_ERR_DISP_INVALID_OPT    invalid operation. CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ CNend
    \see \n
-   none.CNcomment:ÎÞ CNend
+   none.CNcomment:ï¿½ï¿½ CNend
  */
 HI_S32 HI_UNF_DISP_SetAspectRatio( HI_UNF_DISP_E enDisp, HI_UNF_DISP_ASPECT_RATIO_S *pstDispAspectRatio );
 
 
 /**
-   \brief get aspect ratio attribute of display device.CNcomment: »ñµÃÉè±¸¿í¸ß±ÈÊôÐÔ CNend
+   \brief get aspect ratio attribute of display device.CNcomment: ï¿½ï¿½ï¿½ï¿½è±¸ï¿½ï¿½ß±ï¿½ï¿½ï¿½ï¿½ï¿½ CNend
    \attention \n
    none.
-   CNcomment:ÎÞ CNend
-   \param[in] enDisp      DISP channel ID.CNcomment:DISPÍ¨µÀºÅ CNend
-   \param[out] pstDispAspectRatio    pointer of aspect ratio attribute of display device . CNcomment:Ö¸ÕëÀàÐÍ£¬ÏÔÊ¾Éè±¸¿í¸ß±ÈÐÅÏ¢ CNend
-   \retval ::HI_SUCCESS CNcomment: success.³É¹¦ CNend
-   \retval ::HI_ERR_DISP_DEV_NO_INIT    DISP uninitialization.CNcomment:DISPÎ´³õÊ¼»¯ CNend
-   \retval ::HI_ERR_DISP_NULL_PTR          Input pointer is NULL.CNcomment:ÊäÈëÖ¸ÕëÎª¿Õ CNend
-   \retval ::HI_ERR_DISP_INVALID_PARA   invalid input parameter.CNcomment:ÊäÈë²ÎÊý·Ç·¨ CNend
-   \retval ::HI_ERR_DISP_INVALID_OPT    invalid operation. CNcomment:²Ù×÷·Ç·¨ CNend
+   CNcomment:ï¿½ï¿½ CNend
+   \param[in] enDisp      DISP channel ID.CNcomment:DISPÍ¨ï¿½ï¿½ï¿½ï¿½ CNend
+   \param[out] pstDispAspectRatio    pointer of aspect ratio attribute of display device . CNcomment:Ö¸ï¿½ï¿½ï¿½ï¿½ï¿½Í£ï¿½ï¿½ï¿½Ê¾ï¿½è±¸ï¿½ï¿½ß±ï¿½ï¿½ï¿½Ï¢ CNend
+   \retval ::HI_SUCCESS CNcomment: success.ï¿½É¹ï¿½ CNend
+   \retval ::HI_ERR_DISP_DEV_NO_INIT    DISP uninitialization.CNcomment:DISPÎ´ï¿½ï¿½Ê¼ï¿½ï¿½ CNend
+   \retval ::HI_ERR_DISP_NULL_PTR          Input pointer is NULL.CNcomment:ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½Îªï¿½ï¿½ CNend
+   \retval ::HI_ERR_DISP_INVALID_PARA   invalid input parameter.CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ CNend
+   \retval ::HI_ERR_DISP_INVALID_OPT    invalid operation. CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ CNend
    \see \n
-   none.CNcomment:ÎÞ CNend
+   none.CNcomment:ï¿½ï¿½ CNend
  */
 HI_S32 HI_UNF_DISP_GetAspectRatio( HI_UNF_DISP_E enDisp, HI_UNF_DISP_ASPECT_RATIO_S *pstDispAspectRatio );
 
 
 /**
-   \brief set algorithmic attribute of display device.CNcomment: ÉèÖÃÉè±¸Ëã·¨ÊôÐÔ CNend
+   \brief set algorithmic attribute of display device.CNcomment: ï¿½ï¿½ï¿½ï¿½ï¿½è±¸ï¿½ã·¨ï¿½ï¿½ï¿½ï¿½ CNend
    \attention \n
-   none. CNcomment:ÎÞ CNend
-   \param[in] enDisp      DISP channel ID.CNcomment:DISPÍ¨µÀºÅ CNend
-   \param[in] pstAlg    pointer of algorithmic attribute of display device . CNcomment:Ö¸ÕëÀàÐÍ£¬ÏÔÊ¾Éè±¸Ëã·¨ÊôÐÔ CNend
-   \retval ::HI_SUCCESS CNcomment: success.³É¹¦ CNend
-   \retval ::HI_ERR_DISP_DEV_NO_INIT    DISP uninitialization.CNcomment:DISPÎ´³õÊ¼»¯ CNend
-   \retval ::HI_ERR_DISP_NULL_PTR          Input pointer is NULL.CNcomment:ÊäÈëÖ¸ÕëÎª¿Õ CNend
-   \retval ::HI_ERR_DISP_INVALID_PARA   invalid input parameter.CNcomment:ÊäÈë²ÎÊý·Ç·¨ CNend
-   \retval ::HI_ERR_DISP_INVALID_OPT    invalid operation. CNcomment:²Ù×÷·Ç·¨ CNend
+   none. CNcomment:ï¿½ï¿½ CNend
+   \param[in] enDisp      DISP channel ID.CNcomment:DISPÍ¨ï¿½ï¿½ï¿½ï¿½ CNend
+   \param[in] pstAlg    pointer of algorithmic attribute of display device . CNcomment:Ö¸ï¿½ï¿½ï¿½ï¿½ï¿½Í£ï¿½ï¿½ï¿½Ê¾ï¿½è±¸ï¿½ã·¨ï¿½ï¿½ï¿½ï¿½ CNend
+   \retval ::HI_SUCCESS CNcomment: success.ï¿½É¹ï¿½ CNend
+   \retval ::HI_ERR_DISP_DEV_NO_INIT    DISP uninitialization.CNcomment:DISPÎ´ï¿½ï¿½Ê¼ï¿½ï¿½ CNend
+   \retval ::HI_ERR_DISP_NULL_PTR          Input pointer is NULL.CNcomment:ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½Îªï¿½ï¿½ CNend
+   \retval ::HI_ERR_DISP_INVALID_PARA   invalid input parameter.CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ CNend
+   \retval ::HI_ERR_DISP_INVALID_OPT    invalid operation. CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ CNend
    \see \n
-   none.CNcomment:ÎÞ CNend
+   none.CNcomment:ï¿½ï¿½ CNend
  */
 HI_S32 HI_UNF_DISP_SetAlgCfg( HI_UNF_DISP_E enDisp, HI_UNF_DISP_ALG_CFG_S *pstAlg );
 
 
 /**
-   \brief get algorithmic status of display device.CNcomment: »ñÈ¡Éè±¸Ëã·¨ÊôÐÔ CNend
+   \brief get algorithmic status of display device.CNcomment: ï¿½ï¿½È¡ï¿½è±¸ï¿½ã·¨ï¿½ï¿½ï¿½ï¿½ CNend
    \attention \n
-   none. CNcomment:ÎÞ CNend
-   \param[in] enDisp      DISP channel ID.CNcomment:DISPÍ¨µÀºÅ CNend
-   \param[out] pstAlg    pointer of algorithmic attribute of display device . CNcomment:Ö¸ÕëÀàÐÍ£¬ÏÔÊ¾Éè±¸Ëã·¨ÊôÐÔ CNend
-   \retval ::HI_SUCCESS CNcomment: success.³É¹¦ CNend
-   \retval ::HI_ERR_DISP_DEV_NO_INIT    DISP uninitialization.CNcomment:DISPÎ´³õÊ¼»¯ CNend
-   \retval ::HI_ERR_DISP_NULL_PTR          Input pointer is NULL.CNcomment:ÊäÈëÖ¸ÕëÎª¿Õ CNend
-   \retval ::HI_ERR_DISP_INVALID_PARA   invalid input parameter.CNcomment:ÊäÈë²ÎÊý·Ç·¨ CNend
-   \retval ::HI_ERR_DISP_INVALID_OPT    invalid operation. CNcomment:²Ù×÷·Ç·¨ CNend
+   none. CNcomment:ï¿½ï¿½ CNend
+   \param[in] enDisp      DISP channel ID.CNcomment:DISPÍ¨ï¿½ï¿½ï¿½ï¿½ CNend
+   \param[out] pstAlg    pointer of algorithmic attribute of display device . CNcomment:Ö¸ï¿½ï¿½ï¿½ï¿½ï¿½Í£ï¿½ï¿½ï¿½Ê¾ï¿½è±¸ï¿½ã·¨ï¿½ï¿½ï¿½ï¿½ CNend
+   \retval ::HI_SUCCESS CNcomment: success.ï¿½É¹ï¿½ CNend
+   \retval ::HI_ERR_DISP_DEV_NO_INIT    DISP uninitialization.CNcomment:DISPÎ´ï¿½ï¿½Ê¼ï¿½ï¿½ CNend
+   \retval ::HI_ERR_DISP_NULL_PTR          Input pointer is NULL.CNcomment:ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½Îªï¿½ï¿½ CNend
+   \retval ::HI_ERR_DISP_INVALID_PARA   invalid input parameter.CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ CNend
+   \retval ::HI_ERR_DISP_INVALID_OPT    invalid operation. CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ CNend
    \see \n
-   none.CNcomment:ÎÞ CNend
+   none.CNcomment:ï¿½ï¿½ CNend
  */
 HI_S32 HI_UNF_DISP_GetAlgCfg( HI_UNF_DISP_E enDisp, HI_UNF_DISP_ALG_CFG_S *pstAlg );
 
 
 /**
-   \brief create VBI data channel.CNcomment: ´´½¨VBIÊý¾ÝÍ¨µÀ CNend
+   \brief create VBI data channel.CNcomment: ï¿½ï¿½ï¿½ï¿½VBIï¿½ï¿½ï¿½Í¨ï¿½ï¿½ CNend
    \attention \n
    Each VBI type can not  created  repeatedly,if created more than one time,it will be return HI_ERR_DISP_CREATE_ERR;
-   CNcomment:Ã¿ÖÖVBIÀàÐÍÖ»ÄÜ´´½¨Ò»´Î£¬¶à´Î´´½¨Ôò·µ»ØHI_ERR_DISP_CREATE_ERR CNend
-   \param[in] enDisp      DISP channel ID.CNcomment:DISPÍ¨µÀºÅ CNend
-   \param[in] pstCfg    pointer of parameter of VBI channel . CNcomment:Ö¸ÕëÀàÐÍ£¬VBIÍ¨µÀ²ÎÊý CNend
-   \param[out] phVbi    pointer of VBI handle . CNcomment:Ö¸ÕëÀàÐÍ£¬VBIÍ¨µÀ¾ä±ú CNend
-   \retval ::HI_SUCCESS CNcomment: success.³É¹¦ CNend
-   \retval ::HI_ERR_DISP_DEV_NO_INIT    DISP uninitialization.CNcomment:DISPÎ´³õÊ¼»¯ CNend
-   \retval ::HI_ERR_DISP_NULL_PTR          Input pointer is NULL.CNcomment:ÊäÈëÖ¸ÕëÎª¿Õ CNend
-   \retval ::HI_ERR_DISP_INVALID_PARA   invalid input parameter.CNcomment:ÊäÈë²ÎÊý·Ç·¨ CNend
-   \retval ::HI_ERR_DISP_INVALID_OPT    invalid operation. CNcomment:²Ù×÷·Ç·¨ CNend
-   \retval ::HI_ERR_DISP_CREATE_ERR    invalid operation. CNcomment:´´½¨Ê§°Ü CNend
+   CNcomment:Ã¿ï¿½ï¿½VBIï¿½ï¿½ï¿½ï¿½Ö»ï¿½Ü´ï¿½ï¿½ï¿½Ò»ï¿½Î£ï¿½ï¿½ï¿½Î´ï¿½ï¿½ï¿½ï¿½ò·µ»ï¿½HI_ERR_DISP_CREATE_ERR CNend
+   \param[in] enDisp      DISP channel ID.CNcomment:DISPÍ¨ï¿½ï¿½ï¿½ï¿½ CNend
+   \param[in] pstCfg    pointer of parameter of VBI channel . CNcomment:Ö¸ï¿½ï¿½ï¿½ï¿½ï¿½Í£ï¿½VBIÍ¨ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ CNend
+   \param[out] phVbi    pointer of VBI handle . CNcomment:Ö¸ï¿½ï¿½ï¿½ï¿½ï¿½Í£ï¿½VBIÍ¨ï¿½ï¿½ï¿½ï¿½ï¿½ CNend
+   \retval ::HI_SUCCESS CNcomment: success.ï¿½É¹ï¿½ CNend
+   \retval ::HI_ERR_DISP_DEV_NO_INIT    DISP uninitialization.CNcomment:DISPÎ´ï¿½ï¿½Ê¼ï¿½ï¿½ CNend
+   \retval ::HI_ERR_DISP_NULL_PTR          Input pointer is NULL.CNcomment:ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½Îªï¿½ï¿½ CNend
+   \retval ::HI_ERR_DISP_INVALID_PARA   invalid input parameter.CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ CNend
+   \retval ::HI_ERR_DISP_INVALID_OPT    invalid operation. CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ CNend
+   \retval ::HI_ERR_DISP_CREATE_ERR    invalid operation. CNcomment:ï¿½ï¿½ï¿½ï¿½Ê§ï¿½ï¿½ CNend
    \see \n
-   none.CNcomment:ÎÞ CNend
+   none.CNcomment:ï¿½ï¿½ CNend
  */
 HI_S32 HI_UNF_DISP_CreateVBI( HI_UNF_DISP_E enDisp, HI_UNF_DISP_VBI_CFG_S *pstCfg, HI_HANDLE *phVbi );
 
 
 /**
-   \brief destroy VBI data channel.CNcomment: Ïú»ÙVBIÊý¾ÝÍ¨µÀ CNend
+   \brief destroy VBI data channel.CNcomment: ï¿½ï¿½ï¿½VBIï¿½ï¿½ï¿½Í¨ï¿½ï¿½ CNend
    \attention \n
    none.
-   CNcomment:ÎÞ CNend
-   \param[in] hVbi      VBI handle ID.CNcomment:VBI Í¨µÀ¾ä±ú CNend
-   \retval ::HI_SUCCESS CNcomment: success.³É¹¦ CNend
-   \retval ::HI_ERR_DISP_DEV_NO_INIT    DISP uninitialization.CNcomment:DISPÎ´³õÊ¼»¯ CNend
-   \retval ::HI_ERR_DISP_NULL_PTR          Input pointer is NULL.CNcomment:ÊäÈëÖ¸ÕëÎª¿Õ CNend
-   \retval ::HI_ERR_DISP_INVALID_PARA   invalid input parameter.CNcomment:ÊäÈë²ÎÊý·Ç·¨ CNend
-   \retval ::HI_ERR_DISP_INVALID_OPT    invalid operation. CNcomment:²Ù×÷·Ç·¨ CNend
+   CNcomment:ï¿½ï¿½ CNend
+   \param[in] hVbi      VBI handle ID.CNcomment:VBI Í¨ï¿½ï¿½ï¿½ï¿½ï¿½ CNend
+   \retval ::HI_SUCCESS CNcomment: success.ï¿½É¹ï¿½ CNend
+   \retval ::HI_ERR_DISP_DEV_NO_INIT    DISP uninitialization.CNcomment:DISPÎ´ï¿½ï¿½Ê¼ï¿½ï¿½ CNend
+   \retval ::HI_ERR_DISP_NULL_PTR          Input pointer is NULL.CNcomment:ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½Îªï¿½ï¿½ CNend
+   \retval ::HI_ERR_DISP_INVALID_PARA   invalid input parameter.CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ CNend
+   \retval ::HI_ERR_DISP_INVALID_OPT    invalid operation. CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ CNend
    \see \n
-   none.CNcomment:ÎÞ CNend
+   none.CNcomment:ï¿½ï¿½ CNend
  */
 HI_S32 HI_UNF_DISP_DestroyVBI( HI_HANDLE hVbi );
 
 
 /**
-   \brief send data to vbi channel.CNcomment: ·¢ËÍÊý¾Ýµ½VBIÍ¨µÀ CNend
+   \brief send data to vbi channel.CNcomment: ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ýµï¿½VBIÍ¨ï¿½ï¿½ CNend
    \attention \n
    After  call HI_UNF_DISP_CreateVBI creat VBI handle sucess,you can call API HI_UNF_DISP_SendVBIData send VBI data .
-   CNcomment:µ÷ÓÃHI_UNF_DISP_CreateVBI ´´½¨VBIÍ¨µÀ³É¹¦ºó£¬²ÅÄÜµ÷ÓÃHI_UNF_DISP_SendVBIData  ·¢ËÍÊý¾Ý CNend
-   \param[in] hVbi      VBI handle ID.CNcomment:VBI Í¨Â·¾ä±ú CNend
-   \param[in] pstVbiData      pointer of VBI data.CNcomment:VBIÊý¾ÝÖ¸Õë CNend
-   \retval ::HI_SUCCESS CNcomment: success.³É¹¦ CNend
-   \retval ::HI_ERR_DISP_DEV_NO_INIT    DISP uninitialization.CNcomment:DISPÎ´³õÊ¼»¯ CNend
-   \retval ::HI_ERR_DISP_NULL_PTR          Input pointer is NULL.CNcomment:ÊäÈëÖ¸ÕëÎª¿Õ CNend
-   \retval ::HI_ERR_DISP_INVALID_PARA   invalid input parameter.CNcomment:ÊäÈë²ÎÊý·Ç·¨ CNend
-   \retval ::HI_ERR_DISP_INVALID_OPT    invalid operation. CNcomment:²Ù×÷·Ç·¨ CNend
+   CNcomment:ï¿½ï¿½ï¿½ï¿½HI_UNF_DISP_CreateVBI ï¿½ï¿½ï¿½ï¿½VBIÍ¨ï¿½ï¿½ï¿½É¹ï¿½ï¿½ó£¬²ï¿½ï¿½Üµï¿½ï¿½ï¿½HI_UNF_DISP_SendVBIData  ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ CNend
+   \param[in] hVbi      VBI handle ID.CNcomment:VBI Í¨Â·ï¿½ï¿½ï¿½ CNend
+   \param[in] pstVbiData      pointer of VBI data.CNcomment:VBIï¿½ï¿½ï¿½Ö¸ï¿½ï¿½ CNend
+   \retval ::HI_SUCCESS CNcomment: success.ï¿½É¹ï¿½ CNend
+   \retval ::HI_ERR_DISP_DEV_NO_INIT    DISP uninitialization.CNcomment:DISPÎ´ï¿½ï¿½Ê¼ï¿½ï¿½ CNend
+   \retval ::HI_ERR_DISP_NULL_PTR          Input pointer is NULL.CNcomment:ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½Îªï¿½ï¿½ CNend
+   \retval ::HI_ERR_DISP_INVALID_PARA   invalid input parameter.CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ CNend
+   \retval ::HI_ERR_DISP_INVALID_OPT    invalid operation. CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ CNend
    \see \n
-   none.CNcomment:ÎÞ CNend
+   none.CNcomment:ï¿½ï¿½ CNend
  */
 HI_S32 HI_UNF_DISP_SendVBIData( HI_HANDLE hVbi, HI_UNF_DISP_VBI_DATA_S *pstVbiData );
 
 /**
-   \brief Get default attributes of screen share channel.CNcomment: »ñÈ¡ÆÁÄ»Í¶Ó°Í¨µÀµÄÄ¬ÈÏÊôÐÔ CNend
+   \brief Get default attributes of screen share channel.CNcomment: ï¿½ï¿½È¡ï¿½ï¿½Ä»Í¶Ó°Í¨ï¿½ï¿½ï¿½ï¿½Ä¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ CNend
    \attention \n
-   none. CNcomment:ÎÞ CNend
-   \param[in] enDisp      display channel.CNcomment:ÏÔÊ¾Í¨Â· CNend
-   \param[out]pstAttr     pointer of parameter .CNcomment:Ö¸Õë,ÅäÖÃ²ÎÊý CNend
-   \retval ::HI_SUCCESS CNcomment: success.³É¹¦ CNend
-   \retval ::HI_ERR_DISP_NULL_PTR          Input pointer is NULL.CNcomment:ÊäÈëÖ¸ÕëÎª¿Õ CNend
-   \retval ::HI_ERR_DISP_INVALID_PARA   invalid input parameter.CNcomment:ÊäÈë²ÎÊý·Ç·¨ CNend
+   none. CNcomment:ï¿½ï¿½ CNend
+   \param[in] enDisp      display channel.CNcomment:ï¿½ï¿½Ê¾Í¨Â· CNend
+   \param[out]pstAttr     pointer of parameter .CNcomment:Ö¸ï¿½ï¿½,ï¿½ï¿½ï¿½Ã²ï¿½ï¿½ï¿½ CNend
+   \retval ::HI_SUCCESS CNcomment: success.ï¿½É¹ï¿½ CNend
+   \retval ::HI_ERR_DISP_NULL_PTR          Input pointer is NULL.CNcomment:ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½Îªï¿½ï¿½ CNend
+   \retval ::HI_ERR_DISP_INVALID_PARA   invalid input parameter.CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ CNend
    \see \n
-   none.CNcomment:ÎÞ CNend
+   none.CNcomment:ï¿½ï¿½ CNend
  */
 HI_S32 HI_UNF_DISP_GetDefaultCastAttr(HI_UNF_DISP_E enDisp,HI_UNF_DISP_CAST_ATTR_S *pstAttr);
 
 
 /**
-   \brief create screen share channel.CNcomment: ´´½¨ÆÁÄ»Í¶Ó°Í¨µÀ CNend
+   \brief create screen share channel.CNcomment: ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä»Í¶Ó°Í¨ï¿½ï¿½ CNend
    \attention \n
-   none. CNcomment:ÎÞ CNend
-   \param[in] enDisp      display channel.CNcomment:ÏÔÊ¾Í¨Â· CNend
-   \param[in] pstAttr      pointer of parameter .CNcomment:Ö¸Õë,ÅäÖÃ²ÎÊý CNend
-   \param[out] phCast      handle of screen share .CNcomment:ÆÁÄ»Í¶Ó°¾ä±ú CNend
-   \retval ::HI_SUCCESS CNcomment: success.³É¹¦ CNend
-   \retval ::HI_ERR_DISP_DEV_NO_INIT    DISP uninitialization.CNcomment:DISPÎ´³õÊ¼»¯ CNend
-   \retval ::HI_ERR_DISP_NULL_PTR          Input pointer is NULL.CNcomment:ÊäÈëÖ¸ÕëÎª¿Õ CNend
-   \retval ::HI_ERR_DISP_INVALID_PARA   invalid input parameter.CNcomment:ÊäÈë²ÎÊý·Ç·¨ CNend
-   \retval ::HI_ERR_DISP_INVALID_OPT    invalid operation. CNcomment:²Ù×÷·Ç·¨ CNend
+   none. CNcomment:ï¿½ï¿½ CNend
+   \param[in] enDisp      display channel.CNcomment:ï¿½ï¿½Ê¾Í¨Â· CNend
+   \param[in] pstAttr      pointer of parameter .CNcomment:Ö¸ï¿½ï¿½,ï¿½ï¿½ï¿½Ã²ï¿½ï¿½ï¿½ CNend
+   \param[out] phCast      handle of screen share .CNcomment:ï¿½ï¿½Ä»Í¶Ó°ï¿½ï¿½ï¿½ CNend
+   \retval ::HI_SUCCESS CNcomment: success.ï¿½É¹ï¿½ CNend
+   \retval ::HI_ERR_DISP_DEV_NO_INIT    DISP uninitialization.CNcomment:DISPÎ´ï¿½ï¿½Ê¼ï¿½ï¿½ CNend
+   \retval ::HI_ERR_DISP_NULL_PTR          Input pointer is NULL.CNcomment:ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½Îªï¿½ï¿½ CNend
+   \retval ::HI_ERR_DISP_INVALID_PARA   invalid input parameter.CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ CNend
+   \retval ::HI_ERR_DISP_INVALID_OPT    invalid operation. CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ CNend
    \see \n
-   none.CNcomment:ÎÞ CNend
+   none.CNcomment:ï¿½ï¿½ CNend
  */
 HI_S32 HI_UNF_DISP_CreateCast( HI_UNF_DISP_E enDisp, HI_UNF_DISP_CAST_ATTR_S * pstAttr, HI_HANDLE *phCast );
 
 
 /**
-   \brief destroy screen share channel.CNcomment: Ïú»ÙÆÁÄ»Í¶Ó°Í¨µÀ CNend
+   \brief destroy screen share channel.CNcomment: ï¿½ï¿½ï¿½ï¿½ï¿½Ä»Í¶Ó°Í¨ï¿½ï¿½ CNend
    \attention \n
-   none. CNcomment:ÎÞ CNend
-   \param[in] phCast      handle of screen share .CNcomment:ÆÁÄ»Í¶Ó°¾ä±ú CNend
-   \retval ::HI_SUCCESS CNcomment: success.³É¹¦ CNend
-   \retval ::HI_ERR_DISP_DEV_NO_INIT    DISP uninitialization.CNcomment:DISPÎ´³õÊ¼»¯ CNend
-   \retval ::HI_ERR_DISP_NULL_PTR          Input pointer is NULL.CNcomment:ÊäÈëÖ¸ÕëÎª¿Õ CNend
-   \retval ::HI_ERR_DISP_INVALID_PARA   invalid input parameter.CNcomment:ÊäÈë²ÎÊý·Ç·¨ CNend
-   \retval ::HI_ERR_DISP_INVALID_OPT    invalid operation. CNcomment:²Ù×÷·Ç·¨ CNend
+   none. CNcomment:ï¿½ï¿½ CNend
+   \param[in] phCast      handle of screen share .CNcomment:ï¿½ï¿½Ä»Í¶Ó°ï¿½ï¿½ï¿½ CNend
+   \retval ::HI_SUCCESS CNcomment: success.ï¿½É¹ï¿½ CNend
+   \retval ::HI_ERR_DISP_DEV_NO_INIT    DISP uninitialization.CNcomment:DISPÎ´ï¿½ï¿½Ê¼ï¿½ï¿½ CNend
+   \retval ::HI_ERR_DISP_NULL_PTR          Input pointer is NULL.CNcomment:ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½Îªï¿½ï¿½ CNend
+   \retval ::HI_ERR_DISP_INVALID_PARA   invalid input parameter.CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ CNend
+   \retval ::HI_ERR_DISP_INVALID_OPT    invalid operation. CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ CNend
    \see \n
-   none.CNcomment:ÎÞ CNend
+   none.CNcomment:ï¿½ï¿½ CNend
  */
 HI_S32 HI_UNF_DISP_DestroyCast( HI_HANDLE hCast );
 
 
 /**
-   \brief enable screen share.CNcomment: Ê¹ÄÜÆÁÄ»Í¶Ó°¹¦ÄÜ CNend
+   \brief enable screen share.CNcomment: Ê¹ï¿½ï¿½ï¿½ï¿½Ä»Í¶Ó°ï¿½ï¿½ï¿½ï¿½ CNend
    \attention \n
-   none. CNcomment:ÎÞ CNend
-   \param[in] phCast      handle of screen share .CNcomment:ÆÁÄ»Í¶Ó°¾ä±ú CNend
-   \param[in] bEnable      enable screen share .CNcomment:Ê¹ÄÜÆÁÄ»Í¶Ó° CNend
-   \retval ::HI_SUCCESS CNcomment: success.³É¹¦ CNend
-   \retval ::HI_ERR_DISP_DEV_NO_INIT    DISP uninitialization.CNcomment:DISPÎ´³õÊ¼»¯ CNend
-   \retval ::HI_ERR_DISP_NULL_PTR          Input pointer is NULL.CNcomment:ÊäÈëÖ¸ÕëÎª¿Õ CNend
-   \retval ::HI_ERR_DISP_INVALID_PARA   invalid input parameter.CNcomment:ÊäÈë²ÎÊý·Ç·¨ CNend
-   \retval ::HI_ERR_DISP_INVALID_OPT    invalid operation. CNcomment:²Ù×÷·Ç·¨ CNend
+   none. CNcomment:ï¿½ï¿½ CNend
+   \param[in] phCast      handle of screen share .CNcomment:ï¿½ï¿½Ä»Í¶Ó°ï¿½ï¿½ï¿½ CNend
+   \param[in] bEnable      enable screen share .CNcomment:Ê¹ï¿½ï¿½ï¿½ï¿½Ä»Í¶Ó° CNend
+   \retval ::HI_SUCCESS CNcomment: success.ï¿½É¹ï¿½ CNend
+   \retval ::HI_ERR_DISP_DEV_NO_INIT    DISP uninitialization.CNcomment:DISPÎ´ï¿½ï¿½Ê¼ï¿½ï¿½ CNend
+   \retval ::HI_ERR_DISP_NULL_PTR          Input pointer is NULL.CNcomment:ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½Îªï¿½ï¿½ CNend
+   \retval ::HI_ERR_DISP_INVALID_PARA   invalid input parameter.CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ CNend
+   \retval ::HI_ERR_DISP_INVALID_OPT    invalid operation. CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ CNend
    \see \n
-   none.CNcomment:ÎÞ CNend
+   none.CNcomment:ï¿½ï¿½ CNend
  */
 HI_S32 HI_UNF_DISP_SetCastEnable( HI_HANDLE hCast, HI_BOOL bEnable );
 
 
 /**
-   \brief get enable flag of screen share.CNcomment: »ñÈ¡ÆÁÄ»Í¶Ó°ÊÇ·ñÊ¹ÄÜ CNend
+   \brief get enable flag of screen share.CNcomment: ï¿½ï¿½È¡ï¿½ï¿½Ä»Í¶Ó°ï¿½Ç·ï¿½Ê¹ï¿½ï¿½ CNend
    \attention \n
-   none. CNcomment:ÎÞ CNend
-   \param[in] phCast      handle of screen share .CNcomment:ÆÁÄ»Í¶Ó°¾ä±ú CNend
-   \param[out] bEnable     flag .CNcomment:±êÖ¾ CNend
-   \retval ::HI_SUCCESS CNcomment: success.³É¹¦ CNend
-   \retval ::HI_ERR_DISP_DEV_NO_INIT    DISP uninitialization.CNcomment:DISPÎ´³õÊ¼»¯ CNend
-   \retval ::HI_ERR_DISP_NULL_PTR          Input pointer is NULL.CNcomment:ÊäÈëÖ¸ÕëÎª¿Õ CNend
-   \retval ::HI_ERR_DISP_INVALID_PARA   invalid input parameter.CNcomment:ÊäÈë²ÎÊý·Ç·¨ CNend
-   \retval ::HI_ERR_DISP_INVALID_OPT    invalid operation. CNcomment:²Ù×÷·Ç·¨ CNend
+   none. CNcomment:ï¿½ï¿½ CNend
+   \param[in] phCast      handle of screen share .CNcomment:ï¿½ï¿½Ä»Í¶Ó°ï¿½ï¿½ï¿½ CNend
+   \param[out] bEnable     flag .CNcomment:ï¿½ï¿½Ö¾ CNend
+   \retval ::HI_SUCCESS CNcomment: success.ï¿½É¹ï¿½ CNend
+   \retval ::HI_ERR_DISP_DEV_NO_INIT    DISP uninitialization.CNcomment:DISPÎ´ï¿½ï¿½Ê¼ï¿½ï¿½ CNend
+   \retval ::HI_ERR_DISP_NULL_PTR          Input pointer is NULL.CNcomment:ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½Îªï¿½ï¿½ CNend
+   \retval ::HI_ERR_DISP_INVALID_PARA   invalid input parameter.CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ CNend
+   \retval ::HI_ERR_DISP_INVALID_OPT    invalid operation. CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ CNend
    \see \n
-   none.CNcomment:ÎÞ CNend
+   none.CNcomment:ï¿½ï¿½ CNend
  */
 HI_S32 HI_UNF_DISP_GetCastEnable( HI_HANDLE hCast, HI_BOOL *pbEnable );
 
 
 /**
-   \brief get frame info of screen share.CNcomment: »ñÈ¡ÆÁÄ»Í¶Ó°Ö¡ÐÅÏ¢ CNend
+   \brief get frame info of screen share.CNcomment: ï¿½ï¿½È¡ï¿½ï¿½Ä»Í¶Ó°Ö¡ï¿½ï¿½Ï¢ CNend
    \attention \n
-   none. CNcomment:ÎÞ CNend
-   \param[in] hCast      handle of screen share .CNcomment:ÆÁÄ»Í¶Ó°¾ä±ú CNend
-   \param[out] pstFrameInfo        frame info.CNcomment:Ö¡ÐÅÏ¢ CNend
-   \param[in] u32TimeoutMs wait time in ms.CNcomment:µÈ´ýÊ±¼ä£¬ºÁÃëÎªµ¥Î» CNend
-   \retval ::HI_SUCCESS CNcomment: success.³É¹¦ CNend
-   \retval ::HI_ERR_DISP_DEV_NO_INIT    DISP uninitialization.CNcomment:DISPÎ´³õÊ¼»¯ CNend
-   \retval ::HI_ERR_DISP_NULL_PTR          Input pointer is NULL.CNcomment:ÊäÈëÖ¸ÕëÎª¿Õ CNend
-   \retval ::HI_ERR_DISP_INVALID_PARA   invalid input parameter.CNcomment:ÊäÈë²ÎÊý·Ç·¨ CNend
-   \retval ::HI_ERR_DISP_INVALID_OPT    invalid operation. CNcomment:²Ù×÷·Ç·¨ CNend
+   none. CNcomment:ï¿½ï¿½ CNend
+   \param[in] hCast      handle of screen share .CNcomment:ï¿½ï¿½Ä»Í¶Ó°ï¿½ï¿½ï¿½ CNend
+   \param[out] pstFrameInfo        frame info.CNcomment:Ö¡ï¿½ï¿½Ï¢ CNend
+   \param[in] u32TimeoutMs wait time in ms.CNcomment:ï¿½È´ï¿½Ê±ï¿½ä£¬ï¿½ï¿½ï¿½ï¿½Îªï¿½ï¿½Î» CNend
+   \retval ::HI_SUCCESS CNcomment: success.ï¿½É¹ï¿½ CNend
+   \retval ::HI_ERR_DISP_DEV_NO_INIT    DISP uninitialization.CNcomment:DISPÎ´ï¿½ï¿½Ê¼ï¿½ï¿½ CNend
+   \retval ::HI_ERR_DISP_NULL_PTR          Input pointer is NULL.CNcomment:ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½Îªï¿½ï¿½ CNend
+   \retval ::HI_ERR_DISP_INVALID_PARA   invalid input parameter.CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ CNend
+   \retval ::HI_ERR_DISP_INVALID_OPT    invalid operation. CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ CNend
    \see \n
-   none.CNcomment:ÎÞ CNend
+   none.CNcomment:ï¿½ï¿½ CNend
  */
 HI_S32 HI_UNF_DISP_AcquireCastFrame(HI_HANDLE hCast, HI_UNF_VIDEO_FRAME_INFO_S *pstFrameInfo, HI_U32 u32TimeoutMs);
 
 
 /**
-   \brief release frame info of screen share.CNcomment: ÊÍ·ÅÆÁÄ»Í¶Ó°Ö¡ÐÅÏ¢ CNend
+   \brief release frame info of screen share.CNcomment: ï¿½Í·ï¿½ï¿½ï¿½Ä»Í¶Ó°Ö¡ï¿½ï¿½Ï¢ CNend
    \attention \n
-   none. CNcomment:ÎÞ CNend
-   \param[in] hCast      handle of screen share .CNcomment:ÆÁÄ»Í¶Ó°¾ä±ú CNend
-   \param[in] pstFrameInfo     frame info.CNcomment:Ö¡ÐÅÏ¢ CNend
-   \retval ::HI_SUCCESS CNcomment: success.³É¹¦ CNend
-   \retval ::HI_ERR_DISP_DEV_NO_INIT    DISP uninitialization.CNcomment:DISPÎ´³õÊ¼»¯ CNend
-   \retval ::HI_ERR_DISP_NULL_PTR          Input pointer is NULL.CNcomment:ÊäÈëÖ¸ÕëÎª¿Õ CNend
-   \retval ::HI_ERR_DISP_INVALID_PARA   invalid input parameter.CNcomment:ÊäÈë²ÎÊý·Ç·¨ CNend
-   \retval ::HI_ERR_DISP_INVALID_OPT    invalid operation. CNcomment:²Ù×÷·Ç·¨ CNend
+   none. CNcomment:ï¿½ï¿½ CNend
+   \param[in] hCast      handle of screen share .CNcomment:ï¿½ï¿½Ä»Í¶Ó°ï¿½ï¿½ï¿½ CNend
+   \param[in] pstFrameInfo     frame info.CNcomment:Ö¡ï¿½ï¿½Ï¢ CNend
+   \retval ::HI_SUCCESS CNcomment: success.ï¿½É¹ï¿½ CNend
+   \retval ::HI_ERR_DISP_DEV_NO_INIT    DISP uninitialization.CNcomment:DISPÎ´ï¿½ï¿½Ê¼ï¿½ï¿½ CNend
+   \retval ::HI_ERR_DISP_NULL_PTR          Input pointer is NULL.CNcomment:ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½Îªï¿½ï¿½ CNend
+   \retval ::HI_ERR_DISP_INVALID_PARA   invalid input parameter.CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ CNend
+   \retval ::HI_ERR_DISP_INVALID_OPT    invalid operation. CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ CNend
    \see \n
-   none.CNcomment:ÎÞ CNend
+   none.CNcomment:ï¿½ï¿½ CNend
  */
 HI_S32 HI_UNF_DISP_ReleaseCastFrame( HI_HANDLE hCast, HI_UNF_VIDEO_FRAME_INFO_S *pstFrameInfo );
 
 
 /**
-   \brief professional color modulation.CNcomment: ×¨ÒµÉ«²Êµ÷½Ú CNend
+   \brief professional color modulation.CNcomment: ×¨ÒµÉ«ï¿½Êµï¿½ï¿½ï¿½ CNend
    \attention \n
-   none. CNcomment:ÎÞ CNend
-   \param[in] enDisp      display channel.CNcomment:ÏÔÊ¾Í¨Â· CNend
-   \param[in] pstCS      struct of color modulation.CNcomment:É«²Êµ÷½Ú½á¹¹ CNend
-   \retval ::HI_SUCCESS CNcomment: success.³É¹¦ CNend
-   \retval ::HI_ERR_DISP_DEV_NO_INIT    DISP uninitialization.CNcomment:DISPÎ´³õÊ¼»¯ CNend
-   \retval ::HI_ERR_DISP_NULL_PTR          Input pointer is NULL.CNcomment:ÊäÈëÖ¸ÕëÎª¿Õ CNend
-   \retval ::HI_ERR_DISP_INVALID_PARA   invalid input parameter.CNcomment:ÊäÈë²ÎÊý·Ç·¨ CNend
-   \retval ::HI_ERR_DISP_INVALID_OPT    invalid operation. CNcomment:²Ù×÷·Ç·¨ CNend
+   none. CNcomment:ï¿½ï¿½ CNend
+   \param[in] enDisp      display channel.CNcomment:ï¿½ï¿½Ê¾Í¨Â· CNend
+   \param[in] pstCS      struct of color modulation.CNcomment:É«ï¿½Êµï¿½ï¿½Ú½á¹¹ CNend
+   \retval ::HI_SUCCESS CNcomment: success.ï¿½É¹ï¿½ CNend
+   \retval ::HI_ERR_DISP_DEV_NO_INIT    DISP uninitialization.CNcomment:DISPÎ´ï¿½ï¿½Ê¼ï¿½ï¿½ CNend
+   \retval ::HI_ERR_DISP_NULL_PTR          Input pointer is NULL.CNcomment:ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½Îªï¿½ï¿½ CNend
+   \retval ::HI_ERR_DISP_INVALID_PARA   invalid input parameter.CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ CNend
+   \retval ::HI_ERR_DISP_INVALID_OPT    invalid operation. CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ CNend
    \see \n
-   none.CNcomment:ÎÞ CNend
+   none.CNcomment:ï¿½ï¿½ CNend
  */
 HI_S32 HI_UNF_DISP_SetColor( HI_UNF_DISP_E enDisp, HI_UNF_DISP_COLOR_SETTING_S *pstCS );
 
 
 /**
-   \brief get color modulation parameter.CNcomment: »ñÈ¡É«²Êµ÷½ÚÐÅÏ¢ CNend
+   \brief get color modulation parameter.CNcomment: ï¿½ï¿½È¡É«ï¿½Êµï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ CNend
    \attention \n
-   none. CNcomment:ÎÞ CNend
-   \param[in] enDisp      display channel.CNcomment:ÏÔÊ¾Í¨Â· CNend
-   \param[in] pstCS      struct of color modulation.CNcomment:É«²Êµ÷½Ú½á¹¹ CNend
-   \retval ::HI_SUCCESS CNcomment: success.³É¹¦ CNend
-   \retval ::HI_ERR_DISP_DEV_NO_INIT    DISP uninitialization.CNcomment:DISPÎ´³õÊ¼»¯ CNend
-   \retval ::HI_ERR_DISP_NULL_PTR          Input pointer is NULL.CNcomment:ÊäÈëÖ¸ÕëÎª¿Õ CNend
-   \retval ::HI_ERR_DISP_INVALID_PARA   invalid input parameter.CNcomment:ÊäÈë²ÎÊý·Ç·¨ CNend
-   \retval ::HI_ERR_DISP_INVALID_OPT    invalid operation. CNcomment:²Ù×÷·Ç·¨ CNend
+   none. CNcomment:ï¿½ï¿½ CNend
+   \param[in] enDisp      display channel.CNcomment:ï¿½ï¿½Ê¾Í¨Â· CNend
+   \param[in] pstCS      struct of color modulation.CNcomment:É«ï¿½Êµï¿½ï¿½Ú½á¹¹ CNend
+   \retval ::HI_SUCCESS CNcomment: success.ï¿½É¹ï¿½ CNend
+   \retval ::HI_ERR_DISP_DEV_NO_INIT    DISP uninitialization.CNcomment:DISPÎ´ï¿½ï¿½Ê¼ï¿½ï¿½ CNend
+   \retval ::HI_ERR_DISP_NULL_PTR          Input pointer is NULL.CNcomment:ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½Îªï¿½ï¿½ CNend
+   \retval ::HI_ERR_DISP_INVALID_PARA   invalid input parameter.CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ CNend
+   \retval ::HI_ERR_DISP_INVALID_OPT    invalid operation. CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ CNend
    \see \n
-   none.CNcomment:ÎÞ CNend
+   none.CNcomment:ï¿½ï¿½ CNend
  */
 HI_S32 HI_UNF_DISP_GetColor( HI_UNF_DISP_E enDisp, HI_UNF_DISP_COLOR_SETTING_S *pstCS );
 
 
 /**
-   \Snapshot truncation screen connection, intercepts the screen complete picture;CNcomment:½ØÈ¡ÆÁÄ»ÍêÕû»­Ãæ; CNend
+   \Snapshot truncation screen connection, intercepts the screen complete picture;CNcomment:ï¿½ï¿½È¡ï¿½ï¿½Ä»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½; CNend
    \attention \n
-   none. CNcomment:ÎÞ CNend
-   \param[in] enDisp      display channel.CNcomment:ÏÔÊ¾Í¨Â· CNend
-   \param[in] pstFrameInfo     frame info.CNcomment:Ö¡ÐÅÏ¢ CNend
-   \retval ::HI_SUCCESS CNcomment: success.³É¹¦ CNend
-   \retval ::HI_ERR_DISP_DEV_NO_INIT    DISP uninitialization.CNcomment:DISPÎ´³õÊ¼»¯ CNend
-   \retval ::HI_ERR_DISP_NULL_PTR          Input pointer is NULL.CNcomment:ÊäÈëÖ¸ÕëÎª¿Õ CNend
-   \retval ::HI_ERR_DISP_INVALID_PARA   invalid input parameter.CNcomment:ÊäÈë²ÎÊý·Ç·¨ CNend
-   \retval ::HI_ERR_DISP_INVALID_OPT    invalid operation. CNcomment:²Ù×÷·Ç·¨ CNend
+   none. CNcomment:ï¿½ï¿½ CNend
+   \param[in] enDisp      display channel.CNcomment:ï¿½ï¿½Ê¾Í¨Â· CNend
+   \param[in] pstFrameInfo     frame info.CNcomment:Ö¡ï¿½ï¿½Ï¢ CNend
+   \retval ::HI_SUCCESS CNcomment: success.ï¿½É¹ï¿½ CNend
+   \retval ::HI_ERR_DISP_DEV_NO_INIT    DISP uninitialization.CNcomment:DISPÎ´ï¿½ï¿½Ê¼ï¿½ï¿½ CNend
+   \retval ::HI_ERR_DISP_NULL_PTR          Input pointer is NULL.CNcomment:ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½Îªï¿½ï¿½ CNend
+   \retval ::HI_ERR_DISP_INVALID_PARA   invalid input parameter.CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ CNend
+   \retval ::HI_ERR_DISP_INVALID_OPT    invalid operation. CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ CNend
    \see \n
-   none.CNcomment:ÎÞ CNend
+   none.CNcomment:ï¿½ï¿½ CNend
  */
 HI_S32 HI_UNF_DISP_AcquireSnapshot(HI_UNF_DISP_E enDisp, HI_UNF_VIDEO_FRAME_INFO_S * pstFrameInfo);
 
 /**
-   \Release Snapshot picture;CNcomment:ÊÍ·Å½ØÆÁ»­Ãæ; CNend
+   \Release Snapshot picture;CNcomment:ï¿½Í·Å½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½; CNend
    \attention \n
-   none. CNcomment:ÎÞ CNend
-   \param[in] enDisp      display channel.CNcomment:ÏÔÊ¾Í¨Â· CNend
-   \param[in] pstFrameInfo     frame info.CNcomment:Ö¡ÐÅÏ¢ CNend
-   \retval ::HI_SUCCESS CNcomment: success.³É¹¦ CNend
-   \retval ::HI_ERR_DISP_DEV_NO_INIT    DISP uninitialization.CNcomment:DISPÎ´³õÊ¼»¯ CNend
-   \retval ::HI_ERR_DISP_NULL_PTR          Input pointer is NULL.CNcomment:ÊäÈëÖ¸ÕëÎª¿Õ CNend
-   \retval ::HI_ERR_DISP_INVALID_PARA   invalid input parameter.CNcomment:ÊäÈë²ÎÊý·Ç·¨ CNend
-   \retval ::HI_ERR_DISP_INVALID_OPT    invalid operation. CNcomment:²Ù×÷·Ç·¨ CNend
+   none. CNcomment:ï¿½ï¿½ CNend
+   \param[in] enDisp      display channel.CNcomment:ï¿½ï¿½Ê¾Í¨Â· CNend
+   \param[in] pstFrameInfo     frame info.CNcomment:Ö¡ï¿½ï¿½Ï¢ CNend
+   \retval ::HI_SUCCESS CNcomment: success.ï¿½É¹ï¿½ CNend
+   \retval ::HI_ERR_DISP_DEV_NO_INIT    DISP uninitialization.CNcomment:DISPÎ´ï¿½ï¿½Ê¼ï¿½ï¿½ CNend
+   \retval ::HI_ERR_DISP_NULL_PTR          Input pointer is NULL.CNcomment:ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½Îªï¿½ï¿½ CNend
+   \retval ::HI_ERR_DISP_INVALID_PARA   invalid input parameter.CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ CNend
+   \retval ::HI_ERR_DISP_INVALID_OPT    invalid operation. CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ CNend
    \see \n
-   none.CNcomment:ÎÞ CNend
+   none.CNcomment:ï¿½ï¿½ CNend
  */
 HI_S32 HI_UNF_DISP_ReleaseSnapshot(HI_UNF_DISP_E enDisp, HI_UNF_VIDEO_FRAME_INFO_S * pstFrameInfo);
 
 
 /**
-   \brief get color modulation parameter.CNcomment:ÉèÖÃDISPµÄÄ¬ÈÏÊôÐÔ CNend
+   \brief get color modulation parameter.CNcomment:ï¿½ï¿½ï¿½ï¿½DISPï¿½ï¿½Ä¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ CNend
    \attention \n
-   none. CNcomment:ÎÞ CNend
-   \param[in] enDisp      display channel.CNcomment:ÏÔÊ¾Í¨Â· CNend
-   \retval ::HI_SUCCESS CNcomment: success.³É¹¦ CNend
-   \retval ::HI_ERR_DISP_DEV_NO_INIT    DISP uninitialization.CNcomment:DISPÎ´³õÊ¼»¯ CNend
-   \retval ::HI_ERR_DISP_NULL_PTR          Input pointer is NULL.CNcomment:ÊäÈëÖ¸ÕëÎª¿Õ CNend
-   \retval ::HI_ERR_DISP_INVALID_PARA   invalid input parameter.CNcomment:ÊäÈë²ÎÊý·Ç·¨ CNend
-   \retval ::HI_ERR_DISP_INVALID_OPT    invalid operation. CNcomment:²Ù×÷·Ç·¨ CNend
+   none. CNcomment:ï¿½ï¿½ CNend
+   \param[in] enDisp      display channel.CNcomment:ï¿½ï¿½Ê¾Í¨Â· CNend
+   \retval ::HI_SUCCESS CNcomment: success.ï¿½É¹ï¿½ CNend
+   \retval ::HI_ERR_DISP_DEV_NO_INIT    DISP uninitialization.CNcomment:DISPÎ´ï¿½ï¿½Ê¼ï¿½ï¿½ CNend
+   \retval ::HI_ERR_DISP_NULL_PTR          Input pointer is NULL.CNcomment:ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½Îªï¿½ï¿½ CNend
+   \retval ::HI_ERR_DISP_INVALID_PARA   invalid input parameter.CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ CNend
+   \retval ::HI_ERR_DISP_INVALID_OPT    invalid operation. CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ CNend
    \see \n
-   none.CNcomment:ÎÞ CNend
+   none.CNcomment:ï¿½ï¿½ CNend
  */
 HI_S32 HI_UNF_DISP_SetDefaultPara( HI_UNF_DISP_E enDisp);
 
 
 /**
-   \brief set DISP 3D format.CNcomment:ÉèÖÃDISPµÄ3DÖÆÊ½ CNend
+   \brief set DISP 3D format.CNcomment:ï¿½ï¿½ï¿½ï¿½DISPï¿½ï¿½3Dï¿½ï¿½Ê½ CNend
    \attention \n
-   none. CNcomment:ÎÞ CNend
-   \param[in] enDisp           DISP channel ID.CNcomment:DISPÍ¨µÀºÅ CNend
+   none. CNcomment:ï¿½ï¿½ CNend
+   \param[in] enDisp           DISP channel ID.CNcomment:DISPÍ¨ï¿½ï¿½ï¿½ï¿½ CNend
    \param[in] en3D             DISP 3D mode.CNcomment:DISP 3DÄ£Ê½ CNend
-   \param[in] enEncodingFormat DISP format.CNcomment:DISPµÄÖÆÊ½ CNend
-   \retval ::HI_SUCCESS  success.CNcomment:³É¹¦ CNend
-   \retval ::HI_ERR_DISP_DEV_NO_INIT    DISP uninitialization.CNcomment:DISPÎ´³õÊ¼»¯ CNend
-   \retval ::HI_ERR_DISP_INVALID_PARA   invalid input parameter.CNcomment:ÊäÈë²ÎÊý·Ç·¨ CNend
+   \param[in] enEncodingFormat DISP format.CNcomment:DISPï¿½ï¿½ï¿½ï¿½Ê½ CNend
+   \retval ::HI_SUCCESS  success.CNcomment:ï¿½É¹ï¿½ CNend
+   \retval ::HI_ERR_DISP_DEV_NO_INIT    DISP uninitialization.CNcomment:DISPÎ´ï¿½ï¿½Ê¼ï¿½ï¿½ CNend
+   \retval ::HI_ERR_DISP_INVALID_PARA   invalid input parameter.CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ CNend
    \see \n
-   none.CNcomment:ÎÞ CNend
+   none.CNcomment:ï¿½ï¿½ CNend
  */
 HI_S32 HI_UNF_DISP_Set3DMode(HI_UNF_DISP_E enDisp, HI_UNF_DISP_3D_E en3D, HI_UNF_ENC_FMT_E enEncFormat);
 
 /**
-   \brief get DISP 3D format.CNcomment:²éÑ¯DISPµÄ3DÖÆÊ½ CNend
+   \brief get DISP 3D format.CNcomment:ï¿½ï¿½Ñ¯DISPï¿½ï¿½3Dï¿½ï¿½Ê½ CNend
    \attention \n
-   none. CNcomment:ÎÞ CNend
-   \param[in] enDisp           DISP channel ID.CNcomment:DISPÍ¨µÀºÅ CNend
+   none. CNcomment:ï¿½ï¿½ CNend
+   \param[in] enDisp           DISP channel ID.CNcomment:DISPÍ¨ï¿½ï¿½ï¿½ï¿½ CNend
    \param[out] pen3D           DISP 3D mode.CNcomment:DISP 3DÄ£Ê½ CNend
-   \param[out] penEncFormat    DISP format.CNcomment:DISPµÄÖÆÊ½ CNend
-   \retval ::HI_SUCCESS  success.CNcomment:³É¹¦ CNend
-   \retval ::HI_ERR_DISP_DEV_NO_INIT    DISP uninitialization.CNcomment:DISPÎ´³õÊ¼»¯ CNend
-   \retval ::HI_ERR_DISP_INVALID_PARA   invalid input parameter.CNcomment:ÊäÈë²ÎÊý·Ç·¨ CNend
+   \param[out] penEncFormat    DISP format.CNcomment:DISPï¿½ï¿½ï¿½ï¿½Ê½ CNend
+   \retval ::HI_SUCCESS  success.CNcomment:ï¿½É¹ï¿½ CNend
+   \retval ::HI_ERR_DISP_DEV_NO_INIT    DISP uninitialization.CNcomment:DISPÎ´ï¿½ï¿½Ê¼ï¿½ï¿½ CNend
+   \retval ::HI_ERR_DISP_INVALID_PARA   invalid input parameter.CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ CNend
    \see \n
-   none.CNcomment:ÎÞ CNend
+   none.CNcomment:ï¿½ï¿½ CNend
  */
 HI_S32 HI_UNF_DISP_Get3DMode(HI_UNF_DISP_E enDisp, HI_UNF_DISP_3D_E *pen3D, HI_UNF_ENC_FMT_E *penEncFormat);
 
 /**
-   \brief set right eye first for 3D output.CNcomment:ÉèÖÃ3DÊä³öÓÒÑÛÓÅÏÈ CNend
+   \brief set right eye first for 3D output.CNcomment:ï¿½ï¿½ï¿½ï¿½3Dï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ CNend
    \attention \n
-   Only take effect in 3D output mode. CNcomment: ½öÔÚ3DÊä³öÊ±ÓÐÐ§ CNend
-   \param[in] enDisp     DISP channel ID.CNcomment:DISPÍ¨µÀºÅ CNend
-   \param[in] bEnable   Right-Eye-First.CNcomment:ÓÒÑÛÓÅÏÈ CNend
-   \retval ::HI_SUCCESS  success.CNcomment:³É¹¦ CNend
-   \retval ::HI_ERR_DISP_DEV_NO_INIT    DISP uninitialization.CNcomment:DISPÎ´³õÊ¼»¯ CNend
-   \retval ::HI_ERR_DISP_INVALID_PARA   invalid input parameter.CNcomment:ÊäÈë²ÎÊý·Ç·¨ CNend
+   Only take effect in 3D output mode. CNcomment: ï¿½ï¿½ï¿½ï¿½3Dï¿½ï¿½ï¿½Ê±ï¿½ï¿½Ð§ CNend
+   \param[in] enDisp     DISP channel ID.CNcomment:DISPÍ¨ï¿½ï¿½ï¿½ï¿½ CNend
+   \param[in] bEnable   Right-Eye-First.CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ CNend
+   \retval ::HI_SUCCESS  success.CNcomment:ï¿½É¹ï¿½ CNend
+   \retval ::HI_ERR_DISP_DEV_NO_INIT    DISP uninitialization.CNcomment:DISPÎ´ï¿½ï¿½Ê¼ï¿½ï¿½ CNend
+   \retval ::HI_ERR_DISP_INVALID_PARA   invalid input parameter.CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ CNend
    \see \n
-   none.CNcomment:ÎÞ CNend
+   none.CNcomment:ï¿½ï¿½ CNend
  */
 HI_S32 HI_UNF_DISP_SetRightEyeFirst(HI_UNF_DISP_E enDisp, HI_BOOL bEnable);
 
 /**
-   \brief set virtual screen size of display.CNcomment:ÉèÖÃÏÔÊ¾Í¨µÀµÄÐéÄâÆÁÄ»´óÐ¡ CNend
+   \brief set virtual screen size of display.CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¾Í¨ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä»ï¿½ï¿½Ð¡ CNend
    \attention \n
-   if not set ,default value is 1280*720. CNcomment: Èç¹û²»ÉèÖÃ´Ëº¯Êý£¬Ä¬ÈÏµÄÐéÄâÆÁÄ»´óÐ¡ÊÇ720p. CNend
-   \param[in] enDisp   DISP channel ID.CNcomment:DISPÍ¨µÀºÅ CNend
-   \param[in] u32Width  virtual screen width, the range is [480, 3840].CNcomment:ÐéÄâÆÁÄ»¿í¶È£¬È¡Öµ·¶Î§Îª[480, 3840]. CNend
-   \param[in] u32Height  virtual screen height, the range is [480, 3840].CNcomment:ÐéÄâÆÁÄ»¸ß¶È£¬È¡Öµ·¶Î§Îª[480, 3840]. CNend
-   \retval ::HI_SUCCESS  success.CNcomment:³É¹¦ CNend
-   \retval ::HI_ERR_DISP_DEV_NO_INIT    DISP uninitialization.CNcomment:DISPÎ´³õÊ¼»¯ CNend
-   \retval ::HI_ERR_DISP_INVALID_PARA   invalid input parameter.CNcomment:ÊäÈë²ÎÊý·Ç·¨ CNend
+   if not set ,default value is 1280*720. CNcomment: ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã´Ëºï¿½ï¿½ï¿½Ä¬ï¿½Ïµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä»ï¿½ï¿½Ð¡ï¿½ï¿½720p. CNend
+   \param[in] enDisp   DISP channel ID.CNcomment:DISPÍ¨ï¿½ï¿½ï¿½ï¿½ CNend
+   \param[in] u32Width  virtual screen width, the range is [480, 3840].CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä»ï¿½ï¿½È£ï¿½È¡Öµï¿½ï¿½Î§Îª[480, 3840]. CNend
+   \param[in] u32Height  virtual screen height, the range is [480, 3840].CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä»ï¿½ß¶È£ï¿½È¡Öµï¿½ï¿½Î§Îª[480, 3840]. CNend
+   \retval ::HI_SUCCESS  success.CNcomment:ï¿½É¹ï¿½ CNend
+   \retval ::HI_ERR_DISP_DEV_NO_INIT    DISP uninitialization.CNcomment:DISPÎ´ï¿½ï¿½Ê¼ï¿½ï¿½ CNend
+   \retval ::HI_ERR_DISP_INVALID_PARA   invalid input parameter.CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ CNend
    \see \n
-   none.CNcomment:ÎÞ CNend
+   none.CNcomment:ï¿½ï¿½ CNend
  */
 HI_S32 HI_UNF_DISP_SetVirtualScreen(HI_UNF_DISP_E enDisp, HI_U32 u32Width, HI_U32 u32Height);
 
 /**
-   \brief get virtual screen size of display.CNcomment:»ñÈ¡ÏÔÊ¾Í¨µÀµÄÐéÄâÆÁÄ»´óÐ¡ CNend
+   \brief get virtual screen size of display.CNcomment:ï¿½ï¿½È¡ï¿½ï¿½Ê¾Í¨ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä»ï¿½ï¿½Ð¡ CNend
    \attention \n
-   none. CNcomment: ÎÞ CNend
-   \param[in] enDisp   DISP channel ID.CNcomment:DISPÍ¨µÀºÅ CNend
-   \param[out] u32Width  virtual screen width, the range is [480, 3840].CNcomment:ÐéÄâÆÁÄ»¿í¶È£¬È¡Öµ·¶Î§Îª[480, 3840]. CNend
-   \param[out] u32Height  virtual screen height, the range is [480, 3840].CNcomment:ÐéÄâÆÁÄ»¸ß¶È£¬È¡Öµ·¶Î§Îª[480, 3840]. CNend
-   \retval ::HI_SUCCESS  success.CNcomment:³É¹¦ CNend
-   \retval ::HI_ERR_DISP_DEV_NO_INIT    DISP uninitialization.CNcomment:DISPÎ´³õÊ¼»¯ CNend
-   \retval ::HI_ERR_DISP_INVALID_PARA   invalid input parameter.CNcomment:ÊäÈë²ÎÊý·Ç·¨ CNend
+   none. CNcomment: ï¿½ï¿½ CNend
+   \param[in] enDisp   DISP channel ID.CNcomment:DISPÍ¨ï¿½ï¿½ï¿½ï¿½ CNend
+   \param[out] u32Width  virtual screen width, the range is [480, 3840].CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä»ï¿½ï¿½È£ï¿½È¡Öµï¿½ï¿½Î§Îª[480, 3840]. CNend
+   \param[out] u32Height  virtual screen height, the range is [480, 3840].CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä»ï¿½ß¶È£ï¿½È¡Öµï¿½ï¿½Î§Îª[480, 3840]. CNend
+   \retval ::HI_SUCCESS  success.CNcomment:ï¿½É¹ï¿½ CNend
+   \retval ::HI_ERR_DISP_DEV_NO_INIT    DISP uninitialization.CNcomment:DISPÎ´ï¿½ï¿½Ê¼ï¿½ï¿½ CNend
+   \retval ::HI_ERR_DISP_INVALID_PARA   invalid input parameter.CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ CNend
    \see \n
-   none.CNcomment:ÎÞ CNend
+   none.CNcomment:ï¿½ï¿½ CNend
  */
 HI_S32 HI_UNF_DISP_GetVirtualScreen(HI_UNF_DISP_E enDisp, HI_U32 *u32Width, HI_U32 *u32Height);
 
 
 /**
-   \brief set offset of display area in real screen.CNcomment:ÉèÖÃÏÔÊ¾ÇøÓòÔÚÊµÌåÆÁÄ»ÉÏµÄÆ«ÒÆÁ¿,ÎªÎïÀíÏñËØµã CNend
+   \brief set offset of display area in real screen.CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Êµï¿½ï¿½ï¿½ï¿½Ä»ï¿½Ïµï¿½Æ«ï¿½ï¿½ï¿½ï¿½,Îªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Øµï¿½ CNend
    \attention \n
-   must be 4 pixels aligned,if not set, the default value is 0. CNcomment: offset Öµ±ØÐëÊÇ4¶ÔÆë,Èç¹û²»ÉèÖÃÄ¬ÈÏµÄÖµÎª0. CNend
-   \param[in] enDisp   DISP channel ID.CNcomment:DISPÍ¨µÀºÅ CNend
-   \param[in] pstOffset  offset in pixel, the range is [0, 200].CNcomment:Æ«ÒÆÏñËØÊýÄ¿£¬È¡Öµ·¶Î§Îª[0, 200]. CNend
-   \retval ::HI_SUCCESS  success.CNcomment:³É¹¦ CNend
-   \retval ::HI_ERR_DISP_DEV_NO_INIT    DISP uninitialization.CNcomment:DISPÎ´³õÊ¼»¯ CNend
-   \retval ::HI_ERR_DISP_INVALID_PARA   invalid input parameter.CNcomment:ÊäÈë²ÎÊý·Ç·¨ CNend
+   must be 4 pixels aligned,if not set, the default value is 0. CNcomment: offset Öµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½4ï¿½ï¿½ï¿½ï¿½,ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¬ï¿½Ïµï¿½ÖµÎª0. CNend
+   \param[in] enDisp   DISP channel ID.CNcomment:DISPÍ¨ï¿½ï¿½ï¿½ï¿½ CNend
+   \param[in] pstOffset  offset in pixel, the range is [0, 200].CNcomment:Æ«ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¿ï¿½ï¿½È¡Öµï¿½ï¿½Î§Îª[0, 200]. CNend
+   \retval ::HI_SUCCESS  success.CNcomment:ï¿½É¹ï¿½ CNend
+   \retval ::HI_ERR_DISP_DEV_NO_INIT    DISP uninitialization.CNcomment:DISPÎ´ï¿½ï¿½Ê¼ï¿½ï¿½ CNend
+   \retval ::HI_ERR_DISP_INVALID_PARA   invalid input parameter.CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ CNend
    \see \n
-   none.CNcomment:ÎÞ CNend
+   none.CNcomment:ï¿½ï¿½ CNend
  */
 HI_S32 HI_UNF_DISP_SetScreenOffset(HI_UNF_DISP_E enDisp, HI_UNF_DISP_OFFSET_S *pstOffset);
 
 /**
-   \brief get offset of display area in real screen.CNcomment:»ñÈ¡ÏÔÊ¾ÇøÓòÔÚÊµÌåÆÁÄ»ÉÏµÄÆ«ÒÆÁ¿,ÎªÎïÀíÏñËØµã CNend
+   \brief get offset of display area in real screen.CNcomment:ï¿½ï¿½È¡ï¿½ï¿½Ê¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Êµï¿½ï¿½ï¿½ï¿½Ä»ï¿½Ïµï¿½Æ«ï¿½ï¿½ï¿½ï¿½,Îªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Øµï¿½ CNend
    \attention \n
-   none. CNcomment: ÎÞ CNend
-   \param[in] enDisp   DISP channel ID.CNcomment:DISPÍ¨µÀºÅ CNend
-   \param[out] pstOffset  offset in pixel, the range is [0, 200].CNcomment:Æ«ÒÆÏñËØÊýÄ¿£¬È¡Öµ·¶Î§Îª[0, 200]. CNend
-   \retval ::HI_SUCCESS  success.CNcomment:³É¹¦ CNend
-   \retval ::HI_ERR_DISP_DEV_NO_INIT    DISP uninitialization.CNcomment:DISPÎ´³õÊ¼»¯ CNend
-   \retval ::HI_ERR_DISP_INVALID_PARA   invalid input parameter.CNcomment:ÊäÈë²ÎÊý·Ç·¨ CNend
+   none. CNcomment: ï¿½ï¿½ CNend
+   \param[in] enDisp   DISP channel ID.CNcomment:DISPÍ¨ï¿½ï¿½ï¿½ï¿½ CNend
+   \param[out] pstOffset  offset in pixel, the range is [0, 200].CNcomment:Æ«ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¿ï¿½ï¿½È¡Öµï¿½ï¿½Î§Îª[0, 200]. CNend
+   \retval ::HI_SUCCESS  success.CNcomment:ï¿½É¹ï¿½ CNend
+   \retval ::HI_ERR_DISP_DEV_NO_INIT    DISP uninitialization.CNcomment:DISPÎ´ï¿½ï¿½Ê¼ï¿½ï¿½ CNend
+   \retval ::HI_ERR_DISP_INVALID_PARA   invalid input parameter.CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ CNend
    \see \n
-   none.CNcomment:ÎÞ CNend
+   none.CNcomment:ï¿½ï¿½ CNend
  */
 HI_S32 HI_UNF_DISP_GetScreenOffset(HI_UNF_DISP_E enDisp, HI_UNF_DISP_OFFSET_S *pstOffset);
 
