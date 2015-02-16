@@ -114,14 +114,9 @@ typedef struct hiMCE_PARAM_S
 
 typedef struct hiSOUND_PARAM_S
 {
-	unsigned Data_0; //0
-	struct hiSOUND_PARAM_S_Inner2
-	{
-		int Data_0; //0
-		HI_UNF_I2S_ATTR_S Data_4; //4 +32
-		//36
-	} Data_4[16/*????*/]; //4
-	int Data_580[16/*???*/]; //850
+	HI_U32               u32PortNum; //0
+	HI_UNF_SND_OUTPORT_S stOutport[16]; //4
+	int Data_580[16]; //850
 
 }HI_SOUND_PARAM_S;
 

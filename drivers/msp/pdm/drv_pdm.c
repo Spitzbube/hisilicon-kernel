@@ -941,14 +941,14 @@ HI_S32 DRV_PDM_GetSoundParam(HI_UNF_SND_E enSound, HI_SOUND_PARAM_S* pSoundParam
         return HI_FAILURE;
     }
 
-    pSoundParam->Data_0 = 0;
+    pSoundParam->u32PortNum = 0;
 
     Ret = HI_DB_GetKeyByName(&stTable, "BASE_KEY_SND_DAC0", &stKey);
     if(HI_SUCCESS == Ret)
     {
     	if (*(HI_U32 *)(stKey.pValue) == 0)
     	{
-    		pSoundParam->Data_4[pSoundParam->Data_0].Data_0 = 0;
+    		pSoundParam->stOutport[pSoundParam->u32PortNum].enOutPort = HI_UNF_SND_OUTPUTPORT_DAC0;
 
     	    Ret = HI_DB_GetKeyByName(&stTable, "BASE_KEY_SND_DAC_VOLUME0", &stKey);
     	    if(HI_SUCCESS == Ret)
@@ -962,7 +962,7 @@ HI_S32 DRV_PDM_GetSoundParam(HI_UNF_SND_E enSound, HI_SOUND_PARAM_S* pSoundParam
     	    	Data_8110aa1c = 0;
     	    	u32Val = 50;
     	    }
-    	    pSoundParam->Data_580[pSoundParam->Data_0++] = u32Val;
+    	    pSoundParam->Data_580[pSoundParam->u32PortNum++] = u32Val;
     	}
     }
 
@@ -971,7 +971,7 @@ HI_S32 DRV_PDM_GetSoundParam(HI_UNF_SND_E enSound, HI_SOUND_PARAM_S* pSoundParam
     {
     	if (*(HI_U32 *)(stKey.pValue) == 3)
     	{
-    		pSoundParam->Data_4[pSoundParam->Data_0].Data_0 = 3;
+    		pSoundParam->stOutport[pSoundParam->u32PortNum].enOutPort = HI_UNF_SND_OUTPUTPORT_SPDIF0;
 
     	    Ret = HI_DB_GetKeyByName(&stTable, "BASE_KEY_SND_SPDIF_VOLUME0", &stKey);
     	    if(HI_SUCCESS == Ret)
@@ -985,7 +985,7 @@ HI_S32 DRV_PDM_GetSoundParam(HI_UNF_SND_E enSound, HI_SOUND_PARAM_S* pSoundParam
     	    	Data_8110aa1c = 0;
     	    	u32Val = 50;
     	    }
-    	    pSoundParam->Data_580[pSoundParam->Data_0++] = u32Val;
+    	    pSoundParam->Data_580[pSoundParam->u32PortNum++] = u32Val;
     	}
     }
 
@@ -994,7 +994,7 @@ HI_S32 DRV_PDM_GetSoundParam(HI_UNF_SND_E enSound, HI_SOUND_PARAM_S* pSoundParam
     {
     	if (*(HI_U32 *)(stKey.pValue) == 4)
     	{
-    		pSoundParam->Data_4[pSoundParam->Data_0].Data_0 = 4;
+    		pSoundParam->stOutport[pSoundParam->u32PortNum].enOutPort = HI_UNF_SND_OUTPUTPORT_HDMI0;
 
     	    Ret = HI_DB_GetKeyByName(&stTable, "BASE_KEY_SND_HDMI_VOLUME0", &stKey);
     	    if(HI_SUCCESS == Ret)
@@ -1008,7 +1008,7 @@ HI_S32 DRV_PDM_GetSoundParam(HI_UNF_SND_E enSound, HI_SOUND_PARAM_S* pSoundParam
     	    	Data_8110aa1c = 0;
     	    	u32Val = 50;
     	    }
-    	    pSoundParam->Data_580[pSoundParam->Data_0++] = u32Val;
+    	    pSoundParam->Data_580[pSoundParam->u32PortNum++] = u32Val;
     	}
     }
 
@@ -1017,7 +1017,7 @@ HI_S32 DRV_PDM_GetSoundParam(HI_UNF_SND_E enSound, HI_SOUND_PARAM_S* pSoundParam
     {
     	if (*(HI_U32 *)(stKey.pValue) == 5)
     	{
-    		pSoundParam->Data_4[pSoundParam->Data_0].Data_0 = 5;
+    		pSoundParam->stOutport[pSoundParam->u32PortNum].enOutPort = HI_UNF_SND_OUTPUTPORT_ARC0;
 
     	    Ret = HI_DB_GetKeyByName(&stTable, "BASE_KEY_SND_ARC_VOLUME0", &stKey);
     	    if(HI_SUCCESS == Ret)
@@ -1031,7 +1031,7 @@ HI_S32 DRV_PDM_GetSoundParam(HI_UNF_SND_E enSound, HI_SOUND_PARAM_S* pSoundParam
     	    	Data_8110aa1c = 0;
     	    	u32Val = 50;
     	    }
-    	    pSoundParam->Data_580[pSoundParam->Data_0++] = u32Val;
+    	    pSoundParam->Data_580[pSoundParam->u32PortNum++] = u32Val;
     	}
     }
 
@@ -1040,8 +1040,9 @@ HI_S32 DRV_PDM_GetSoundParam(HI_UNF_SND_E enSound, HI_SOUND_PARAM_S* pSoundParam
     {
     	if (*(HI_U32 *)(stKey.pValue) == 1)
     	{
-    		pSoundParam->Data_4[pSoundParam->Data_0].Data_0 = 1;
-    		pSoundParam->Data_4[pSoundParam->Data_0].Data_4 = ((struct hiSOUND_PARAM_S_Inner2*)(stKey.pValue))->Data_4;
+    		pSoundParam->stOutport[pSoundParam->u32PortNum].enOutPort = HI_UNF_SND_OUTPUTPORT_I2S0;
+    		pSoundParam->stOutport[pSoundParam->u32PortNum].unAttr.stI2sAttr.stAttr =
+    				((HI_UNF_SND_OUTPORT_S*)(stKey.pValue))->unAttr.stI2sAttr.stAttr;
 
     	    Ret = HI_DB_GetKeyByName(&stTable, "BASE_KEY_SND_I2S_VOLUME0", &stKey);
     	    if(HI_SUCCESS == Ret)
@@ -1055,7 +1056,7 @@ HI_S32 DRV_PDM_GetSoundParam(HI_UNF_SND_E enSound, HI_SOUND_PARAM_S* pSoundParam
     	    	Data_8110aa1c = 0;
     	    	u32Val = 50;
     	    }
-    	    pSoundParam->Data_580[pSoundParam->Data_0++] = u32Val;
+    	    pSoundParam->Data_580[pSoundParam->u32PortNum++] = u32Val;
     	}
     }
 
@@ -1064,8 +1065,9 @@ HI_S32 DRV_PDM_GetSoundParam(HI_UNF_SND_E enSound, HI_SOUND_PARAM_S* pSoundParam
     {
     	if (*(HI_U32 *)(stKey.pValue) == 2)
     	{
-    		pSoundParam->Data_4[pSoundParam->Data_0].Data_0 = 2;
-    		pSoundParam->Data_4[pSoundParam->Data_0].Data_4 = ((struct hiSOUND_PARAM_S_Inner2*)(stKey.pValue))->Data_4;
+    		pSoundParam->stOutport[pSoundParam->u32PortNum].enOutPort = HI_UNF_SND_OUTPUTPORT_I2S1;
+    		pSoundParam->stOutport[pSoundParam->u32PortNum].unAttr.stI2sAttr.stAttr =
+    				((HI_UNF_SND_OUTPORT_S*)(stKey.pValue))->unAttr.stI2sAttr.stAttr;
 
     	    Ret = HI_DB_GetKeyByName(&stTable, "BASE_KEY_SND_I2S_VOLUME1", &stKey);
     	    if(HI_SUCCESS == Ret)
@@ -1079,7 +1081,7 @@ HI_S32 DRV_PDM_GetSoundParam(HI_UNF_SND_E enSound, HI_SOUND_PARAM_S* pSoundParam
     	    	Data_8110aa1c = 0;
     	    	u32Val = 50;
     	    }
-    	    pSoundParam->Data_580[pSoundParam->Data_0++] = u32Val;
+    	    pSoundParam->Data_580[pSoundParam->u32PortNum++] = u32Val;
     	}
     }
 

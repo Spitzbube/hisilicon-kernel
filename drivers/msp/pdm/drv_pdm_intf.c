@@ -55,6 +55,116 @@ PDM_GLOBAL_S        g_PdmGlobal;
 /*the function to get pdm tag data*/
 extern int get_param_data(const char *name, char *buf, unsigned int buflen);
 
+
+static void print_custom_timing(struct seq_file *p, HI_DISP_PARAM_S *pstDispParam)
+{
+	HI_CHAR *DataWidth[] =
+	{
+		"WIDTH8",
+		"WIDTH16",
+		"WIDTH24",
+    };
+
+	PROC_PRINT(p, " ############ Custom Timing begin ##############\n");
+	PROC_PRINT(p, "VFB:      \011\011%d   \n", pstDispParam->stDispTiming.VFB);
+	PROC_PRINT(p, "VBB:      \011\011%d   \n", pstDispParam->stDispTiming.VBB);
+	PROC_PRINT(p, "VACT:      \011\011%d   \n", pstDispParam->stDispTiming.VACT);
+	PROC_PRINT(p, "HFB:      \011\011%d   \n", pstDispParam->stDispTiming.HFB);
+	PROC_PRINT(p, "HBB:      \011\011%d   \n", pstDispParam->stDispTiming.HBB);
+	PROC_PRINT(p, "HACT:      \011\011%d   \n", pstDispParam->stDispTiming.HACT);
+	PROC_PRINT(p, "VPW:      \011\011%d   \n", pstDispParam->stDispTiming.VPW);
+	PROC_PRINT(p, "HPW:      \011\011%d   \n", pstDispParam->stDispTiming.HPW);
+
+	if (pstDispParam->stDispTiming.IDV)
+	{
+		PROC_PRINT(p, "IDV:      \011\011%s   \n", "true");
+	}
+	else
+	{
+		PROC_PRINT(p, "IDV:      \011\011%s   \n", "false");
+	}
+
+	if (pstDispParam->stDispTiming.IHS)
+	{
+		PROC_PRINT(p, "IHS:      \011\011%s   \n", "true");
+	}
+	else
+	{
+		PROC_PRINT(p, "IHS:      \011\011%s   \n", "false");
+	}
+
+	if (pstDispParam->stDispTiming.IVS)
+	{
+		PROC_PRINT(p, "IVS:      \011\011%s   \n", "true");
+	}
+	else
+	{
+		PROC_PRINT(p, "IVS:      \011\011%s   \n", "false");
+	}
+
+	if (pstDispParam->stDispTiming.ClockReversal)
+	{
+		PROC_PRINT(p, "ClockReversal:      \011%s   \n", "true");
+	}
+	else
+	{
+		PROC_PRINT(p, "ClockReversal:      \011%s   \n", "false");
+	}
+
+	if (pstDispParam->stDispTiming.DataWidth < 3)
+	{
+		PROC_PRINT(p, "DataWidth:      \011%s   \n", DataWidth[pstDispParam->stDispTiming.DataWidth]);
+	}
+	else
+	{
+		PROC_PRINT(p, "DataWidth:      \011%d   \n", pstDispParam->stDispTiming.DataWidth);
+	}
+
+	PROC_PRINT(p, "ItfFormat:      \011%d   \n", pstDispParam->stDispTiming.ItfFormat);
+
+	if (pstDispParam->stDispTiming.DitherEnable)
+	{
+		PROC_PRINT(p, "DitherEnable:      \011%s   \n", "true");
+	}
+	else
+	{
+		PROC_PRINT(p, "DitherEnable:      \011%s   \n", "false");
+	}
+
+	PROC_PRINT(p, "ClkPara0:      \011\0110x%x   \n", pstDispParam->stDispTiming.ClkPara0);
+	PROC_PRINT(p, "ClkPara1:      \011\0110x%x   \n", pstDispParam->stDispTiming.ClkPara1);
+
+	if (pstDispParam->stDispTiming.bInterlace)
+	{
+		PROC_PRINT(p, "bInterlace:      \011%s   \n", "true");
+	}
+	else
+	{
+		PROC_PRINT(p, "bInterlace:      \011%s   \n", "false");
+	}
+
+	PROC_PRINT(p, "PixFreq:      \011\011%d   \n", pstDispParam->stDispTiming.PixFreq);
+	PROC_PRINT(p, "VertFreq:      \011\011%d   \n", pstDispParam->stDispTiming.VertFreq);
+	PROC_PRINT(p, "AspectRatioW:      \011%d   \n", pstDispParam->stDispTiming.AspectRatioW);
+	PROC_PRINT(p, "AspectRatioH:      \011%d   \n", pstDispParam->stDispTiming.AspectRatioH);
+
+	if (pstDispParam->stDispTiming.bUseGamma)
+	{
+		PROC_PRINT(p, "UseGamma:      \011\011%s   \n", "true");
+	}
+	else
+	{
+		PROC_PRINT(p, "UseGamma:      \011\011%s   \n", "false");
+	}
+
+	PROC_PRINT(p, "Reserve0:      \011\011%d   \n", pstDispParam->stDispTiming.Reserve0);
+	PROC_PRINT(p, "Reserve1:      \011\011%d   \n", pstDispParam->stDispTiming.Reserve1);
+
+	PROC_PRINT(p, " ############ Custom Timing end ##############\n");
+}
+
+
+
 static HI_S32 PDM_ProcRead(struct seq_file *p, HI_VOID *v)
 {
 	HI_DISP_PARAM_S stDispParam;
@@ -62,8 +172,9 @@ static HI_S32 PDM_ProcRead(struct seq_file *p, HI_VOID *v)
 	HI_U32 u32Data;
 	HI_S32 s32Ret = HI_SUCCESS;
 	HI_U8  ii = 0;
-	HI_UNF_DISP_E i;
-	HI_UNF_SND_E j;
+	HI_U32 i = 0;
+//	HI_UNF_DISP_E i;
+//	HI_UNF_SND_E j;
 	HI_CHAR *Aspect[HI_UNF_DISP_ASPECT_RATIO_BUTT] = 
 	{
 		"auto",
@@ -72,7 +183,7 @@ static HI_S32 PDM_ProcRead(struct seq_file *p, HI_VOID *v)
 		"221to1",
 		"user"
 	};	
-	HI_CHAR *fp104[] =
+	HI_CHAR *MasterClock[] =
 	{
 		"128*fs",
 		"256*fs",
@@ -80,26 +191,27 @@ static HI_S32 PDM_ProcRead(struct seq_file *p, HI_VOID *v)
 		"512*fs",
 		"768*fs",
 		"1024*fs",
-		"WIDTH8",
-		"WIDTH16",
-		"WIDTH24",
 	};
 
-#if 0
-	"WIDTH8",
-	"WIDTH16",
-	"WIDTH24",
-#endif
-
-	for (i = HI_UNF_DISPLAY0; i < HI_UNF_DISPLAY_BUTT; i++)
+	for (i = HI_UNF_DISPLAY0; i < HI_UNF_DISPLAY2/*HI_UNF_DISPLAY_BUTT*/; i++)
 	{
 		memset(&stDispParam, 0, sizeof(stDispParam));
 		s32Ret = DRV_PDM_GetDispParam(i, &stDispParam);
 		if (HI_SUCCESS == s32Ret)
 		{
-			PROC_PRINT(p,"---------------------------Dispaly0------------------------------\n");
-			PROC_PRINT(p,"format:      		%d   \n", stDispParam.enFormat);
-			PROC_PRINT(p,"source display:        	%d\n", stDispParam.enSrcDisp);
+			PROC_PRINT(p,"---------------------------Dispaly%d------------------------------\n", i);
+
+			if (stDispParam.enFormat == 260)
+			{
+				PROC_PRINT(p, "format:      \011\011%s   \n", "Custom timing");
+				print_custom_timing(p, &stDispParam);
+			}
+			else
+			{
+				PROC_PRINT(p, "format:      \011\011%d   \n", stDispParam.enFormat);
+			}
+
+			PROC_PRINT(p,"source display:        \011%d\n", stDispParam.enSrcDisp);
 			PROC_PRINT(p,"background color:      	0x%02x%02x%02x\n",
 	                       stDispParam.stBgColor.u8Red, stDispParam.stBgColor.u8Green, stDispParam.stBgColor.u8Blue);
 			PROC_PRINT(p,"HuePlus/Brightness/Contrast/Saturation: %d/%d/%d/%d\n",
@@ -159,96 +271,90 @@ static HI_S32 PDM_ProcRead(struct seq_file *p, HI_VOID *v)
 					PROC_PRINT(p,"SVIDEO(Y/C):      		%d/%d\n",   stDispParam.stIntf[ii].unIntf.stSVideo.u8DacY,
 									stDispParam.stIntf[ii].unIntf.stSVideo.u8DacC);
 				}
+				else if (stDispParam.stIntf[ii].enIntfType == HI_UNF_DISP_INTF_TYPE_VGA)
+				{
+					PROC_PRINT(p, "VGA(R/G/B):      \011%d/%d/%d\n",
+							stDispParam.stIntf[ii].unIntf.stRGB.u8DacR,
+							stDispParam.stIntf[ii].unIntf.stRGB.u8DacG,
+							stDispParam.stIntf[ii].unIntf.stRGB.u8DacB);
+				}
 			}
 		}
 	}
 
-	for (j = HI_UNF_SND_0; j < HI_UNF_SND_BUTT; j++)
+	for (i = HI_UNF_SND_0; i != HI_UNF_SND_BUTT; i++)
 	{
 		u32Data = 0;
 		memset(&stSoundParam, 0, sizeof(stSoundParam));
-		s32Ret = HI_DRV_PDM_GetSoundParamEx(j, &stSoundParam, &u32Data);
+		s32Ret = HI_DRV_PDM_GetSoundParamEx(i, &stSoundParam, &u32Data);
 		if (HI_SUCCESS == s32Ret)
 		{
-			if (stSoundParam.Data_0 < 16)
+			if (stSoundParam.u32PortNum < 17)
 			{
-				//->805428c8
-				PROC_PRINT(p, "---------------------------Sound%d------------------------------\n", j);
+				PROC_PRINT(p, "---------------------------Sound%d------------------------------\n", i);
 
-				for (ii = 0; ii < stSoundParam.Data_0; ii++)
+				for (ii = 0; ii < stSoundParam.u32PortNum; ii++)
 				{
-					if (stSoundParam.Data_4[ii].Data_0 == 0)
+					if (stSoundParam.stOutport[ii].enOutPort == HI_UNF_SND_OUTPUTPORT_DAC0)
 					{
-						//8054293c
 						if (u32Data != 0)
 						{
-							//80542948
 							PROC_PRINT(p, "DAC:      \011\011\011%s       VOL:%3d\n", "DAC0", stSoundParam.Data_580[ii]);
 						}
 						else
 						{
-							//80542b90
 							PROC_PRINT(p, "DAC:      \011\011\011%s\n", "DAC0");
 						}
 					}
-					//80542970
-					if (stSoundParam.Data_4[ii].Data_0 == 3)
+
+					if (stSoundParam.stOutport[ii].enOutPort == HI_UNF_SND_OUTPUTPORT_SPDIF0)
 					{
-						//80542978
 						if (u32Data != 0)
 						{
-							//80542984
 							PROC_PRINT(p, "SPDIF:      \011\011\011%s     VOL:%3d\n", "SPDIF0", stSoundParam.Data_580[ii]);
 						}
 						else
 						{
-							//80542bb0
 							PROC_PRINT(p, "SPDIF:      \011\011\011%s\n", "SPDIF0");
 						}
 					}
-					//805428ec
-					if (stSoundParam.Data_4[ii].Data_0 == 4)
+
+					if (stSoundParam.stOutport[ii].enOutPort == HI_UNF_SND_OUTPUTPORT_HDMI0)
 					{
-						//805429c0
 						if (u32Data != 0)
 						{
-							//805429cc
 							PROC_PRINT(p, "HDMI:     \011\011\011%s      VOL:%3d\n", "HDMI0", stSoundParam.Data_580[ii]);
 						}
 						else
 						{
-							//80542c08
 							PROC_PRINT(p, "HDMI:      \011\011\011%s\n", "HDMI0");
 						}
 					}
 
-					if (stSoundParam.Data_4[ii].Data_0 == 5)
+					if (stSoundParam.stOutport[ii].enOutPort == HI_UNF_SND_OUTPUTPORT_ARC0)
 					{
-						//80542a08
 						if (u32Data != 0)
 						{
-							//80542a14
 							PROC_PRINT(p, "ARC:      \011\011\011%s       VOL:%3d\n", "ARC0", stSoundParam.Data_580[ii]);
 						}
 						else
 						{
-							//80542bdc
 							PROC_PRINT(p, "ARC:      \011\011\011%s\n", "ARC0");
 						}
 					}
-					//805428fc
-					if ((stSoundParam.Data_4[ii].Data_0 == 1) || (stSoundParam.Data_4[ii].Data_0 == 2))
+
+					if ((stSoundParam.stOutport[ii].enOutPort == HI_UNF_SND_OUTPUTPORT_I2S0) ||
+							(stSoundParam.stOutport[ii].enOutPort == HI_UNF_SND_OUTPUTPORT_I2S1))
 					{
-						//80542a54
-						PROC_PRINT(p, "I2S%d attr:      \011\011\n", stSoundParam.Data_4[ii].Data_0);
+						PROC_PRINT(p, "I2S%d attr:      \011\011\n",
+								stSoundParam.stOutport[ii].enOutPort - HI_UNF_SND_OUTPUTPORT_I2S0);
 
 						if (u32Data != 0)
 						{
-							//805430b0
 							PROC_PRINT(p, "\011VOL :                   %3d\n", stSoundParam.Data_580[ii]);
 						}
-						//80542a70
-						if (stSoundParam.Data_4[ii].Data_4.bMaster)
+
+						if (stSoundParam.stOutport[ii].unAttr.stI2sAttr.stAttr.bMaster)
 						{
 							PROC_PRINT(p, "\011Master:      \011\011TRUE\n");
 						}
@@ -256,8 +362,8 @@ static HI_S32 PDM_ProcRead(struct seq_file *p, HI_VOID *v)
 						{
 							PROC_PRINT(p, "\011Master:      \011\011FALSE\n");
 						}
-						//80542aa4
-						if (stSoundParam.Data_4[ii].Data_4.bPcmSampleRiseEdge)
+
+						if (stSoundParam.stOutport[ii].unAttr.stI2sAttr.stAttr.bPcmSampleRiseEdge)
 						{
 							PROC_PRINT(p, "\011PcmSampleRiseEdge:      TRUE\n");
 						}
@@ -266,11 +372,11 @@ static HI_S32 PDM_ProcRead(struct seq_file *p, HI_VOID *v)
 							PROC_PRINT(p, "\011PcmSampleRiseEdge:      FALSE\n");
 						}
 
-						PROC_PRINT(p, "\011Master colock:      \011%s\n", fp104[stSoundParam.Data_4[ii].Data_4.enMclkSel]);
-						PROC_PRINT(p, "\011Bit colock:      \011%d DIV\n", stSoundParam.Data_4[ii].Data_4.enBclkSel);
-						PROC_PRINT(p, "\011Channel:      \011\011%d\n", stSoundParam.Data_4[ii].Data_4.enChannel);
+						PROC_PRINT(p, "\011Master colock:      \011%s\n", MasterClock[stSoundParam.stOutport[ii].unAttr.stI2sAttr.stAttr.enMclkSel]);
+						PROC_PRINT(p, "\011Bit colock:      \011%d DIV\n", stSoundParam.stOutport[ii].unAttr.stI2sAttr.stAttr.enBclkSel);
+						PROC_PRINT(p, "\011Channel:      \011\011%d\n", stSoundParam.stOutport[ii].unAttr.stI2sAttr.stAttr.enChannel);
 
-						if (stSoundParam.Data_4[ii].Data_4.enI2sMode)
+						if (stSoundParam.stOutport[ii].unAttr.stI2sAttr.stAttr.enI2sMode == HI_UNF_I2S_STD_MODE)
 						{
 							PROC_PRINT(p, "\011Mode:      \011\011standard\n");
 						}
@@ -279,151 +385,13 @@ static HI_S32 PDM_ProcRead(struct seq_file *p, HI_VOID *v)
 							PROC_PRINT(p, "\011Mode:      \011\011pcm\n");
 						}
 
-						PROC_PRINT(p, "\011Bit Depth:      \011%d\n", stSoundParam.Data_4[ii].Data_4.enBitDepth);
-						PROC_PRINT(p, "\011PCM Delay Cycle:      \011%d\n", stSoundParam.Data_4[ii].Data_4.enPcmDelayCycle);
+						PROC_PRINT(p, "\011Bit Depth:      \011%d\n", stSoundParam.stOutport[ii].unAttr.stI2sAttr.stAttr.enBitDepth);
+						PROC_PRINT(p, "\011PCM Delay Cycle:      \011%d\n", stSoundParam.stOutport[ii].unAttr.stI2sAttr.stAttr.enPcmDelayCycle);
 					}
 				} //for (ii = 0; ii < stSoundParam.Data_0; ii++)
 			} //if (stSoundParam.Data_0 < 16)
 		}
-	} //for (j = HI_UNF_SND_0; j < HI_UNF_SND_BUTT; j++)
-#if 0
-	memset(&stDispParam, 0, sizeof(stDispParam));
-	s32Ret = DRV_PDM_GetDispParam(HI_UNF_DISPLAY0, &stDispParam);
-	if (HI_SUCCESS == s32Ret)
-	{
-		PROC_PRINT(p,"---------------------------Dispaly0------------------------------\n");
-		PROC_PRINT(p,"format:      		%d   \n", stDispParam.enFormat);
-		PROC_PRINT(p,"source display:        	%d\n", stDispParam.enSrcDisp);
-		PROC_PRINT(p,"background color:      	0x%02x%02x%02x\n",
-                       stDispParam.stBgColor.u8Red, stDispParam.stBgColor.u8Green, stDispParam.stBgColor.u8Blue);
-		PROC_PRINT(p,"HuePlus/Brightness/Contrast/Saturation: %d/%d/%d/%d\n",
-                       stDispParam.u32HuePlus, stDispParam.u32Brightness, 
-                       stDispParam.u32Contrast, stDispParam.u32Saturation);
-		PROC_PRINT(p,"virtual screen(Width/Height):      	%d/%d\n",
-                       stDispParam.u32VirtScreenWidth, stDispParam.u32VirtScreenHeight);
-		PROC_PRINT(p,"offset(Left/Top/Right/Bottom):      	%d/%d/%d/%d\n",
-                       stDispParam.stOffsetInfo.u32Left, stDispParam.stOffsetInfo.u32Top, 
-                       stDispParam.stOffsetInfo.u32Right, stDispParam.stOffsetInfo.u32Bottom);
-		PROC_PRINT(p,"bGammaEnable:      	%d\n",   stDispParam.bGammaEnable);
-		PROC_PRINT(p,"pixelformat:      	%d\n",   stDispParam.enPixelFormat);
-		if ((stDispParam.stAspectRatio.enDispAspectRatio != HI_UNF_DISP_ASPECT_RATIO_USER)
-			&& (stDispParam.stAspectRatio.enDispAspectRatio != HI_UNF_DISP_ASPECT_RATIO_BUTT))
-		{
-			PROC_PRINT(p,"aspectRatio:      	%s\n",   Aspect[stDispParam.stAspectRatio.enDispAspectRatio]);
-		}
-		else if (stDispParam.stAspectRatio.enDispAspectRatio == HI_UNF_DISP_ASPECT_RATIO_USER)
-		{
-			PROC_PRINT(p,"aspectRatio:      	%s(%dto%d)\n",   Aspect[stDispParam.stAspectRatio.enDispAspectRatio],
-							stDispParam.stAspectRatio.u32UserAspectWidth, stDispParam.stAspectRatio.u32UserAspectHeight);
-		}
-		for (ii = HI_UNF_DISP_INTF_TYPE_HDMI; ii < HI_UNF_DISP_INTF_TYPE_BUTT; ii++)
-		{
-			if (stDispParam.stIntf[ii].enIntfType ==  HI_UNF_DISP_INTF_TYPE_HDMI)
-			{
-				PROC_PRINT(p,"HDMI:      		HDMI_%d\n",   stDispParam.stIntf[ii].unIntf.enHdmi);
-			}
-			else if (stDispParam.stIntf[ii].enIntfType ==  HI_UNF_DISP_INTF_TYPE_LCD)
-			{
-				PROC_PRINT(p,"LCD:      		LCD_%d\n",   stDispParam.stIntf[ii].unIntf.enLcd);
-			}
-			else if (stDispParam.stIntf[ii].enIntfType ==  HI_UNF_DISP_INTF_TYPE_BT1120)
-			{
-				PROC_PRINT(p,"BT1120:      	BT1120_%d\n",   stDispParam.stIntf[ii].unIntf.enHdmi);
-			}
-			else if (stDispParam.stIntf[ii].enIntfType ==  HI_UNF_DISP_INTF_TYPE_BT656)
-			{
-				PROC_PRINT(p,"BT656:      		BT656_%d\n",   stDispParam.stIntf[ii].unIntf.enHdmi);
-			}
-			else if (stDispParam.stIntf[ii].enIntfType ==  HI_UNF_DISP_INTF_TYPE_YPBPR)
-			{
-				PROC_PRINT(p,"YPbPr(Y/Pb/Pr):      	%d/%d/%d\n",   stDispParam.stIntf[ii].unIntf.stYPbPr.u8DacY,
-								stDispParam.stIntf[ii].unIntf.stYPbPr.u8DacPb, stDispParam.stIntf[ii].unIntf.stYPbPr.u8DacPr);
-			}
-			else if (stDispParam.stIntf[ii].enIntfType ==  HI_UNF_DISP_INTF_TYPE_RGB)
-			{
-				PROC_PRINT(p,"RGB(R/G/B):      			%d/%d/%d\n",   stDispParam.stIntf[ii].unIntf.stRGB.u8DacR,
-								stDispParam.stIntf[ii].unIntf.stRGB.u8DacG, stDispParam.stIntf[ii].unIntf.stRGB.u8DacB);
-			}
-			else if (stDispParam.stIntf[ii].enIntfType ==  HI_UNF_DISP_INTF_TYPE_CVBS)
-			{
-				PROC_PRINT(p,"CVBS:      		%d\n",   stDispParam.stIntf[ii].unIntf.stCVBS.u8Dac);
-			}
-			else if (stDispParam.stIntf[ii].enIntfType ==  HI_UNF_DISP_INTF_TYPE_SVIDEO)
-			{
-				PROC_PRINT(p,"SVIDEO(Y/C):      		%d/%d\n",   stDispParam.stIntf[ii].unIntf.stSVideo.u8DacY,
-								stDispParam.stIntf[ii].unIntf.stSVideo.u8DacC);
-			}			
-		}
-	}  
-	memset(&stDispParam, 0, sizeof(stDispParam));
-	s32Ret = DRV_PDM_GetDispParam(HI_UNF_DISPLAY1, &stDispParam);
-	if (HI_SUCCESS == s32Ret)
-	{
-		PROC_PRINT(p,"---------------------------Dispaly1------------------------------\n");
-		PROC_PRINT(p,"format:      		%d   \n", stDispParam.enFormat);
-		PROC_PRINT(p,"source display:        	%d\n", stDispParam.enSrcDisp);
-		PROC_PRINT(p,"background color:      	0x%02x%02x%02x\n",
-                       stDispParam.stBgColor.u8Red, stDispParam.stBgColor.u8Green, stDispParam.stBgColor.u8Blue);
-		PROC_PRINT(p,"HuePlus/Brightness/Contrast/Saturation: %d/%d/%d/%d\n",
-                       stDispParam.u32HuePlus, stDispParam.u32Brightness, 
-                       stDispParam.u32Contrast, stDispParam.u32Saturation);
-		PROC_PRINT(p,"virtual screen(Width/Height):      	%d/%d\n",
-                       stDispParam.u32VirtScreenWidth, stDispParam.u32VirtScreenHeight);
-		PROC_PRINT(p,"offset(Left/Top/Right/Bottom):      	%d/%d/%d/%d\n",
-                       stDispParam.stOffsetInfo.u32Left, stDispParam.stOffsetInfo.u32Top, 
-                       stDispParam.stOffsetInfo.u32Right, stDispParam.stOffsetInfo.u32Bottom);
-		PROC_PRINT(p,"bGammaEnable:      	%d\n",   stDispParam.bGammaEnable);
-		 PROC_PRINT(p,"pixelformat:      	%d\n",   stDispParam.enPixelFormat);
-		if ((stDispParam.stAspectRatio.enDispAspectRatio != HI_UNF_DISP_ASPECT_RATIO_USER)
-			&& (stDispParam.stAspectRatio.enDispAspectRatio != HI_UNF_DISP_ASPECT_RATIO_BUTT))
-		{
-			PROC_PRINT(p,"aspectRatio:      	%s\n",   Aspect[stDispParam.stAspectRatio.enDispAspectRatio]);
-		}
-		else if (stDispParam.stAspectRatio.enDispAspectRatio == HI_UNF_DISP_ASPECT_RATIO_USER)
-		{
-			PROC_PRINT(p,"aspectRatio:      	%s(%dto%d)\n",   Aspect[stDispParam.stAspectRatio.enDispAspectRatio],
-							stDispParam.stAspectRatio.u32UserAspectWidth, stDispParam.stAspectRatio.u32UserAspectHeight);
-		}
-		for (ii = HI_UNF_DISP_INTF_TYPE_HDMI; ii < HI_UNF_DISP_INTF_TYPE_BUTT; ii++)
-		{
-			if (stDispParam.stIntf[ii].enIntfType ==  HI_UNF_DISP_INTF_TYPE_HDMI)
-			{
-				PROC_PRINT(p,"HDMI:      		HDMI_%d\n",   stDispParam.stIntf[ii].unIntf.enHdmi);
-			}
-			else if (stDispParam.stIntf[ii].enIntfType ==  HI_UNF_DISP_INTF_TYPE_LCD)
-			{
-				PROC_PRINT(p,"LCD:      		LCD_%d\n",   stDispParam.stIntf[ii].unIntf.enLcd);
-			}
-			else if (stDispParam.stIntf[ii].enIntfType ==  HI_UNF_DISP_INTF_TYPE_BT1120)
-			{
-				PROC_PRINT(p,"BT1120:      	BT1120_%d\n",   stDispParam.stIntf[ii].unIntf.enHdmi);
-			}
-			else if (stDispParam.stIntf[ii].enIntfType ==  HI_UNF_DISP_INTF_TYPE_BT656)
-			{
-				PROC_PRINT(p,"BT656:      		BT656_%d\n",   stDispParam.stIntf[ii].unIntf.enHdmi);
-			}
-			else if (stDispParam.stIntf[ii].enIntfType ==  HI_UNF_DISP_INTF_TYPE_YPBPR)
-			{
-				PROC_PRINT(p,"YPbPr(Y/Pb/Pr):      	%d/%d/%d\n",   stDispParam.stIntf[ii].unIntf.stYPbPr.u8DacY,
-								stDispParam.stIntf[ii].unIntf.stYPbPr.u8DacPb, stDispParam.stIntf[ii].unIntf.stYPbPr.u8DacPr);
-			}
-			else if (stDispParam.stIntf[ii].enIntfType ==  HI_UNF_DISP_INTF_TYPE_RGB)
-			{
-				PROC_PRINT(p,"RGB(R/G/B):      		%d/%d/%d\n",   stDispParam.stIntf[ii].unIntf.stRGB.u8DacR,
-								stDispParam.stIntf[ii].unIntf.stRGB.u8DacG, stDispParam.stIntf[ii].unIntf.stRGB.u8DacB);
-			}
-			else if (stDispParam.stIntf[ii].enIntfType ==  HI_UNF_DISP_INTF_TYPE_CVBS)
-			{
-				PROC_PRINT(p,"CVBS:      		%d\n",   stDispParam.stIntf[ii].unIntf.stCVBS.u8Dac);
-			}
-			else if (stDispParam.stIntf[ii].enIntfType ==  HI_UNF_DISP_INTF_TYPE_SVIDEO)
-			{
-				PROC_PRINT(p,"SVIDEO(Y/C):      		%d/%d\n",   stDispParam.stIntf[ii].unIntf.stSVideo.u8DacY,
-								stDispParam.stIntf[ii].unIntf.stSVideo.u8DacC);
-			}			
-		}
-	}
-#endif
+	} //for (i = HI_UNF_SND_0; i < HI_UNF_SND_BUTT; i++)
 
     return HI_SUCCESS;
 }

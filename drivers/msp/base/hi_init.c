@@ -43,7 +43,9 @@
 #include "drv_mce_ext.h"
 #include "drv_vpss_ext.h"
 #include "drv_venc_ext.h"
+#endif
 #include "drv_pdm_ext.h"
+#if 0
 #include "drv_aenc_ext.h"
 #include "drv_ao_ext.h"
 #include "drv_adsp_ext.h"
@@ -66,9 +68,11 @@ HI_S32 HI_DRV_LoadModules(HI_VOID)
     IR_DRV_ModInit();
 
     CIPHER_DRV_ModInit();
+#endif
 
     PDM_DRV_ModInit();
-	
+
+#if 0
     PQ_DRV_ModInit();	
 
     HDMI_DRV_ModInit();
