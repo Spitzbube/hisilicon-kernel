@@ -8,6 +8,7 @@ ccflags-y += -Idrivers/msp/frontend/demod/AVL_DVBSx_SDK/AVL_DVBSx/include
 ccflags-y += -Idrivers/msp/frontend/demod/AVL_DVBSx_SDK/BSP
 ccflags-y += -Idrivers/msp/mce/include
 ccflags-y += -Idrivers/msp/pdm/db
+ccflags-y += -Idrivers/msp/hifb/adp/platform/alg
 ccflags-y += -DCHIP_TYPE_hi3798cv100
 #ccflags-y += -DSDK_VERSION="HiSTBLinuxV100R002C00SPC011"
 ccflags-y += -DSDK_VERSION="HiSTBAndroidV600R001C00SPC020_v2014072118"
@@ -113,6 +114,15 @@ obj-y += i2c/gpio_i2c/drv_gpioi2c_intf.o
 obj-y += i2c/gpio_i2c/drv_gpio_i2c.o
 
 obj-y += hifb/hifb_main_k.o
+obj-y += hifb/hifb_main.o
+obj-y += hifb/hifb_comm.o
+obj-y += hifb/hifb_snapshot.o
+obj-y += hifb/adp/hifb_drv_adpt.o
+obj-y += hifb/adp/hifb_blit.o
+obj-y += hifb/adp/platform/alg/optm_alg_gzme.o
+obj-y += hifb/adp/platform/alg/optm_alg_zme_coef.o
+obj-y += hifb/adp/platform/cv200/optm_hifb.o
+obj-y += hifb/adp/platform/cv200/optm_hal.o
 
 obj-y += mce/drv_mce_intf.o
 obj-y += mce/drv_mce_play.o
