@@ -1,6 +1,6 @@
 /** 
  * \file
- * \brief Describes the information about HiSilicion frame buffer (HiFB). CNcomment:Ìá¹©HIBFµÄÏà¹ØÐÅÏ¢CNend
+ * \brief Describes the information about HiSilicion frame buffer (HiFB). CNcomment:ï¿½á¹©HIBFï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢CNend
  */
  
 #ifndef __HIFB_H__
@@ -27,51 +27,51 @@ extern "C"{
 #define IOC_TYPE_HIFB       'F'
 
 /**Obtains the colorkey of a graphics layer.*/
-/**CNcomment:»ñÈ¡Í¼²ãcolorkeyÐÅÏ¢ */
+/**CNcomment:ï¿½ï¿½È¡Í¼ï¿½ï¿½colorkeyï¿½ï¿½Ï¢ */
 #define FBIOGET_COLORKEY_HIFB       _IOR(IOC_TYPE_HIFB, 90, HIFB_COLORKEY_S)
 
 /**Sets the colorkey of a graphics layer.*/
-/**CNcomment:ÉèÖÃÍ¼²ãcolorkeyÐÅÏ¢ */
+/**CNcomment:ï¿½ï¿½ï¿½ï¿½Í¼ï¿½ï¿½colorkeyï¿½ï¿½Ï¢ */
 #define FBIOPUT_COLORKEY_HIFB       _IOW(IOC_TYPE_HIFB, 91, HIFB_COLORKEY_S)
 
 /**Obtains the alpha values of a graphics layer, including the pixel alpha and global alpha.*/
-/**CNcomment:»ñÈ¡Í¼²ãalphaÐÅÏ¢,°üÀ¨ÏñËØºÍÈ«¾Öalpha */
+/**CNcomment:ï¿½ï¿½È¡Í¼ï¿½ï¿½alphaï¿½ï¿½Ï¢,ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Øºï¿½È«ï¿½ï¿½alpha */
 #define FBIOGET_ALPHA_HIFB          _IOR(IOC_TYPE_HIFB, 92, HIFB_ALPHA_S)
 
 /**Sets the alpha values of a graphics layer, including the pixel alpha and global alpha.*/
-/**CNcomment:ÉèÖÃÍ¼²ãalphaÐÅÏ¢,°üÀ¨ÏñËØºÍÈ«¾Öalpha */
+/**CNcomment:ï¿½ï¿½ï¿½ï¿½Í¼ï¿½ï¿½alphaï¿½ï¿½Ï¢,ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Øºï¿½È«ï¿½ï¿½alpha */
 #define FBIOPUT_ALPHA_HIFB          _IOW(IOC_TYPE_HIFB, 93, HIFB_ALPHA_S)
 
 /**Obtains the origin of a graphics layer.*/
-/**CNcomment:»ñÈ¡Í¼²ãÆÁÄ»Ô­µãÐÅÏ¢ */
+/**CNcomment:ï¿½ï¿½È¡Í¼ï¿½ï¿½ï¿½ï¿½Ä»Ô­ï¿½ï¿½ï¿½ï¿½Ï¢ */
 #define FBIOGET_SCREEN_ORIGIN_HIFB  _IOR(IOC_TYPE_HIFB, 94, HIFB_POINT_S)
 
 /**Sets the origin of a graphics layer.*/
-/**CNcomment:ÉèÖÃÍ¼²ãÆÁÄ»Ô­µãÐÅÏ¢ */
+/**CNcomment:ï¿½ï¿½ï¿½ï¿½Í¼ï¿½ï¿½ï¿½ï¿½Ä»Ô­ï¿½ï¿½ï¿½ï¿½Ï¢ */
 #define FBIOPUT_SCREEN_ORIGIN_HIFB  _IOW(IOC_TYPE_HIFB, 95, HIFB_POINT_S)
 
 /**Obtains the anti-flicker status of a graphics layer.*/
-/**CNcomment:»ñÈ¡Í¼²ã¿¹ÉÁË¸*/
+/**CNcomment:ï¿½ï¿½È¡Í¼ï¿½ã¿¹ï¿½ï¿½Ë¸*/
 #define FBIOGET_DEFLICKER_HIFB       _IOR(IOC_TYPE_HIFB, 98, HIFB_DEFLICKER_S)
 
 /**Sets the anti-flicker status of a graphics layer.*/
-/**CNcomment:ÉèÖÃÍ¼²ã¿¹ÉÁË¸ */
+/**CNcomment:ï¿½ï¿½ï¿½ï¿½Í¼ï¿½ã¿¹ï¿½ï¿½Ë¸ */
 #define FBIOPUT_DEFLICKER_HIFB       _IOW(IOC_TYPE_HIFB, 99, HIFB_DEFLICKER_S)
 
 /**Waits for the vertical blanking interrupt of a graphics layer.*/
-/**CNcomment:µÈ´ýÍ¼²ã´¹Ö±Ë®ÒþÖÐ¶Ï */
+/**CNcomment:ï¿½È´ï¿½Í¼ï¿½ã´¹Ö±Ë®ï¿½ï¿½ï¿½Ð¶ï¿½ */
 #define FBIOGET_VBLANK_HIFB         _IO(IOC_TYPE_HIFB, 100)
 
 /**Sets to display a graphics layer.*/
-/**CNcomment:ÉèÖÃÍ¼²ãÏÔÊ¾ */
+/**CNcomment:ï¿½ï¿½ï¿½ï¿½Í¼ï¿½ï¿½ï¿½ï¿½Ê¾ */
 #define FBIOPUT_SHOW_HIFB           _IOW(IOC_TYPE_HIFB, 101, HI_BOOL)
 
 /**Obtains the display information about a graphics layer.*/
-/**CNcomment:»ñÈ¡Í¼²ãÏÔÊ¾ÏÔÊ¾ÐÅÏ¢ */
+/**CNcomment:ï¿½ï¿½È¡Í¼ï¿½ï¿½ï¿½ï¿½Ê¾ï¿½ï¿½Ê¾ï¿½ï¿½Ï¢ */
 #define FBIOGET_SHOW_HIFB           _IOR(IOC_TYPE_HIFB, 102, HI_BOOL)
 
 /**Obtains the capability of a graphics layer.*/
-/**CNcomment:»ñÈ¡Í¼²ãÄÜÁ¦ */
+/**CNcomment:ï¿½ï¿½È¡Í¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ */
 #define FBIOGET_CAPABILITY_HIFB    _IOR(IOC_TYPE_HIFB, 103, HIFB_CAPABILITY_S)
 
 /* crusor handle */
@@ -85,19 +85,19 @@ cursor can be attached to only one layer at any time*/
 
 
 /**Sets the information about a graphics layer.*/
-/**CNcomment:ÉèÖÃÍ¼²ãÐÅÏ¢ */
+/**CNcomment:ï¿½ï¿½ï¿½ï¿½Í¼ï¿½ï¿½ï¿½ï¿½Ï¢ */
 #define FBIOPUT_LAYER_INFO                _IOW(IOC_TYPE_HIFB, 120, HIFB_LAYER_INFO_S*)
 
 /**Obtains the information about a graphics layer.*/
-/**CNcomment:»ñÈ¡Í¼²ãÐÅÏ¢ */
+/**CNcomment:ï¿½ï¿½È¡Í¼ï¿½ï¿½ï¿½ï¿½Ï¢ */
 #define FBIOGET_LAYER_INFO                _IOR(IOC_TYPE_HIFB, 121, HIFB_LAYER_INFO_S*)
 
 /**Obtains a canvas buffer.*/
-/**CNcomment:»ñÈ¡canvas buf */
+/**CNcomment:ï¿½ï¿½È¡canvas buf */
 #define FBIOGET_CANVAS_BUFFER             _IOR(IOC_TYPE_HIFB, 123, HIFB_BUFFER_S*) 
 
 /**Refreshes a graphics layer.*/
-/**CNcomment:Ë¢ÐÂÍ¼²ã */
+/**CNcomment:Ë¢ï¿½ï¿½Í¼ï¿½ï¿½ */
 #define FBIO_REFRESH                      _IOW(IOC_TYPE_HIFB, 124, HIFB_BUFFER_S*) 
 
 /**sync refresh*/
@@ -115,11 +115,11 @@ cursor can be attached to only one layer at any time*/
 
 
 /**Sets the output range of the screen.*/
-/**CNcomment:ÉèÖÃÆÁÄ»Êä³ö·¶Î§*/
+/**CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä»ï¿½ï¿½ï¿½ï¿½ï¿½Î§*/
 #define FBIOPUT_SCREENSIZE          _IOW(IOC_TYPE_HIFB, 130, HIFB_SIZE_S*)
 
 /**Obtains the output range of the screen.*/
-/**CNcomment:»ñÈ¡ÆÁÄ»Êä³ö·¶Î§*/
+/**CNcomment:ï¿½ï¿½È¡ï¿½ï¿½Ä»ï¿½ï¿½ï¿½ï¿½ï¿½Î§*/
 #define FBIOGET_SCREENSIZE          _IOR(IOC_TYPE_HIFB, 131, HIFB_SIZE_S*)
 
 /*set compression mode, only support pixel format argb8888, and stereo mode not support top and bottom*/
@@ -167,15 +167,15 @@ cursor can be attached to only one layer at any time*/
 
 
 /**Definition of the range type*/
-/**CNcomment:·¶Î§ÀàÐÍ¶¨Òå*/
+/**CNcomment:ï¿½ï¿½Î§ï¿½ï¿½ï¿½Í¶ï¿½ï¿½ï¿½*/
 typedef struct
 {
-    HI_U32  u32Width;         /**<Output width of the screen*//**<CNcomment:ÆÁÄ»ÉÏÊä³öµÄ¿í¶È */
-    HI_U32  u32Height;        /**<Output height of the screen*//**<CNcomment:ÆÁÄ»ÉÏÊä³öµÄ¸ß¶È */
+    HI_U32  u32Width;         /**<Output width of the screen*//**<CNcomment:ï¿½ï¿½Ä»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¿ï¿½ï¿½ */
+    HI_U32  u32Height;        /**<Output height of the screen*//**<CNcomment:ï¿½ï¿½Ä»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¸ß¶ï¿½ */
 }HIFB_SIZE_S;
 
 /**layer ID */
-/**CNcomment:Í¼²ãID¶¨Òå*/
+/**CNcomment:Í¼ï¿½ï¿½IDï¿½ï¿½ï¿½ï¿½*/
 typedef enum 
 {
     HIFB_LAYER_HD_0 = 0x0,
@@ -191,12 +191,12 @@ typedef enum
     HIFB_LAYER_AD_2,
     HIFB_LAYER_AD_3,
     HIFB_LAYER_CURSOR,
-    HIFB_LAYER_ID_BUTT
+    HIFB_LAYER_ID_BUTT //13
 } HIFB_LAYER_ID_E;
 
 
 /**Obtains the extended 32-bit color value based on color components. The upper bits are padded with lower bits during color extension.*/
-/**CNcomment:¸ù¾ÝÑÕÉ«·ÖÁ¿£¬»ñÈ¡ÆäÀ©Õ¹µ½32Î»ºóÖµ¡£À©Õ¹¹æÔò:µÍÎ»²¹Æä¸ßÎ»*/
+/**CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½É«ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½Õ¹ï¿½ï¿½32Î»ï¿½ï¿½Öµï¿½ï¿½ï¿½ï¿½Õ¹ï¿½ï¿½ï¿½ï¿½:ï¿½ï¿½Î»ï¿½ï¿½ï¿½ï¿½ï¿½Î»*/
 static inline HI_U8  hifb_rgb(const struct fb_bitfield* pBit, HI_S32 color)
 {
     return ((HI_U8)((((HI_U32)color)>>pBit->offset) << (8-pBit->length)) +
@@ -205,8 +205,8 @@ static inline HI_U8  hifb_rgb(const struct fb_bitfield* pBit, HI_S32 color)
 
 /**Converts a colorkey to a 32-bit colorkey based on the pixel format. A lower-bit color (such as 16 bits) is extended to an upper-bit color (such as 32 bits) as follows:
    For each chip, upper bits can be padded with lower bits in multiple mode. The padding mode of the chip must be consistent with the preceding extension mode. Otherwise, the colorkey of the graphics layer is invalid.*/
-/**CNcomment:¸ù¾ÝÏñËØ¸ñÊ½ÐÅÏ¢£¬½«Ò»¸öÑÕÉ«Öµ£¬×ª»»³ÉÒ»¸ö32Î»µÄÑÕÉ«keyÖµ,½«µÍÉ«ÉîÈç16bitÀ©Õ¹Îª¸ßÉ«ÉîÈç32bitµÄ²ßÂÔÊÇ:
-   µÍÎ»²¹¸ß¼¸Î»£¬Ð¾Æ¬ÓÐ¶àÖÖ·½Ê½¡£Ð¾Æ¬µÄ·½Ê½±ØÐëÈçÕâ¸ö·½Ê½Ò»ÖÂ£¬·ñÔòÍ¼²ãcolorkeyÎÞÐ§*/
+/**CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ø¸ï¿½Ê½ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½É«Öµï¿½ï¿½×ªï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½32Î»ï¿½ï¿½ï¿½ï¿½É«keyÖµ,ï¿½ï¿½ï¿½ï¿½É«ï¿½ï¿½ï¿½ï¿½16bitï¿½ï¿½Õ¹Îªï¿½ï¿½É«ï¿½ï¿½ï¿½ï¿½32bitï¿½Ä²ï¿½ï¿½ï¿½ï¿½ï¿½:
+   ï¿½ï¿½Î»ï¿½ï¿½ï¿½ß¼ï¿½Î»ï¿½ï¿½Ð¾Æ¬ï¿½Ð¶ï¿½ï¿½Ö·ï¿½Ê½ï¿½ï¿½Ð¾Æ¬ï¿½Ä·ï¿½Ê½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê½Ò»ï¿½Â£ï¿½ï¿½ï¿½ï¿½ï¿½Í¼ï¿½ï¿½colorkeyï¿½ï¿½Ð§*/
 static inline HI_S32 hifb_color2key(const struct fb_var_screeninfo* pVar, HI_S32 color)
 {
    if (pVar->bits_per_pixel <= 8)
@@ -226,16 +226,16 @@ static inline HI_S32 hifb_color2key(const struct fb_var_screeninfo* pVar, HI_S32
 
 typedef struct
 {
-    HI_BOOL bKeyEnable;         /**<Colorkey enable*//**<CNcomment:colorkey ÊÇ·ñÊ¹ÄÜ */
-    HI_U32 u32Key;              /**<The value is obtained by calling ::hifb_color2key.*//**<CNcomment:¸ÃÖµÓ¦¸ÃÍ¨¹ý::hifb_color2keyµÃµ½*/
+    HI_BOOL bKeyEnable;         /**<Colorkey enable*//**<CNcomment:colorkey ï¿½Ç·ï¿½Ê¹ï¿½ï¿½ */
+    HI_U32 u32Key;              /**<The value is obtained by calling ::hifb_color2key.*//**<CNcomment:ï¿½ï¿½ÖµÓ¦ï¿½ï¿½Í¨ï¿½ï¿½::hifb_color2keyï¿½Ãµï¿½*/
 }HIFB_COLORKEY_S;
 
 /**Rectangle information*/
-/**CNcomment:¾ØÐÎÐÅÏ¢ */
+/**CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ */
 typedef struct
 {
-    HI_S32 x, y;    /**<x: horizontal coordinate of the upper left point of the rectangle; y: vertical coordinate of the upper left point of the rectangle*//**<CNcomment: x:¾ØÐÎ×óÉÏµãºá×ø±ê y:¾ØÐÎ×óÉÏµã×Ý×ø±ê*/
-    HI_S32 w, h;    /**< w: rectangle width; h: rectangle height*//**<CNcomment: w:¾ØÐÎ¿í¶È h:¾ØÐÎ¸ß¶È*/
+    HI_S32 x, y;    /**<x: horizontal coordinate of the upper left point of the rectangle; y: vertical coordinate of the upper left point of the rectangle*//**<CNcomment: x:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ïµï¿½ï¿½ï¿½ï¿½ï¿½ y:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ïµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½*/
+    HI_S32 w, h;    /**< w: rectangle width; h: rectangle height*//**<CNcomment: w:ï¿½ï¿½ï¿½Î¿ï¿½ï¿½ h:ï¿½ï¿½ï¿½Î¸ß¶ï¿½*/
 } HIFB_RECT;
 
 typedef struct
@@ -247,37 +247,37 @@ typedef struct
 }HIFB_REGION;
 
 /**Coordinate of a point*/
-/**CNcomment:µã×ø±êÐÅÏ¢ */
+/**CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ */
 typedef struct
 {
-    HI_S32 s32XPos;         /**<  horizontal position *//**<CNcomment:Ë®Æ½Î»ÖÃ */
-    HI_S32 s32YPos;         /**<  vertical position *//**<CNcomment:´¹Ö±Î»ÖÃ */
+    HI_S32 s32XPos;         /**<  horizontal position *//**<CNcomment:Ë®Æ½Î»ï¿½ï¿½ */
+    HI_S32 s32YPos;         /**<  vertical position *//**<CNcomment:ï¿½ï¿½Ö±Î»ï¿½ï¿½ */
 }HIFB_POINT_S;
 
 /**Anti-flicker information*/
-/**CNcomment:¿¹ÉÁË¸ÐÅÏ¢ */
+/**CNcomment:ï¿½ï¿½ï¿½ï¿½Ë¸ï¿½ï¿½Ï¢ */
 typedef struct hiHIFB_DEFLICKER_S
 {
-    HI_U32  u32HDfLevel;    /**<  horizontal deflicker level *//**<CNcomment:Ë®Æ½¿¹ÉÁË¸¼¶±ð */     
-    HI_U32  u32VDfLevel;    /**<  vertical deflicker level *//**<CNcomment:´¹Ö±¿¹ÉÁË¸¼¶±ð */
-    HI_U8   *pu8HDfCoef;    /**<  horizontal deflicker coefficient *//**<CNcomment:Ë®Æ½¿¹ÉÁË¸ÏµÊý */
-    HI_U8   *pu8VDfCoef;    /**<  vertical deflicker coefficient *//**<CNcomment:´¹Ö±¿¹ÉÁË¸ÏµÊý */
+    HI_U32  u32HDfLevel;    /**<  horizontal deflicker level *//**<CNcomment:Ë®Æ½ï¿½ï¿½ï¿½ï¿½Ë¸ï¿½ï¿½ï¿½ï¿½ */     
+    HI_U32  u32VDfLevel;    /**<  vertical deflicker level *//**<CNcomment:ï¿½ï¿½Ö±ï¿½ï¿½ï¿½ï¿½Ë¸ï¿½ï¿½ï¿½ï¿½ */
+    HI_U8   *pu8HDfCoef;    /**<  horizontal deflicker coefficient *//**<CNcomment:Ë®Æ½ï¿½ï¿½ï¿½ï¿½Ë¸Ïµï¿½ï¿½ */
+    HI_U8   *pu8VDfCoef;    /**<  vertical deflicker coefficient *//**<CNcomment:ï¿½ï¿½Ö±ï¿½ï¿½ï¿½ï¿½Ë¸Ïµï¿½ï¿½ */
 }HIFB_DEFLICKER_S;
 
 /**Alpha information*/
-/**CNcomment:AlphaÐÅÏ¢ */
+/**CNcomment:Alphaï¿½ï¿½Ï¢ */
 typedef struct
 {
-    HI_BOOL bAlphaEnable;   /**<  alpha enable flag *//**<CNcomment:alphaÊ¹ÄÜ±êÊ¶*/
-    HI_BOOL bAlphaChannel;  /**<  alpha channel enable flag *//**<CNcomment:alphaÍ¨µÀÊ¹ÄÜ*/
-    HI_U8 u8Alpha0;         /**<  alpha0 value, used in ARGB1555 *//**CNcomment:alpha0È¡Öµ£¬ARGB1555¸ñÊ½Ê±Ê¹ÓÃ*/
-    HI_U8 u8Alpha1;         /**<  alpha1 value, used in ARGB1555 *//**CNcomment:alpha1È¡Öµ£¬ARGB1555¸ñÊ½Ê±Ê¹ÓÃ*/
-    HI_U8 u8GlobalAlpha;    /**<  global alpha value *//**<CNcomment:È«¾ÖalphaÈ¡Öµ*/
+    HI_BOOL bAlphaEnable;   /**<  alpha enable flag *//**<CNcomment:alphaÊ¹ï¿½Ü±ï¿½Ê¶*/
+    HI_BOOL bAlphaChannel;  /**<  alpha channel enable flag *//**<CNcomment:alphaÍ¨ï¿½ï¿½Ê¹ï¿½ï¿½*/
+    HI_U8 u8Alpha0;         /**<  alpha0 value, used in ARGB1555 *//**CNcomment:alpha0È¡Öµï¿½ï¿½ARGB1555ï¿½ï¿½Ê½Ê±Ê¹ï¿½ï¿½*/
+    HI_U8 u8Alpha1;         /**<  alpha1 value, used in ARGB1555 *//**CNcomment:alpha1È¡Öµï¿½ï¿½ARGB1555ï¿½ï¿½Ê½Ê±Ê¹ï¿½ï¿½*/
+    HI_U8 u8GlobalAlpha;    /**<  global alpha value *//**<CNcomment:È«ï¿½ï¿½alphaÈ¡Öµ*/
     HI_U8 u8Reserved;
 }HIFB_ALPHA_S;
 
 /**Pixel format*/
-/**CNcomment:ÏñËØ¸ñÊ½Ã¶¾Ù */
+/**CNcomment:ï¿½ï¿½ï¿½Ø¸ï¿½Ê½Ã¶ï¿½ï¿½ */
 typedef enum
 {        
     HIFB_FMT_RGB565 = 0,        
@@ -323,7 +323,7 @@ typedef enum
 }HIFB_COLOR_FMT_E;
 
 /**HiFB capability set*/
-/**CNcomment:hifbÄÜÁ¦¼¯ */
+/**CNcomment:hifbï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ */
 typedef struct
 {
     HI_BOOL bKeyAlpha;      /**< whether support colorkey alpha */
@@ -413,13 +413,13 @@ typedef enum
 /*layer info maskbit*/
 typedef enum
 {
-    HIFB_LAYERMASK_BUFMODE = 0x1,           /**< Whether the buffer mode in HIFB_LAYER_INFO_S is masked when the graphics layer information is set.*//**<CNcomment:ÉèÖÃÍ¼²ãÐÅÏ¢Ê±£¬HIFB_LAYER_INFO_SÖÐbufÄ£Ê½ÊÇ·ñÓÐÐ§ÑÚÂë */
-    HIFB_LAYERMASK_ANTIFLICKER_MODE = 0x2,  /**< Whether the anti-flicker mode is masked.*//**<CNcomment:¿¹ÉÁË¸Ä£Ê½ÊÇ·ñÓÐÐ§ÑÚÂë */
-    HIFB_LAYERMASK_POS = 0x4,               /**< Whether the graphics layer position is masked.*//**<CNcomment:Í¼²ãÎ»ÖÃÊÇ·ñÓÐÐ§ÑÚÂë */
-    HIFB_LAYERMASK_CANVASSIZE = 0x8,        /**< Whether the canvas size is masked.*//**<CNcomment:canvassizeÊÇ·ñÓÐÐ§ÑÚÂë */
-    HIFB_LAYERMASK_DISPSIZE = 0x10,         /**< Whether the display size is masked.*//**<CNcomment:displaysizeÊÇ·ñÓÐÐ§ÑÚÂë */
-    HIFB_LAYERMASK_SCREENSIZE = 0x20,       /**< Whether the screen size is masked.*//**<CNcomment:screensizeÊÇ·ñÓÐÐ§ÑÚÂë */
-    HIFB_LAYERMASK_BMUL = 0x40,             /**< Whether the premultiplexed mode is masked.*//**<CNcomment:ÊÇ·ñÔ¤³ËÊÇ·ñÓÐÐ§ÑÚÂë */
+    HIFB_LAYERMASK_BUFMODE = 0x1,           /**< Whether the buffer mode in HIFB_LAYER_INFO_S is masked when the graphics layer information is set.*//**<CNcomment:ï¿½ï¿½ï¿½ï¿½Í¼ï¿½ï¿½ï¿½ï¿½Ï¢Ê±ï¿½ï¿½HIFB_LAYER_INFO_Sï¿½ï¿½bufÄ£Ê½ï¿½Ç·ï¿½ï¿½ï¿½Ð§ï¿½ï¿½ï¿½ï¿½ */
+    HIFB_LAYERMASK_ANTIFLICKER_MODE = 0x2,  /**< Whether the anti-flicker mode is masked.*//**<CNcomment:ï¿½ï¿½ï¿½ï¿½Ë¸Ä£Ê½ï¿½Ç·ï¿½ï¿½ï¿½Ð§ï¿½ï¿½ï¿½ï¿½ */
+    HIFB_LAYERMASK_POS = 0x4,               /**< Whether the graphics layer position is masked.*//**<CNcomment:Í¼ï¿½ï¿½Î»ï¿½ï¿½ï¿½Ç·ï¿½ï¿½ï¿½Ð§ï¿½ï¿½ï¿½ï¿½ */
+    HIFB_LAYERMASK_CANVASSIZE = 0x8,        /**< Whether the canvas size is masked.*//**<CNcomment:canvassizeï¿½Ç·ï¿½ï¿½ï¿½Ð§ï¿½ï¿½ï¿½ï¿½ */
+    HIFB_LAYERMASK_DISPSIZE = 0x10,         /**< Whether the display size is masked.*//**<CNcomment:displaysizeï¿½Ç·ï¿½ï¿½ï¿½Ð§ï¿½ï¿½ï¿½ï¿½ */
+    HIFB_LAYERMASK_SCREENSIZE = 0x20,       /**< Whether the screen size is masked.*//**<CNcomment:screensizeï¿½Ç·ï¿½ï¿½ï¿½Ð§ï¿½ï¿½ï¿½ï¿½ */
+    HIFB_LAYERMASK_BMUL = 0x40,             /**< Whether the premultiplexed mode is masked.*//**<CNcomment:ï¿½Ç·ï¿½Ô¤ï¿½ï¿½ï¿½Ç·ï¿½ï¿½ï¿½Ð§ï¿½ï¿½ï¿½ï¿½ */
     HIFB_LAYERMASK_BUTT
 }HIFB_LAYER_INFO_MASKBIT;
 
@@ -471,10 +471,10 @@ typedef struct
 /*virtual window info*/
 typedef enum
 {
-    HIFB_ZORDER_MOVETOP = 0,  /**< Move to the top*//**<CNcomment:ÒÆµ½×î¶¥²¿*/
-    HIFB_ZORDER_MOVEUP,       /**< Move upwards*//**<CNcomment:ÏòÉÏÒÆ*/
-    HIFB_ZORDER_MOVEBOTTOM,   /**< Move to the bottom*//**<CNcomment:ÒÆµ½×îµ×²¿*/
-    HIFB_ZORDER_MOVEDOWN,     /**< Move downwards*//**<CNcomment:ÏòÏÂÒÆ*/
+    HIFB_ZORDER_MOVETOP = 0,  /**< Move to the top*//**<CNcomment:ï¿½Æµï¿½ï¿½î¶¥ï¿½ï¿½*/
+    HIFB_ZORDER_MOVEUP,       /**< Move upwards*//**<CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½*/
+    HIFB_ZORDER_MOVEBOTTOM,   /**< Move to the bottom*//**<CNcomment:ï¿½Æµï¿½ï¿½ï¿½×²ï¿½*/
+    HIFB_ZORDER_MOVEDOWN,     /**< Move downwards*//**<CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½*/
     HIFB_ZORDER_BUTT
 }HIFB_ZORDER_E;
 
@@ -484,22 +484,22 @@ typedef enum
 #if 0
 /******************************* API declaration *****************************/
 /** \addtogroup     HiFB */
-/** @{ */  /** <!-- ¡¾HiFB¡¿ */
+/** @{ */  /** <!-- ï¿½ï¿½HiFBï¿½ï¿½ */
 
 /**
-\brief Obtains the variable information about the screen. CNcomment:»ñÈ¡ÆÁÄ»µÄ¿É±äÐÅÏ¢.CNend
+\brief Obtains the variable information about the screen. CNcomment:ï¿½ï¿½È¡ï¿½ï¿½Ä»ï¿½Ä¿É±ï¿½ï¿½ï¿½Ï¢.CNend
 \attention \n
 By default, the resolution and pixel format of the standard-definition (SD) graphics layer are 720x576 and ARGB1555 respectively; the resolution and pixel format of the high-definition (HD) graphics layer are 1280x720 and ARGB888 respectively;
-CNcomment:ÏµÍ³Ä¬ÈÏµÄ±êÇåÍ¼²ã·Ö±æÂÊÎª720¡Á576£¬ÏóËØ¸ñÊ½ÎªARGB1555¡£ÏµÍ³Ä¬ÈÏµÄ¸ßÇåÍ¼²ã·Ö±æÂÊÎª1280¡Á720£¬ÏóËØ¸ñÊ½ÎªARGB888¡£CNend
+CNcomment:ÏµÍ³Ä¬ï¿½ÏµÄ±ï¿½ï¿½ï¿½Í¼ï¿½ï¿½Ö±ï¿½ï¿½ï¿½Îª720ï¿½ï¿½576ï¿½ï¿½ï¿½ï¿½ï¿½Ø¸ï¿½Ê½ÎªARGB1555ï¿½ï¿½ÏµÍ³Ä¬ï¿½ÏµÄ¸ï¿½ï¿½ï¿½Í¼ï¿½ï¿½Ö±ï¿½ï¿½ï¿½Îª1280ï¿½ï¿½720ï¿½ï¿½ï¿½ï¿½ï¿½Ø¸ï¿½Ê½ÎªARGB888ï¿½ï¿½CNend
 
-\param[in] fd ID of an FB device. CNcomment:FramebufferÉè±¸ºÅCNend
-\param[in] FBIOGET_VSCREENINFO  ioctl number. CNcomment:ioctlºÅCNend
-\param[out] var  Pointer to the variable information. CNcomment:¿É±äÐÅÏ¢½á¹¹ÌåÖ¸ÕëCNend
-\retval 0  SUCCESS Success. CNcomment:³É¹¦CNend
-\retval ::EPERM  1. The operation is not supported. CNcomment:1,²»Ö§³Ö¸Ã²Ù×÷CNend
-\retval ::ENOMEM  12. The memory is insufficient. CNcomment:12,ÄÚ´æ²»¹»CNend
-\retval ::EFAULT  14. The input pointer is invalid. CNcomment:14,´«Èë²ÎÊýÖ¸ÕëµØÖ·ÎÞÐ§CNend
-\retval ::EINVAL  22. The input parameter is invalid. CNcomment:22,´«Èë²ÎÊýÎÞÐ§CNend
+\param[in] fd ID of an FB device. CNcomment:Framebufferï¿½è±¸ï¿½ï¿½CNend
+\param[in] FBIOGET_VSCREENINFO  ioctl number. CNcomment:ioctlï¿½ï¿½CNend
+\param[out] var  Pointer to the variable information. CNcomment:ï¿½É±ï¿½ï¿½ï¿½Ï¢ï¿½á¹¹ï¿½ï¿½Ö¸ï¿½ï¿½CNend
+\retval 0  SUCCESS Success. CNcomment:ï¿½É¹ï¿½CNend
+\retval ::EPERM  1. The operation is not supported. CNcomment:1,ï¿½ï¿½Ö§ï¿½Ö¸Ã²ï¿½ï¿½ï¿½CNend
+\retval ::ENOMEM  12. The memory is insufficient. CNcomment:12,ï¿½Ú´æ²»ï¿½ï¿½CNend
+\retval ::EFAULT  14. The input pointer is invalid. CNcomment:14,ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½ï¿½Ö·ï¿½ï¿½Ð§CNend
+\retval ::EINVAL  22. The input parameter is invalid. CNcomment:22,ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð§CNend
 \see \n
 ::FBIOPUT_VSCREENINFO
 \par example
@@ -516,27 +516,27 @@ int ioctl (int fd, FBIOGET_VSCREENINFO, struct fb_var_screeninfo *var);
 
 
 /**
-\brief Sets the screen resolution and pixel format of the FB. CNcomment:ÉèÖÃFramebufferµÄÆÁÄ»·Ö±æÂÊºÍÏóËØ¸ñÊ½µÈ¡£CNend
+\brief Sets the screen resolution and pixel format of the FB. CNcomment:ï¿½ï¿½ï¿½ï¿½Framebufferï¿½ï¿½ï¿½ï¿½Ä»ï¿½Ö±ï¿½ï¿½Êºï¿½ï¿½ï¿½ï¿½Ø¸ï¿½Ê½ï¿½È¡ï¿½CNend
 \attention \n
 The resolution must be supported by each overlay layer. You can query the maximum resolution and minimum resolution supported by each overlay layer by calling FBIOGET_CAPABILITY_HIFB.\n
 The sum of the actual resolution and offset value must be within the range of the virtual resolution. Otherwise, the system automatically adjusts the actual resolution.
-CNcomment:·Ö±æÂÊµÄ´óÐ¡±ØÐëÔÚ¸÷µþ¼Ó²ãÖ§³ÖµÄ·Ö±æÂÊ·¶Î§ÄÚ£¬¸÷µþ¼Ó²ãÖ§³ÖµÄ×î´ó·Ö±æÂÊºÍ×îÐ¡·Ö±æÂÊ¿ÉÍ¨¹ýFBIOGET_CAPABILITY_HIFB»ñÈ¡¡£CNend
-±ØÐë±£Ö¤Êµ¼Ê·Ö±æÂÊÓëÆ«ÒÆµÄºÍÔÚÐéÄâ·Ö±æÂÊ·¶Î§ÄÚ£¬·ñÔòÏµÍ³»á×Ô¶¯µ÷ÕûÊµ¼Ê·Ö±æÂÊµÄ´óÐ¡ÈÃÆäÔÚÐéÄâ·Ö±æÂÊ·¶Î§ÄÚ¡£CNend
+CNcomment:ï¿½Ö±ï¿½ï¿½ÊµÄ´ï¿½Ð¡ï¿½ï¿½ï¿½ï¿½ï¿½Ú¸ï¿½ï¿½ï¿½ï¿½Ó²ï¿½Ö§ï¿½ÖµÄ·Ö±ï¿½ï¿½Ê·ï¿½Î§ï¿½Ú£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó²ï¿½Ö§ï¿½Öµï¿½ï¿½ï¿½ï¿½Ö±ï¿½ï¿½Êºï¿½ï¿½ï¿½Ð¡ï¿½Ö±ï¿½ï¿½Ê¿ï¿½Í¨ï¿½ï¿½FBIOGET_CAPABILITY_HIFBï¿½ï¿½È¡ï¿½ï¿½CNend
+ï¿½ï¿½ï¿½ë±£Ö¤Êµï¿½Ê·Ö±ï¿½ï¿½ï¿½ï¿½ï¿½Æ«ï¿½ÆµÄºï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö±ï¿½ï¿½Ê·ï¿½Î§ï¿½Ú£ï¿½ï¿½ï¿½ï¿½ï¿½ÏµÍ³ï¿½ï¿½ï¿½Ô¶ï¿½ï¿½ï¿½ï¿½ï¿½Êµï¿½Ê·Ö±ï¿½ï¿½ÊµÄ´ï¿½Ð¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö±ï¿½ï¿½Ê·ï¿½Î§ï¿½Ú¡ï¿½CNend
 
-\param[in] fd ID of an FB device. CNcomment:FramebufferÉè±¸ºÅCNend
-\param[in] FBIOPUT_VSCREENINFO ioctl number. CNcomment:ioctlºÅCNend
-\param[in] var Pointer to the variable information. CNcomment:¿É±äÐÅÏ¢½á¹¹ÌåÖ¸ÕëCNend
-\retval  0 SUCCESS Success. CNcomment:³É¹¦CNend
-\retval ::EPERM  1. The operation is not supported. CNcomment:1,²»Ö§³Ö¸Ã²Ù×÷CNend
-\retval ::ENOMEM  12. The memory is insufficient. CNcomment:12,ÄÚ´æ²»¹»CNend
-\retval ::EFAULT  14. The input pointer is invalid. CNcomment:14,´«Èë²ÎÊýÖ¸ÕëµØÖ·ÎÞÐ§CNend
-\retval ::EINVAL  22. The input parameter is invalid. CNcomment:22,´«Èë²ÎÊýÎÞÐ§CNend
+\param[in] fd ID of an FB device. CNcomment:Framebufferï¿½è±¸ï¿½ï¿½CNend
+\param[in] FBIOPUT_VSCREENINFO ioctl number. CNcomment:ioctlï¿½ï¿½CNend
+\param[in] var Pointer to the variable information. CNcomment:ï¿½É±ï¿½ï¿½ï¿½Ï¢ï¿½á¹¹ï¿½ï¿½Ö¸ï¿½ï¿½CNend
+\retval  0 SUCCESS Success. CNcomment:ï¿½É¹ï¿½CNend
+\retval ::EPERM  1. The operation is not supported. CNcomment:1,ï¿½ï¿½Ö§ï¿½Ö¸Ã²ï¿½ï¿½ï¿½CNend
+\retval ::ENOMEM  12. The memory is insufficient. CNcomment:12,ï¿½Ú´æ²»ï¿½ï¿½CNend
+\retval ::EFAULT  14. The input pointer is invalid. CNcomment:14,ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½ï¿½Ö·ï¿½ï¿½Ð§CNend
+\retval ::EINVAL  22. The input parameter is invalid. CNcomment:22,ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð§CNend
 \see \n
 ::FBIOGET_VSCREENINFO
 \par example
 \code
 //Assume that the actual resolution is 720x576, the virtual resolution is 720x576, the offset value is (0, 0), and the pixel format is ARGB8888. In this case, the sample code is as follows:
-//CNcommnet:ÉèÖÃÊµ¼Ê·Ö±æÂÊÎª720¡Á576£¬ÐéÄâ·Ö±æÂÊÎª720¡Á576£¬Æ«ÒÆÎª£¨0£¬0£©£¬ÏóËØ¸ñÊ½ÎªARGB8888µÄÊ¾Àý´úÂëÈçÏÂ£ºCNend
+//CNcommnet:ï¿½ï¿½ï¿½ï¿½Êµï¿½Ê·Ö±ï¿½ï¿½ï¿½Îª720ï¿½ï¿½576ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö±ï¿½ï¿½ï¿½Îª720ï¿½ï¿½576ï¿½ï¿½Æ«ï¿½ï¿½Îªï¿½ï¿½0ï¿½ï¿½0ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ø¸ï¿½Ê½ÎªARGB8888ï¿½ï¿½Ê¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Â£ï¿½CNend
 struct fb_bitfield r32 = {16, 8, 0};
 struct fb_bitfield g32 = {8, 8, 0};
 struct fb_bitfield b32 = {0, 8, 0}; 
@@ -570,17 +570,17 @@ int ioctl (int fd, FBIOPUT_VSCREENINFO, struct fb_var_screeninfo *var);
 
 
 /**
-\brief Obtains the fixed information about the FB. CNcomment:»ñÈ¡FramebufferµÄ¹Ì¶¨ÐÅÏ¢¡£CNend
+\brief Obtains the fixed information about the FB. CNcomment:ï¿½ï¿½È¡Framebufferï¿½Ä¹Ì¶ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½CNend
 \attention \n
 None
-\param[in] fd ID of an FB device. CNcomment:FramebufferÉè±¸ºÅCNend
-\param[in] FBIOGET_FSCREENINFO  ioctl number. CNcomment:ioctlºÅCNend
-\param[out] fix Pointer to the fixed information. CNcomment:¹Ì¶¨ÐÅÏ¢½á¹¹ÌåÖ¸ÕëCNend
-\retval  0 SUCCESS Success. CNcomment:³É¹¦CNend
-\retval ::EPERM  1. The operation is not supported. CNcomment:1,²»Ö§³Ö¸Ã²Ù×÷CNend
-\retval ::ENOMEM  12. The memory is insufficient. CNcomment:12,ÄÚ´æ²»¹»CNend
-\retval ::EFAULT  14. The input pointer is invalid. CNcomment:14,´«Èë²ÎÊýÖ¸ÕëµØÖ·ÎÞÐ§CNend
-\retval ::EINVAL  22. The input parameter is invalid. CNcomment:22,´«Èë²ÎÊýÎÞÐ§CNend
+\param[in] fd ID of an FB device. CNcomment:Framebufferï¿½è±¸ï¿½ï¿½CNend
+\param[in] FBIOGET_FSCREENINFO  ioctl number. CNcomment:ioctlï¿½ï¿½CNend
+\param[out] fix Pointer to the fixed information. CNcomment:ï¿½Ì¶ï¿½ï¿½ï¿½Ï¢ï¿½á¹¹ï¿½ï¿½Ö¸ï¿½ï¿½CNend
+\retval  0 SUCCESS Success. CNcomment:ï¿½É¹ï¿½CNend
+\retval ::EPERM  1. The operation is not supported. CNcomment:1,ï¿½ï¿½Ö§ï¿½Ö¸Ã²ï¿½ï¿½ï¿½CNend
+\retval ::ENOMEM  12. The memory is insufficient. CNcomment:12,ï¿½Ú´æ²»ï¿½ï¿½CNend
+\retval ::EFAULT  14. The input pointer is invalid. CNcomment:14,ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½ï¿½Ö·ï¿½ï¿½Ð§CNend
+\retval ::EINVAL  22. The input parameter is invalid. CNcomment:22,ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð§CNend
 \see \n
 N/A
 */
@@ -589,25 +589,25 @@ int ioctl (int fd, FBIOGET_FSCREENINFO, struct fb_fix_screeninfo *fix);
 
 
 /**
-\brief Sets to display contents at different offset positions of the virtual resolution. CNcommnet:ÉèÖÃ´ÓÐéÄâ·Ö±æÂÊÖÐµÄ²»Í¬Æ«ÒÆ´¦¿ªÊ¼ÏÔÊ¾¡£CNend
+\brief Sets to display contents at different offset positions of the virtual resolution. CNcommnet:ï¿½ï¿½ï¿½Ã´ï¿½ï¿½ï¿½ï¿½ï¿½Ö±ï¿½ï¿½ï¿½ï¿½ÐµÄ²ï¿½Í¬Æ«ï¿½Æ´ï¿½ï¿½ï¿½Ê¼ï¿½ï¿½Ê¾ï¿½ï¿½CNend
 \attention \n
 The sum of the actual resolution and offset value must be within the range of the virtual resolution. Otherwise, the setting is unsuccessful.
-CNcomment:±ØÐë±£Ö¤Êµ¼Ê·Ö±æÂÊÓëÆ«ÒÆµÄºÍÔÚÐéÄâ·Ö±æÂÊ·¶Î§ÄÚ£¬·ñÔòÉèÖÃ²»³É¹¦¡£CNend
+CNcomment:ï¿½ï¿½ï¿½ë±£Ö¤Êµï¿½Ê·Ö±ï¿½ï¿½ï¿½ï¿½ï¿½Æ«ï¿½ÆµÄºï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö±ï¿½ï¿½Ê·ï¿½Î§ï¿½Ú£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã²ï¿½ï¿½É¹ï¿½ï¿½ï¿½CNend
 
-\param[in] fd ID of an FB device. CNcomment:FramebufferÉè±¸ºÅCNend
-\param[in] FBIOPAN_DISPLAY  ioctl number. CNcomment:ioctlºÅCNend
-\param[out] var  Pointer to the variable information. CNcomment:¿É±äÐÅÏ¢½á¹¹ÌåÖ¸ÕëCNend
-\retval  0 SUCCESS Success. CNcomment:³É¹¦CNend
-\retval ::EPERM  1. The operation is not supported. CNcomment:1,²»Ö§³Ö¸Ã²Ù×÷CNend
-\retval ::ENOMEM  12. The memory is insufficient. CNcomment:12,ÄÚ´æ²»¹»CNend
-\retval ::EFAULT  14. The input pointer is invalid.  CNcomment:14,´«Èë²ÎÊýÖ¸ÕëµØÖ·ÎÞÐ§CNend
-\retval ::EINVAL  22. The input parameter is invalid. CNcomment:22,´«Èë²ÎÊýÎÞÐ§CNend
+\param[in] fd ID of an FB device. CNcomment:Framebufferï¿½è±¸ï¿½ï¿½CNend
+\param[in] FBIOPAN_DISPLAY  ioctl number. CNcomment:ioctlï¿½ï¿½CNend
+\param[out] var  Pointer to the variable information. CNcomment:ï¿½É±ï¿½ï¿½ï¿½Ï¢ï¿½á¹¹ï¿½ï¿½Ö¸ï¿½ï¿½CNend
+\retval  0 SUCCESS Success. CNcomment:ï¿½É¹ï¿½CNend
+\retval ::EPERM  1. The operation is not supported. CNcomment:1,ï¿½ï¿½Ö§ï¿½Ö¸Ã²ï¿½ï¿½ï¿½CNend
+\retval ::ENOMEM  12. The memory is insufficient. CNcomment:12,ï¿½Ú´æ²»ï¿½ï¿½CNend
+\retval ::EFAULT  14. The input pointer is invalid.  CNcomment:14,ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½ï¿½Ö·ï¿½ï¿½Ð§CNend
+\retval ::EINVAL  22. The input parameter is invalid. CNcomment:22,ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð§CNend
 \see \n
 N/A
 \par example
 \code
 //Assume that the actual resolution is 300x300, the virtual resolution is 720x576, the start offset value is (50, 50), and the display position is (300, 0). In this case, the code for the PAN setting is as follows:
-//CNcomment:ÉèÖÃÊµ¼Ê·Ö±æÂÊÎª300¡Á300£¬ÐéÄâ·Ö±æÂÊÎª720¡Á576£¬ÆðÊ¼Æ«ÒÆÎª£¨50£¬50£©£¬È»ºóÆ«ÒÆµ½£¨300£¬0£©´¦¿ªÊ¼ÏÔÊ¾µÄPANÉèÖÃ´úÂëÈçÏÂ£ºCNend
+//CNcomment:ï¿½ï¿½ï¿½ï¿½Êµï¿½Ê·Ö±ï¿½ï¿½ï¿½Îª300ï¿½ï¿½300ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö±ï¿½ï¿½ï¿½Îª720ï¿½ï¿½576ï¿½ï¿½ï¿½ï¿½Ê¼Æ«ï¿½ï¿½Îªï¿½ï¿½50ï¿½ï¿½50ï¿½ï¿½ï¿½ï¿½È»ï¿½ï¿½Æ«ï¿½Æµï¿½ï¿½ï¿½300ï¿½ï¿½0ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¼ï¿½ï¿½Ê¾ï¿½ï¿½PANï¿½ï¿½ï¿½Ã´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Â£ï¿½CNend
 struct fb_bitfield r32 = {16, 8, 0};
 struct fb_bitfield g32 = {8, 8, 0};
 struct fb_bitfield b32 = {0, 8, 0};
@@ -644,18 +644,18 @@ int ioctl (int fd, FBIOPAN_DISPLAY, struct fb_var_screeninfo *var);
 
 
 /**
-\brief Obtains the information about the palette. CNcommnet:»ñÈ¡µ÷É«°åÐÅÏ¢¡£CNend
+\brief Obtains the information about the palette. CNcommnet:ï¿½ï¿½È¡ï¿½ï¿½É«ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½CNend
 \attention \n
 None
 
-\param[in] fd ID of an FB device. CNcomment:FramebufferÉè±¸ºÅCNend
-\param[in] FBIOGETCMAP  ioctl number. CNcomment:ioctlºÅCNend
-\param[out] cmap Pointer to the palette. CNcomment:µ÷É«°å½á¹¹ÌåÖ¸ÕëCNend
-\retval  0 SUCCESS Success. CNcomment:³É¹¦CNend
-\retval ::EPERM  1. The operation is not supported. CNcomment:1,²»Ö§³Ö¸Ã²Ù×÷CNend
-\retval ::ENOMEM  12. The memory is insufficient. CNcomment:12,ÄÚ´æ²»¹»CNend
-\retval ::EFAULT  14. The input pointer is invalid. CNcomment:14,´«Èë²ÎÊýÖ¸ÕëµØÖ·ÎÞÐ§CNend
-\retval ::EINVAL  22. The input parameter is invalid. CNcomment:22,´«Èë²ÎÊýÎÞÐ§CNend
+\param[in] fd ID of an FB device. CNcomment:Framebufferï¿½è±¸ï¿½ï¿½CNend
+\param[in] FBIOGETCMAP  ioctl number. CNcomment:ioctlï¿½ï¿½CNend
+\param[out] cmap Pointer to the palette. CNcomment:ï¿½ï¿½É«ï¿½ï¿½á¹¹ï¿½ï¿½Ö¸ï¿½ï¿½CNend
+\retval  0 SUCCESS Success. CNcomment:ï¿½É¹ï¿½CNend
+\retval ::EPERM  1. The operation is not supported. CNcomment:1,ï¿½ï¿½Ö§ï¿½Ö¸Ã²ï¿½ï¿½ï¿½CNend
+\retval ::ENOMEM  12. The memory is insufficient. CNcomment:12,ï¿½Ú´æ²»ï¿½ï¿½CNend
+\retval ::EFAULT  14. The input pointer is invalid. CNcomment:14,ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½ï¿½Ö·ï¿½ï¿½Ð§CNend
+\retval ::EINVAL  22. The input parameter is invalid. CNcomment:22,ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð§CNend
 \see \n
 ::FBIOPUTCMAP
 \par example
@@ -688,17 +688,17 @@ int ioctl (int fd, FBIOGETCMAP, struct fb_cmap *cmap);
 
 
 /**
-\brief Sets the information about the palette. CNcomment:ÉèÖÃµ÷É«°åÐÅÏ¢¡£CNend
+\brief Sets the information about the palette. CNcomment:ï¿½ï¿½ï¿½Ãµï¿½É«ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½CNend
 \attention \n
 None
-\param[in] fd ID of an FB device. CNcomment:FramebufferÉè±¸ºÅCNend
-\param[in] FBIOPUTCMAP  ioctl number. CNcomment:ioctlºÅCNend
-\param[in] cmap Pointer to the palette. CNcomment:µ÷É«°å½á¹¹ÌåÖ¸ÕëCNend
-\retval  0 SUCCESS Success. CNcomment:³É¹¦CNend
-\retval ::EPERM  1. The operation is not supported. CNcomment:1,²»Ö§³Ö¸Ã²Ù×÷CNend
-\retval ::ENOMEM  12. The memory is insufficient. CNcomment:12,ÄÚ´æ²»¹»CNend
-\retval ::EFAULT  14. The input pointer is invalid. CNcomment:14,´«Èë²ÎÊýÖ¸ÕëµØÖ·ÎÞÐ§CNend
-\retval ::EINVAL  22. The input parameter is invalid. CNcomment:22,´«Èë²ÎÊýÎÞÐ§CNend
+\param[in] fd ID of an FB device. CNcomment:Framebufferï¿½è±¸ï¿½ï¿½CNend
+\param[in] FBIOPUTCMAP  ioctl number. CNcomment:ioctlï¿½ï¿½CNend
+\param[in] cmap Pointer to the palette. CNcomment:ï¿½ï¿½É«ï¿½ï¿½á¹¹ï¿½ï¿½Ö¸ï¿½ï¿½CNend
+\retval  0 SUCCESS Success. CNcomment:ï¿½É¹ï¿½CNend
+\retval ::EPERM  1. The operation is not supported. CNcomment:1,ï¿½ï¿½Ö§ï¿½Ö¸Ã²ï¿½ï¿½ï¿½CNend
+\retval ::ENOMEM  12. The memory is insufficient. CNcomment:12,ï¿½Ú´æ²»ï¿½ï¿½CNend
+\retval ::EFAULT  14. The input pointer is invalid. CNcomment:14,ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½ï¿½Ö·ï¿½ï¿½Ð§CNend
+\retval ::EINVAL  22. The input parameter is invalid. CNcomment:22,ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð§CNend
 \see \n
 ::FBIOGETCMAP
 \par example
@@ -735,17 +735,17 @@ int ioctl (int fd, FBIOPUTCMAP, struct fb_cmap *cmap);
 
 /**-----Extended Functions--------*/
 /**
-\brief Obtains the capability of an overlay layer. CNcomment:»ñÈ¡µþ¼Ó²ãµÄÖ§³ÖÄÜÁ¦¡£CNend
+\brief Obtains the capability of an overlay layer. CNcomment:ï¿½ï¿½È¡ï¿½ï¿½ï¿½Ó²ï¿½ï¿½Ö§ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½CNend
 \attention \n
 None
-\param[in] fd ID of an FB device. CNcomment:FramebufferÉè±¸ºÅCNend
-\param[in] FBIOGET_CAPABILITY_HIFB  ioctl number. CNcomment:ioctlºÅCNend
-\param[out] pstCap Pointer to the capability. CNcomment:Ö§³ÖÄÜÁ¦½á¹¹ÌåÖ¸ÕëCNend
-\retval  0 SUCCESS Success. CNcomment:³É¹¦CNend
-\retval ::EPERM  1. The operation is not supported. CNcomment:1,²»Ö§³Ö¸Ã²Ù×÷CNend
-\retval ::ENOMEM  12. The memory is insufficient. CNcomment:12,ÄÚ´æ²»¹»CNend
-\retval ::EFAULT  14. The input pointer is invalid. CNcomment:14,´«Èë²ÎÊýÖ¸ÕëµØÖ·ÎÞÐ§CNend
-\retval ::EINVAL  22. The input parameter is invalid. CNcomment:22,´«Èë²ÎÊýÎÞÐ§CNend
+\param[in] fd ID of an FB device. CNcomment:Framebufferï¿½è±¸ï¿½ï¿½CNend
+\param[in] FBIOGET_CAPABILITY_HIFB  ioctl number. CNcomment:ioctlï¿½ï¿½CNend
+\param[out] pstCap Pointer to the capability. CNcomment:Ö§ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½á¹¹ï¿½ï¿½Ö¸ï¿½ï¿½CNend
+\retval  0 SUCCESS Success. CNcomment:ï¿½É¹ï¿½CNend
+\retval ::EPERM  1. The operation is not supported. CNcomment:1,ï¿½ï¿½Ö§ï¿½Ö¸Ã²ï¿½ï¿½ï¿½CNend
+\retval ::ENOMEM  12. The memory is insufficient. CNcomment:12,ï¿½Ú´æ²»ï¿½ï¿½CNend
+\retval ::EFAULT  14. The input pointer is invalid. CNcomment:14,ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½ï¿½Ö·ï¿½ï¿½Ð§CNend
+\retval ::EINVAL  22. The input parameter is invalid. CNcomment:22,ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð§CNend
 \see \n
 N/A
 */
@@ -754,17 +754,17 @@ int ioctl (int fd, FBIOGET_CAPABILITY_HIFB, HIFB_CAPABILITY_S *pstCap);
 
 
 /**
-\brief Obtains the coordinates of the start display point of an overlay layer on the screen. CNcomment:»ñÈ¡µþ¼Ó²ãÔÚÆÁÄ»ÉÏÏÔÊ¾µÄÆðÊ¼µã×ø±ê¡£CNend
+\brief Obtains the coordinates of the start display point of an overlay layer on the screen. CNcomment:ï¿½ï¿½È¡ï¿½ï¿½ï¿½Ó²ï¿½ï¿½ï¿½ï¿½ï¿½Ä»ï¿½ï¿½ï¿½ï¿½Ê¾ï¿½ï¿½ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½ê¡£CNend
 \attention \n
 None
-\param[in] fd ID of an FB device. CNcomment:FramebufferÉè±¸ºÅCNend
-\param[in] FBIOGET_SCREEN_ORIGIN_HIFB  ioctl number. CNcomment:ioctlºÅCNend
-\param[out] pstPoint Pointer to the coordinate origin. CNcomment:×ø±êÔ­µã½á¹¹ÌåÖ¸ÕëCNend
-\retval  0 SUCCESS Success. CNcomment:³É¹¦CNend
-\retval ::EPERM  1. The operation is not supported. CNcomment:1,²»Ö§³Ö¸Ã²Ù×÷CNend
-\retval ::ENOMEM  12. The memory is insufficient. CNcomment:12,ÄÚ´æ²»¹»CNend
-\retval ::EFAULT  14. The input pointer is invalid. CNcomment:14,´«Èë²ÎÊýÖ¸ÕëµØÖ·ÎÞÐ§CNend
-\retval ::EINVAL  22. The input parameter is invalid. CNcomment:22,´«Èë²ÎÊýÎÞÐ§CNend
+\param[in] fd ID of an FB device. CNcomment:Framebufferï¿½è±¸ï¿½ï¿½CNend
+\param[in] FBIOGET_SCREEN_ORIGIN_HIFB  ioctl number. CNcomment:ioctlï¿½ï¿½CNend
+\param[out] pstPoint Pointer to the coordinate origin. CNcomment:ï¿½ï¿½ï¿½Ô­ï¿½ï¿½á¹¹ï¿½ï¿½Ö¸ï¿½ï¿½CNend
+\retval  0 SUCCESS Success. CNcomment:ï¿½É¹ï¿½CNend
+\retval ::EPERM  1. The operation is not supported. CNcomment:1,ï¿½ï¿½Ö§ï¿½Ö¸Ã²ï¿½ï¿½ï¿½CNend
+\retval ::ENOMEM  12. The memory is insufficient. CNcomment:12,ï¿½Ú´æ²»ï¿½ï¿½CNend
+\retval ::EFAULT  14. The input pointer is invalid. CNcomment:14,ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½ï¿½Ö·ï¿½ï¿½Ð§CNend
+\retval ::EINVAL  22. The input parameter is invalid. CNcomment:22,ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð§CNend
 \see \n
 ::FBIOPUT_SCREEN_ORIGIN_HIFB
 */
@@ -773,18 +773,18 @@ int ioctl (int fd, FBIOGET_SCREEN_ORIGIN_HIFB, HIFB_POINT_S *pstPoint);
 
 
 /**
-\brief Sets the coordinates of the start display point of an overlay layer on the screen. CNcomment:ÉèÖÃµþ¼Ó²ãÔÚÆÁÄ»ÉÏÏÔÊ¾µÄÆðÊ¼µã×ø±ê¡£CNend
+\brief Sets the coordinates of the start display point of an overlay layer on the screen. CNcomment:ï¿½ï¿½ï¿½Ãµï¿½ï¿½Ó²ï¿½ï¿½ï¿½ï¿½ï¿½Ä»ï¿½ï¿½ï¿½ï¿½Ê¾ï¿½ï¿½ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½ê¡£CNend
 \attention \n
 If the coordinate origin of an overlay layer is beyond the range, the coordinate origin is set to (u32MaxWidth - u32MinWidth, u32MaxHeight - u32MinHeight) by default.
-CNcomment:Èç¹ûµþ¼Ó²ã×ø±êÔ­µã³¬³öÁË·¶Î§£¬Ä¬ÈÏ½«×ø±êÔ­µãÉèÖÃÎª£¨u32MaxWidth ¨Cu32MinWidth,£¬u32MaxHeight ¨Cu32MinHeight£©¡£CNend
-\param[in] fd ID of an FB device. CNcomment:FramebufferÉè±¸ºÅCNend
-\param[in] FBIOPUT_SCREEN_ORIGIN_HIFB  ioctl number. CNcomment:ioctlºÅCNend
-\param[in] pstPoint Pointer to the coordinate origin. CNcomment:×ø±êÔ­µã½á¹¹ÌåÖ¸ÕëCNend
-\retval  0 SUCCESS Success. CNcomment:³É¹¦CNend
-\retval ::EPERM  1. The operation is not supported. CNcomment:1,²»Ö§³Ö¸Ã²Ù×÷CNend
-\retval ::ENOMEM  12. The memory is insufficient. CNcomment:12,ÄÚ´æ²»¹»CNend
-\retval ::EFAULT  14. The input pointer is invalid. CNcomment:14,´«Èë²ÎÊýÖ¸ÕëµØÖ·ÎÞÐ§CNend
-\retval ::EINVAL  22. The input parameter is invalid. CNcomment:22,´«Èë²ÎÊýÎÞÐ§CNend
+CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½Ó²ï¿½ï¿½ï¿½ï¿½Ô­ï¿½ã³¬ï¿½ï¿½ï¿½Ë·ï¿½Î§ï¿½ï¿½Ä¬ï¿½Ï½ï¿½ï¿½ï¿½ï¿½Ô­ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îªï¿½ï¿½u32MaxWidth ï¿½Cu32MinWidth,ï¿½ï¿½u32MaxHeight ï¿½Cu32MinHeightï¿½ï¿½ï¿½ï¿½CNend
+\param[in] fd ID of an FB device. CNcomment:Framebufferï¿½è±¸ï¿½ï¿½CNend
+\param[in] FBIOPUT_SCREEN_ORIGIN_HIFB  ioctl number. CNcomment:ioctlï¿½ï¿½CNend
+\param[in] pstPoint Pointer to the coordinate origin. CNcomment:ï¿½ï¿½ï¿½Ô­ï¿½ï¿½á¹¹ï¿½ï¿½Ö¸ï¿½ï¿½CNend
+\retval  0 SUCCESS Success. CNcomment:ï¿½É¹ï¿½CNend
+\retval ::EPERM  1. The operation is not supported. CNcomment:1,ï¿½ï¿½Ö§ï¿½Ö¸Ã²ï¿½ï¿½ï¿½CNend
+\retval ::ENOMEM  12. The memory is insufficient. CNcomment:12,ï¿½Ú´æ²»ï¿½ï¿½CNend
+\retval ::EFAULT  14. The input pointer is invalid. CNcomment:14,ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½ï¿½Ö·ï¿½ï¿½Ð§CNend
+\retval ::EINVAL  22. The input parameter is invalid. CNcomment:22,ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð§CNend
 \see \n
 ::FBIOGET_SCREEN_ORIGIN_HIFB
 */
@@ -793,17 +793,17 @@ int ioctl (int fd, FBIOPUT_SCREEN_ORIGIN_HIFB, HIFB_POINT_S *pstPoint);
 
 
 /**
-\brief Obtains the display status of the current overlay layer. CNcomment:»ñÈ¡µ±Ç°µþ¼Ó²ãµÄÏÔÊ¾×´Ì¬¡£CNend
+\brief Obtains the display status of the current overlay layer. CNcomment:ï¿½ï¿½È¡ï¿½ï¿½Ç°ï¿½ï¿½ï¿½Ó²ï¿½ï¿½ï¿½ï¿½Ê¾×´Ì¬ï¿½ï¿½CNend
 \attention \n
 None
-\param[in] fd ID of an FB device. CNcomment:FramebufferÉè±¸ºÅCNend
-\param[in] FBIOGET_SHOW_HIFB  ioctl number. CNcomment:ioctlºÅCNend
-\param[out] bShow Status of the current overlay layer. If *bShow is set to HI_TRUE, it indicates that the current overlay layer is shown; if *bShow is set to HI_FALSE, it indicates that the current overlay layer is hidden. CNcomment:Ö¸Ê¾µ±Ç°µþ¼Ó²ãµÄ×´Ì¬£º*bShow = HI_TRUE£ºµ±Ç°µþ¼Ó²ã´¦ÓÚÏÔÊ¾×´Ì¬£»*bShow = HI_FALSE£ºµ±Ç°µþ¼Ó²ã´¦ÓÚÒþ²Ø×´Ì¬CNend
-\retval  0 SUCCESS Success. CNcomment:³É¹¦CNend
-\retval ::EPERM  1. The operation is not supported. CNcomment:1,²»Ö§³Ö¸Ã²Ù×÷CNend
-\retval ::ENOMEM  12. The memory is insufficient. CNcomment:12,ÄÚ´æ²»¹»CNend
-\retval ::EFAULT  14. The input pointer is invalid. CNcomment:14,´«Èë²ÎÊýÖ¸ÕëµØÖ·ÎÞÐ§CNend
-\retval ::EINVAL  22. The input parameter is invalid. CNcomment:22,´«Èë²ÎÊýÎÞÐ§CNend
+\param[in] fd ID of an FB device. CNcomment:Framebufferï¿½è±¸ï¿½ï¿½CNend
+\param[in] FBIOGET_SHOW_HIFB  ioctl number. CNcomment:ioctlï¿½ï¿½CNend
+\param[out] bShow Status of the current overlay layer. If *bShow is set to HI_TRUE, it indicates that the current overlay layer is shown; if *bShow is set to HI_FALSE, it indicates that the current overlay layer is hidden. CNcomment:Ö¸Ê¾ï¿½ï¿½Ç°ï¿½ï¿½ï¿½Ó²ï¿½ï¿½×´Ì¬ï¿½ï¿½*bShow = HI_TRUEï¿½ï¿½ï¿½ï¿½Ç°ï¿½ï¿½ï¿½Ó²ã´¦ï¿½ï¿½ï¿½ï¿½Ê¾×´Ì¬ï¿½ï¿½*bShow = HI_FALSEï¿½ï¿½ï¿½ï¿½Ç°ï¿½ï¿½ï¿½Ó²ã´¦ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½×´Ì¬CNend
+\retval  0 SUCCESS Success. CNcomment:ï¿½É¹ï¿½CNend
+\retval ::EPERM  1. The operation is not supported. CNcomment:1,ï¿½ï¿½Ö§ï¿½Ö¸Ã²ï¿½ï¿½ï¿½CNend
+\retval ::ENOMEM  12. The memory is insufficient. CNcomment:12,ï¿½Ú´æ²»ï¿½ï¿½CNend
+\retval ::EFAULT  14. The input pointer is invalid. CNcomment:14,ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½ï¿½Ö·ï¿½ï¿½Ð§CNend
+\retval ::EINVAL  22. The input parameter is invalid. CNcomment:22,ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð§CNend
 \see \n
 ::FBIOPUT_SHOW_HIFB
 */
@@ -812,17 +812,17 @@ int ioctl (int fd, FBIOGET_SHOW_HIFB, HI_BOOL *bShow);
 
 
 /**
-\brief Shows or hides the current overlay layer. CNcomment:ÏÔÊ¾»òÒþ²Ø¸Ãµþ¼Ó²ã¡£CNend
+\brief Shows or hides the current overlay layer. CNcomment:ï¿½ï¿½Ê¾ï¿½ï¿½ï¿½ï¿½ï¿½Ø¸Ãµï¿½ï¿½Ó²ã¡£CNend
 \attention \n
 None
-\param[in] fd ID of an FB device. CNcomment:FramebufferÉè±¸ºÅCNend
-\param[in] FBIOPUT_SHOW_HIFB  ioctl number. CNcomment:ioctlºÅCNend
-\param[in] bShow Display status of the current overlay layer. If *bShow is set to HI_TRUE, it indicates that the current overlay layer is shown; if *bShow is set to HI_FALSE, it indicates that the current overlay layer is hidden. CNcomment:¸Ãµþ¼Ó²ãµÄÏÔÊ¾×´Ì¬£º*bShow = HI_TRUE£ºÏÔÊ¾µ±Ç°µþ¼Ó²ã£»*bShow = HI_FALSE£ºÒþ²Øµ±Ç°µþ¼Ó²ãCNend
-\retval  0 SUCCESS Success. CNcomment:³É¹¦CNend
-\retval ::EPERM  1. The operation is not supported. CNcomment:1,²»Ö§³Ö¸Ã²Ù×÷CNend
-\retval ::ENOMEM  12. The memory is insufficient. CNcomment:12,ÄÚ´æ²»¹»CNend
-\retval ::EFAULT  14. The input pointer is invalid. CNcomment:14,´«Èë²ÎÊýÖ¸ÕëµØÖ·ÎÞÐ§CNend
-\retval ::EINVAL  22. The input parameter is invalid. CNcomment:22,´«Èë²ÎÊýÎÞÐ§CNend
+\param[in] fd ID of an FB device. CNcomment:Framebufferï¿½è±¸ï¿½ï¿½CNend
+\param[in] FBIOPUT_SHOW_HIFB  ioctl number. CNcomment:ioctlï¿½ï¿½CNend
+\param[in] bShow Display status of the current overlay layer. If *bShow is set to HI_TRUE, it indicates that the current overlay layer is shown; if *bShow is set to HI_FALSE, it indicates that the current overlay layer is hidden. CNcomment:ï¿½Ãµï¿½ï¿½Ó²ï¿½ï¿½ï¿½ï¿½Ê¾×´Ì¬ï¿½ï¿½*bShow = HI_TRUEï¿½ï¿½ï¿½ï¿½Ê¾ï¿½ï¿½Ç°ï¿½ï¿½ï¿½Ó²ã£»*bShow = HI_FALSEï¿½ï¿½ï¿½ï¿½ï¿½Øµï¿½Ç°ï¿½ï¿½ï¿½Ó²ï¿½CNend
+\retval  0 SUCCESS Success. CNcomment:ï¿½É¹ï¿½CNend
+\retval ::EPERM  1. The operation is not supported. CNcomment:1,ï¿½ï¿½Ö§ï¿½Ö¸Ã²ï¿½ï¿½ï¿½CNend
+\retval ::ENOMEM  12. The memory is insufficient. CNcomment:12,ï¿½Ú´æ²»ï¿½ï¿½CNend
+\retval ::EFAULT  14. The input pointer is invalid. CNcomment:14,ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½ï¿½Ö·ï¿½ï¿½Ð§CNend
+\retval ::EINVAL  22. The input parameter is invalid. CNcomment:22,ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð§CNend
 \see \n
 ::FBIOGET_SHOW_HIFB
 */
@@ -831,17 +831,17 @@ int ioctl (int fd, FBIOPUT_SHOW_HIFB, HI_BOOL *bShow);
 
 
 /**
-\brief Obtains the colorkey of an overlay layer. CNcomment:»ñÈ¡µþ¼Ó²ãµÄcolorkey¡£CNend
+\brief Obtains the colorkey of an overlay layer. CNcomment:ï¿½ï¿½È¡ï¿½ï¿½ï¿½Ó²ï¿½ï¿½colorkeyï¿½ï¿½CNend
 \attention \n
 None
-\param[in] fd ID of an FB device. CNcomment:FramebufferÉè±¸ºÅCNend
-\param[in] FBIOGET_COLORKEY_HIFB  ioctl number. CNcomment:ioctlºÅCNend
-\param[out] pstColorKey Pointer to the colorkey. CNcomment:colorkey½á¹¹ÌåÖ¸ÕëCNend
-\retval  0 SUCCESS Success. CNcomment:³É¹¦CNend
-\retval ::EPERM  1. The operation is not supported. CNcomment:1,²»Ö§³Ö¸Ã²Ù×÷CNend
-\retval ::ENOMEM  12. The memory is insufficient. CNcomment:12,ÄÚ´æ²»¹»CNend
-\retval ::EFAULT  14. The input pointer is invalid. CNcomment:14,´«Èë²ÎÊýÖ¸ÕëµØÖ·ÎÞÐ§CNend
-\retval ::EINVAL  22. The input parameter is invalid. CNcomment:22,´«Èë²ÎÊýÎÞÐ§CNend
+\param[in] fd ID of an FB device. CNcomment:Framebufferï¿½è±¸ï¿½ï¿½CNend
+\param[in] FBIOGET_COLORKEY_HIFB  ioctl number. CNcomment:ioctlï¿½ï¿½CNend
+\param[out] pstColorKey Pointer to the colorkey. CNcomment:colorkeyï¿½á¹¹ï¿½ï¿½Ö¸ï¿½ï¿½CNend
+\retval  0 SUCCESS Success. CNcomment:ï¿½É¹ï¿½CNend
+\retval ::EPERM  1. The operation is not supported. CNcomment:1,ï¿½ï¿½Ö§ï¿½Ö¸Ã²ï¿½ï¿½ï¿½CNend
+\retval ::ENOMEM  12. The memory is insufficient. CNcomment:12,ï¿½Ú´æ²»ï¿½ï¿½CNend
+\retval ::EFAULT  14. The input pointer is invalid. CNcomment:14,ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½ï¿½Ö·ï¿½ï¿½Ð§CNend
+\retval ::EINVAL  22. The input parameter is invalid. CNcomment:22,ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð§CNend
 \see \n
 ::FBIOPUT_COLORKEY_HIFB
 */
@@ -850,23 +850,23 @@ int ioctl (int fd, FBIOGET_COLORKEY_HIFB, HIFB_COLORKEY_S *pstColorKey);
 
 
 /**
-\brief Sets the colorkey of an overlay layer. CNcomment:ÉèÖÃµþ¼Ó²ãµÄcolorkey¡£CNend
+\brief Sets the colorkey of an overlay layer. CNcomment:ï¿½ï¿½ï¿½Ãµï¿½ï¿½Ó²ï¿½ï¿½colorkeyï¿½ï¿½CNend
 \attention \n
 None
-\param[in] fd  ID of an FB device. CNcomment:FramebufferÉè±¸ºÅCNend
-\param[in] FBIOPUT_COLORKEY_HIFB  ioctl number. CNcomment:ioctlºÅCNend
-\param[in] pstColorKey  Pointer to the colorkey. CNcomment:colorkey½á¹¹ÌåÖ¸ÕëCNend
-\retval  0 SUCCESS Success. CNcomment:³É¹¦CNend
-\retval ::EPERM  1. The operation is not supported. CNcomment:1,²»Ö§³Ö¸Ã²Ù×÷CNend
-\retval ::ENOMEM  12. The memory is insufficient. CNcomment:12,ÄÚ´æ²»¹»CNend
-\retval ::EFAULT  14. The input pointer is invalid. CNcomment:14,´«Èë²ÎÊýÖ¸ÕëµØÖ·ÎÞÐ§CNend
-\retval ::EINVAL  22. The input parameter is invalid. CNcomment:22,´«Èë²ÎÊýÎÞÐ§CNend
+\param[in] fd  ID of an FB device. CNcomment:Framebufferï¿½è±¸ï¿½ï¿½CNend
+\param[in] FBIOPUT_COLORKEY_HIFB  ioctl number. CNcomment:ioctlï¿½ï¿½CNend
+\param[in] pstColorKey  Pointer to the colorkey. CNcomment:colorkeyï¿½á¹¹ï¿½ï¿½Ö¸ï¿½ï¿½CNend
+\retval  0 SUCCESS Success. CNcomment:ï¿½É¹ï¿½CNend
+\retval ::EPERM  1. The operation is not supported. CNcomment:1,ï¿½ï¿½Ö§ï¿½Ö¸Ã²ï¿½ï¿½ï¿½CNend
+\retval ::ENOMEM  12. The memory is insufficient. CNcomment:12,ï¿½Ú´æ²»ï¿½ï¿½CNend
+\retval ::EFAULT  14. The input pointer is invalid. CNcomment:14,ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½ï¿½Ö·ï¿½ï¿½Ð§CNend
+\retval ::EINVAL  22. The input parameter is invalid. CNcomment:22,ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð§CNend
 \see \n
 ::FBIOGET_COLORKEY_HIFB
 \par example
 \code
 //Assume that the pixel format is ARGB8888. To filter the red color, perform the following setting:
-//CNcomment:¼ÙÉèµ±Ç°ÏóËØ¸ñÊ½ÎªARGB8888£¬ÔòÒª¹ýÂËµôºìÉ«,¾ßÌåÉèÖÃÈçÏÂ£ºCNend
+//CNcomment:ï¿½ï¿½ï¿½èµ±Ç°ï¿½ï¿½ï¿½Ø¸ï¿½Ê½ÎªARGB8888ï¿½ï¿½ï¿½ï¿½Òªï¿½ï¿½ï¿½Ëµï¿½ï¿½ï¿½É«,ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Â£ï¿½CNend
 HIFB_COLORKEY_S stColorKey;
 
 stColorKey.bKeyEnable = HI_TRUE;
@@ -883,19 +883,19 @@ int ioctl (int fd, FBIOPUT_COLORKEY_HIFB, HIFB_COLORKEY_S *pstColorKey);
 
 
 /**
-\brief Obtains the alpha value of an overlay layer. CNcomment:»ñÈ¡µþ¼Ó²ãAlpha¡£CNend
+\brief Obtains the alpha value of an overlay layer. CNcomment:ï¿½ï¿½È¡ï¿½ï¿½ï¿½Ó²ï¿½Alphaï¿½ï¿½CNend
 \attention \n
 For details, see the description of ::HIFB_ALPHA_S.
-CNcomment:Çë²Î¼û::HIFB_ALPHA_SµÄËµÃ÷¡£CNend
+CNcomment:ï¿½ï¿½Î¼ï¿½::HIFB_ALPHA_Sï¿½ï¿½Ëµï¿½ï¿½ï¿½ï¿½CNend
 
-\param[in] fd  ID of an FB device. CNcomment:FramebufferÉè±¸ºÅCNend
-\param[in] FBIOGET_ALPHA_HIFB  ioctl number. CNcomment:ioctlºÅCNend
-\param[out] pstAlpha  Pointer to the alpha value. CNcomment:Alpha½á¹¹ÌåÖ¸ÕëCNend
-\retval  0 SUCCESS Success. CNcomment:³É¹¦CNend
-\retval ::EPERM  1. The operation is not supported. CNcomment:1,²»Ö§³Ö¸Ã²Ù×÷CNend
-\retval ::ENOMEM  12. The memory is insufficient. CNcomment:12,ÄÚ´æ²»¹»CNend
-\retval ::EFAULT  14. The input pointer is invalid. CNcomment:14,´«Èë²ÎÊýÖ¸ÕëµØÖ·ÎÞÐ§CNend
-\retval ::EINVAL  22. The input parameter is invalid. CNcomment:22,´«Èë²ÎÊýÎÞÐ§CNend
+\param[in] fd  ID of an FB device. CNcomment:Framebufferï¿½è±¸ï¿½ï¿½CNend
+\param[in] FBIOGET_ALPHA_HIFB  ioctl number. CNcomment:ioctlï¿½ï¿½CNend
+\param[out] pstAlpha  Pointer to the alpha value. CNcomment:Alphaï¿½á¹¹ï¿½ï¿½Ö¸ï¿½ï¿½CNend
+\retval  0 SUCCESS Success. CNcomment:ï¿½É¹ï¿½CNend
+\retval ::EPERM  1. The operation is not supported. CNcomment:1,ï¿½ï¿½Ö§ï¿½Ö¸Ã²ï¿½ï¿½ï¿½CNend
+\retval ::ENOMEM  12. The memory is insufficient. CNcomment:12,ï¿½Ú´æ²»ï¿½ï¿½CNend
+\retval ::EFAULT  14. The input pointer is invalid. CNcomment:14,ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½ï¿½Ö·ï¿½ï¿½Ð§CNend
+\retval ::EINVAL  22. The input parameter is invalid. CNcomment:22,ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð§CNend
 \see \n
 ::FBIOPUT_ALPHA_HIFB
 */
@@ -905,19 +905,19 @@ int ioctl (int fd, FBIOGET_ALPHA_HIFB, HIFB_ALPHA_S *pstAlpha);
 
 
 /**
-\brief Sets the alpha value of an overlay layer. CNcomment:ÉèÖÃµþ¼Ó²ãµÄAlpha¡£CNend
+\brief Sets the alpha value of an overlay layer. CNcomment:ï¿½ï¿½ï¿½Ãµï¿½ï¿½Ó²ï¿½ï¿½Alphaï¿½ï¿½CNend
 \attention \n
 For details, see the description of ::HIFB_ALPHA_S.
-CNcomment:Çë²Î¼û::HIFB_ALPHA_SµÄËµÃ÷CNend
+CNcomment:ï¿½ï¿½Î¼ï¿½::HIFB_ALPHA_Sï¿½ï¿½Ëµï¿½ï¿½CNend
 
-\param[in] fd  ID of an FB device. CNcomment:FramebufferÉè±¸ºÅCNend
-\param[in] FBIOPUT_ALPHA_HIFB  ioctl number. CNcomment:ioctlºÅCNend
-\param[in] pstAlpha  Pointer to the alpha value. CNcomment:Alpha½á¹¹ÌåÖ¸ÕëCNend
-\retval  0 SUCCESS Success. CNcomment:³É¹¦CNend
-\retval ::EPERM  1. The operation is not supported. CNcomment:1,²»Ö§³Ö¸Ã²Ù×÷CNend
-\retval ::ENOMEM  12. The memory is insufficient. CNcomment:12,ÄÚ´æ²»¹»CNend
-\retval ::EFAULT  14. The input pointer is invalid. CNcomment:14,´«Èë²ÎÊýÖ¸ÕëµØÖ·ÎÞÐ§CNend
-\retval ::EINVAL  22. The input parameter is invalid. CNcomment:22,´«Èë²ÎÊýÎÞÐ§CNend
+\param[in] fd  ID of an FB device. CNcomment:Framebufferï¿½è±¸ï¿½ï¿½CNend
+\param[in] FBIOPUT_ALPHA_HIFB  ioctl number. CNcomment:ioctlï¿½ï¿½CNend
+\param[in] pstAlpha  Pointer to the alpha value. CNcomment:Alphaï¿½á¹¹ï¿½ï¿½Ö¸ï¿½ï¿½CNend
+\retval  0 SUCCESS Success. CNcomment:ï¿½É¹ï¿½CNend
+\retval ::EPERM  1. The operation is not supported. CNcomment:1,ï¿½ï¿½Ö§ï¿½Ö¸Ã²ï¿½ï¿½ï¿½CNend
+\retval ::ENOMEM  12. The memory is insufficient. CNcomment:12,ï¿½Ú´æ²»ï¿½ï¿½CNend
+\retval ::EFAULT  14. The input pointer is invalid. CNcomment:14,ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½ï¿½Ö·ï¿½ï¿½Ð§CNend
+\retval ::EINVAL  22. The input parameter is invalid. CNcomment:22,ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð§CNend
 \see \n
 ::FBIOGET_ALPHA_HIFB
 */
@@ -926,25 +926,25 @@ int ioctl (int fd, FBIOPUT_ALPHA_HIFB, HIFB_ALPHA_S *pstAlpha);
 
 
 /**
-\brief Obtains the anti-flicker setting of an overlay layer. The HD platform does not support this function. CNcomment:»ñÈ¡µþ¼Ó²ãµÄ¿¹ÉÁË¸ÉèÖÃ¡£¸ßÇåÆ½Ì¨²»Ö§³ÖÉèÖÃ¡£CNend
+\brief Obtains the anti-flicker setting of an overlay layer. The HD platform does not support this function. CNcomment:ï¿½ï¿½È¡ï¿½ï¿½ï¿½Ó²ï¿½Ä¿ï¿½ï¿½ï¿½Ë¸ï¿½ï¿½ï¿½Ã¡ï¿½ï¿½ï¿½ï¿½ï¿½Æ½Ì¨ï¿½ï¿½Ö§ï¿½ï¿½ï¿½ï¿½ï¿½Ã¡ï¿½CNend
 \attention \n
 Before obtaining the values of anti-flicker parameters, you must set the maximum anti-flicker level that can be obtained, and allocate sufficient memory for storing anti-flicker coefficients. This API is invalid for the HD platform currently.
-CNcomment:ÔÚ»ñÈ¡¿¹ÉÁË¸²ÎÊýÊ±£¬±ØÐëÉèÖÃÄÜ¹»»ñÈ¡¿¹ÉÁË¸µÄ×î´ó¼¶±ð£¬ÇÒÎª¿¹ÉÁË¸ÏµÊý·ÖÅä×ã¹»µÄÄÚ´æ¡£Ä¿Ç°¸Ã½Ó¿ÚÔÚ¸ßÇåÎÞÐ§¡£CNend
+CNcomment:ï¿½Ú»ï¿½È¡ï¿½ï¿½ï¿½ï¿½Ë¸ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ü¹ï¿½ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½Ë¸ï¿½ï¿½ï¿½ï¿½ó¼¶±ï¿½ï¿½ï¿½Îªï¿½ï¿½ï¿½ï¿½Ë¸Ïµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ã¹»ï¿½ï¿½ï¿½Ú´æ¡£Ä¿Ç°ï¿½Ã½Ó¿ï¿½ï¿½Ú¸ï¿½ï¿½ï¿½ï¿½ï¿½Ð§ï¿½ï¿½CNend
 
-\param[in] fd  ID of an FB device. CNcomment:FramebufferÉè±¸ºÅCNend
-\param[in] FBIOGET_DEFLICKER_HIFB  ioctl number. CNcomment:ioctlºÅCNend
-\param[out] pstDeflicker  Pointer to the anti-flicker setting. CNcomment:¿¹ÉÁË¸½á¹¹ÌåÖ¸ÕëCNend
-\retval  0 SUCCESS Success. CNcomment:³É¹¦CNend
-\retval ::EPERM  1. The operation is not supported. CNcomment:1,²»Ö§³Ö¸Ã²Ù×÷CNend
-\retval ::ENOMEM  12. The memory is insufficient. CNcomment:12,ÄÚ´æ²»¹»CNend
-\retval ::EFAULT  14. The input pointer is invalid. CNcomment:14,´«Èë²ÎÊýÖ¸ÕëµØÖ·ÎÞÐ§CNend
-\retval ::EINVAL  22. The input parameter is invalid. CNcomment:22,´«Èë²ÎÊýÎÞÐ§CNend
+\param[in] fd  ID of an FB device. CNcomment:Framebufferï¿½è±¸ï¿½ï¿½CNend
+\param[in] FBIOGET_DEFLICKER_HIFB  ioctl number. CNcomment:ioctlï¿½ï¿½CNend
+\param[out] pstDeflicker  Pointer to the anti-flicker setting. CNcomment:ï¿½ï¿½ï¿½ï¿½Ë¸ï¿½á¹¹ï¿½ï¿½Ö¸ï¿½ï¿½CNend
+\retval  0 SUCCESS Success. CNcomment:ï¿½É¹ï¿½CNend
+\retval ::EPERM  1. The operation is not supported. CNcomment:1,ï¿½ï¿½Ö§ï¿½Ö¸Ã²ï¿½ï¿½ï¿½CNend
+\retval ::ENOMEM  12. The memory is insufficient. CNcomment:12,ï¿½Ú´æ²»ï¿½ï¿½CNend
+\retval ::EFAULT  14. The input pointer is invalid. CNcomment:14,ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½ï¿½Ö·ï¿½ï¿½Ð§CNend
+\retval ::EINVAL  22. The input parameter is invalid. CNcomment:22,ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð§CNend
 \see \n
 ::FBIOPUT_DEFLICKER_HIFB
 \par example
 \code
 //Assume that the maximum horizontal and vertical anti-flicker levels that can be obtained are 2. In this case, the sample code is as follows:
-//CNcomment:»ñÈ¡Ë®Æ½ºÍ´¹Ö±¿¹ÉÁË¸×î´ó¼¶±ðÎª2µÄÊ¾Àý´úÂëÈçÏÂ£ºCNend
+//CNcomment:ï¿½ï¿½È¡Ë®Æ½ï¿½Í´ï¿½Ö±ï¿½ï¿½ï¿½ï¿½Ë¸ï¿½ï¿½ó¼¶±ï¿½Îª2ï¿½ï¿½Ê¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Â£ï¿½CNend
 HI_U8 u8HDefCoef;
 HI_U8 u8VDefCoef;
 HIFB_DEFLICKER_S stDeflicker;
@@ -966,25 +966,25 @@ int ioctl (int fd, FBIOGET_DEFLICKER_HIFB, HIFB_DEFLICKER_S *pstDeflicker);
 
 
 /**
-\brief Sets the anti-flicker function of an overlay layer. CNcomment:ÉèÖÃµþ¼Ó²ãµÄ¿¹ÉÁË¸¹¦ÄÜ¡£CNend
+\brief Sets the anti-flicker function of an overlay layer. CNcomment:ï¿½ï¿½ï¿½Ãµï¿½ï¿½Ó²ï¿½Ä¿ï¿½ï¿½ï¿½Ë¸ï¿½ï¿½ï¿½Ü¡ï¿½CNend
 \attention \n
 For details, see the description of ::HIFB_DEFLICKER_S. This API is invalid for the HD platform currently.
-CNcomment:Çë²Î¼û::HIFB_DEFLICKER_SµÄËµÃ÷¡£Ä¿Ç°¸Ã½Ó¿ÚÔÚ¸ßÇåÎÞÐ§¡£CNend
+CNcomment:ï¿½ï¿½Î¼ï¿½::HIFB_DEFLICKER_Sï¿½ï¿½Ëµï¿½ï¿½ï¿½ï¿½Ä¿Ç°ï¿½Ã½Ó¿ï¿½ï¿½Ú¸ï¿½ï¿½ï¿½ï¿½ï¿½Ð§ï¿½ï¿½CNend
 
-\param[in] fd  ID of an FB device. CNcomment:FramebufferÉè±¸ºÅCNend
-\param[in] FBIOPUT_DEFLICKER_HIFB  ioctl number. CNcomment:ioctlºÅCNend
-\param[in] pstDeflicker  Pointer to the anti-flicker setting. CNcomment:¿¹ÉÁË¸½á¹¹ÌåÖ¸ÕëCNend
-\retval  0 SUCCESS Success. CNcomment:³É¹¦CNend
-\retval ::EPERM  1. The operation is not supported. CNcomment:1,²»Ö§³Ö¸Ã²Ù×÷CNend
-\retval ::ENOMEM  12. The memory is insufficient. CNcomment:12,ÄÚ´æ²»¹»CNend
-\retval ::EFAULT  14. The input pointer is invalid. CNcomment:14,´«Èë²ÎÊýÖ¸ÕëµØÖ·ÎÞÐ§CNend
-\retval ::EINVAL  22. The input parameter is invalid. CNcomment:22,´«Èë²ÎÊýÎÞÐ§CNend
+\param[in] fd  ID of an FB device. CNcomment:Framebufferï¿½è±¸ï¿½ï¿½CNend
+\param[in] FBIOPUT_DEFLICKER_HIFB  ioctl number. CNcomment:ioctlï¿½ï¿½CNend
+\param[in] pstDeflicker  Pointer to the anti-flicker setting. CNcomment:ï¿½ï¿½ï¿½ï¿½Ë¸ï¿½á¹¹ï¿½ï¿½Ö¸ï¿½ï¿½CNend
+\retval  0 SUCCESS Success. CNcomment:ï¿½É¹ï¿½CNend
+\retval ::EPERM  1. The operation is not supported. CNcomment:1,ï¿½ï¿½Ö§ï¿½Ö¸Ã²ï¿½ï¿½ï¿½CNend
+\retval ::ENOMEM  12. The memory is insufficient. CNcomment:12,ï¿½Ú´æ²»ï¿½ï¿½CNend
+\retval ::EFAULT  14. The input pointer is invalid. CNcomment:14,ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½ï¿½Ö·ï¿½ï¿½Ð§CNend
+\retval ::EINVAL  22. The input parameter is invalid. CNcomment:22,ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð§CNend
 \see \n
 ::FBIOGET_DEFLICKER_HIFB
 \par example
 \code
 //Assume that the 2-tap horizontal and vertical anti-flicker functions are required. In this case, the sample code is as follows:
-//CNcomment:ÉèÖÃË®Æ½ºÍ´¹Ö±2½×¿¹ÉÁË¸µÄ´úÂëÈçÏÂ£ºCNend
+//CNcomment:ï¿½ï¿½ï¿½ï¿½Ë®Æ½ï¿½Í´ï¿½Ö±2ï¿½×¿ï¿½ï¿½ï¿½Ë¸ï¿½Ä´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Â£ï¿½CNend
 HI_U8 u8HDefCoef = 0x80;
 HI_U8 u8VDefCoef = 0x80;
 HIFB_DEFLICKER_S stDeflicker;
@@ -1005,16 +1005,16 @@ int ioctl (int fd, FBIOPUT_DEFLICKER_HIFB, HIFB_DEFLICKER_S *pstDeflicker);
 
 
 /**
-\brief Waits for the vertical blanking region of an overlay layer. To operate the display buffer without tearing, you can operate it in the vertical blanking region. CNcomment:ÎªÁË²Ù×÷ÏÔ´æÊ±¶ø²»ÒýÆðËºÁÑÏÖÏó£¬Ò»°ã¿ÉÒÔÔÚ¸Ãµþ¼Ó²ãµÄ´¹Ö±ÏûÒþÇø¶ÔÏÔ´æ½øÐÐ²Ù×÷£¬Í¨¹ý¸Ã½Ó¿Ú¿ÉÒÔµÈ´ý¸Ãµþ¼Ó²ã´¹Ö±ÏûÒþÇøµÄµ½À´¡£CNend
+\brief Waits for the vertical blanking region of an overlay layer. To operate the display buffer without tearing, you can operate it in the vertical blanking region. CNcomment:Îªï¿½Ë²ï¿½ï¿½ï¿½ï¿½Ô´ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ëºï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ú¸Ãµï¿½ï¿½Ó²ï¿½Ä´ï¿½Ö±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô´ï¿½ï¿½ï¿½Ð²ï¿½ï¿½ï¿½ï¿½ï¿½Í¨ï¿½ï¿½Ã½Ó¿Ú¿ï¿½ï¿½ÔµÈ´ï¿½Ãµï¿½ï¿½Ó²ã´¹Ö±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Äµï¿½ï¿½ï¿½ï¿½ï¿½CNend
 \attention \n
 None
-\param[in] fd ID of an FB device. CNcomment:FramebufferÉè±¸ºÅCNend
-\param[in] FBIOGET_VBLANK_HIFB  ioctl number. CNcomment:ioctlºÅCNend
-\retval  0 SUCCESS Success. CNcomment:³É¹¦CNend
-\retval ::EPERM  1. The operation is not supported. CNcomment:1,²»Ö§³Ö¸Ã²Ù×÷CNend
-\retval ::ENOMEM  12. The memory is insufficient. CNcomment:12,ÄÚ´æ²»¹»CNend
-\retval ::EFAULT  14. The input pointer is invalid. CNcomment:14,´«Èë²ÎÊýÖ¸ÕëµØÖ·ÎÞÐ§CNend
-\retval ::EINVAL  22. The input parameter is invalid. CNcomment:22,´«Èë²ÎÊýÎÞÐ§CNend
+\param[in] fd ID of an FB device. CNcomment:Framebufferï¿½è±¸ï¿½ï¿½CNend
+\param[in] FBIOGET_VBLANK_HIFB  ioctl number. CNcomment:ioctlï¿½ï¿½CNend
+\retval  0 SUCCESS Success. CNcomment:ï¿½É¹ï¿½CNend
+\retval ::EPERM  1. The operation is not supported. CNcomment:1,ï¿½ï¿½Ö§ï¿½Ö¸Ã²ï¿½ï¿½ï¿½CNend
+\retval ::ENOMEM  12. The memory is insufficient. CNcomment:12,ï¿½Ú´æ²»ï¿½ï¿½CNend
+\retval ::EFAULT  14. The input pointer is invalid. CNcomment:14,ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½ï¿½Ö·ï¿½ï¿½Ð§CNend
+\retval ::EINVAL  22. The input parameter is invalid. CNcomment:22,ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð§CNend
 \see \n
 N/A
 */
@@ -1022,18 +1022,18 @@ int ioctl (int fd, FBIOGET_VBLANK_HIFB);
 
 
 /**
-\brief Obtains the stereo frame encode format. CNcomment:»ñÈ¡StereoÖ¡±àÂë¸ñÊ½¹¦ÄÜ¡£CNend
+\brief Obtains the stereo frame encode format. CNcomment:ï¿½ï¿½È¡StereoÖ¡ï¿½ï¿½ï¿½ï¿½ï¿½Ê½ï¿½ï¿½ï¿½Ü¡ï¿½CNend
 \attention \n
 For details, see the description of ::HIFB_STEREO_MODE_E. 
 
-\param[in] fd  FramebufferÉè±¸ºÅCNend
-\param[in] FBIOGET_STEREO_MODE  ioctlºÅCNend
-\param[out] penStereoMode  stereoÄ£Ê½Ã¶¾ÙÖ¸ÕëCNend
-\retval  0 SUCCESS ³É¹¦CNend
-\retval ::EPERM  1,²»Ö§³Ö¸Ã²Ù×÷CNend
-\retval ::ENOMEM  12,ÄÚ´æ²»¹»CNend
-\retval ::EFAULT  14,´«Èë²ÎÊýÖ¸ÕëµØÖ·ÎÞÐ§CNend
-\retval ::EINVAL  22,´«Èë²ÎÊýÎÞÐ§CNend
+\param[in] fd  Framebufferï¿½è±¸ï¿½ï¿½CNend
+\param[in] FBIOGET_STEREO_MODE  ioctlï¿½ï¿½CNend
+\param[out] penStereoMode  stereoÄ£Ê½Ã¶ï¿½ï¿½Ö¸ï¿½ï¿½CNend
+\retval  0 SUCCESS ï¿½É¹ï¿½CNend
+\retval ::EPERM  1,ï¿½ï¿½Ö§ï¿½Ö¸Ã²ï¿½ï¿½ï¿½CNend
+\retval ::ENOMEM  12,ï¿½Ú´æ²»ï¿½ï¿½CNend
+\retval ::EFAULT  14,ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½ï¿½Ö·ï¿½ï¿½Ð§CNend
+\retval ::EINVAL  22,ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð§CNend
 \see \n
 ::FBIOPUT_STEREO_MODE
 */
@@ -1041,18 +1041,18 @@ int ioctl (int fd, FBIOGET_STEREO_MODE, HIFB_STEREO_MODE_E *penStereoMode);
 
 
 /**
-\brief ÉèÖÃStereoÄ£Ê½¹¦ÄÜ¡£CNend
+\brief ï¿½ï¿½ï¿½ï¿½StereoÄ£Ê½ï¿½ï¿½ï¿½Ü¡ï¿½CNend
 \attention \n
-Çë²Î¼û::HIFB_STEREO_MODE_EµÄËµÃ÷¡£CNend
+ï¿½ï¿½Î¼ï¿½::HIFB_STEREO_MODE_Eï¿½ï¿½Ëµï¿½ï¿½ï¿½ï¿½CNend
 
-\param[in] fd  FramebufferÉè±¸ºÅCNend
-\param[in] FBIOPUT_STEREO_MODE  ioctlºÅCNend
-\param[in] penStereoMode  stereoÄ£Ê½Ã¶¾ÙÖ¸ÕëCNend
-\retval  0 SUCCESS ³É¹¦CNend
-\retval ::EPERM  1,²»Ö§³Ö¸Ã²Ù×÷CNend
-\retval ::ENOMEM  12,ÄÚ´æ²»¹»CNend
-\retval ::EFAULT  14,´«Èë²ÎÊýÖ¸ÕëµØÖ·ÎÞÐ§CNend
-\retval ::EINVAL  22,´«Èë²ÎÊýÎÞÐ§CNend
+\param[in] fd  Framebufferï¿½è±¸ï¿½ï¿½CNend
+\param[in] FBIOPUT_STEREO_MODE  ioctlï¿½ï¿½CNend
+\param[in] penStereoMode  stereoÄ£Ê½Ã¶ï¿½ï¿½Ö¸ï¿½ï¿½CNend
+\retval  0 SUCCESS ï¿½É¹ï¿½CNend
+\retval ::EPERM  1,ï¿½ï¿½Ö§ï¿½Ö¸Ã²ï¿½ï¿½ï¿½CNend
+\retval ::ENOMEM  12,ï¿½Ú´æ²»ï¿½ï¿½CNend
+\retval ::EFAULT  14,ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½ï¿½Ö·ï¿½ï¿½Ð§CNend
+\retval ::EINVAL  22,ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð§CNend
 \see \n
 ::FBIOGET_STEREO_MODE
 */
@@ -1060,18 +1060,18 @@ int ioctl (int fd, FBIOPUT_STEREO_MODE, HIFB_STEREO_MODE_E *penStereoMode);
 
 
 /**
-\brief »ñÈ¡StereoÖ¡±àÂë¸ñÊ½¹¦ÄÜ¡£CNend
+\brief ï¿½ï¿½È¡StereoÖ¡ï¿½ï¿½ï¿½ï¿½ï¿½Ê½ï¿½ï¿½ï¿½Ü¡ï¿½CNend
 \attention \n
-CNcomment:Çë²Î¼û::HIFB_ENCODER_PICTURE_FRAMING_EµÄËµÃ÷¡£CNend
+CNcomment:ï¿½ï¿½Î¼ï¿½::HIFB_ENCODER_PICTURE_FRAMING_Eï¿½ï¿½Ëµï¿½ï¿½ï¿½ï¿½CNend
 
-\param[in] fd  ID of an FB device. CNcomment:FramebufferÉè±¸ºÅCNend
-\param[in] FBIOGET_STEREO_MODE  ioctl number. CNcomment:ioctlºÅCNend
-\param[out] penStereoMode  Pointer to the frame encode format. CNcomment:Ö¡±àÂë¸ñÊ½Ã¶¾ÙÖ¸ÕëCNend
-\retval  0 SUCCESS Success. CNcomment:³É¹¦CNend
-\retval ::EPERM  1. The operation is not supported. CNcomment:1,²»Ö§³Ö¸Ã²Ù×÷CNend
-\retval ::ENOMEM  12. The memory is insufficient. CNcomment:12,ÄÚ´æ²»¹»CNend
-\retval ::EFAULT  14. The input pointer is invalid. CNcomment:14,´«Èë²ÎÊýÖ¸ÕëµØÖ·ÎÞÐ§CNend
-\retval ::EINVAL  22. The input parameter is invalid. CNcomment:22,´«Èë²ÎÊýÎÞÐ§CNend
+\param[in] fd  ID of an FB device. CNcomment:Framebufferï¿½è±¸ï¿½ï¿½CNend
+\param[in] FBIOGET_STEREO_MODE  ioctl number. CNcomment:ioctlï¿½ï¿½CNend
+\param[out] penStereoMode  Pointer to the frame encode format. CNcomment:Ö¡ï¿½ï¿½ï¿½ï¿½ï¿½Ê½Ã¶ï¿½ï¿½Ö¸ï¿½ï¿½CNend
+\retval  0 SUCCESS Success. CNcomment:ï¿½É¹ï¿½CNend
+\retval ::EPERM  1. The operation is not supported. CNcomment:1,ï¿½ï¿½Ö§ï¿½Ö¸Ã²ï¿½ï¿½ï¿½CNend
+\retval ::ENOMEM  12. The memory is insufficient. CNcomment:12,ï¿½Ú´æ²»ï¿½ï¿½CNend
+\retval ::EFAULT  14. The input pointer is invalid. CNcomment:14,ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½ï¿½Ö·ï¿½ï¿½Ð§CNend
+\retval ::EINVAL  22. The input parameter is invalid. CNcomment:22,ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð§CNend
 \see \n
 ::FBIOPUT_ENCODER_PICTURE_FRAMING
 */
@@ -1079,19 +1079,19 @@ int ioctl (int fd, FBIOGET_ENCODER_PICTURE_FRAMING, HIFB_STEREO_MODE_E *penEncPi
 
 
 /**
-\brief Sets the stereo frame encode format. CNcomment:ÉèÖÃStereoÖ¡±àÂë¸ñÊ½¹¦ÄÜ¡£CNend
+\brief Sets the stereo frame encode format. CNcomment:ï¿½ï¿½ï¿½ï¿½StereoÖ¡ï¿½ï¿½ï¿½ï¿½ï¿½Ê½ï¿½ï¿½ï¿½Ü¡ï¿½CNend
 \attention \n
 For details, see the description of ::HIFB_STEREO_MODE_E. 
-CNcomment:Çë²Î¼û::HIFB_ENCODER_PICTURE_FRAMING_EµÄËµÃ÷¡£CNend
+CNcomment:ï¿½ï¿½Î¼ï¿½::HIFB_ENCODER_PICTURE_FRAMING_Eï¿½ï¿½Ëµï¿½ï¿½ï¿½ï¿½CNend
 
-\param[in] fd  ID of an FB device. CNcomment:FramebufferÉè±¸ºÅCNend
-\param[in] FBIOPUT_STEREO_MODE  ioctl number. CNcomment:ioctlºÅCNend
-\param[in] penStereoMode  Pointer to the frame encode format. CNcomment:Ö¡±àÂë¸ñÊ½Ã¶¾ÙÖ¸ÕëCNend
-\retval  0 SUCCESS Success. CNcomment:³É¹¦CNend
-\retval ::EPERM  1. The operation is not supported. CNcomment:1,²»Ö§³Ö¸Ã²Ù×÷CNend
-\retval ::ENOMEM  12. The memory is insufficient. CNcomment:12,ÄÚ´æ²»¹»CNend
-\retval ::EFAULT  14. The input pointer is invalid. CNcomment:14,´«Èë²ÎÊýÖ¸ÕëµØÖ·ÎÞÐ§CNend
-\retval ::EINVAL  22. The input parameter is invalid. CNcomment:22,´«Èë²ÎÊýÎÞÐ§CNend
+\param[in] fd  ID of an FB device. CNcomment:Framebufferï¿½è±¸ï¿½ï¿½CNend
+\param[in] FBIOPUT_STEREO_MODE  ioctl number. CNcomment:ioctlï¿½ï¿½CNend
+\param[in] penStereoMode  Pointer to the frame encode format. CNcomment:Ö¡ï¿½ï¿½ï¿½ï¿½ï¿½Ê½Ã¶ï¿½ï¿½Ö¸ï¿½ï¿½CNend
+\retval  0 SUCCESS Success. CNcomment:ï¿½É¹ï¿½CNend
+\retval ::EPERM  1. The operation is not supported. CNcomment:1,ï¿½ï¿½Ö§ï¿½Ö¸Ã²ï¿½ï¿½ï¿½CNend
+\retval ::ENOMEM  12. The memory is insufficient. CNcomment:12,ï¿½Ú´æ²»ï¿½ï¿½CNend
+\retval ::EFAULT  14. The input pointer is invalid. CNcomment:14,ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½ï¿½Ö·ï¿½ï¿½Ð§CNend
+\retval ::EINVAL  22. The input parameter is invalid. CNcomment:22,ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð§CNend
 \see \n
 ::FBIOGET_ENCODER_PICTURE_FRAMING
 */

@@ -41,11 +41,11 @@ typedef struct
 typedef enum
 {
     /*Color format*/
-    /*CNcomment:ÑÕÉ«¸ñÊ½*/
+    /*CNcomment:ï¿½ï¿½É«ï¿½ï¿½Ê½*/
     HIFB_LAYER_PARAMODIFY_FMT = 0x1,
 
     /*Line length*/
-    /*CNcomment:ÐÐ¼ä¾à*/
+    /*CNcomment:ï¿½Ð¼ï¿½ï¿½*/
     HIFB_LAYER_PARAMODIFY_STRIDE = 0x2,
 
     /*Alpha value*/
@@ -57,36 +57,36 @@ typedef enum
     HIFB_LAYER_PARAMODIFY_COLORKEY = 0x8,
 
     /*Input rectangle*/
-    /*CNcomment:ÊäÈë¾ØÐÎ*/
+    /*CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½*/
     HIFB_LAYER_PARAMODIFY_INRECT = 0x10,
 
     /*Output rectangle*/
-    /*CNcomment:Êä³ö¾ØÐÎ*/
+    /*CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½*/
     HIFB_LAYER_PARAMODIFY_OUTRECT = 0x20,
 
     /*Display buf address*/
-    /*CNcomment:ÏÔÊ¾bufferµØÖ·*/
+    /*CNcomment:ï¿½ï¿½Ê¾bufferï¿½ï¿½Ö·*/
     HIFB_LAYER_PARAMODIFY_DISPLAYADDR = 0x40,
 
     /*State of show or hide*/
-    /*CNcomment:ÏÔÊ¾Òþ²Ø×´Ì¬*/
+    /*CNcomment:ï¿½ï¿½Ê¾ï¿½ï¿½ï¿½ï¿½×´Ì¬*/
     HIFB_LAYER_PARAMODIFY_SHOW = 0x80,
 
     /*Whether premultiply data or not*/
-    /*CNcomment:ÊÇ·ñÎªÔ¤´æÊý¾Ý*/
+    /*CNcomment:ï¿½Ç·ï¿½ÎªÔ¤ï¿½ï¿½ï¿½ï¿½ï¿½*/
     HIFB_LAYER_PARAMODIFY_BMUL = 0x100,
 
     /*Anti deflicker level*/
-    /*CNcomment:¿¹ÉÁË¸¼¶±ð*/
+    /*CNcomment:ï¿½ï¿½ï¿½ï¿½Ë¸ï¿½ï¿½ï¿½ï¿½*/
     HIFB_LAYER_PARAMODIFY_ANTIFLICKERLEVEL = 0x200,
 
 	/*refresh usr data*/
-    /*CNcomment:ÊÇ·ñË¢ÐÂ*/
+    /*CNcomment:ï¿½Ç·ï¿½Ë¢ï¿½ï¿½*/
     HIFB_LAYER_PARAMODIFY_REFRESH = 0x400,  /**color format ,stride,display address only take effect when 
     												usr data was refreshed*/
 
 	/*param modify all*/
-	/*CNcomment:ËùÓÐÐÞ¸ÄÏî*/
+	/*CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½Þ¸ï¿½ï¿½ï¿½*/
 	HIFB_LAYER_PARAMODIFY_ALL = 0x1 | 0x2 | 0x4 | 0x8 | 0x10 | 0x20 | 0x40 | 0x80 | 0x100 | 0x200 | 0x400,
 	
     HIFB_LAYER_PARAMODIFY_BUTT
@@ -95,192 +95,205 @@ typedef enum
 typedef struct 
 {
 	 /* support how many layers*/
-	/*CNcomment:·µ»ØÖ§³ÖµÄÍ¼²ãÊý */
+	/*CNcomment:ï¿½ï¿½ï¿½ï¿½Ö§ï¿½Öµï¿½Í¼ï¿½ï¿½ï¿½ï¿½ */
 	//HI_U32 HIFB_DRV_GetSupportLayerCount();
 
 	/*set layer the default bit extenal mode*/
-	/*CNcomment:ÉèÖÃÄ¬ÈÏµÄÀ©Õ¹bit Ä£Ê½*/
+	/*CNcomment:ï¿½ï¿½ï¿½ï¿½Ä¬ï¿½Ïµï¿½ï¿½ï¿½Õ¹bit Ä£Ê½*/
 	//HI_S32 (*HIFB_DRV_SetLayerBitExtMode)(HIFB_LAYER_ID_E enLayerID);
 
 	/*enable/disable the layer*/
-	/*CNcomment:Ê¹ÄÜÍ¼²ã*/
-	HI_S32 (*HIFB_DRV_EnableLayer)(HIFB_LAYER_ID_E enLayerId,HI_BOOL bEnable);
+	/*CNcomment:Ê¹ï¿½ï¿½Í¼ï¿½ï¿½*/
+	HI_S32 (*HIFB_DRV_EnableLayer)(HIFB_LAYER_ID_E enLayerId,HI_BOOL bEnable); //0
 
 	/*set the address of layer*/
-	/*CNcomment:ÉèÖÃÍ¼²ãµÄÏÔÊ¾µØÖ·*/
-	HI_S32 (*HIFB_DRV_SetLayerAddr)(HIFB_LAYER_ID_E enLayerId,HI_U32 u32Addr);
+	/*CNcomment:ï¿½ï¿½ï¿½ï¿½Í¼ï¿½ï¿½ï¿½ï¿½ï¿½Ê¾ï¿½ï¿½Ö·*/
+	HI_S32 (*HIFB_DRV_SetLayerAddr)(HIFB_LAYER_ID_E enLayerId,HI_U32 u32Addr); //4
 
 	/*set layer stride*/
-	/*CNcomment:ÉèÖÃÍ¼²ãÐÐ¼ä¾à*/
-	HI_S32 (*HIFB_DRV_SetLayerStride)(HIFB_LAYER_ID_E enLayerId,HI_U32 u32Stride);
+	/*CNcomment:ï¿½ï¿½ï¿½ï¿½Í¼ï¿½ï¿½ï¿½Ð¼ï¿½ï¿½*/
+	HI_S32 (*HIFB_DRV_SetLayerStride)(HIFB_LAYER_ID_E enLayerId,HI_U32 u32Stride); //8
 
 	/*set layer pixel format*/
-	/*CNcomment:ÉèÖÃÍ¼²ãÏñËØ¸ñÊ½*/
-	HI_S32 (*HIFB_DRV_SetLayerDataFmt)(HIFB_LAYER_ID_E enLayerId,HIFB_COLOR_FMT_E enDataFmt);
+	/*CNcomment:ï¿½ï¿½ï¿½ï¿½Í¼ï¿½ï¿½ï¿½ï¿½ï¿½Ø¸ï¿½Ê½*/
+	HI_S32 (*HIFB_DRV_SetLayerDataFmt)(HIFB_LAYER_ID_E enLayerId,HIFB_COLOR_FMT_E enDataFmt); //12
 
 	/*set color register*/
-	/*CNcomment:ÉèÖÃCLUT Êý×éÖµ*/
-	HI_S32 (*HIFB_DRV_SetColorReg)(HIFB_LAYER_ID_E enLayerId, HI_U32 u32OffSet, HI_U32 u32Color, HI_S32 UpFlag);
+	/*CNcomment:ï¿½ï¿½ï¿½ï¿½CLUT ï¿½ï¿½ï¿½ï¿½Öµ*/
+	HI_S32 (*HIFB_DRV_SetColorReg)(HIFB_LAYER_ID_E enLayerId, HI_U32 u32OffSet, HI_U32 u32Color, HI_S32 UpFlag); //16
 
 	/*wait until vblank, it's a block interface*/
-	/*CNcomment:µÈ´ý´¹Ö±Ê±ÐòÖÐ¶Ï£¬×èÈûÐÍ½Ó¿Ú*/
-	HI_S32 (*HIFB_DRV_WaitVBlank)(HIFB_LAYER_ID_E enLayerId);
+	/*CNcomment:ï¿½È´ï¿½Ö±Ê±ï¿½ï¿½ï¿½Ð¶Ï£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í½Ó¿ï¿½*/
+	HI_S32 (*HIFB_DRV_WaitVBlank)(HIFB_LAYER_ID_E enLayerId); //20
 
 	/* set layer deflicker */
-	/*CNcomment:ÉèÖÃÍ¼²ã¿¹ÉÁ²ÎÊý*/
-	HI_S32 (*HIFB_DRV_SetLayerDeFlicker)(HIFB_LAYER_ID_E enLayerId, HIFB_DEFLICKER_S *pstDeFlicker);
+	/*CNcomment:ï¿½ï¿½ï¿½ï¿½Í¼ï¿½ã¿¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½*/
+	HI_S32 (*HIFB_DRV_SetLayerDeFlicker)(HIFB_LAYER_ID_E enLayerId, HIFB_DEFLICKER_S *pstDeFlicker); //24
 
 	/*set layer alpha*/
-	/*CNcomment:ÉèÖÃÍ¼²ãalpha*/
-	HI_S32 (*HIFB_DRV_SetLayerAlpha)(HIFB_LAYER_ID_E enLayerId, HIFB_ALPHA_S *pstAlpha);
+	/*CNcomment:ï¿½ï¿½ï¿½ï¿½Í¼ï¿½ï¿½alpha*/
+	HI_S32 (*HIFB_DRV_SetLayerAlpha)(HIFB_LAYER_ID_E enLayerId, HIFB_ALPHA_S *pstAlpha); //28
 
 	/*set layer start position and size*/
-	/*CNcomment:ÉèÖÃÍ¼²ãÆðÊ¼Î»ÖÃºÍ´óÐ¡*/
+	/*CNcomment:ï¿½ï¿½ï¿½ï¿½Í¼ï¿½ï¿½ï¿½ï¿½Ê¼Î»ï¿½ÃºÍ´ï¿½Ð¡*/
 	HI_S32 (*HIFB_DRV_SetLayerRect)(HIFB_LAYER_ID_E enLayerId, const HIFB_RECT *pstInputRect, const HIFB_RECT *pstOutputRect);
 	
 	/*set layer start position and size*/
-	/*CNcomment:ÉèÖÃÍ¼²ãÆðÊ¼Î»ÖÃºÍ´óÐ¡*/
-	HI_S32 (*HIFB_DRV_SetLayerInRect)(HIFB_LAYER_ID_E enLayerId, const HIFB_RECT *pstInputRect);
+	/*CNcomment:ï¿½ï¿½ï¿½ï¿½Í¼ï¿½ï¿½ï¿½ï¿½Ê¼Î»ï¿½ÃºÍ´ï¿½Ð¡*/
+	HI_S32 (*HIFB_DRV_SetLayerInRect)(HIFB_LAYER_ID_E enLayerId, const HIFB_RECT *pstInputRect); //36
 
 	/*set layer output size*/
-	/*CNcomment:ÉèÖÃÍ¼²ãµÄÊä³öÇøÓò*/
-	HI_S32 (*HIFB_DRV_SetLayerOutRect)(HIFB_LAYER_ID_E enLayerId, const HIFB_RECT *pstOutputRect);
+	/*CNcomment:ï¿½ï¿½ï¿½ï¿½Í¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½*/
+	HI_S32 (*HIFB_DRV_SetLayerOutRect)(HIFB_LAYER_ID_E enLayerId, const HIFB_RECT *pstOutputRect); //40
 
 
 	/* set layer colorkey */
-	/* CNcomment:ÉèÖÃÍ¼²ãcolorkey*/
-	HI_S32 (*HIFB_DRV_SetLayerKeyMask)(HIFB_LAYER_ID_E enLayerId, const HIFB_COLORKEYEX_S* pstColorkey);
+	/* CNcomment:ï¿½ï¿½ï¿½ï¿½Í¼ï¿½ï¿½colorkey*/
+	HI_S32 (*HIFB_DRV_SetLayerKeyMask)(HIFB_LAYER_ID_E enLayerId, const HIFB_COLORKEYEX_S* pstColorkey); //44
 
 	/* update layer register */
-	/*CNcomment:¼Ä´æÆ÷¸üÐÂ*/
-	HI_S32 (*HIFB_DRV_UpdataLayerReg)(HIFB_LAYER_ID_E enLayerId);
+	/*CNcomment:ï¿½Ä´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½*/
+	HI_S32 (*HIFB_DRV_UpdataLayerReg)(HIFB_LAYER_ID_E enLayerId); //48
 
 	/*wait for the config register completed*/
-	/*CNcomment:µÈ´ý¼Ä´æÆ÷ÅäÖÃÍê³É*/
+	/*CNcomment:ï¿½È´ï¿½Ä´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½*/
 	HI_S32 (*HIFB_DRV_WaitRegUpdateFinished)(HIFB_LAYER_ID_E enLayerId);
 
 	/*set premul data*/
-	/*CNcomment:ÉèÖÃÔ¤³Ë*/
-	HI_S32 (*HIFB_DRV_SetLayerPreMult)(HIFB_LAYER_ID_E enLayerId, HI_BOOL bPreMul);
+	/*CNcomment:ï¿½ï¿½ï¿½ï¿½Ô¤ï¿½ï¿½*/
+	HI_S32 (*HIFB_DRV_SetLayerPreMult)(HIFB_LAYER_ID_E enLayerId, HI_BOOL bPreMul); //56
 
 	/*set clut address*/
-	/*CNcomment:ÉèÖÃCLUT µØÖ·*/
-	HI_S32 (*HIFB_DRV_SetClutAddr)(HIFB_LAYER_ID_E enLayerId, HI_U32 u32PhyAddr);
+	/*CNcomment:ï¿½ï¿½ï¿½ï¿½CLUT ï¿½ï¿½Ö·*/
+	HI_S32 (*HIFB_DRV_SetClutAddr)(HIFB_LAYER_ID_E enLayerId, HI_U32 u32PhyAddr); //60
 
 	/* get osd data */
-	/*CNcomment:»ñÈ¡Ó²¼þÊý¾Ý*/
-	HI_S32 (*HIFB_DRV_GetOSDData)(HIFB_LAYER_ID_E enLayerId, HIFB_OSD_DATA_S *pstLayerData);
+	/*CNcomment:ï¿½ï¿½È¡Ó²ï¿½ï¿½ï¿½ï¿½ï¿½*/
+	HI_S32 (*HIFB_DRV_GetOSDData)(HIFB_LAYER_ID_E enLayerId, HIFB_OSD_DATA_S *pstLayerData); //64
   
 	/* register call back function*/
-	/*CNcomment:×¢²áÖÐ¶Ï»Øµ÷º¯Êý*/
-	HI_S32 (*HIFB_DRV_SetIntCallback)(HIFB_CALLBACK_TPYE_E enCType, IntCallBack pCallback, HIFB_LAYER_ID_E enLayerId);
+	/*CNcomment:×¢ï¿½ï¿½ï¿½Ð¶Ï»Øµï¿½ï¿½ï¿½ï¿½ï¿½*/
+	HI_S32 (*HIFB_DRV_SetIntCallback)(HIFB_CALLBACK_TPYE_E enCType, IntCallBack pCallback, HIFB_LAYER_ID_E enLayerId); //68
 
 	/*open layer*/
-	/*CNcomment:´ò¿ªÍ¼²ã*/
-	HI_S32 (*HIFB_DRV_OpenLayer)(HIFB_LAYER_ID_E enLayerId);
+	/*CNcomment:ï¿½ï¿½Í¼ï¿½ï¿½*/
+	HI_S32 (*HIFB_DRV_OpenLayer)(HIFB_LAYER_ID_E enLayerId); //72
 
 	/*close layer*/
-	/*CNcomment:¹Ø±ÕÍ¼²ã*/
-	HI_S32 (*HIFB_DRV_CloseLayer)(HIFB_LAYER_ID_E enLayerId);
+	/*CNcomment:ï¿½Ø±ï¿½Í¼ï¿½ï¿½*/
+	HI_S32 (*HIFB_DRV_CloseLayer)(HIFB_LAYER_ID_E enLayerId); //76
 
 	/*get status of disp*/
-	/*CNcomment:»ñÈ¡DISP ´ò¿ª×´Ì¬*/
+	/*CNcomment:ï¿½ï¿½È¡DISP ï¿½ï¿½×´Ì¬*/
 	HI_S32 (*HIFB_DRV_GetHaltDispStatus)(HIFB_LAYER_ID_E enLayerId,HI_BOOL *pbDispInit);
 
+#if 0
 	/*enable/disable compression*/
-	/*CNcomment:Ê¹ÄÜ/ ·ÇÊ¹ÄÜÑ¹Ëõ*/
+	/*CNcomment:Ê¹ï¿½ï¿½/ ï¿½ï¿½Ê¹ï¿½ï¿½Ñ¹ï¿½ï¿½*/
 	HI_S32 (*HIFB_DRV_EnableCompression)(HIFB_LAYER_ID_E enLayerId, HI_BOOL bCompressionEnable);
 
 	/*set update rect of compression*/
-	/*CNcomment:ÉèÖÃÑ¹Ëõ¸üÐÂ¾ØÐÎ*/
+	/*CNcomment:ï¿½ï¿½ï¿½ï¿½Ñ¹ï¿½ï¿½ï¿½ï¿½ï¿½Â¾ï¿½ï¿½ï¿½*/
 	HI_S32 (*HIFB_DRV_SetCompressionRect)(HIFB_LAYER_ID_E enLayerId, const HIFB_RECT *pstRect);
 
 	/*handle the compression job*/
-	/*CNcomment:´¦ÀíÑ¹Ëõ¸üÐÂ*/
+	/*CNcomment:ï¿½ï¿½ï¿½ï¿½Ñ¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½*/
 	HI_S32 (*HIFB_DRV_CompressionHandle)(HIFB_LAYER_ID_E enLayerId);
+#endif
 
 	/*set 3D mode*/
-	/*CNcomment:ÉèÖÃ3D Ä£Ê½*/
-	HI_S32 (*HIFB_DRV_SetTriDimMode)(HIFB_LAYER_ID_E enLayerId, HIFB_STEREO_MODE_E enStereoMode);  
+	/*CNcomment:ï¿½ï¿½ï¿½ï¿½3D Ä£Ê½*/
+	HI_S32 (*HIFB_DRV_SetTriDimMode)(HIFB_LAYER_ID_E enLayerId, HIFB_STEREO_MODE_E enStereoMode); //84
 
 	
 	/*set 3D address*/
-	/*CNcomment:ÉèÖÃ3D Êý¾ÝµØÖ·*/
-	HI_S32 (*HIFB_DRV_SetTriDimAddr)(HIFB_LAYER_ID_E enLayerId, HI_U32 u32StereoAddr);  
+	/*CNcomment:ï¿½ï¿½ï¿½ï¿½3D ï¿½ï¿½Ýµï¿½Ö·*/
+	HI_S32 (*HIFB_DRV_SetTriDimAddr)(HIFB_LAYER_ID_E enLayerId, HI_U32 u32StereoAddr); //88
 
 	/*get capability of gfx*/
-	/*CNcomment:»ñÈ¡Í¼²ãÄÜÁ¦¼¯*/
-	HI_S32 (*HIFB_DRV_GetGFXCap)(const HIFB_CAPABILITY_S **pstCap);
+	/*CNcomment:ï¿½ï¿½È¡Í¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½*/
+	HI_S32 (*HIFB_DRV_GetGFXCap)(const HIFB_CAPABILITY_S **pstCap); //92
 
 	/*pause compression*/
-	/*CNcomment:ÔÝÍ£Ñ¹Ëõ*/
-	HI_S32 (*HIFB_DRV_PauseCompression)(HIFB_LAYER_ID_E enLayerId);
+	/*CNcomment:ï¿½ï¿½Í£Ñ¹ï¿½ï¿½*/
+	HI_S32 (*HIFB_DRV_PauseCompression)(HIFB_LAYER_ID_E enLayerId); //96
 
 	/*resume compression*/
-	/*CNcomment:»Ö¸´Ñ¹Ëõ*/
-	HI_S32 (*HIFB_DRV_ResumeCompression)(HIFB_LAYER_ID_E enLayerId);
+	/*CNcomment:ï¿½Ö¸ï¿½Ñ¹ï¿½ï¿½*/
+	HI_S32 (*HIFB_DRV_ResumeCompression)(HIFB_LAYER_ID_E enLayerId); //100
 
 	/*set the priority of layer in gp*/
-	/*CNcomment:ÉèÖÃÍ¼²ãÔÚGP ÖÐµÄÓÅÏÈ¼¶*/
-	HI_S32 (*HIFB_DRV_SetLayerPriority)(HIFB_LAYER_ID_E enLayerId, HIFB_ZORDER_E enZOrder);
+	/*CNcomment:ï¿½ï¿½ï¿½ï¿½Í¼ï¿½ï¿½ï¿½ï¿½GP ï¿½Ðµï¿½ï¿½ï¿½ï¿½È¼ï¿½*/
+	HI_S32 (*HIFB_DRV_SetLayerPriority)(HIFB_LAYER_ID_E enLayerId, HIFB_ZORDER_E enZOrder); //104
 
 	/*get the priority of layer in gp*/
-	/*CNcomment:»ñÈ¡Í¼²ãÔÚGP ÖÐµÄÓÅÏÈ¼¶*/
-	HI_S32 (*HIFB_DRV_GetLayerPriority)(HIFB_LAYER_ID_E enLayerId, HI_U32 *pU32Priority);
+	/*CNcomment:ï¿½ï¿½È¡Í¼ï¿½ï¿½ï¿½ï¿½GP ï¿½Ðµï¿½ï¿½ï¿½ï¿½È¼ï¿½*/
+	HI_S32 (*HIFB_DRV_GetLayerPriority)(HIFB_LAYER_ID_E enLayerId, HI_U32 *pU32Priority); //108
 
 	/*mask layer,  prevent user to operating the layer in  the period of display format changing*/
-	/*CNcomment:ÆÁ±ÎÍ¼²ã£¬×èÖ¹ÓÃ»§¶ÔÍ¼²ãµÄÓ²¼þÉèÖÃ²Ù×÷*/
+	/*CNcomment:ï¿½ï¿½ï¿½ï¿½Í¼ï¿½ã£¬ï¿½ï¿½Ö¹ï¿½Ã»ï¿½ï¿½ï¿½Í¼ï¿½ï¿½ï¿½Ó²ï¿½ï¿½ï¿½ï¿½ï¿½Ã²ï¿½ï¿½ï¿½*/
 	HI_S32 (*HIFB_DRV_MaskLayer)(HIFB_LAYER_ID_E enLayerId, HI_BOOL bFlag);	
   
-	HI_S32 (*HIFB_DRV_ColorConvert)(const struct fb_var_screeninfo *pstVar, HIFB_COLORKEYEX_S *pCkey);	
+	HI_S32 (*HIFB_DRV_ColorConvert)(const struct fb_var_screeninfo *pstVar, HIFB_COLORKEYEX_S *pCkey);	//116
 
-	HI_S32 (*HIFB_DRV_GfxInit)(HI_VOID);
-	HI_S32 (*HIFB_DRV_GfxDeInit)(HI_VOID);
+	HI_S32 (*HIFB_DRV_GfxInit)(HI_VOID); //120
+	HI_S32 (*HIFB_DRV_GfxDeInit)(HI_VOID); //124
 
-	HI_S32 (*HIFB_DRV_GetLayerOutRect)(HIFB_LAYER_ID_E enLayerId, HIFB_RECT *pstOutputRect);
-	HI_S32 (*HIFB_DRV_GetLayerInRect)(HIFB_LAYER_ID_E enLayerId, HIFB_RECT *pstOutputRect);  
+	HI_S32 (*HIFB_DRV_GetLayerOutRect)(HIFB_LAYER_ID_E enLayerId, HIFB_RECT *pstOutputRect); //128
+	HI_S32 (*HIFB_DRV_GetLayerInRect)(HIFB_LAYER_ID_E enLayerId, HIFB_RECT *pstOutputRect); //132
 	/*set layer screen size*/
-	/*CNcomment:ÉèÖÃÍ¼²ãµÄÊä³öÇøÓò*/
-	HI_S32 (*HIFB_DRV_SetLayerScreenSize)(HIFB_LAYER_ID_E enLayerId, HI_U32 u32Width, HI_U32 u32Height);
+	/*CNcomment:ï¿½ï¿½ï¿½ï¿½Í¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½*/
+	HI_S32 (*HIFB_DRV_SetLayerScreenSize)(HIFB_LAYER_ID_E enLayerId, HI_U32 u32Width, HI_U32 u32Height); //136
 	/*set flag of screensize modified by usr*/
-	/*CNcomment:ÉèÖÃÓÃ»§ÐÞ¸ÄSCREEN µÄ±êÖ¾*/
-	HI_S32 (*HIFB_DRV_SetScreenFlag)(HIFB_LAYER_ID_E enLayerId, HI_BOOL bFlag);
+	/*CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½Ã»ï¿½ï¿½Þ¸ï¿½SCREEN ï¿½Ä±ï¿½Ö¾*/
+	HI_S32 (*HIFB_DRV_SetScreenFlag)(HIFB_LAYER_ID_E enLayerId, HI_BOOL bFlag); //140
 	/*Get flag of screensize modified by usr*/
-	/*CNcomment:»ñÈ¡ÓÃ»§ÐÞ¸ÄSCREEN µÄ±êÖ¾*/
-	HI_S32 (*HIFB_DRV_GetScreenFlag)(HIFB_LAYER_ID_E enLayerId);
+	/*CNcomment:ï¿½ï¿½È¡ï¿½Ã»ï¿½ï¿½Þ¸ï¿½SCREEN ï¿½Ä±ï¿½Ö¾*/
+	HI_S32 (*HIFB_DRV_GetScreenFlag)(HIFB_LAYER_ID_E enLayerId); //144
 
 	/*set flag of screensize modified by usr*/
-	/*CNcomment:ÉèÖÃÓÃ»§ÐÞ¸ÄSCREEN µÄ±êÖ¾*/
-	HI_S32 (*HIFB_DRV_SetInitScreenFlag)(HIFB_LAYER_ID_E enLayerId, HI_BOOL bFlag);
+	/*CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½Ã»ï¿½ï¿½Þ¸ï¿½SCREEN ï¿½Ä±ï¿½Ö¾*/
+	HI_S32 (*HIFB_DRV_SetInitScreenFlag)(HIFB_LAYER_ID_E enLayerId, HI_BOOL bFlag); //148
 	/*Get flag of screensize modified by usr*/
-	/*CNcomment:»ñÈ¡ÓÃ»§ÐÞ¸ÄSCREEN µÄ±êÖ¾*/
-	HI_S32 (*HIFB_DRV_GetInitScreenFlag)(HIFB_LAYER_ID_E enLayerId);
+	/*CNcomment:ï¿½ï¿½È¡ï¿½Ã»ï¿½ï¿½Þ¸ï¿½SCREEN ï¿½Ä±ï¿½Ö¾*/
+	HI_S32 (*HIFB_DRV_GetInitScreenFlag)(HIFB_LAYER_ID_E enLayerId); //152
 	/*set gfx mask flag*/
-	/*CNcomment:ÉèÖÃÍ¼ÐÎÆÁ±Î±êÖ¾*/
-	HI_S32 (*HIFB_DRV_SetLayerMaskFlag)(HIFB_LAYER_ID_E enLayerId, HI_BOOL bFlag);
+	/*CNcomment:ï¿½ï¿½ï¿½ï¿½Í¼ï¿½ï¿½ï¿½ï¿½ï¿½Î±ï¿½Ö¾*/
+	HI_S32 (*HIFB_DRV_SetLayerMaskFlag)(HIFB_LAYER_ID_E enLayerId, HI_BOOL bFlag); //156
 	/*Get gfx mask flag*/
-	/*CNcomment:»ñÈ¡Í¼ÐÎÆÁ±Î±êÖ¾*/
-	HI_S32 (*HIFB_DRV_GetLayerMaskFlag)(HIFB_LAYER_ID_E enLayerId);
+	/*CNcomment:ï¿½ï¿½È¡Í¼ï¿½ï¿½ï¿½ï¿½ï¿½Î±ï¿½Ö¾*/
+	HI_S32 (*HIFB_DRV_GetLayerMaskFlag)(HIFB_LAYER_ID_E enLayerId); //160
 
-	HI_S32 (*HIFB_DRV_GetDispSize)(HIFB_LAYER_ID_E enLayerId, HIFB_RECT *pstOutputRect);
-	HI_S32 (*HIFB_DRV_ClearLogo)(HIFB_LAYER_ID_E enLayerId);
-	HI_S32 (*HIFB_DRV_SetStereoDepth)(HIFB_LAYER_ID_E enLayerId, HI_S32 s32Depth);
+	HI_S32 (*HIFB_DRV_GetDispSize)(HIFB_LAYER_ID_E enLayerId, HIFB_RECT *pstOutputRect); //164
+	HI_S32 (*HIFB_DRV_ClearLogo)(HIFB_LAYER_ID_E enLayerId); //168
+	HI_S32 (*HIFB_DRV_SetStereoDepth)(HIFB_LAYER_ID_E enLayerId, HI_S32 s32Depth); //172
+
+	HI_S32 (*HIFB_DRV_SetTCFlag)(HIFB_LAYER_ID_E enLayerId); //176
+	HI_S32 (*HIFB_DRV_SetCmpSwitch)(HIFB_LAYER_ID_E enLayerId); //180
+	HI_S32 (*HIFB_DRV_GetCmpSwitch)(HIFB_LAYER_ID_E enLayerId); //184
+	HI_S32 (*HIFB_DRV_SetCmpRect)(HIFB_LAYER_ID_E enLayerId); //188
+	HI_S32 (*HIFB_DRV_SetCmpMode)(HIFB_LAYER_ID_E enLayerId); //192
+	HI_S32 (*HIFB_DRV_GetCmpMode)(HIFB_LAYER_ID_E enLayerId); //196
+	HI_S32 (*HIFB_DRV_SetCmpDDROpen)(HIFB_LAYER_ID_E enLayerId); //200
+	HI_S32 (*HIFB_DRV_SetGpDeflicker)(HIFB_LAYER_ID_E enLayerId); //204
+	HI_S32 (*HIFB_DRV_GetSlvLayerInfo)(HIFB_LAYER_ID_E enLayerId); //208
+	//212?
 }HIFB_DRV_OPS_S;
 
 typedef struct
 {
-	HI_S32 (*HIFB_DRV_Blit)(HIFB_BUFFER_S *pSrcImg, HIFB_BUFFER_S *pDstImg,  HIFB_BLIT_OPT_S *pstOpt,HI_BOOL bScreenRefresh);
-	HI_S32 (*HIFB_DRV_ClearRect)(HIFB_SURFACE_S* pDstImg, HIFB_BLIT_OPT_S* pstOpt);
-	HI_S32 (*HIFB_DRV_SetTdeCallBack)(IntCallBack pTdeCallBack);
-	HI_VOID (*HIFB_DRV_WaitAllTdeDone)(HI_BOOL bSync);
-	HI_S32 (*HIFB_DRV_TdeSupportFmt)(HIFB_COLOR_FMT_E fmt);
+	HI_S32 (*HIFB_DRV_Blit)(HIFB_BUFFER_S *pSrcImg, HIFB_BUFFER_S *pDstImg,  HIFB_BLIT_OPT_S *pstOpt,HI_BOOL bScreenRefresh); //0
+	HI_S32 (*HIFB_DRV_ClearRect)(HIFB_SURFACE_S* pDstImg, HIFB_BLIT_OPT_S* pstOpt); //4
+	HI_S32 (*HIFB_DRV_SetTdeCallBack)(IntCallBack pTdeCallBack); //8
+	HI_VOID (*HIFB_DRV_WaitAllTdeDone)(HI_BOOL bSync); //12
+	HI_S32 (*HIFB_DRV_TdeSupportFmt)(HIFB_COLOR_FMT_E fmt); //16
 	
 	HI_S32 (*HIFB_DRV_CalScaleRect)(const TDE2_RECT_S* pstSrcRect, const TDE2_RECT_S* pstDstRect,
-								TDE2_RECT_S* pstRectInSrc, TDE2_RECT_S* pstRectInDst);
-	HI_S32 (*HIFB_DRV_WaitForDone)(TDE_HANDLE s32Handle, HI_U32 u32TimeOut);
+								TDE2_RECT_S* pstRectInSrc, TDE2_RECT_S* pstRectInDst); //20
+	HI_S32 (*HIFB_DRV_WaitForDone)(TDE_HANDLE s32Handle, HI_U32 u32TimeOut); //24
 	
-	HI_S32 (*HIFB_DRV_TdeOpen)(HI_VOID);
-	HI_S32 (*HIFB_DRV_TdeClose)(HI_VOID);
+	HI_S32 (*HIFB_DRV_TdeOpen)(HI_VOID); //28
+	HI_S32 (*HIFB_DRV_TdeClose)(HI_VOID); //32
 
 }HIFB_DRV_TDEOPS_S;
 

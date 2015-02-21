@@ -17,7 +17,8 @@ extern "C"{
 
 #define HIFB_WORK_QUEUE      "HIFB_WorkQueque"
 #define OPTM_GFX_WBC2_BUFFER "HIFB_GfxWbc2"
-#define DISPLAY_BUFFER       "HIFB_DispBuf_HD" //"HIFB_Display_Buffer"
+//#define DISPLAY_BUFFER       "HIFB_Display_Buffer"
+#define DISPLAY_BUFFER_HD	 "HIFB_DispBuf_HD"
 #define DISPLAY_BUFFER_SD	 "HIFB_DispBuf_SD"
 #define HIFB_ZME_COEF_BUFFER "HIFB_ZmeCoef"
 	
@@ -150,7 +151,8 @@ typedef struct
     HIFB_COLOR_FMT_E eFmt;
     HIFB_ALPHA_S stAlpha;
     HIFB_COLORKEYEX_S stColorKey; 
-	HIFB_SCAN_MODE_E eScanMode;           
+	HIFB_SCAN_MODE_E eScanMode;
+	int fill; //
 }HIFB_OSD_DATA_S;
 
 

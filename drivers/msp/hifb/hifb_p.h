@@ -154,15 +154,82 @@ typedef struct
 
 typedef struct
 {   	
-	HI_BOOL             bSetStereoMode;
+	HI_BOOL             bSetStereoMode; //0
 	HI_BOOL             bPanFlag;
-    HIFB_BASE_INFO_S    stBaseInfo;
+	int fill_8[4]; //8???
+    HIFB_BASE_INFO_S    stBaseInfo; //24?
+#if 0
+    typedef struct
+    {
+    	HI_U32             u32LayerID; //24      /* layer id */
+    	atomic_t           ref_count;        /* framebuffer reference count */
+    	spinlock_t         lock;             /* using in 2buf refresh */
+    	HI_BOOL            bPreMul;
+    	HI_BOOL            bNeedAntiflicker;
+    	HI_U32             u32HDflevel;      /* horizontal deflicker level */
+    	HI_U32             u32VDflevel;      /* vertical deflicker level */
+    	HI_UCHAR           ucHDfcoef[HIFB_DEFLICKER_LEVEL_MAX - 1];/* horizontal deflicker coefficients */
+    	HI_UCHAR           ucVDfcoef[HIFB_DEFLICKER_LEVEL_MAX - 1];/* vertical deflicker coefficients */
+    	HIFB_LAYER_ANTIFLICKER_LEVEL_E  enAntiflickerLevel; /* antiflicker level */
+    	HIFB_LAYER_ANTIFLICKER_MODE_E   enAntiflickerMode; /* antiflicker mode */
+    }HIFB_BASE_INFO_S;
+#endif
     HIFB_EXTEND_INFO_S  stExtendInfo;
     
     HIFB_3D_PAR_S       st3DInfo;
-    HIFB_DISP_INFO_S    stDispInfo; 
+#if 0
+    typedef struct
+    {
+    	HI_S32                 s32StereoDepth;
+    	HI_U32                 u32rightEyeAddr; //152    /**<  right eye address */
+    	HI_U32                 u32DisplayAddr[HIFB_MAX_FLIPBUF_NUM]; //156
+        HIFB_STEREO_MODE_E     enInStereoMode;
+        HIFB_STEREO_MODE_E     enOutStereoMode;
+    	HIFB_RECT              st3DUpdateRect;
+    	HIFB_SURFACE_S         st3DSurface;
+        HIFB_3DMEM_INFO_S      st3DMemInfo;
+    }HIFB_3D_PAR_S;
+#endif
+    HIFB_DISP_INFO_S    stDispInfo;
+#if 0
+    typedef struct
+    {
+    	HIFB_RECT       stUpdateRect;
+    	HI_U32          u32DisplayAddr[HIFB_MAX_FLIPBUF_NUM];
+    	HIFB_SURFACE_S  stCanvasSur;        /* canvas surface allocated for user */
+#if 0
+    	typedef struct
+    	{
+    	    HI_U32  u32PhyAddr; //280 TODO:240+40    /**<  start physical address */
+    	    HI_U32  u32Width;       /**<  width pixels */
+    	    HI_U32  u32Height;      /**<  height pixels */
+    	    HI_U32  u32Pitch;       /**<  line pixels */
+    	    HIFB_COLOR_FMT_E enFmt; /**<  color format */
+    	}HIFB_SURFACE_S;
+#endif
+    	HIFB_BUFFER_S   stUserBuffer;       /* backup usr's refreshing buffer data,
+    											using when refresh again or refresh all*/
+    }HIFB_DISP_INFO_S;
+#endif
 
 	HIFB_RTIME_INFO_S   stRunInfo;      /**run time info for N3D and 3D*/
+#if 0
+	typedef struct
+	{
+		HI_BOOL   bModifying;
+		HI_U32    u32ParamModifyMask;
+	    HI_BOOL   bNeedFlip;       /* when tde blit job completed, we need to flip buffer, only using in pandisplay and 2buf*/
+	    HI_BOOL   bFliped;	       /* a flag to record buf has been swithed no not in vo isr, effect only in 2 buf mode*/
+	    HI_U32    u32IndexForInt; //352 TODO: 312+40 /* index of screen buf*/
+		HI_U32    u32BufNum;      //356 TODO: 316+40 /* count of flip buffer*/
+		HI_U32    u32ScreenAddr;   //360 TODO: 312+40 /* screen buf addr */
+		HI_S32    s32RefreshHandle;/* job handle of tde blit*/
+	}HIFB_RTIME_INFO_S;
+#endif
+	int fill_a[17]; //????
+	int Data_396[1/*????*/]; //396
+	int fill[255]; //????
+	//1420
 }HIFB_PAR_S;
 
 typedef struct 

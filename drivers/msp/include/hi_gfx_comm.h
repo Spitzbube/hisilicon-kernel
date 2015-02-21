@@ -129,7 +129,7 @@ HIGFX_CHIP_TYPE_E;
 static inline  HI_VOID HI_GFX_ShowVersionK(HIGFX_MODE_ID_E ModID)
 {
 #ifndef CONFIG_GFX_COMM_VERSION_DISABLE
-    HI_CHAR MouleName[6][10] = {"tde","jpegdec","jpegenc","fb","png"};
+    HI_CHAR MouleName[7][10] = {"tde","jpegdec","jpegenc","fb","png", "higo", "gfx2d"};
     HI_CHAR Version[160] ="SDK_VERSION:["MKMARCOTOSTR(SDK_VERSION)"] Build Time:["\
 	__DATE__", "__TIME__"]";    
     
