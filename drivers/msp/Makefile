@@ -133,4 +133,7 @@ obj-y += pdm/drv_pdm_intf.o
 obj-y += pdm/drv_pdm.o
 obj-y += pdm/db/hi_db.o
 
+obj-y += vo/
+
+
 
