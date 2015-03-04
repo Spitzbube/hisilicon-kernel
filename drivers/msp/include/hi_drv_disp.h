@@ -110,14 +110,14 @@ typedef enum hiDRV_DISP_FMT_E
     HI_DRV_DISP_FMT_480P_60,          /**<480p 60 Hz*/
 
     HI_DRV_DISP_FMT_PAL,              /* B D G H I PAL */
-    HI_DRV_DISP_FMT_PAL_B,            /* B PAL£¬ Australia */
+    HI_DRV_DISP_FMT_PAL_B,            /* B PALï¿½ï¿½ Australia */
     HI_DRV_DISP_FMT_PAL_B1,           /* B1 PAL, Hungary */
     HI_DRV_DISP_FMT_PAL_D,            /* D PAL, China */
-    HI_DRV_DISP_FMT_PAL_D1,           /* D1 PAL£¬ Poland */
-    HI_DRV_DISP_FMT_PAL_G,            /* G PAL£¬ Europe */
-    HI_DRV_DISP_FMT_PAL_H,            /* H PAL£¬ Europe */
-    HI_DRV_DISP_FMT_PAL_K,            /* K PAL£¬ Europe */
-    HI_DRV_DISP_FMT_PAL_I,            /* I PAL£¬U.K. */
+    HI_DRV_DISP_FMT_PAL_D1,           /* D1 PALï¿½ï¿½ Poland */
+    HI_DRV_DISP_FMT_PAL_G,            /* G PALï¿½ï¿½ Europe */
+    HI_DRV_DISP_FMT_PAL_H,            /* H PALï¿½ï¿½ Europe */
+    HI_DRV_DISP_FMT_PAL_K,            /* K PALï¿½ï¿½ Europe */
+    HI_DRV_DISP_FMT_PAL_I,            /* I PALï¿½ï¿½U.K. */
     HI_DRV_DISP_FMT_PAL_N,            /* N PAL, Jamaica/Uruguay */
     HI_DRV_DISP_FMT_PAL_Nc,           /* Nc PAL, Argentina */
 
@@ -558,13 +558,15 @@ typedef struct hiDRV_DISP_VERSION_S
 
 typedef enum hiDRV_DISP_CALLBACK_TYPE_E
 {
-    /* ÖÐ¶Ï·¢ÆðÎ»ÖÃ£¬ÒÔÐÐÓÐÐ§ÇøÎª²Î¿¼£¬0ÎªµÚÒ»ÐÐ£¬100Îª×îºóÒ»ÐÐ½áÊø */
+    /* ï¿½Ð¶Ï·ï¿½ï¿½ï¿½Î»ï¿½Ã£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð§ï¿½ï¿½Îªï¿½Î¿ï¿½ï¿½ï¿½0Îªï¿½ï¿½Ò»ï¿½Ð£ï¿½100Îªï¿½ï¿½ï¿½Ò»ï¿½Ð½ï¿½ï¿½ï¿½ */
     HI_DRV_DISP_C_TYPE_NONE = 0,
     //HI_DRV_DISP_C_SHOW_MODE,
     HI_DRV_DISP_C_INTPOS_0_PERCENT,
-    HI_DRV_DISP_C_INTPOS_90_PERCENT,
-    HI_DRV_DISP_C_GFX_WBC,
+    HI_DRV_DISP_C_INTPOS_90_PERCENT, //2
+    HI_DRV_DISP_C_GFX_WBC, //3
     HI_DRV_DISP_C_REG_UP,
+    HI_DRV_DISP_C_5, //5
+    HI_DRV_DISP_C_6, //6
     HI_DRV_DISP_C_TYPE_BUTT
 }HI_DRV_DISP_CALLBACK_TYPE_E;
 

@@ -51,7 +51,7 @@ typedef enum hiMOD_ID_E
     /**< video. */ /**< CNcomment: ��Ƶ���ֳ����� */
     HI_ID_VFMW        = 0x20,
     HI_ID_SVDEC       ,
-    HI_ID_DISP        ,
+    HI_ID_DISP        , //34
     HI_ID_HDMI        ,
     HI_ID_VO          ,
     HI_ID_VPSS        ,

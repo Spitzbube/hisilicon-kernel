@@ -182,7 +182,7 @@ typedef enum
     HIFB_LAYER_HD_1,
     HIFB_LAYER_HD_2,
     HIFB_LAYER_HD_3,
-    HIFB_LAYER_SD_0,    
+    HIFB_LAYER_SD_0, //4
     HIFB_LAYER_SD_1,    
     HIFB_LAYER_SD_2,     
     HIFB_LAYER_SD_3, 
@@ -317,9 +317,9 @@ typedef enum
     HIFB_FMT_PYUYV,         /**< YUYV */
     HIFB_FMT_PYVYU,         /**< YVYU */
     HIFB_FMT_YUV888,        /**< YUV888 */
-    HIFB_FMT_AYUV8888,      /**< AYUV8888 */
+    HIFB_FMT_AYUV8888, //32     /**< AYUV8888 */
     HIFB_FMT_YUVA8888,      /**< YUVA8888 */
-    HIFB_FMT_BUTT
+    HIFB_FMT_BUTT //34
 }HIFB_COLOR_FMT_E;
 
 /**HiFB capability set*/
@@ -329,10 +329,10 @@ typedef struct
     HI_BOOL bKeyAlpha;      /**< whether support colorkey alpha */
     HI_BOOL bGlobalAlpha;   /**< whether support global alpha */
     HI_BOOL bCmap;          /**< whether support color map */
-    HI_BOOL bHasCmapReg;    /**< whether has color map register*/
+    HI_BOOL bHasCmapReg; //12   /**< whether has color map register*/
     HI_BOOL bColFmt[HIFB_FMT_BUTT]; /**< support which color format */
     HI_BOOL bVoScale;       /**< support vo scale*/
-    HI_BOOL bLayerSupported;    /**< whether support a certain layer, for example:x5 HD support HIFB_SD_0 not support HIFB_SD_1*/
+    HI_BOOL bLayerSupported; //156   /**< whether support a certain layer, for example:x5 HD support HIFB_SD_0 not support HIFB_SD_1*/
     HI_BOOL bCompression;    /**< whether support compression */
     HI_BOOL bStereo;        /**< whether support 3D Stereo*/
     HI_U32  u32MaxWidth;    /**< the max pixels per line */
@@ -477,6 +477,14 @@ typedef enum
     HIFB_ZORDER_MOVEDOWN,     /**< Move downwards*//**<CNcomment:������*/
     HIFB_ZORDER_BUTT
 }HIFB_ZORDER_E;
+
+typedef struct
+{
+	int fill_0[25]; //0
+	HI_U32 u32LayerId; //100
+} HIFB_SLV_LAYER_INFO_S;
+
+
 
 /** @} */  /** <!-- ==== Structure Definition end ==== */
 

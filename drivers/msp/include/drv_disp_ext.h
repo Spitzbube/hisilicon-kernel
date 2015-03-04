@@ -120,8 +120,8 @@ typedef struct
     FN_DISP_GetMaster            pfnDispGetMaster;
     FN_DISP_GetDisplayInfo       pfnDispGetDispInfo;
     FN_DISP_Ioctl                pfnDispIoctl;
-    FN_DISP_RegCallback          pfnDispRegCallback;  
-    FN_DISP_UnRegCallback        pfnDispUnRegCallback;
+    FN_DISP_RegCallback          pfnDispRegCallback; //160
+    FN_DISP_UnRegCallback        pfnDispUnRegCallback; //164
     FN_DISP_UpdatePqData        pfnDispUpdatePqData;
 }DISP_EXPORT_FUNC_S;
 

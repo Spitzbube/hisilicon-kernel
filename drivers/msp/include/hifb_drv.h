@@ -268,7 +268,7 @@ typedef struct
 	HI_S32 (*HIFB_DRV_ClearLogo)(HIFB_LAYER_ID_E enLayerId); //168
 	HI_S32 (*HIFB_DRV_SetStereoDepth)(HIFB_LAYER_ID_E enLayerId, HI_S32 s32Depth); //172
 
-	HI_S32 (*HIFB_DRV_SetTCFlag)(HIFB_LAYER_ID_E enLayerId); //176
+	HI_S32 (*HIFB_DRV_SetTCFlag)(HI_U32 a); //176
 	HI_S32 (*HIFB_DRV_SetCmpSwitch)(HIFB_LAYER_ID_E enLayerId); //180
 	HI_S32 (*HIFB_DRV_GetCmpSwitch)(HIFB_LAYER_ID_E enLayerId); //184
 	HI_S32 (*HIFB_DRV_SetCmpRect)(HIFB_LAYER_ID_E enLayerId); //188
@@ -276,7 +276,7 @@ typedef struct
 	HI_S32 (*HIFB_DRV_GetCmpMode)(HIFB_LAYER_ID_E enLayerId); //196
 	HI_S32 (*HIFB_DRV_SetCmpDDROpen)(HIFB_LAYER_ID_E enLayerId); //200
 	HI_S32 (*HIFB_DRV_SetGpDeflicker)(HIFB_LAYER_ID_E enLayerId); //204
-	HI_S32 (*HIFB_DRV_GetSlvLayerInfo)(HIFB_LAYER_ID_E enLayerId); //208
+	HI_S32 (*HIFB_DRV_GetSlvLayerInfo)(HIFB_SLV_LAYER_INFO_S*); //208
 	//212?
 }HIFB_DRV_OPS_S;
 

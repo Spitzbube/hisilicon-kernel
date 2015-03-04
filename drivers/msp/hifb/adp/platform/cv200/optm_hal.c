@@ -138,12 +138,13 @@ HI_VOID OPTM_VDP_OpenGFX3(HI_BOOL bOpen)
 
 HI_VOID OPTM_VDP_CBM_SetMixerBkg(OPTM_VDP_CBM_MIX_E u32mixer_id, OPTM_VDP_BKG_S stBkg)
 {
-    volatile U_CBM_BKG1 CBM_BKG1;
-    volatile U_CBM_BKG2 CBM_BKG2;
+    //volatile U_CBM_BKG1 CBM_BKG1;
+    //volatile U_CBM_BKG2 CBM_BKG2;
     volatile U_MIXG0_BKG MIXG0_BKG;
     volatile U_MIXG0_BKALPHA MIXG0_BKALPHA;
-    volatile U_MIXV0_BKG MIXV0_BKG;
+    //volatile U_MIXV0_BKG MIXV0_BKG;
 
+#if 0
     if(u32mixer_id == VDP_CBM_MIX0)
     {
         /* DHD0  mixer link */
@@ -163,6 +164,9 @@ HI_VOID OPTM_VDP_CBM_SetMixerBkg(OPTM_VDP_CBM_MIX_E u32mixer_id, OPTM_VDP_BKG_S 
         OPTM_VDP_RegWrite((HI_U32)&(pOptmVdpReg->CBM_BKG2.u32), CBM_BKG2.u32); 
     }
     else if(u32mixer_id == VDP_CBM_MIXG0)
+#else
+    if(u32mixer_id == VDP_CBM_MIXG0)
+#endif
     {
         /* G0 mixer link */
         MIXG0_BKG.u32 = OPTM_VDP_RegRead((HI_U32)(&(pOptmVdpReg->MIXG0_BKG.u32)));;
@@ -179,6 +183,7 @@ HI_VOID OPTM_VDP_CBM_SetMixerBkg(OPTM_VDP_CBM_MIX_E u32mixer_id, OPTM_VDP_BKG_S 
 	{
 		return ;
 	}
+#if 0
     else if(u32mixer_id == VDP_CBM_MIXV0)
     {
         MIXV0_BKG.u32 = OPTM_VDP_RegRead((HI_U32)(&(pOptmVdpReg->MIXV0_BKG.u32)));;
@@ -187,6 +192,7 @@ HI_VOID OPTM_VDP_CBM_SetMixerBkg(OPTM_VDP_CBM_MIX_E u32mixer_id, OPTM_VDP_BKG_S 
         MIXV0_BKG.bits.mixer_bkgcr = stBkg.u32BkgV;
         OPTM_VDP_RegWrite((HI_U32)&(pOptmVdpReg->MIXV0_BKG.u32), MIXV0_BKG.u32); 
     }
+#endif
     else
     {
         HI_PRINT("Error! OPTM_VDP_CBM_SetMixerBkg() Select Wrong mixer ID\n");
@@ -263,9 +269,9 @@ HI_VOID OPTM_VDP_SetMixgPrio(OPTM_VDP_CBM_MIX_E u32mixer_id,HI_U32 u32prio)
 HI_VOID OPTM_VDP_CBM_SetMixerPrio(OPTM_VDP_CBM_MIX_E u32mixer_id,HI_U32 u32layer_id,HI_U32 u32prio)
 {
     volatile U_MIXG0_MIX MIXG0_MIX;
-    volatile U_MIXV0_MIX MIXV0_MIX;
-    volatile U_CBM_MIX1 CBM_MIX1;
-    volatile U_CBM_MIX2 CBM_MIX2;
+    //volatile U_MIXV0_MIX MIXV0_MIX;
+    //volatile U_CBM_MIX1 CBM_MIX1;
+    //volatile U_CBM_MIX2 CBM_MIX2;
     
     if (u32mixer_id == VDP_CBM_MIXG0)
     {
@@ -309,6 +315,7 @@ HI_VOID OPTM_VDP_CBM_SetMixerPrio(OPTM_VDP_CBM_MIX_E u32mixer_id,HI_U32 u32layer
     }
     else if(u32mixer_id == VDP_CBM_MIXG1)
         ;
+#if 0
     else if(u32mixer_id == VDP_CBM_MIXV0)
     {
         switch(u32prio)
@@ -390,6 +397,7 @@ HI_VOID OPTM_VDP_CBM_SetMixerPrio(OPTM_VDP_CBM_MIX_E u32mixer_id,HI_U32 u32layer
         }
 
     }
+#endif
 }
 //-------------------------------------------------------------------
 //GFX_BEGIN
@@ -2616,7 +2624,7 @@ HI_VOID OPTM_VDP_WBC_SetAutoSt(OPTM_VDP_LAYER_WBC_E enLayer, HI_U32 bEnable)
 HI_VOID OPTM_VDP_WBC_SetThreeMd(OPTM_VDP_LAYER_WBC_E enLayer, HI_U32 bMode)
 {
     volatile    U_WBC_GP0_CTRL  WBC_GP0_CTRL;
-    volatile    U_WBC_DHD0_CTRL    WBC_DHD0_CTRL;
+//    volatile    U_WBC_DHD0_CTRL    WBC_DHD0_CTRL;
 
     if(enLayer == OPTM_VDP_LAYER_WBC_GP0)
     {
@@ -2624,21 +2632,23 @@ HI_VOID OPTM_VDP_WBC_SetThreeMd(OPTM_VDP_LAYER_WBC_E enLayer, HI_U32 bMode)
         WBC_GP0_CTRL.bits.three_d_mode =  bMode;
         OPTM_VDP_RegWrite((HI_U32)(&(pOptmVdpReg->WBC_GP0_CTRL.u32)), WBC_GP0_CTRL.u32);
     }
+#if 0
     else if(enLayer == OPTM_VDP_LAYER_WBC_HD0)
     {
         WBC_DHD0_CTRL.u32 = OPTM_VDP_RegRead((HI_U32)(&(pOptmVdpReg->WBC_DHD0_CTRL.u32)));
         WBC_DHD0_CTRL.bits.three_d_mode =  bMode;
         OPTM_VDP_RegWrite((HI_U32)(&(pOptmVdpReg->WBC_DHD0_CTRL.u32)), WBC_DHD0_CTRL.u32);
     }
-
+#endif
 }
 
 HI_VOID OPTM_VDP_WBC_SetEnable( OPTM_VDP_LAYER_WBC_E enLayer, HI_U32 bEnable)
 {
-    volatile U_WBC_DHD0_CTRL WBC_DHD0_CTRL;
+//    volatile U_WBC_DHD0_CTRL WBC_DHD0_CTRL;
     volatile U_WBC_GP0_CTRL  WBC_GP0_CTRL;
+    volatile U_WBC_G0_CTRL   WBC_G0_CTRL;
 
-
+#if 0
     if( enLayer == OPTM_VDP_LAYER_WBC_HD0)
     {
         WBC_DHD0_CTRL.u32 = OPTM_VDP_RegRead((HI_U32)(&(pOptmVdpReg->WBC_DHD0_CTRL.u32)));
@@ -2646,6 +2656,9 @@ HI_VOID OPTM_VDP_WBC_SetEnable( OPTM_VDP_LAYER_WBC_E enLayer, HI_U32 bEnable)
         OPTM_VDP_RegWrite((HI_U32)(&(pOptmVdpReg->WBC_DHD0_CTRL.u32)), WBC_DHD0_CTRL.u32);
     }
     else if(enLayer == OPTM_VDP_LAYER_WBC_GP0)
+#else
+    if(enLayer == OPTM_VDP_LAYER_WBC_GP0)
+#endif
     {
         WBC_GP0_CTRL.u32 = OPTM_VDP_RegRead((HI_U32)(&(pOptmVdpReg->WBC_GP0_CTRL.u32)));
         WBC_GP0_CTRL.bits.wbc_en = bEnable;
@@ -2653,8 +2666,18 @@ HI_VOID OPTM_VDP_WBC_SetEnable( OPTM_VDP_LAYER_WBC_E enLayer, HI_U32 bEnable)
 
 
     }
-
-
+    else if(enLayer == OPTM_VDP_LAYER_WBC_2)
+    {
+        WBC_G0_CTRL.u32 = OPTM_VDP_RegRead((HI_U32)(&(pOptmVdpReg->WBC_G0_CTRL.u32)));
+        WBC_G0_CTRL.bits.wbc_en = bEnable;
+        OPTM_VDP_RegWrite((HI_U32)(&(pOptmVdpReg->WBC_G0_CTRL.u32)), WBC_G0_CTRL.u32);
+    }
+    else if(enLayer == OPTM_VDP_LAYER_WBC_3)
+    {
+        WBC_G0_CTRL.u32 = OPTM_VDP_RegRead(((HI_U32)(&(pOptmVdpReg->WBC_G0_CTRL.u32)))+0x400);
+        WBC_G0_CTRL.bits.wbc_en = bEnable;
+        OPTM_VDP_RegWrite(((HI_U32)(&(pOptmVdpReg->WBC_G0_CTRL.u32)))+0x400, WBC_G0_CTRL.u32);
+    }
 }
 
 HI_VOID OPTM_VDP_WBC_GetEnable( OPTM_VDP_LAYER_WBC_E enLayer, HI_U32 *pU32Enable)
@@ -2680,8 +2703,9 @@ HI_VOID OPTM_VDP_WBC_GetEnable( OPTM_VDP_LAYER_WBC_E enLayer, HI_U32 *pU32Enable
 
 HI_VOID OPTM_VDP_WBC_SetOutIntf (OPTM_VDP_LAYER_WBC_E enLayer, OPTM_VDP_DATA_RMODE_E u32RdMode)
 {
-    volatile U_WBC_DHD0_CTRL WBC_DHD0_CTRL;
+//    volatile U_WBC_DHD0_CTRL WBC_DHD0_CTRL;
     volatile U_WBC_GP0_CTRL  WBC_GP0_CTRL;
+#if 0
     if( enLayer == OPTM_VDP_LAYER_WBC_HD0) 
     {
         WBC_DHD0_CTRL.u32 = OPTM_VDP_RegRead((HI_U32)(&(pOptmVdpReg->WBC_DHD0_CTRL.u32)));
@@ -2689,6 +2713,9 @@ HI_VOID OPTM_VDP_WBC_SetOutIntf (OPTM_VDP_LAYER_WBC_E enLayer, OPTM_VDP_DATA_RMO
         OPTM_VDP_RegWrite((HI_U32)(&(pOptmVdpReg->WBC_DHD0_CTRL.u32)), WBC_DHD0_CTRL.u32);
     }
     else if( enLayer == OPTM_VDP_LAYER_WBC_GP0) 
+#else
+    if( enLayer == OPTM_VDP_LAYER_WBC_GP0)
+#endif
     {
         WBC_GP0_CTRL.u32 = OPTM_VDP_RegRead((HI_U32)(&(pOptmVdpReg->WBC_GP0_CTRL.u32)));
         WBC_GP0_CTRL.bits.mode_out = u32RdMode;            
@@ -2702,9 +2729,11 @@ HI_VOID OPTM_VDP_WBC_SetOutIntf (OPTM_VDP_LAYER_WBC_E enLayer, OPTM_VDP_DATA_RMO
 
 HI_VOID  OPTM_VDP_WBC_SetRegUp (OPTM_VDP_LAYER_WBC_E enLayer)
 {
-    volatile U_WBC_DHD0_UPD WBC_DHD0_UPD;
+//    volatile U_WBC_DHD0_UPD WBC_DHD0_UPD;
     volatile U_WBC_GP0_UPD WBC_GP0_UPD;
+    volatile U_WBC_G0_UPD WBC_G0_UPD;
 
+#if 0
     if(enLayer == OPTM_VDP_LAYER_WBC_HD0)
     {
         WBC_DHD0_UPD.bits.regup = 0x1;
@@ -2713,11 +2742,24 @@ HI_VOID  OPTM_VDP_WBC_SetRegUp (OPTM_VDP_LAYER_WBC_E enLayer)
         return ;
     }
     else if(enLayer == OPTM_VDP_LAYER_WBC_GP0)
+#else
+    if(enLayer == OPTM_VDP_LAYER_WBC_GP0)
+#endif
     {
         WBC_GP0_UPD.bits.regup = 0x1;
         OPTM_VDP_RegWrite((HI_U32)(&(pOptmVdpReg->WBC_GP0_UPD.u32)), WBC_GP0_UPD.u32); 
 
         return ;
+    }
+    else if(enLayer == OPTM_VDP_LAYER_WBC_2)
+    {
+    	WBC_G0_UPD.bits.regup = 0x1;
+        OPTM_VDP_RegWrite((HI_U32)(&(pOptmVdpReg->WBC_G0_UPD.u32)), WBC_G0_UPD.u32);
+    }
+    else if(enLayer == OPTM_VDP_LAYER_WBC_3)
+    {
+    	WBC_G0_UPD.bits.regup = 0x1;
+        OPTM_VDP_RegWrite(((HI_U32)(&(pOptmVdpReg->WBC_G0_UPD.u32)))+0x400, WBC_G0_UPD.u32);
     }
 
 }
@@ -2725,9 +2767,10 @@ HI_VOID  OPTM_VDP_WBC_SetRegUp (OPTM_VDP_LAYER_WBC_E enLayer)
 HI_VOID OPTM_VDP_WBC_SetOutFmt(OPTM_VDP_LAYER_WBC_E enLayer, OPTM_VDP_WBC_OFMT_E stIntfFmt)
 
 {
-    volatile U_WBC_DHD0_CTRL WBC_DHD0_CTRL;
     volatile U_WBC_GP0_CTRL   WBC_GP0_CTRL;
+    volatile U_WBC_G0_CTRL WBC_G0_CTRL;
 
+#if 0
     if(enLayer == OPTM_VDP_LAYER_WBC_HD0)
     {
         WBC_DHD0_CTRL.u32 = OPTM_VDP_RegRead((HI_U32)(&(pOptmVdpReg->WBC_DHD0_CTRL.u32)));
@@ -2735,12 +2778,26 @@ HI_VOID OPTM_VDP_WBC_SetOutFmt(OPTM_VDP_LAYER_WBC_E enLayer, OPTM_VDP_WBC_OFMT_E
         OPTM_VDP_RegWrite((HI_U32)(&(pOptmVdpReg->WBC_DHD0_CTRL.u32)), WBC_DHD0_CTRL.u32);
     }
     else if(enLayer == OPTM_VDP_LAYER_WBC_GP0)
+#else
+    if(enLayer == OPTM_VDP_LAYER_WBC_GP0)
+#endif
     {
         WBC_GP0_CTRL.u32 = OPTM_VDP_RegRead((HI_U32)(&(pOptmVdpReg->WBC_GP0_CTRL.u32)));
         WBC_GP0_CTRL.bits.format_out = stIntfFmt;
         OPTM_VDP_RegWrite((HI_U32)(&(pOptmVdpReg->WBC_GP0_CTRL.u32)), WBC_GP0_CTRL.u32);
     }
-
+    else if(enLayer == OPTM_VDP_LAYER_WBC_2)
+    {
+    	WBC_G0_CTRL.u32 = OPTM_VDP_RegRead((HI_U32)(&(pOptmVdpReg->WBC_G0_CTRL.u32)));
+    	WBC_G0_CTRL.bits.format_out = stIntfFmt;
+        OPTM_VDP_RegWrite((HI_U32)(&(pOptmVdpReg->WBC_G0_CTRL.u32)), WBC_G0_CTRL.u32);
+    }
+    else if(enLayer == OPTM_VDP_LAYER_WBC_3)
+    {
+    	WBC_G0_CTRL.u32 = OPTM_VDP_RegRead(((HI_U32)(&(pOptmVdpReg->WBC_G0_CTRL.u32)))+0x400);
+    	WBC_G0_CTRL.bits.format_out = stIntfFmt;
+        OPTM_VDP_RegWrite(((HI_U32)(&(pOptmVdpReg->WBC_G0_CTRL.u32)))+0x400, WBC_G0_CTRL.u32);
+    }
 
 }
 
@@ -2766,7 +2823,7 @@ HI_VOID OPTM_VDP_WBC_SetSpd(OPTM_VDP_LAYER_WBC_E enLayer, HI_U32 u32ReqSpd)
 
 HI_VOID  OPTM_VDP_WBC_SetLayerAddr   (OPTM_VDP_LAYER_WBC_E enLayer, HI_U32 u32LAddr,HI_U32 u32CAddr,HI_U32 u32LStr, HI_U32 u32CStr)
 {
-    volatile U_WBC_DHD0_STRIDE WBC_DHD0_STRIDE;
+//    volatile U_WBC_DHD0_STRIDE WBC_DHD0_STRIDE;
 //    U_WBC_DHD0_YADDR  WBC_DHD0_YADDR ;
 //    U_WBC_DHD0_CADDR  WBC_DHD0_CADDR ;
 
@@ -2774,6 +2831,9 @@ HI_VOID  OPTM_VDP_WBC_SetLayerAddr   (OPTM_VDP_LAYER_WBC_E enLayer, HI_U32 u32LA
 //    U_WBC_GP0_YADDR  WBC_GP0_YADDR ;
 //    U_WBC_GP0_CADDR  WBC_GP0_CADDR ;
 
+    volatile U_WBC_G0_STRIDE WBC_G0_STRIDE;
+
+#if 0
     if (enLayer == OPTM_VDP_LAYER_WBC_HD0)
     {
         OPTM_VDP_RegWrite((HI_U32)(&(pOptmVdpReg->WBC_DHD0_YADDR.u32)), u32LAddr); 
@@ -2786,6 +2846,9 @@ HI_VOID  OPTM_VDP_WBC_SetLayerAddr   (OPTM_VDP_LAYER_WBC_E enLayer, HI_U32 u32LA
     }
 
     else if (enLayer == OPTM_VDP_LAYER_WBC_GP0)
+#else
+    if (enLayer == OPTM_VDP_LAYER_WBC_GP0)
+#endif
     {
         OPTM_VDP_RegWrite((HI_U32)(&(pOptmVdpReg->WBC_GP0_YADDR.u32)), u32LAddr); 
         OPTM_VDP_RegWrite((HI_U32)(&(pOptmVdpReg->WBC_GP0_CADDR.u32)), u32CAddr); 
@@ -2795,7 +2858,20 @@ HI_VOID  OPTM_VDP_WBC_SetLayerAddr   (OPTM_VDP_LAYER_WBC_E enLayer, HI_U32 u32LA
 
         return ;
     }
-
+    else if(enLayer == OPTM_VDP_LAYER_WBC_2)
+    {
+        OPTM_VDP_RegWrite((HI_U32)(&(pOptmVdpReg->WBC_G0_YADDR.u32)), u32LAddr);
+        OPTM_VDP_RegWrite((HI_U32)(&(pOptmVdpReg->WBC_G0_CADDR.u32)), u32CAddr);
+        WBC_G0_STRIDE.bits.wbcstride = u32LStr;
+        OPTM_VDP_RegWrite((HI_U32)(&(pOptmVdpReg->WBC_G0_STRIDE.u32)), WBC_G0_STRIDE.u32);
+    }
+    else if(enLayer == OPTM_VDP_LAYER_WBC_3)
+    {
+        OPTM_VDP_RegWrite(((HI_U32)(&(pOptmVdpReg->WBC_G0_YADDR.u32)))+0x400, u32LAddr);
+        OPTM_VDP_RegWrite(((HI_U32)(&(pOptmVdpReg->WBC_G0_CADDR.u32)))+0x400, u32CAddr);
+        WBC_G0_STRIDE.bits.wbcstride = u32LStr;
+        OPTM_VDP_RegWrite(((HI_U32)(&(pOptmVdpReg->WBC_G0_STRIDE.u32)))+0x400, WBC_G0_STRIDE.u32);
+    }
 }
 
 HI_VOID  OPTM_VDP_WBC_SetLayerReso     (OPTM_VDP_LAYER_WBC_E enLayer, OPTM_VDP_DISP_RECT_S  stRect)
@@ -2831,10 +2907,10 @@ HI_VOID  OPTM_VDP_WBC_SetLayerReso     (OPTM_VDP_LAYER_WBC_E enLayer, OPTM_VDP_D
 HI_VOID OPTM_VDP_WBC_SetDitherMode  (OPTM_VDP_LAYER_WBC_E enLayer, OPTM_VDP_DITHER_E enDitherMode)
 
 {
-    volatile U_WBC_DHD0_DITHER_CTRL WBC_DHD0_DITHER_CTRL;
+//    volatile U_WBC_DHD0_DITHER_CTRL WBC_DHD0_DITHER_CTRL;
     volatile U_WBC_GP0_DITHER_CTRL WBC_GP0_DITHER_CTRL;
 
-
+#if 0
     if(enLayer == OPTM_VDP_LAYER_WBC_HD0)
     {
 
@@ -2844,8 +2920,11 @@ HI_VOID OPTM_VDP_WBC_SetDitherMode  (OPTM_VDP_LAYER_WBC_E enLayer, OPTM_VDP_DITH
 
     }
     else if(enLayer == OPTM_VDP_LAYER_WBC_GP0)
+#else
+     if(enLayer == OPTM_VDP_LAYER_WBC_GP0)
+#endif
     {
-
+#warning TODO: OPTM_VDP_WBC_SetDitherMode
         WBC_GP0_DITHER_CTRL.u32 = OPTM_VDP_RegRead((HI_U32)(&(pOptmVdpReg->WBC_GP0_DITHER_CTRL.u32)));
         WBC_GP0_DITHER_CTRL.bits.dither_md = enDitherMode;
         OPTM_VDP_RegWrite((HI_U32)(&(pOptmVdpReg->WBC_GP0_DITHER_CTRL.u32)), WBC_GP0_DITHER_CTRL.u32);

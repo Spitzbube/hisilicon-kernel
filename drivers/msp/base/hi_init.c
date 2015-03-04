@@ -29,7 +29,9 @@
 #include "drv_ir_ext.h"
 #include "drv_jpeg_ext.h"
 #include "drv_jpge_ext.h"
+#endif
 #include "drv_hifb_ext.h"
+#if 0
 #include "drv_tde_ext.h"
 #endif
 #include "drv_tuner_ext.h"
@@ -56,7 +58,7 @@
 #ifndef MODULE
 HI_S32 HI_DRV_LoadModules(HI_VOID)
 {
-	printk("--> HI_DRV_LoadModules");
+	printk("--> HI_DRV_LoadModules\n");
 
     GPIO_DRV_ModInit();
 
@@ -80,9 +82,11 @@ HI_S32 HI_DRV_LoadModules(HI_VOID)
     VDP_DRV_ModInit();
 
     TDE_DRV_ModInit();
+#endif
 
     HIFB_DRV_ModInit();
 
+#if 0
     JPEG_DRV_ModInit();
 #endif
 
@@ -161,7 +165,7 @@ HI_S32 HI_DRV_LoadModules(HI_VOID)
 #endif
 #endif
 
-    printk("<-- HI_DRV_LoadModules");
+    printk("<-- HI_DRV_LoadModules\n");
 
     return HI_SUCCESS;
 }

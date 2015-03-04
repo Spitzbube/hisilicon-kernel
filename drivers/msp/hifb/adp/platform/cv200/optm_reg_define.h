@@ -5872,7 +5872,7 @@ typedef union
     {
         unsigned int    mixer_prio0           : 4   ; // [3..0] 
         unsigned int    mixer_prio1           : 4   ; // [7..4] 
-        unsigned int    Reserved_404          : 24  ; // [31..8] 
+        unsigned int    Reserved_404          : 24  ; // [31..8]
     } bits;
 
     // Define an unsigned member
@@ -8908,22 +8908,22 @@ typedef struct
     U_VP0_CSC1_P2        VP0_CSC1_P2;
     U_VP0_CSC1_P3        VP0_CSC1_P3;
     U_VP0_CSC1_P4        VP0_CSC1_P4;
-    unsigned int         Reserved_60[1840];
-    U_G0_CTRL            G0_CTRL;
-    U_G0_UPD             G0_UPD;
+    unsigned int         Reserved_60[1840+1024];
+    U_G0_CTRL            G0_CTRL; //0x7000
+    U_G0_UPD             G0_UPD; //0x7004
     unsigned int         Reserved_61[2];
     U_G0_ADDR            G0_ADDR;
     unsigned int         Reserved_62;
     U_G0_NADDR           G0_NADDR;
-    U_G0_STRIDE          G0_STRIDE;
+    U_G0_STRIDE          G0_STRIDE; //0x701c
     U_G0_IRESO           G0_IRESO;
     U_G0_SFPOS           G0_SFPOS;
     unsigned int         Reserved_63[2];
-    U_G0_CBMPARA         G0_CBMPARA;
-    U_G0_CKEYMAX         G0_CKEYMAX;
-    U_G0_CKEYMIN         G0_CKEYMIN;
+    U_G0_CBMPARA         G0_CBMPARA; //0x7030
+    U_G0_CKEYMAX         G0_CKEYMAX; //0x7034
+    U_G0_CKEYMIN         G0_CKEYMIN; //0x7038
     U_G0_CMASK           G0_CMASK;
-    U_G0_PARAADDR        G0_PARAADDR;
+    U_G0_PARAADDR        G0_PARAADDR; //0x7040
     U_G0_PARAUP          G0_PARAUP;
     unsigned int         Reserved_64[2];
     U_G0_DCMP_ADDR       G0_DCMP_ADDR;
@@ -8934,13 +8934,13 @@ typedef struct
     U_G0_DLPOS           G0_DLPOS;
     U_G0_VFPOS           G0_VFPOS;
     U_G0_VLPOS           G0_VLPOS;
-    U_G0_BK              G0_BK;
-    U_G0_ALPHA           G0_ALPHA;
+    U_G0_BK              G0_BK; //0x7090
+    U_G0_ALPHA           G0_ALPHA; //0x7094
     unsigned int         Reserved_66[2];
     U_G0_DOF_CTRL        G0_DOF_CTRL;
     U_G0_DOF_STEP        G0_DOF_STEP;
-    unsigned int         Reserved_67[3030];
-    U_GP0_CTRL           GP0_CTRL;
+    unsigned int         Reserved_67[3030-2048];
+    U_GP0_CTRL           GP0_CTRL; //0x8000
     U_GP0_UPD            GP0_UPD;
     U_GP0_ORESO          GP0_ORESO;
     U_GP0_IRESO          GP0_IRESO;
@@ -8948,7 +8948,7 @@ typedef struct
     U_GP0_VCOEFAD        GP0_VCOEFAD;
     U_GP0_PARAUP         GP0_PARAUP;
     unsigned int         Reserved_68;
-    U_GP0_GALPHA         GP0_GALPHA;
+    U_GP0_GALPHA         GP0_GALPHA; //0x8020
     unsigned int         Reserved_69[55];
     U_GP0_DFPOS          GP0_DFPOS;
     U_GP0_DLPOS          GP0_DLPOS;
@@ -8971,44 +8971,60 @@ typedef struct
     U_GP0_ZME_VSR        GP0_ZME_VSR;
     U_GP0_ZME_VOFFSET    GP0_ZME_VOFFSET;
     unsigned int         Reserved_71[3];
-    U_GP0_ZME_LTICTRL    GP0_ZME_LTICTRL;
-    U_GP0_ZME_LHPASSCOEF GP0_ZME_LHPASSCOEF;
-    U_GP0_ZME_LTITHD     GP0_ZME_LTITHD;
+    U_GP0_ZME_LTICTRL    GP0_ZME_LTICTRL; //0x8160
+    U_GP0_ZME_LHPASSCOEF GP0_ZME_LHPASSCOEF; //0x8164
+    U_GP0_ZME_LTITHD     GP0_ZME_LTITHD; //0x8168
     unsigned int         Reserved_72;
-    U_GP0_ZME_LHFREQTHD  GP0_ZME_LHFREQTHD;
-    U_GP0_ZME_LGAINCOEF  GP0_ZME_LGAINCOEF;
+    U_GP0_ZME_LHFREQTHD  GP0_ZME_LHFREQTHD; //0x8170
+    U_GP0_ZME_LGAINCOEF  GP0_ZME_LGAINCOEF; //0x8174
     unsigned int         Reserved_73[2];
-    U_GP0_ZME_CTICTRL    GP0_ZME_CTICTRL;
-    U_GP0_ZME_CHPASSCOEF GP0_ZME_CHPASSCOEF;
-    U_GP0_ZME_CTITHD     GP0_ZME_CTITHD;
+    U_GP0_ZME_CTICTRL    GP0_ZME_CTICTRL; //0x8180
+    U_GP0_ZME_CHPASSCOEF GP0_ZME_CHPASSCOEF; //0x8184
+    U_GP0_ZME_CTITHD     GP0_ZME_CTITHD; //0x8188
     unsigned int         Reserved_74[925];
-    U_WBC_G0_CTRL        WBC_G0_CTRL;
-    U_WBC_G0_UPD         WBC_G0_UPD;
+#if 0
+    U_WBC_G0_CTRL        WBC_G0_CTRL; //????
+    U_WBC_G0_UPD         WBC_G0_UPD; //???
+#else
+    int fill_WBC_G0_CTRL[2];
+#endif
     U_WBC_G0_CMP         WBC_G0_CMP;
     unsigned int         Reserved_75;
     U_WBC_G0_AR_ADDR     WBC_G0_AR_ADDR;
     U_WBC_G0_GB_ADDR     WBC_G0_GB_ADDR;
-    U_WBC_G0_STRIDE      WBC_G0_STRIDE;
+#if 0
+    U_WBC_G0_STRIDE      WBC_G0_STRIDE; //????
+#else
+    int fill_WBC_G0_STRIDE;
+#endif
     U_WBC_G0_OFFSET      WBC_G0_OFFSET;
     U_WBC_G0_ORESO       WBC_G0_ORESO;
     U_WBC_G0_FCROP       WBC_G0_FCROP;
     U_WBC_G0_LCROP       WBC_G0_LCROP;
-    unsigned int         Reserved_76[501];
-    U_WBC_GP0_CTRL       WBC_GP0_CTRL;
-    U_WBC_GP0_UPD        WBC_GP0_UPD;
+    unsigned int         Reserved_76[501- 256];
+    U_WBC_GP0_CTRL       WBC_GP0_CTRL; //0x9400
+    U_WBC_GP0_UPD        WBC_GP0_UPD; //0x9404
     unsigned int         Reserved_77[2];
-    U_WBC_GP0_YADDR      WBC_GP0_YADDR;
-    U_WBC_GP0_CADDR      WBC_GP0_CADDR;
-    U_WBC_GP0_STRIDE     WBC_GP0_STRIDE;
+    U_WBC_GP0_YADDR      WBC_GP0_YADDR; //0x9410
+    U_WBC_GP0_CADDR      WBC_GP0_CADDR; //0x9414
+    U_WBC_GP0_STRIDE     WBC_GP0_STRIDE; //0x9418
     unsigned int         Reserved_78;
     U_WBC_GP0_ORESO      WBC_GP0_ORESO;
     U_WBC_GP0_FCROP      WBC_GP0_FCROP;
     U_WBC_GP0_LCROP      WBC_GP0_LCROP;
     unsigned int         Reserved_79[53];
-    U_WBC_GP0_DITHER_CTRL WBC_GP0_DITHER_CTRL;
+    U_WBC_GP0_DITHER_CTRL WBC_GP0_DITHER_CTRL; //0x9500
     U_WBC_GP0_DITHER_COEF0 WBC_GP0_DITHER_COEF0;
     U_WBC_GP0_DITHER_COEF1 WBC_GP0_DITHER_COEF1;
     unsigned int         Reserved_80[189];
+
+    U_WBC_G0_CTRL        WBC_G0_CTRL; //0x9800???
+    U_WBC_G0_UPD         WBC_G0_UPD; //0x9804
+    unsigned int         Reserved_0x9808[2];
+    U_WBC_GP0_YADDR      WBC_G0_YADDR; //0x9810
+    U_WBC_GP0_CADDR      WBC_G0_CADDR; //0x9814
+    U_WBC_G0_STRIDE      WBC_G0_STRIDE; //0x9818
+
     U_WBC_DHD0_CTRL      WBC_DHD0_CTRL;
     U_WBC_DHD0_UPD       WBC_DHD0_UPD;
     unsigned int         Reserved_81[2];
@@ -9071,14 +9087,17 @@ typedef struct
     U_WBC_DHD0_CSCP2     WBC_DHD0_CSCP2;
     U_WBC_DHD0_CSCP3     WBC_DHD0_CSCP3;
     U_WBC_DHD0_CSCP4     WBC_DHD0_CSCP4;
-    unsigned int         Reserved_92[57];
+    unsigned int         Reserved_92[57-7];
+
+    int fill_9c00[256];
+
     U_MIXV0_BKG          MIXV0_BKG;
     unsigned int         Reserved_93;
     U_MIXV0_MIX          MIXV0_MIX;
-    unsigned int         Reserved_94[125];
-    U_MIXG0_BKG          MIXG0_BKG;
-    U_MIXG0_BKALPHA      MIXG0_BKALPHA;
-    U_MIXG0_MIX          MIXG0_MIX;
+    unsigned int         Reserved_94[125+1024/*?*/];
+    U_MIXG0_BKG          MIXG0_BKG; //0xb200
+    U_MIXG0_BKALPHA      MIXG0_BKALPHA; //0xb204
+    U_MIXG0_MIX          MIXG0_MIX; //0xb208
     unsigned int         Reserved_95[125];
     U_CBM_BKG1           CBM_BKG1;
     unsigned int         Reserved_96;

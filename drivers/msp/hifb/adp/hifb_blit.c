@@ -55,6 +55,7 @@ HI_S32 HIFB_DRV_TdeOpen(HI_VOID)
         return HI_SUCCESS;
     }
 	   
+#warning module HI_ID_TDE not yet implemented!
     if (HI_SUCCESS != HI_DRV_MODULE_GetFunction(HI_ID_TDE, (HI_VOID**)&ps_TdeExportFuncs))
     {
     	return HI_FAILURE;
@@ -62,7 +63,7 @@ HI_S32 HIFB_DRV_TdeOpen(HI_VOID)
 
     if(HI_NULL == ps_TdeExportFuncs)
     {
-        HIFB_ERROR("Tde is not available!\n");
+        HIFB_ERROR("Tde is not available!\n"); //65
         return HI_FAILURE;
     }
 

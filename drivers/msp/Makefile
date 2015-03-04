@@ -1,5 +1,6 @@
 
 ccflags-y += -Ifs
+ccflags-y += -Idrivers
 ccflags-y += -Idrivers/msp/include
 ccflags-y += -Idrivers/msp/adsp/adsp_v1_1/include
 ccflags-y += -Idrivers/msp/demux
@@ -122,6 +123,7 @@ obj-y += hifb/adp/hifb_blit.o
 obj-y += hifb/adp/platform/alg/optm_alg_gzme.o
 obj-y += hifb/adp/platform/alg/optm_alg_zme_coef.o
 obj-y += hifb/adp/platform/cv200/optm_hifb.o
+obj-y += hifb/adp/platform/alg/optm_alg_gsharp.o
 obj-y += hifb/adp/platform/cv200/optm_hal.o
 
 obj-y += mce/drv_mce_intf.o

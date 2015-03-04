@@ -259,10 +259,10 @@ static HI_S32 stat_proc_write(struct file * file,
 }
 #endif
 
-static HI_S32 func_80539d84(struct seq_file *s, HI_VOID *pArg)
+static HI_S32 low_delay_proc_read(struct seq_file *s, HI_VOID *pArg)
 {
-#warning func_80539d84: TODO
-	printk("func_80539d84: TODO\n");
+#warning low_delay_proc_read: TODO
+	printk("low_delay_proc_read: TODO\n");
 }
 
 HI_VOID stat_event_fun(STAT_EVENT_E enEvent, HI_U32 Value);
@@ -320,7 +320,7 @@ HI_S32 HI_DRV_STAT_Init(HI_VOID)
         return -1;
     }
 
-    item2->read = func_80539d84; //stat_proc_read;
+    item2->read = low_delay_proc_read;
     item2->write = NULL;
 
     return 0;

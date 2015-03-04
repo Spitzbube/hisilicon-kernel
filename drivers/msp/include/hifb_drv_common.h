@@ -95,7 +95,9 @@ typedef enum
 
 	/*VO Register update completed interrupt */
     /*CNcomment:�Ĵ�����������ж�*/
-    HIFB_CALLBACK_TYPE_REGUP = 0x4, 
+    HIFB_CALLBACK_TYPE_REGUP = 0x4,
+
+    HIFB_CALLBACK_TYPE_0x10 = 0x10,
     
     HIFB_CALLBACK_TYPE_BUTT,
 }HIFB_CALLBACK_TPYE_E;
@@ -122,7 +124,7 @@ typedef enum
 typedef enum tagHIFB_GFX_MODE_EN
 {
     HIFB_GFX_MODE_NORMAL = 0,
-    HIFB_GFX_MODE_HD_WBC,
+    HIFB_GFX_MODE_HD_WBC, //1
     HIFB_GFX_MODE_BUTT
 }HIFB_GFX_MODE_EN;
 

@@ -74,7 +74,7 @@ typedef enum optm_COLOR_SPACE_E
     OPTM_CS_BT709_YUV_LIMITED,/* BT.709 */
     OPTM_CS_BT709_YUV_FULL,
     OPTM_CS_BT709_RGB_LIMITED,
-    OPTM_CS_BT709_RGB_FULL,
+    OPTM_CS_BT709_RGB_FULL, //8
     
     OPTM_CS_BUTT
 } OPTM_COLOR_SPACE_E;
@@ -245,8 +245,8 @@ typedef struct
 	HI_S32 (*OPTM_GFX_SetCmpMode)(HIFB_LAYER_ID_E enLayerId, int b); //172
 	HI_S32 (*OPTM_GFX_GetCmpMode)(HIFB_LAYER_ID_E enLayerId); //176
 	HI_S32 (*OPTM_GFX_SetCmpDDROpen)(HIFB_LAYER_ID_E enLayerId, int b); //180
-	HI_S32 (*OPTM_GFX_GetSlvLayerInfo)(HIFB_LAYER_ID_E enLayerId); //184
-	HI_S32 (*OPTM_GFX_SetTCFlag)(HIFB_LAYER_ID_E enLayerId); //188
+	HI_S32 (*OPTM_GFX_GetSlvLayerInfo)(HIFB_SLV_LAYER_INFO_S*); //184
+	HI_S32 (*OPTM_GFX_SetTCFlag)(HI_U32 a); //188
 	HI_S32 (*OPTM_GFX_SetGpDeflicker)(int, int); //192
 }OPTM_GFX_OPS_S;
 

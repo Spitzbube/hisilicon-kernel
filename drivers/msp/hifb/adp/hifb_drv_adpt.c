@@ -389,9 +389,9 @@ HI_S32 HIFB_DRV_SetStereoDepth(HIFB_LAYER_ID_E enLayerId, HI_S32 s32Depth)
 	return g_stGfxOps.OPTM_GFX_SetStereoDepth(enLayerId, s32Depth);
 }
 
-HI_S32 HIFB_DRV_SetTCFlag(HIFB_LAYER_ID_E enLayerId)
+HI_S32 HIFB_DRV_SetTCFlag(HI_U32 a)
 {
-	return g_stGfxOps.OPTM_GFX_SetTCFlag(enLayerId);
+	return g_stGfxOps.OPTM_GFX_SetTCFlag(a);
 }
 
 HI_S32 HIFB_DRV_SetCmpSwitch(HIFB_LAYER_ID_E enLayerId, int b)
@@ -436,9 +436,9 @@ HI_S32 HIFB_DRV_SetGpDeflicker(int a, int b)
 	return g_stGfxOps.OPTM_GFX_SetGpDeflicker(!a, b);
 }
 
-HI_S32 HIFB_DRV_GetSlvLayerInfo(HIFB_LAYER_ID_E enLayerId)
+HI_S32 HIFB_DRV_GetSlvLayerInfo(HIFB_SLV_LAYER_INFO_S* a)
 {
-	return g_stGfxOps.OPTM_GFX_GetSlvLayerInfo(enLayerId);
+	return g_stGfxOps.OPTM_GFX_GetSlvLayerInfo(a);
 }
 
 

@@ -204,6 +204,8 @@ static HI_U32 OPTM_GZmeLoadCoefH(OPTM_GZME_COEF_RATIO_E enCoefRatio, HI_U8 *pu8A
     HI_U32 u32TableTmpSize;
     OPTM_ZME_COEF_BITARRAY_S stArray;   /*for DTI coefficient*/
 
+#warning TODO: OPTM_GZmeLoadCoefH
+
 	memset(u16TableTmp, 0, sizeof(u16TableTmp));
     //Luma
     u32TableTmpSize = OPTM_GZmeTransCoefAlign(g_pOPTMGfxZmeCoef[enCoefRatio][GZME_COEF_8T8P_LH],(HI_S16)(8 * 8), u16TableTmp);
@@ -232,6 +234,7 @@ static HI_S32 OPTM_GZmeLoadCoefV(OPTM_GZME_COEF_RATIO_E enCoefRatio, HI_U8 *pu8A
     HI_S32 i;
     OPTM_ZME_COEF_BITARRAY_S stArray;
 
+#warning TODO: OPTM_GZmeLoadCoefV
 
     ps16L   = g_pOPTMGfxZmeCoef[enCoefRatio][GZME_COEF_4T16P_LV];
     ps16Ch  = g_pOPTMGfxZmeCoef[enCoefRatio][GZME_COEF_4T16P_CV];
@@ -269,6 +272,8 @@ static HI_U32 OPTM_GZmeLoadSDCoefH(OPTM_GZME_COEF_RATIO_E enCoefRatio, HI_U8 *pu
     HI_S16 u16TableTmp[8 * 8];
     HI_U32 u32TableTmpSize;
 
+#warning TODO: OPTM_GZmeLoadSDCoefH
+
 	memset(u16TableTmp,0,sizeof(u16TableTmp));
     //����
     u32TableTmpSize = OPTM_GZmeTransCoefAlign(g_pOPTMGfxSDZmeCoef[enCoefRatio][GZME_COEF_8T8P_LH],(HI_S16)(8 * 8), u16TableTmp);
@@ -290,6 +295,8 @@ static HI_S32 OPTM_GZmeLoadSDCoefV(OPTM_GZME_COEF_RATIO_E enCoefRatio, HI_U8 *pu
     const HI_S16 *ps16L, *ps16Ch;
     HI_S16 *ps16Dst;
     HI_S32 i;
+
+#warning TODO: OPTM_GZmeLoadSDCoefV
 
     ps16L   = g_pOPTMGfxSDZmeCoef[enCoefRatio][GZME_COEF_4T16P_LV];
     ps16Ch  = g_pOPTMGfxSDZmeCoef[enCoefRatio][GZME_COEF_4T16P_CV];

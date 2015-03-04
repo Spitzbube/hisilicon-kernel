@@ -45,7 +45,7 @@
 
 #define OPTM_VID_OFFSET 0x800 
 #define OPTM_VP_OFFSET  0x800 
-#define OPTM_GFX_OFFSET 0x800 
+#define OPTM_GFX_OFFSET 0x200 //0x800
 #define OPTM_GP_OFFSET  0x800 
 #define OPTM_MIX_OFFSET 0x100 
 #define OPTM_CHN_OFFSET 0x400
@@ -91,6 +91,8 @@ typedef enum tagVDP_LAYER_WBC_E
 {
     OPTM_VDP_LAYER_WBC_GP0  = 0,
     OPTM_VDP_LAYER_WBC_HD0  = 1,
+    OPTM_VDP_LAYER_WBC_2 = 2,
+    OPTM_VDP_LAYER_WBC_3 = 3,
     OPTM_VDP_LAYER_WBC_BUTT
 
 } OPTM_VDP_LAYER_WBC_E;
@@ -159,7 +161,7 @@ typedef enum tagVDP_GFX_IFMT_E
     VDP_GFX_IFMT_YCBCRA_8888 = 0xe9,
     VDP_GFX_IFMT_ABGR_8888   = 0xef,
 
-    VDP_GFX_IFMT_BUTT        
+    VDP_GFX_IFMT_BUTT //0xf0
     
 }OPTM_VDP_GFX_IFMT_E;
  
@@ -191,7 +193,7 @@ typedef enum tagVDP_WBC_FMT_E
 typedef enum tagVDP_DATA_RMODE_E
 {
     VDP_RMODE_INTERLACE = 0,
-    VDP_RMODE_PROGRESSIVE,
+    VDP_RMODE_PROGRESSIVE, //1
     VDP_RMODE_TOP,
     VDP_RMODE_BOTTOM,
     VDP_RMODE_BUTT
@@ -298,7 +300,7 @@ typedef struct tagVDP_DISP_RECT_S
     HI_U32 u32IHgt; // input height
     HI_U32 u32OWth; // output width
     HI_U32 u32OHgt; // output height
-
+    //56
 } OPTM_VDP_DISP_RECT_S;
 
 

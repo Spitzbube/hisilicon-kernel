@@ -83,6 +83,7 @@ typedef struct
 {
     HI_U32 u32StereoMemStart;
     HI_U32 u32StereoMemLen;
+    struct mutex stStereoMemLock;
 }HIFB_3DMEM_INFO_S;
 
 
@@ -155,17 +156,20 @@ typedef struct
 typedef struct
 {   	
 	HI_BOOL             bSetStereoMode; //0
-	HI_BOOL             bPanFlag;
-	int fill_8[4]; //8???
-    HIFB_BASE_INFO_S    stBaseInfo; //24?
+	HI_BOOL             bPanFlag; //4
+	int Data_8; //8
+	int Data_12; //12
+	int Data_16; //16
+	int fill_20; //20
+    HIFB_BASE_INFO_S    stBaseInfo; //24
 #if 0
     typedef struct
     {
     	HI_U32             u32LayerID; //24      /* layer id */
-    	atomic_t           ref_count;        /* framebuffer reference count */
-    	spinlock_t         lock;             /* using in 2buf refresh */
+    	atomic_t           ref_count; //28       /* framebuffer reference count */
+    	spinlock_t         lock; //32            /* using in 2buf refresh */
     	HI_BOOL            bPreMul;
-    	HI_BOOL            bNeedAntiflicker;
+    	HI_BOOL            bNeedAntiflicker; //40
     	HI_U32             u32HDflevel;      /* horizontal deflicker level */
     	HI_U32             u32VDflevel;      /* vertical deflicker level */
     	HI_UCHAR           ucHDfcoef[HIFB_DEFLICKER_LEVEL_MAX - 1];/* horizontal deflicker coefficients */
@@ -175,6 +179,22 @@ typedef struct
     }HIFB_BASE_INFO_S;
 #endif
     HIFB_EXTEND_INFO_S  stExtendInfo;
+#if 0
+    typedef struct
+    {
+    	HI_BOOL                         bOpen; //68              /* open status*/
+    	HI_BOOL                         bShow; //72              /* show status */
+        HIFB_COLOR_FMT_E                enColFmt; //76           /* color format */
+    	HIFB_LAYER_BUF_E                enBufMode; //80          /* refresh mode*/
+    	HI_U32                          u32DisplayWidth; //84    /* width  of layer's display buffer*/
+        HI_U32                          u32DisplayHeight; //88   /* height of layer's display buffer*/
+        HI_U32                          u32ScreenWidth;      /* width  of layer's  show    area*/
+        HI_U32                          u32ScreenHeight;     /* height of layer's  show    area*/
+    	HIFB_POINT_S                    stPos; //100              /* beginning position of layer*/
+        HIFB_ALPHA_S                    stAlpha; //108            /* alpha attribution */
+        HIFB_COLORKEYEX_S               stCkey; //120             /* colorkey attribution */
+    }HIFB_EXTEND_INFO_S;
+#endif
     
     HIFB_3D_PAR_S       st3DInfo;
 #if 0
@@ -186,17 +206,36 @@ typedef struct
         HIFB_STEREO_MODE_E     enInStereoMode;
         HIFB_STEREO_MODE_E     enOutStereoMode;
     	HIFB_RECT              st3DUpdateRect;
-    	HIFB_SURFACE_S         st3DSurface;
-        HIFB_3DMEM_INFO_S      st3DMemInfo;
+    	HIFB_SURFACE_S         st3DSurface; //188
+#if 0
+    	typedef struct
+    	{
+    	    HI_U32  u32PhyAddr;     /**<  start physical address */
+    	    HI_U32  u32Width; //192      /**<  width pixels */
+    	    HI_U32  u32Height; //196     /**<  height pixels */
+    	    HI_U32  u32Pitch; //200      /**<  line pixels */
+    	    HIFB_COLOR_FMT_E enFmt; //204 /**<  color format */
+    	}HIFB_SURFACE_S;
+#endif
+        HIFB_3DMEM_INFO_S      st3DMemInfo; //208
+#if 0
+        typedef struct
+        {
+            HI_U32 u32StereoMemStart; //208
+            HI_U32 u32StereoMemLen; //212
+            struct mutex stStereoMemLock; //216
+        }HIFB_3DMEM_INFO_S;
+#endif
     }HIFB_3D_PAR_S;
 #endif
+    int fill1[3]; //????
     HIFB_DISP_INFO_S    stDispInfo;
 #if 0
     typedef struct
     {
     	HIFB_RECT       stUpdateRect;
     	HI_U32          u32DisplayAddr[HIFB_MAX_FLIPBUF_NUM];
-    	HIFB_SURFACE_S  stCanvasSur;        /* canvas surface allocated for user */
+    	HIFB_SURFACE_S  stCanvasSur; //280 TODO:240+40       /* canvas surface allocated for user */
 #if 0
     	typedef struct
     	{
@@ -207,7 +246,7 @@ typedef struct
     	    HIFB_COLOR_FMT_E enFmt; /**<  color format */
     	}HIFB_SURFACE_S;
 #endif
-    	HIFB_BUFFER_S   stUserBuffer;       /* backup usr's refreshing buffer data,
+    	HIFB_BUFFER_S   stUserBuffer; //300 TODO:260+40       /* backup usr's refreshing buffer data,
     											using when refresh again or refresh all*/
     }HIFB_DISP_INFO_S;
 #endif
@@ -216,8 +255,8 @@ typedef struct
 #if 0
 	typedef struct
 	{
-		HI_BOOL   bModifying;
-		HI_U32    u32ParamModifyMask;
+		HI_BOOL   bModifying; //336 TODO:296+40
+		HI_U32    u32ParamModifyMask; //340 TODO:300+40
 	    HI_BOOL   bNeedFlip;       /* when tde blit job completed, we need to flip buffer, only using in pandisplay and 2buf*/
 	    HI_BOOL   bFliped;	       /* a flag to record buf has been swithed no not in vo isr, effect only in 2 buf mode*/
 	    HI_U32    u32IndexForInt; //352 TODO: 312+40 /* index of screen buf*/
@@ -226,9 +265,12 @@ typedef struct
 		HI_S32    s32RefreshHandle;/* job handle of tde blit*/
 	}HIFB_RTIME_INFO_S;
 #endif
-	int fill_a[17]; //????
-	int Data_396[1/*????*/]; //396
-	int fill[255]; //????
+	int fill2[3]; //????
+	int Data_380; //380
+	int Data_384; //384
+	int Data_388; //388
+	int Data_392; //392
+	int Data_396[256]; //396
 	//1420
 }HIFB_PAR_S;
 

@@ -59,6 +59,7 @@ static volatile HI_U32 *g_u32Data_811437bc = HI_NULL;
 static HIFB_EXPORT_FUNC_S s_HifbExportFuncs =
 {
     .pfnHifbSetLogoLayerEnable             = HifbSetLogoLayerEnable,
+#warning TODO: HIFB_EXPORT_FUNC_S
 };
 
 HI_VOID HifbSetLogoLayerEnable(HI_BOOL bEnable)
