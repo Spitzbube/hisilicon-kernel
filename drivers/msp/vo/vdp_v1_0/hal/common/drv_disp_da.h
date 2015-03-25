@@ -20,6 +20,7 @@ History       :
 #include "drv_disp_alg_struct.h"
 #include "drv_disp_alg_rgb2yuv.h"
 #include "drv_disp_alg_csc.h"
+#include "drv_disp_alg_gmm.h"
 
 #ifdef __cplusplus
  #if __cplusplus
@@ -32,12 +33,16 @@ extern "C" {
 typedef struct tagDISP_DA_FUNCTION_S
 {
     /******************* CSC ALG group  *********************/
+#if  0
     HI_S32 (*DISP_GetCSCAlgVersion)(DISP_ALG_VERSION_S *pstVer);
     HI_VOID (* pfCalcCscCoef)(ALG_CSC_DRV_PARA_S *pstCscDrvPara, ALG_CSC_RTL_PARA_S *pstCscRtlPara);
-
-    HI_VOID (* PFCscRgb2Yuv)(ALG_COLOR_S *pstRgbColor, ALG_COLOR_S *pYuvColor);
-
+#endif
+    HI_VOID (* PFCscRgb2Yuv)(ALG_COLOR_S *pstRgbColor, ALG_COLOR_S *pYuvColor); //0
+    void (*Func_4)(Struct_8113ea8c* a, HI_U32 b); //4
+    void (*Func_8)(void); //8
+    //12
 }DISP_DA_FUNCTION_S;
+
 
 HI_S32 DISP_DA_Init(HI_DRV_DISP_VERSION_S *pstVersion);
 HI_S32 DISP_DA_DeInit(HI_VOID);

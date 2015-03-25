@@ -106,8 +106,9 @@ typedef struct hiRECT_S
 {
     HI_S32 s32X;
     HI_S32 s32Y;
-    HI_S32 s32Width;
-    HI_S32 s32Height;
+    HI_S32 s32Width; //8
+    HI_S32 s32Height; //12
+    //16
 } HI_RECT_S;
 
 typedef enum hiLAYER_ZORDER_E

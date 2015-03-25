@@ -35,10 +35,10 @@
 #define EDA_TEST  0
 #define FPGA_TEST 1
 
-#define VID_MAX 5
+#define VID_MAX 8 //5?
 #define GFX_MAX 5
 #define WBC_MAX 4
-#define CHN_MAX 2
+#define CHN_MAX 3 //2?
 #define GP_MAX  2
 #define VP_MAX  2
 #define CBM_MAX  (VP_MAX + GP_MAX)
@@ -218,6 +218,8 @@ typedef enum
 {
     VDP_MASTER0 = 0,  
     VDP_MASTER1 = 1,  
+    VDP_MASTER2 = 2, //???
+    VDP_MASTER3 = 3, //???
     VDP_MASTER_BUTT
       
 }VDP_MASTER_E;
@@ -913,26 +915,26 @@ typedef struct tagVDP_DISP_RECT_S
     HI_U32 u32IHgt; // input height
     HI_U32 u32OWth; // output width
     HI_U32 u32OHgt; // output height
-
+    //56
 } VDP_DISP_RECT_S;
 
 typedef struct tagVDP_DISP_SYNCINFO_S
 {
     HI_U32  bSynm;
-    HI_U32  bIop;
+    HI_U32  bIop; //4
     HI_U32  u32Intfb; 
     
-    HI_U32  u32Vact ;
-    HI_U32  u32Vbb;
-    HI_U32  u32Vfb;
+    HI_U32  u32Vact ; //12
+    HI_U32  u32Vbb; //16
+    HI_U32  u32Vfb; //20
 
-    HI_U32  u32Hact;
+    HI_U32  u32Hact; //24
     HI_U32  u32Hbb;
     HI_U32  u32Hfb;
 
-    HI_U32  u32Bvact;
-    HI_U32  u32Bvbb;
-    HI_U32  u32Bvfb;
+    HI_U32  u32Bvact; //36
+    HI_U32  u32Bvbb; //40
+    HI_U32  u32Bvfb; //44
 
     HI_U32  u32Hpw;
     HI_U32  u32Vpw;
@@ -941,7 +943,7 @@ typedef struct tagVDP_DISP_SYNCINFO_S
     HI_U32  bIdv;
     HI_U32  bIhs;
     HI_U32  bIvs;
-
+    //72
 } VDP_DISP_SYNCINFO_S;
 
 
@@ -1380,6 +1382,8 @@ typedef enum tagVDP_CBM_MIX_E
     VDP_CBM_MIXG1 = 3,
     VDP_CBM_MIX0  = 4,
     VDP_CBM_MIX1  = 5,
+    VDP_CBM_MIX_6  = 6,
+    VDP_CBM_MIX_7  = 7,
 
     VDP_CBM_MIX_BUTT 
 }VDP_CBM_MIX_E;
@@ -1631,15 +1635,25 @@ typedef struct
 
 typedef enum tagVDP_DISP_INTF_E
 {
+#if 0
     VDP_DISP_INTF_LCD = 0 , 
-    VDP_DISP_INTF_BT1120  ,
-    VDP_DISP_INTF_HDMI    ,
-    VDP_DISP_INTF_VGA     ,
-    VDP_DISP_INTF_HDDATE  ,
-    VDP_DISP_INTF_SDDATE  ,
-    VDP_DISP_INTF_DATE    ,
-    VDP_DISP_INTF_CVBS    ,
-    VDP_DISP_INTF_BUTT    ,
+    VDP_DISP_INTF_BT1120  , //1
+    VDP_DISP_INTF_HDMI    , //2
+    VDP_DISP_INTF_VGA     , //3
+    VDP_DISP_INTF_HDDATE  , //4
+    VDP_DISP_INTF_SDDATE  , //5
+    VDP_DISP_INTF_DATE    , //6
+    VDP_DISP_INTF_CVBS    , //7
+    VDP_DISP_INTF_BUTT    , //8
+#else
+    VDP_DISP_INTF_HDMI = 0,
+    VDP_DISP_INTF_VGA, //1
+    VDP_DISP_INTF_BT1120, //2
+    VDP_DISP_INTF_SDDATE, //3
+    VDP_DISP_INTF_LCD, //4
+    VDP_DISP_INTF_HDDATE, //5
+    VDP_DISP_INTF_BUTT, //6
+#endif
 } VDP_DISP_INTF_E;
 
 typedef enum tagVDP_DISP_INTF_OFMT_E
@@ -1667,8 +1681,8 @@ typedef enum tagDISP_VENC_E
 {
     DISP_VENC_HDATE0 = 0,
 
-    DISP_VENC_SDATE0,
-    DISP_VENC_VGA0,
+    DISP_VENC_SDATE0, //1
+    DISP_VENC_VGA0, //2
     DISP_VENC_MAX
 }DISP_VENC_E;
 

@@ -95,7 +95,7 @@ typedef struct hiDISP_PARAM_S
     HI_UNF_DISP_BG_COLOR_S      stBgColor;
     HI_UNF_DISP_ASPECT_RATIO_S  stAspectRatio;
     HI_UNF_DISP_INTF_S          stIntf[HI_UNF_DISP_INTF_TYPE_BUTT];
-    HI_UNF_DISP_TIMING_S        stDispTiming;
+    HI_UNF_DISP_TIMING_S        stDispTiming; //176
 	HIGO_PF_E                   enPixelFormat;
 }HI_DISP_PARAM_S;
 

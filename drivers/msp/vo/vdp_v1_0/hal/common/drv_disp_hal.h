@@ -76,8 +76,8 @@ typedef enum tagDISP_INTERRUPT_E
 typedef enum tagDISP_PLL_SOURCE_E
 {
     DISP_CLOCK_SOURCE_SD0 = 0,
-    DISP_CLOCK_SOURCE_HD0  ,
-    DISP_CLOCK_SOURCE_HD1,
+    DISP_CLOCK_SOURCE_HD0  , //1
+    DISP_CLOCK_SOURCE_HD1, //2
     DISP_CLOCK_SOURCE_BUTT
 }DISP_PLL_SOURCE_E;
 typedef enum tagDISP_CHANNEL_E
@@ -97,18 +97,19 @@ typedef enum tagDISP_HDMI_DATA_E
 #define HDMI_MODE_RGB  1
 typedef struct tagDISP_INTF_S
 {
-    HI_BOOL bOpen;
+    HI_BOOL bOpen; //0
 
-    HI_BOOL bLinkVenc;
-    DISP_VENC_E eVencId;
+    HI_BOOL bLinkVenc; //4
+    DISP_VENC_E eVencId; //8
 
-    HI_DRV_DISP_INTF_S stIf;
+    HI_DRV_DISP_INTF_S stIf; //12
 
     // signal index is VDACID
     //HI_DRV_DISP_VDAC_SIGNAL_E eSignal[DISP_VENC_SIGNAL_MAX_NUMBER];
     DISP_CHANNEL_E enDispChan;
     DISP_PLL_SOURCE_E enDispPll;
     DISP_HDMI_DATA_E enHDMIDataType;
+    //36
 }DISP_INTF_S;
 
 typedef struct tagDISP_HAL_ENCFMT_PARAM_S
@@ -130,10 +131,11 @@ typedef struct tagDISP_HAL_ENCFMT_PARAM_S
 
 typedef struct tagDISP_FMT_CFG_S
 {
-    VDP_DISP_SYNCINFO_S stTiming;
-    DISP_PLL_SOURCE_E enPllIndex;
+    VDP_DISP_SYNCINFO_S stTiming; //0
+    DISP_PLL_SOURCE_E enPllIndex; //72
     HI_U32 u32Pll[2];
     DISP_HAL_ENCFMT_PARAM_S stInfo;
+    //144
 }DISP_FMT_CFG_S;
 
 
@@ -148,9 +150,10 @@ typedef struct tagDISP_VTTHD_CFG_S
 
 typedef struct tagDISP_CAPA_S
 {
-    HI_BOOL bSupport;
-    HI_BOOL bWbc;
-    HI_BOOL bHD;
+    HI_BOOL bSupport; //0
+    HI_BOOL bWbc; //4
+    HI_BOOL bHD; //8
+    //12
 }DISP_CAPA_S;
 
 
@@ -195,6 +198,7 @@ typedef struct tagDISP_LOCAL_INTF_S
     HI_BOOL bSupport;
     HI_BOOL bIdle;
     HI_DRV_DISPLAY_E enChan;
+    //12
 }DISP_LOCAL_INTF_S;
 
 typedef struct tagDISP_LOCAL_VENC_S
@@ -207,6 +211,7 @@ typedef struct tagDISP_LOCAL_VDAC_S
 {
     HI_BOOL bSupport;
     HI_BOOL bIdle;
+    //8
 }DISP_LOCAL_VDAC_S;
 
 typedef struct tagDISP_LOCAL_WBC_S
@@ -241,73 +246,99 @@ typedef struct tagDISP_CH_CFG_S
 }DISP_CH_CFG_S;
 
 
+typedef struct
+{
+	int Data_0; //0
+	struct
+	{
+		HI_U32 Data_0; //0
+		HI_U32 Data_4; //4
+		//8
+	} Data_81141c24[4]; //4
+	//36
+} Struct_81141c20;
+
+
 typedef struct tagDISP_INTF_OPERATION_S
 {
     /* usual */
     /* reset vdp */
-    HI_S32 (*PF_ResetHardware)(HI_VOID);
-    HI_S32 (*PF_CloseClkResetModule)(HI_VOID);
+    HI_S32 (*PF_ResetHardware)(HI_VOID); //0
+    HI_S32 (*PF_CloseClkResetModule)(HI_VOID); //4
     
     /* Display config */
-    HI_BOOL (* PF_TestChnSupport)(HI_DRV_DISPLAY_E eChn);
-    HI_BOOL (* PF_TestChnSupportHD)(HI_DRV_DISPLAY_E eChn);
-    HI_BOOL (* PF_TestIntfSupport)(HI_DRV_DISPLAY_E eChn, HI_DRV_DISP_INTF_ID_E eIntf);
-    HI_BOOL (* PF_TestChnSupportCast)(HI_DRV_DISPLAY_E eChn);
-    HI_BOOL (* PF_TestChnEncFmt)(HI_DRV_DISPLAY_E eChn, HI_DRV_DISP_FMT_E eFmt);
-    HI_BOOL (* PF_TestChnAttach)(HI_DRV_DISPLAY_E enM, HI_DRV_DISPLAY_E enS);
+    HI_BOOL (* PF_TestChnSupport)(HI_DRV_DISPLAY_E eChn); //8
+    HI_BOOL (* PF_TestChnSupportHD)(HI_DRV_DISPLAY_E eChn); //12
+    HI_BOOL (* PF_TestIntfSupport)(HI_DRV_DISPLAY_E eChn, HI_DRV_DISP_INTF_ID_E eIntf); //16
+    HI_BOOL (* PF_TestChnSupportCast)(HI_DRV_DISPLAY_E eChn); //20
+    HI_BOOL (* PF_TestChnEncFmt)(HI_DRV_DISPLAY_E eChn, HI_DRV_DISP_FMT_E eFmt); //24
+    HI_BOOL (* PF_TestChnAttach)(HI_DRV_DISPLAY_E enM, HI_DRV_DISPLAY_E enS); //28
 
-    HI_S32 (* PF_SetChnFmt)(HI_DRV_DISPLAY_E eChn, HI_DRV_DISP_FMT_E eFmt, HI_DRV_DISP_STEREO_E enStereo);
-    HI_S32 (* PF_SetChnTiming)(HI_DRV_DISPLAY_E eChn, HI_DRV_DISP_TIMING_S *pstTiming);
+    HI_S32 (* PF_SetChnFmt)(HI_DRV_DISPLAY_E eChn, HI_DRV_DISP_FMT_E eFmt, HI_DRV_DISP_STEREO_E enStereo); //32
+    HI_S32 (* PF_SetChnTiming)(HI_DRV_DISPLAY_E eChn, HI_DRV_DISP_TIMING_S *pstTiming); //36
 
-    HI_S32 (* PF_SetChnPixFmt)(HI_DRV_DISPLAY_E eChn, HI_DRV_PIX_FORMAT_E ePix);
-    HI_S32 (* PF_SetChnBgColor)(HI_DRV_DISPLAY_E eChn, HI_DRV_COLOR_SPACE_E enCS, HI_DRV_DISP_COLOR_S *pstBGC);
-    HI_S32 (* PF_SetChnColor)(HI_DRV_DISPLAY_E eChn, DISP_HAL_COLOR_S *pstColor);
-    HI_S32 (* PF_SetDispSignal)(HI_DRV_DISPLAY_E eChn, HI_U32 index, HI_DRV_DISP_VDAC_SIGNAL_E eSignal);
+    HI_S32 (* PF_SetChnPixFmt)(HI_DRV_DISPLAY_E eChn, HI_DRV_PIX_FORMAT_E ePix); //40
+    HI_S32 (* PF_SetChnBgColor)(HI_DRV_DISPLAY_E eChn, HI_DRV_COLOR_SPACE_E enCS, HI_DRV_DISP_COLOR_S *pstBGC); //44
+    HI_S32 (* PF_SetChnColor)(HI_DRV_DISPLAY_E eChn, DISP_HAL_COLOR_S *pstColor); //48
+    //HI_S32 (* PF_SetDispSignal)(HI_DRV_DISPLAY_E eChn, HI_U32 index, HI_DRV_DISP_VDAC_SIGNAL_E eSignal);
 
-    HI_S32 (* PF_SetChnEnable)(HI_DRV_DISPLAY_E eChn, HI_BOOL bEnalbe);
-    HI_S32 (* PF_GetChnEnable)(HI_DRV_DISPLAY_E eChn, HI_BOOL *pbEnalbe);
-    HI_S32 (* PF_SetMSChnEnable)(HI_DRV_DISPLAY_E eChnM, HI_DRV_DISPLAY_E eChnS, HI_U32 u32DelayMs, HI_BOOL bEnalbe);
+    HI_S32 (* PF_SetChnEnable)(HI_DRV_DISPLAY_E eChn, HI_BOOL bEnalbe); //52
+    HI_S32 (* PF_GetChnEnable)(HI_DRV_DISPLAY_E eChn, HI_BOOL *pbEnalbe); //56
+    HI_S32 (* PF_InitDacDetect)(HI_DRV_DISP_INTF_S * p); //60
+    HI_S32 (* PF_SetMSChnEnable)(HI_DRV_DISPLAY_E eChnM, HI_DRV_DISPLAY_E eChnS, HI_U32 u32DelayMs, HI_BOOL bEnalbe); //64
+    HI_S32 (* PF_UpdateGamma)(void/*???*/); //68
+    HI_S32 (* PF_SetGammaCtrl)(void/*???*/); //72
+    HI_S32 (* PF_SetGammaRWZBCtrl)(void/*???*/); //76
     
     /* interrup */
-    HI_S32 (* PF_SetIntEnable)(HI_U32 u32Int, HI_BOOL bEnable);
+    HI_S32 (* PF_SetIntEnable)(HI_U32 u32Int, HI_BOOL bEnable); //80
     HI_S32 (* PF_SetIntDisable)(HI_U32 u32Int);
 
-    HI_S32 (* PF_GetIntSetting)(HI_U32 *pu32IntSetting);
+    HI_S32 (* PF_GetIntSetting)(HI_U32 *pu32IntSetting); //88
 
-    HI_S32 (* PF_GetMaskedIntState)(HI_U32 *pu32State);
-    HI_S32 (* PF_GetUnmaskedIntState)(HI_U32 *pu32State);
-    HI_S32 (* PF_CleanIntState)(HI_U32 u32State);
-    HI_U32 (* FP_GetChnIntState)(HI_DRV_DISPLAY_E enDisp, HI_U32 u32IntState);
-    HI_U32 (* FP_GetChnBottomFlag)(HI_DRV_DISPLAY_E enDisp,  HI_BOOL *pbBtm, HI_U32 *pu32Vcnt);
+    HI_S32 (* PF_GetMaskedIntState)(HI_U32 *pu32State); //92
+    HI_S32 (* PF_GetUnmaskedIntState)(HI_U32 *pu32State); //96
+    HI_S32 (* PF_CleanIntState)(HI_U32 u32State); //100
+    HI_U32 (* FP_GetChnIntState)(HI_DRV_DISPLAY_E enDisp, HI_U32 u32IntState); //104
+    HI_U32 (* FP_GetChnBottomFlag)(HI_DRV_DISPLAY_E enDisp,  HI_BOOL *pbBtm, HI_U32 *pu32Vcnt); //108
 
     /* intf manage */
-    HI_S32 (* PF_AcquireIntf2)(HI_DRV_DISPLAY_E enDisp, DISP_INTF_S *pstIf);
-    HI_S32 (* PF_ReleaseIntf2)(HI_DRV_DISPLAY_E enDisp, DISP_INTF_S *pstIf);
-    HI_S32 (* PF_ResetIntfFmt2)(HI_DRV_DISPLAY_E enDisp, DISP_INTF_S *pstIntf, HI_DRV_DISP_FMT_E eFmt);
-    HI_S32 (* PF_SetIntfEnable2)(HI_DRV_DISPLAY_E enDisp, DISP_INTF_S *pstIntf, HI_BOOL bEnable);
+    HI_S32 (* PF_AcquireIntf2)(HI_DRV_DISPLAY_E enDisp, DISP_INTF_S *pstIf); //112
+    HI_S32 (* PF_ReleaseIntf2)(HI_DRV_DISPLAY_E enDisp, DISP_INTF_S *pstIf); //116
+    HI_S32 (* PF_ResetIntfFmt2)(HI_DRV_DISPLAY_E enDisp, DISP_INTF_S *pstIntf, HI_DRV_DISP_FMT_E eFmt, HI_DRV_DISP_TIMING_S* p); //120
+    HI_S32 (* PF_SetIntfEnable2)(HI_DRV_DISPLAY_E enDisp, DISP_INTF_S *pstIntf, HI_BOOL bEnable); //124
 
     /* WBC manager */
-    HI_S32 (* PF_AcquireWbcByChn)(HI_DRV_DISPLAY_E eChn, DISP_WBC_E *peWbc);
-    HI_S32 (* PF_AcquireWbc)(DISP_WBC_E eWbc);
-    HI_S32 (* PF_ReleaseWbc)(DISP_WBC_E eWbc);
+    HI_S32 (* PF_AcquireWbcByChn)(HI_DRV_DISPLAY_E eChn, DISP_WBC_E *peWbc); //128
+    HI_S32 (* PF_AcquireWbc)(DISP_WBC_E eWbc); //132
+    HI_S32 (* PF_ReleaseWbc)(DISP_WBC_E eWbc); //136
 
     /* WBC */
-    HI_S32 (*PF_SetWbcIORect)(DISP_WBC_E eWbc, HI_DISP_DISPLAY_INFO_S *pstDispInfo, HI_RECT_S *in, HI_RECT_S *out);
-    HI_S32 (*PF_SetWbc3DInfo)(DISP_WBC_E eWbc, HI_DISP_DISPLAY_INFO_S *pstDispInfo, HI_RECT_S *in);
-    HI_S32 (*PF_SetWbcColorSpace)(DISP_WBC_E eWbc, HI_DRV_COLOR_SPACE_E eSrcCS, HI_DRV_COLOR_SPACE_E eDstCS);
-    HI_S32 (*PF_SetWbcPixFmt)(DISP_WBC_E eWbc, HI_DRV_PIX_FORMAT_E eFmt);
-    HI_S32 (*PF_SetWbcAddr)(DISP_WBC_E eWbc, HI_DRV_VID_FRAME_ADDR_S *pstAddr);
-    HI_S32 (*PF_SetWbcEnable)(DISP_WBC_E eWbc, HI_BOOL bEnable);
-    HI_S32 (*PF_UpdateWbc)(DISP_WBC_E eWbc);
-    HI_S32 (*PF_DACIsr)(HI_U8 u8DAC);
+    HI_S32 (*PF_SetWbcIORect)(DISP_WBC_E eWbc, HI_DISP_DISPLAY_INFO_S *pstDispInfo, HI_RECT_S *in, HI_RECT_S *out); //140
+    HI_S32 (*PF_SetWbc3DInfo)(DISP_WBC_E eWbc, HI_DISP_DISPLAY_INFO_S *pstDispInfo, HI_RECT_S *in); //144
+    HI_S32 (*PF_SetWbcColorSpace)(DISP_WBC_E eWbc, HI_DRV_COLOR_SPACE_E eSrcCS, HI_DRV_COLOR_SPACE_E eDstCS); //148
+    HI_S32 (*PF_SetWbcPixFmt)(DISP_WBC_E eWbc, HI_DRV_PIX_FORMAT_E eFmt); //152
+    HI_S32 (*PF_SetWbcAddr)(DISP_WBC_E eWbc, HI_DRV_VID_FRAME_ADDR_S *pstAddr); //156
+    HI_S32 (*PF_SetWbcEnable)(DISP_WBC_E eWbc, HI_BOOL bEnable); //160
+    HI_S32 (*PF_SetWbcLowdlyEnable)(void); //164
+    HI_S32 (*PF_SetWbcPartfnsLineNum)(void); //168
+    HI_S32 (*PF_SetWbcLineNumInterval)(void); //172
+    HI_S32 (*PF_SetWbcLineAddr)(void); //176
+
+    HI_S32 (*PF_UpdateWbc)(DISP_WBC_E eWbc); //180
+    HI_S32 (*PF_DACIsr)(HI_U8 u8DAC); //184
+    HI_S32 (*PF_SetDACDetEn)(void); //188
+    HI_S32 (*PF_GetDACAttr)(Struct_81141c20* p); //192
     /*Zorder*/
-    HI_S32 (*PF_CBM_MovTOP)(HI_DRV_DISPLAY_E enDisp, HI_DRV_DISP_LAYER_E enLayer);
-    HI_S32 (*PF_VDP_RegSave)(HI_VOID);
-    HI_S32 (*PF_VDP_RegReStore)(HI_VOID);
+    HI_S32 (*PF_CBM_MovTOP)(HI_DRV_DISPLAY_E enDisp, HI_DRV_DISP_LAYER_E enLayer); //196
+    HI_S32 (*PF_VDP_RegSave)(HI_VOID); //200
+    HI_S32 (*PF_VDP_RegReStore)(HI_VOID); //204
 
     /* date */
-    HI_S32 (*PF_DATE_SetCoef)(HI_DRV_DISPLAY_E enDisp, HI_BOOL bDefault);
-
+    HI_S32 (*PF_DATE_SetCoef)(HI_DRV_DISPLAY_E enDisp, HI_BOOL bDefault); //208
+    HI_S32 (*PF_DATE_SetIRE)(void); //212
+    HI_S32 (*PF_SetAllDACEn)(void); //216
+    //220
 }DISP_INTF_OPERATION_S;
 
 

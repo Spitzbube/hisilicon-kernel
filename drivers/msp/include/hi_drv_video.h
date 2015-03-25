@@ -218,7 +218,7 @@ typedef enum hiDRV_COLOR_SPACE_E
     HI_DRV_CS_BT709_YUV_LIMITED,/* BT.709 */
     HI_DRV_CS_BT709_YUV_FULL,
     HI_DRV_CS_BT709_RGB_LIMITED,
-    HI_DRV_CS_BT709_RGB_FULL,
+    HI_DRV_CS_BT709_RGB_FULL, //12
     
     HI_DRV_CS_REC709,      /* HD and modern captures. */
     
@@ -280,8 +280,13 @@ typedef struct hiDRV_CROP_RECT_S
   */  
 typedef struct hiDRV_ASPECT_RATIO_S
 {
+#if 0
     HI_U8 u8ARw;
     HI_U8 u8ARh;
+#else
+    HI_U32 u8ARw;
+    HI_U32 u8ARh;
+#endif
 }HI_DRV_ASPECT_RATIO_S;
 
 /* video frame buffer physical address */
@@ -314,7 +319,7 @@ typedef enum hiDRV_BUF_ADDR_E
 #if 0
 typedef struct hiDRV_VIDEO_PRIV_INFO_S
 {
-    HI_U32 u32FrameIndex;  //ÓÐµÝÔöÒªÇó
+    HI_U32 u32FrameIndex;  //ï¿½Ðµï¿½ï¿½ï¿½Òªï¿½ï¿½
     HI_U32 u32BufferID;
 
     //HI_U32 u32Is1D;
@@ -459,7 +464,7 @@ typedef struct hiDRV_VIDEO_FRAME_S
 typedef struct hiDRV_VIDEO_PRIVATE_S
 {
 	HI_BOOL bValid;
-	HI_U32 u32LastFlag;                  /*×îºóÒ»Ö¡±ê¼Ç*/
+	HI_U32 u32LastFlag;                  /*ï¿½ï¿½ï¿½Ò»Ö¡ï¿½ï¿½ï¿½*/
 	HI_DRV_COLOR_SPACE_E eColorSpace;    //?????????
 	HI_U32 u32BufferID;                    //?????????????ID
 	HI_U32 u32FrmCnt;

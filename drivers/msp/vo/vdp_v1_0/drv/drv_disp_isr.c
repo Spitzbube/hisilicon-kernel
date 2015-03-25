@@ -39,8 +39,8 @@ HI_S32 DISP_ISR_SwitchIntterrup(HI_DRV_DISPLAY_E enDisp, HI_DRV_DISP_CALLBACK_TY
     DISP_INTF_OPERATION_S *pfOpt = DISP_HAL_GetOperationPtr();
     
     //printk("Open enDisp=%d int %d\n", enDisp, eType);
-    DispCheckNullPointer( pfOpt);
-    DispCheckNullPointer( pfOpt->PF_SetIntEnable);
+    DispCheckNullPointer( pfOpt); //42
+    DispCheckNullPointer( pfOpt->PF_SetIntEnable); //43
     switch(eType)
     {
         case HI_DRV_DISP_C_INTPOS_0_PERCENT:
@@ -63,6 +63,21 @@ HI_S32 DISP_ISR_SwitchIntterrup(HI_DRV_DISPLAY_E enDisp, HI_DRV_DISP_CALLBACK_TY
                 pfOpt->PF_SetIntEnable((HI_U32)DISP_INTERRUPT_D1_90_PERCENT, bEnable);
             }
             break;
+
+        case HI_DRV_DISP_C_GFX_WBC:
+            if (HI_DRV_DISPLAY_0 ==  enDisp)
+            {
+                pfOpt->PF_SetIntEnable((HI_U32)0x40, bEnable);
+            }
+            else if (HI_DRV_DISPLAY_1 ==  enDisp)
+            {
+                pfOpt->PF_SetIntEnable((HI_U32)0x4, bEnable);
+            }
+        	break;
+
+        case HI_DRV_DISP_C_REG_UP:
+            pfOpt->PF_SetIntEnable(0x20000000, bEnable);
+        	break;
 
         default :
             break;
@@ -244,9 +259,9 @@ HI_S32 DISP_ISR_SearchNullNode(DISP_ISR_CHN_S *pstChn, HI_DRV_DISP_CALLBACK_TYPE
 static HI_U32 s_DispIntTable[HI_DRV_DISPLAY_BUTT][HI_DRV_DISP_C_TYPE_BUTT] = 
 {
 //NONE, SHOW_MODE, INTPOS_0_PERCENT, INTPOS_90_PERCENT,       GFX_WBC, REG_UP
-{0, DISP_INTERRUPT_D0_0_PERCENT, DISP_INTERRUPT_D0_90_PERCENT, 0, 0 },
-{0, DISP_INTERRUPT_D1_0_PERCENT, DISP_INTERRUPT_D1_90_PERCENT, 0, 0 },    
-{0, 0, 0, 0, 0 },
+{0, DISP_INTERRUPT_D0_0_PERCENT, DISP_INTERRUPT_D0_90_PERCENT, DISP_INTERRUPT_D0_RES, 0, 0, 0 },
+{0, DISP_INTERRUPT_D1_0_PERCENT, DISP_INTERRUPT_D1_90_PERCENT, DISP_INTERRUPT_D1_RES, 0x20000000, 0, 0 },
+{0, 0, 0, 0, 0, 0, 0 },
 };
 
 HI_S32 DISP_ISR_RegCallback(HI_DRV_DISPLAY_E enDisp, HI_DRV_DISP_CALLBACK_TYPE_E eType,
@@ -260,11 +275,11 @@ HI_S32 DISP_ISR_RegCallback(HI_DRV_DISPLAY_E enDisp, HI_DRV_DISP_CALLBACK_TYPE_E
     {
         return HI_FAILURE;
     }
-    DispCheckID(enDisp);
+    DispCheckID(enDisp); //276
     pstChn = &s_DispISRMngr.stDispChn[enDisp];
     if (pstChn->bEnable != HI_TRUE)
     {
-        DISP_ERROR("DISP %d is not add to ISR manager!\n", enDisp);
+        DISP_ERROR("DISP %d is not add to ISR manager!\n", enDisp); //280
         return HI_FAILURE;
     }
 
@@ -273,7 +288,7 @@ HI_S32 DISP_ISR_RegCallback(HI_DRV_DISPLAY_E enDisp, HI_DRV_DISP_CALLBACK_TYPE_E
     index = DISP_ISR_SearchNullNode(pstChn, eType);
     if (index < 0)
     {
-        DISP_ERROR("DISP %d  callback reach max number!\n", enDisp);
+        DISP_ERROR("DISP %d  callback reach max number!\n", enDisp); //289
         return HI_FAILURE;
     }
 
@@ -353,7 +368,7 @@ HI_S32 DISP_ISR_SetEvent(HI_DRV_DISPLAY_E enDisp, HI_DRV_DISP_CALLBACK_EVENT_E e
     pstChn = &s_DispISRMngr.stDispChn[enDisp];
     if (pstChn->bEnable != HI_TRUE)
     {
-        DISP_ERROR("DISP %d is not add to ISR manager!\n", enDisp);
+        DISP_ERROR("DISP %d is not add to ISR manager!\n", enDisp); //369
         return HI_FAILURE;
     }
 
@@ -374,7 +389,7 @@ HI_S32 DISP_ISR_SetDispInfo(HI_DRV_DISPLAY_E enDisp, HI_DISP_DISPLAY_INFO_S *pst
     pstChn = &s_DispISRMngr.stDispChn[enDisp];
     if (pstChn->bEnable != HI_TRUE)
     {
-        DISP_ERROR("DISP %d is not add to ISR manager!\n", enDisp);
+        DISP_ERROR("DISP %d is not add to ISR manager!\n", enDisp); //390
         return HI_FAILURE;
     }
 
@@ -391,6 +406,7 @@ static HI_U32 s_DebugMyIntCount = 0;
 
 HI_S32 DISP_ISR_Main(HI_S32 irq, HI_VOID *dev_id)
 {
+#warning TODO: DISP_ISR_Main
     HI_DRV_DISPLAY_E enDisp;
     HI_DRV_DISP_CALLBACK_TYPE_E eIntType;
     DISP_ISR_CHN_S *pstDisp;
@@ -400,10 +416,10 @@ HI_S32 DISP_ISR_Main(HI_S32 irq, HI_VOID *dev_id)
     DISP_INTF_OPERATION_S *pfOpt = DISP_HAL_GetOperationPtr();
 
     // if get int ops failed, return
-    DispCheckNullPointer( pfOpt);
-    DispCheckNullPointer( pfOpt->PF_GetMaskedIntState);
-    DispCheckNullPointer( pfOpt->PF_CleanIntState);
-    DispCheckNullPointer( pfOpt->FP_GetChnBottomFlag);
+    DispCheckNullPointer( pfOpt); //416
+    DispCheckNullPointer( pfOpt->PF_GetMaskedIntState); //417
+    DispCheckNullPointer( pfOpt->PF_CleanIntState); //418
+    DispCheckNullPointer( pfOpt->FP_GetChnBottomFlag); //419
 	
     // s1 get interrupt state
     pfOpt->PF_GetMaskedIntState(&u32IntState);
@@ -485,7 +501,7 @@ HI_S32 DISP_ISR_Main(HI_S32 irq, HI_VOID *dev_id)
 
                     if( !irqs_disabled() )
                     {
-                        DISP_PRINT("#######$$$$$$$$$$$............eIntType=%u, n=%d\n",eIntType, n);
+                        DISP_PRINT("#######$$$$$$$$$$$............eIntType=%u, n=%d\n",eIntType, n); //501
                     }
 
                 }
@@ -502,7 +518,7 @@ HI_S32 DISP_ISR_Main(HI_S32 irq, HI_VOID *dev_id)
 
     if (u32IntState)
     {
-        DISP_FATAL("Unespexted interrup 0x%x happened!\n", u32IntState);
+        DISP_FATAL("Unespexted interrup 0x%x happened!\n", u32IntState); //518
     }
 
     return DEF_DISP_ISR_Main_RETURN_VALUE;

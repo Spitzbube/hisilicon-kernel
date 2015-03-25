@@ -11,6 +11,7 @@
 #endif
 #include "hi_reg_common.h"
 
+#warning TODO: s_stDispFormatParam (41-44)
 
 static DISP_FMT_CFG_S s_stDispFormatParam[] =
 {
@@ -18,7 +19,7 @@ static DISP_FMT_CFG_S s_stDispFormatParam[] =
 /* Synm Iop  Itf  Vact Vbb Vfb   Hact  Hbb Hfb      Bvact Bvbb Bvfb  Hpw Vpw Hmid bIdv bIhs bIvs */
   // 0 HI_UNF_ENC_FMT_1080P_60,
  { {1,   1,   2,  1080,  41,  4,  1920, 192, 88,      1,   1,  1,     44, 5, 1,  0,  0,  0}, /* 1080P@60Hz */
-   //{0x14000000, 0x02002063}, // 1080P60/50
+   //{0x14000000, 0x02002063}, // 1080P14460/50
    DISP_CLOCK_SOURCE_HD0, 
    {0x12000000, 0x02002063}, // 1080P60/50
    {HI_DRV_DISP_FMT_1080P_60, DISP_STEREO_NONE, HI_FALSE, {0,0,1920,1080}, {0,0,1920,1080}, {16,9}, 6000, HI_DRV_CS_BT709_YUV_LIMITED}
@@ -120,8 +121,8 @@ static DISP_FMT_CFG_S s_stDispFormatParam[] =
    {HI_DRV_DISP_FMT_PAL,     DISP_STEREO_NONE, HI_TRUE,  {0,0,720,576} ,  {0,0,720,576} , {4,3},  5000, HI_DRV_CS_BT601_YUV_LIMITED}
  },
 #if 1
-  //576I: HDMIÊä³öÒªÇóhmid=300, ¶øYPbPrÒªÇóhmid=0, 
-  //¿¼ÂÇÒ»°ãÓÃ»§²»»áÊ¹ÓÃHDMIÊä³ö576I£¬ËùÒÔ²»Ö§³ÖHDMI_567IÊä³ö£¬Ñ¡Ôñhmid=0
+  //576I: HDMIï¿½ï¿½ï¿½Òªï¿½ï¿½hmid=300, ï¿½ï¿½YPbPrÒªï¿½ï¿½hmid=0, 
+  //ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½Ã»ï¿½ï¿½ï¿½ï¿½ï¿½Ê¹ï¿½ï¿½HDMIï¿½ï¿½ï¿½576Iï¿½ï¿½ï¿½ï¿½ï¿½Ô²ï¿½Ö§ï¿½ï¿½HDMI_567Iï¿½ï¿½ï¿½ï¿½ï¿½Ñ¡ï¿½ï¿½hmid=0
   // 13 HI_UNF_ENC_FMT_NTSC
  { {0,   0,   0,   240,  18,  4,   720, 119, 19,     240,  19,  4,    124, 3,  0, 0, 0,  0},/* 480I(NTSC) */
    DISP_CLOCK_SOURCE_SD0, 
@@ -135,8 +136,8 @@ static DISP_FMT_CFG_S s_stDispFormatParam[] =
    {HI_DRV_DISP_FMT_NTSC,    DISP_STEREO_NONE, HI_TRUE,  {0,0,720-16,480} , {0,0,720-16,480} ,{4,3},  6000, HI_DRV_CS_BT601_YUV_LIMITED},
  },
 #endif
-  //480I: HDMIÊä³öÒªÇóhmid=310, ¶øYPbPrÒªÇóhmid=0, 
-  //¿¼ÂÇÒ»°ãÓÃ»§²»»áÊ¹ÓÃHDMIÊä³ö480I£¬ËùÒÔ²»Ö§³ÖHDMI_480IÊä³ö£¬Ñ¡Ôñhmid=0
+  //480I: HDMIï¿½ï¿½ï¿½Òªï¿½ï¿½hmid=310, ï¿½ï¿½YPbPrÒªï¿½ï¿½hmid=0, 
+  //ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½Ã»ï¿½ï¿½ï¿½ï¿½ï¿½Ê¹ï¿½ï¿½HDMIï¿½ï¿½ï¿½480Iï¿½ï¿½ï¿½ï¿½ï¿½Ô²ï¿½Ö§ï¿½ï¿½HDMI_480Iï¿½ï¿½ï¿½ï¿½ï¿½Ñ¡ï¿½ï¿½hmid=0
 
     /* ============================================= */
     // TODO:
@@ -312,11 +313,36 @@ static DISP_FMT_CFG_S s_stDispFormatParam[] =
    {HI_DRV_DISP_FMT_PAL,     DISP_STEREO_NONE, HI_TRUE,  {0,0,720,576} ,  {0,0,720,576} , {4,3},  5000, HI_DRV_CS_BT601_YUV_LIMITED}
  },
  
-  //576I: HDMIÊä³öÒªÇóhmid=300, ¶øYPbPrÒªÇóhmid=0, 
-  //¿¼ÂÇÒ»°ãÓÃ»§²»»áÊ¹ÓÃHDMIÊä³ö576I£¬ËùÒÔ²»Ö§³ÖHDMI_567IÊä³ö£¬Ñ¡Ôñhmid=0
+  //576I: HDMIï¿½ï¿½ï¿½Òªï¿½ï¿½hmid=300, ï¿½ï¿½YPbPrÒªï¿½ï¿½hmid=0, 
+  //ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½Ã»ï¿½ï¿½ï¿½ï¿½ï¿½Ê¹ï¿½ï¿½HDMIï¿½ï¿½ï¿½576Iï¿½ï¿½ï¿½ï¿½ï¿½Ô²ï¿½Ö§ï¿½ï¿½HDMI_567Iï¿½ï¿½ï¿½ï¿½ï¿½Ñ¡ï¿½ï¿½hmid=0
   // 13 HI_UNF_ENC_FMT_NTSC
  { {0,   0,   0,   240,  18,  4,   720, 119, 19,     240,  19,  4,    124, 3,  0, 0, 0,  0},/* 480I(NTSC) */
    DISP_CLOCK_SOURCE_SD0, 
+   {0x24000000, 0x02002063}, // 1080i50
+   {HI_DRV_DISP_FMT_NTSC,    DISP_STEREO_NONE, HI_TRUE,  {0,0,720,480} , {0,0,720,480} ,{4,3},  6000, HI_DRV_CS_BT601_YUV_LIMITED},
+ },
+
+ //41
+ { {0,   0,   0,   240,  18,  4,   720, 119, 19,     240,  19,  4,    124, 3,  0, 0, 0,  0},/* 480I(NTSC) */
+   DISP_CLOCK_SOURCE_SD0,
+   {0x24000000, 0x02002063}, // 1080i50
+   {HI_DRV_DISP_FMT_NTSC,    DISP_STEREO_NONE, HI_TRUE,  {0,0,720,480} , {0,0,720,480} ,{4,3},  6000, HI_DRV_CS_BT601_YUV_LIMITED},
+ },
+ //42
+ { {0,   0,   0,   240,  18,  4,   720, 119, 19,     240,  19,  4,    124, 3,  0, 0, 0,  0},/* 480I(NTSC) */
+   DISP_CLOCK_SOURCE_SD0,
+   {0x24000000, 0x02002063}, // 1080i50
+   {HI_DRV_DISP_FMT_NTSC,    DISP_STEREO_NONE, HI_TRUE,  {0,0,720,480} , {0,0,720,480} ,{4,3},  6000, HI_DRV_CS_BT601_YUV_LIMITED},
+ },
+ //43
+ { {0,   0,   0,   240,  18,  4,   720, 119, 19,     240,  19,  4,    124, 3,  0, 0, 0,  0},/* 480I(NTSC) */
+   DISP_CLOCK_SOURCE_SD0,
+   {0x24000000, 0x02002063}, // 1080i50
+   {HI_DRV_DISP_FMT_NTSC,    DISP_STEREO_NONE, HI_TRUE,  {0,0,720,480} , {0,0,720,480} ,{4,3},  6000, HI_DRV_CS_BT601_YUV_LIMITED},
+ },
+ //44
+ { {0,   0,   0,   240,  18,  4,   720, 119, 19,     240,  19,  4,    124, 3,  0, 0, 0,  0},/* 480I(NTSC) */
+   DISP_CLOCK_SOURCE_SD0,
    {0x24000000, 0x02002063}, // 1080i50
    {HI_DRV_DISP_FMT_NTSC,    DISP_STEREO_NONE, HI_TRUE,  {0,0,720,480} , {0,0,720,480} ,{4,3},  6000, HI_DRV_CS_BT601_YUV_LIMITED},
  },
@@ -734,7 +760,17 @@ HI_VOID  Chip_Specific_DispSetPll(DISP_PLL_SOURCE_E enPllIndex,HI_U32 u32PllxReg
         g_pstRegCrg->PERI_CRG11.u32 = PERI_CRG11Tmp.u32;
     }
     else  if (DISP_CLOCK_SOURCE_HD1 == enPllIndex)
-    {/*do nothing*/
+    {
+    	U_PERI_CRG16 PERI_CRG16Tmp;
+    	U_PERI_CRG17 PERI_CRG17Tmp;
+
+        PERI_CRG16Tmp.u32 = g_pstRegCrg->PERI_CRG16.u32;
+        PERI_CRG16Tmp.bits.qpll_ctrl0 = u32PllxReg0;
+        g_pstRegCrg->PERI_CRG16.u32 = PERI_CRG16Tmp.u32;
+
+        PERI_CRG17Tmp.u32 = g_pstRegCrg->PERI_CRG17.u32;
+        PERI_CRG17Tmp.bits.qpll_ctrl1 = u32PllxReg1;
+        g_pstRegCrg->PERI_CRG17.u32 = PERI_CRG17Tmp.u32;
     }
     else  if (DISP_CLOCK_SOURCE_SD0 == enPllIndex)
     {/*do nothing*/
@@ -813,13 +849,13 @@ static VDP_LAYER_VID_E s_MIXv0_Zorder[VDP_LAYER_VID_BUTT]=
 /*mixv1  and mixg1 be control by CMB*/
 static VDP_CBM_LAYER_E s_MIXv1_Zorder[VDP_CBM_BUTT]=
 {
-    VDP_CBM_VID3,
-    VDP_CBM_VID4
+	VDP_CBM_GP0, //1
+    VDP_CBM_VID3, //2?
 };
 static VDP_CBM_LAYER_E s_MIXg1_Zorder[VDP_CBM_BUTT]=
 {
-    VDP_CBM_GP1,
-    VDP_CBM_GFX3
+    VDP_CBM_GP1, //3
+    VDP_CBM_GFX3 //5
 };
 
 HI_U32 Chip_Specific_GetMixvMaxNumvber(VDP_CBM_MIX_E eM)
@@ -857,8 +893,8 @@ HI_S32 Chip_Specific_CBM_SetDispZorder(HI_DRV_DISPLAY_E enDisp)
 {
     HI_U32 i, j = 0;
     VDP_CBM_MIX_E eMixId;
-    HI_U32 MixArray[VDP_CBM_BUTT];
-    memset(MixArray,0 ,sizeof(HI_U32)*VDP_CBM_BUTT);
+    HI_U32 MixArray[/*VDP_CBM_BUTT*/2];
+    memset(MixArray,0 ,sizeof(HI_U32)*/*VDP_CBM_BUTT*/2);
     
     if (HI_DRV_DISPLAY_1 == enDisp)
     {
@@ -866,18 +902,18 @@ HI_S32 Chip_Specific_CBM_SetDispZorder(HI_DRV_DISPLAY_E enDisp)
         j = 2;
         if (s_CBM_Zorder[HI_DRV_DISPLAY_1][1] == VDP_MIX_GFX)
        {
-            MixArray[1] = VDP_CBM_GP0;
-            MixArray[0] = VDP_CBM_VP0;
+            MixArray[1] = VDP_CBM_VP1; //VDP_CBM_GP0;
+            MixArray[0] = VDP_CBM_GP0; //VDP_CBM_VP0;
         }
         else
         {
-            MixArray[1] = VDP_CBM_VP0;
-            MixArray[0] = VDP_CBM_GP0;
+            MixArray[1] = VDP_CBM_GP0; //VDP_CBM_VP0;
+            MixArray[0] = VDP_CBM_VP1; //VDP_CBM_GP0;
         }
     }
     else if (HI_DRV_DISPLAY_0 == enDisp)
     {
-        eMixId = VDP_CBM_MIX1;
+        eMixId = VDP_CBM_MIX_7; //VDP_CBM_MIX1;
         j = 0;
         
         if (s_CBM_Zorder[HI_DRV_DISPLAY_0][1] == VDP_MIX_GFX)
@@ -887,7 +923,7 @@ HI_S32 Chip_Specific_CBM_SetDispZorder(HI_DRV_DISPLAY_E enDisp)
                 MixArray[j] = s_MIXv1_Zorder[i];
                 j++;
             }
-             for (i = 0;i < VDP_MIXg1_LayerNO;i++)
+             for (i = 0;i < 1/*VDP_MIXg1_LayerNO*/;i++)
             {
                 MixArray[j] = s_MIXg1_Zorder[i];
                 j++;
@@ -895,7 +931,7 @@ HI_S32 Chip_Specific_CBM_SetDispZorder(HI_DRV_DISPLAY_E enDisp)
        }
         else
         {
-             for (i = 0;i < VDP_MIXg1_LayerNO;i++)
+             for (i = 0;i < 1/*VDP_MIXg1_LayerNO*/;i++)
             {
                 MixArray[j] = s_MIXg1_Zorder[i];
                 j++;
@@ -995,6 +1031,50 @@ HI_S32 Chip_Specific_CBM_MovTOP(HI_DRV_DISPLAY_E enDisp, HI_DRV_DISP_LAYER_E enL
     Chip_Specific_CBM_SetDispZorder(enDisp);
 
     return HI_SUCCESS;
+}
+
+HI_S32 Chip_Specific_DISP_OpenClock(void)
+{
+	extern void DISP_ResetCRG(void);
+
+    U_PERI_CRG54 PERI_CRG54Tmp; /* 0xd8 */
+
+    PERI_CRG54Tmp.u32 = g_pstRegCrg->PERI_CRG54.u32;
+
+    if ((PERI_CRG54Tmp.u32 & 0x40000401) != 0x401)
+    {
+    	DISP_ResetCRG();
+    }
+
+    return HI_SUCCESS;
+}
+
+HI_S32 Chip_Specific_DISP_CloseClock(void)
+{
+#if 0
+    g_pstRegCrg->PERI_CRG54.u32 = 0;
+    return HI_SUCCESS;
+#else
+    U_PERI_CRG54 unTmpValue;
+
+    unTmpValue.u32 = g_pstRegCrg->PERI_CRG54.u32;
+
+    /*Close Clock*/
+    //unTmpValue.u32 = 0;
+    unTmpValue.bits.vo_bus_cken  = 0;
+//    unTmpValue.bits.vo_cken      = 0;
+    unTmpValue.bits.vou_srst_req = 1; /*set reset*/
+
+    g_pstRegCrg->PERI_CRG54.u32 = unTmpValue.u32;
+    return HI_SUCCESS;
+#endif
+}
+
+void Chip_Specific_GetVersion(HI_DRV_DISP_VERSION_S * pVersion)
+{
+	extern HI_S32 VDP_Disp_GetVdpVersion(HI_U32 *pu32VersionPartL, HI_U32 *pu32VersionPartH);
+
+	VDP_Disp_GetVdpVersion(&pVersion->u32VersionPartL, &pVersion->u32VersionPartH);
 }
 
 

@@ -55,7 +55,7 @@ typedef enum hiDRV_DISPLAY_E
     HI_DRV_DISPLAY_0 = 0,
     HI_DRV_DISPLAY_1,
     HI_DRV_DISPLAY_2,
-    HI_DRV_DISPLAY_BUTT
+    HI_DRV_DISPLAY_BUTT //3
 }HI_DRV_DISPLAY_E;
 
 typedef enum hiDRV_DISP_LAYER_E
@@ -65,7 +65,7 @@ typedef enum hiDRV_DISP_LAYER_E
 
     HI_DRV_DISP_LAYER_GFX,
     
-    HI_DRV_DISP_LAYER_BUTT
+    HI_DRV_DISP_LAYER_BUTT //3
 }HI_DRV_DISP_LAYER_E;
 
 
@@ -95,21 +95,21 @@ typedef enum hiDRV_DISP_ZORDER_E
 typedef enum hiDRV_DISP_FMT_E
 {
     HI_DRV_DISP_FMT_1080P_60 = 0,         /**<1080p 60 Hz*/
-    HI_DRV_DISP_FMT_1080P_50,         /**<1080p 50 Hz*/
-    HI_DRV_DISP_FMT_1080P_30,         /**<1080p 30 Hz*/
-    HI_DRV_DISP_FMT_1080P_25,         /**<1080p 25 Hz*/
-    HI_DRV_DISP_FMT_1080P_24,         /**<1080p 24 Hz*/
+    HI_DRV_DISP_FMT_1080P_50, //1        /**<1080p 50 Hz*/
+    HI_DRV_DISP_FMT_1080P_30, //2        /**<1080p 30 Hz*/
+    HI_DRV_DISP_FMT_1080P_25, //3        /**<1080p 25 Hz*/
+    HI_DRV_DISP_FMT_1080P_24, //4        /**<1080p 24 Hz*/
 
-    HI_DRV_DISP_FMT_1080i_60,         /**<1080i 60 Hz*/
-    HI_DRV_DISP_FMT_1080i_50,         /**<1080i 60 Hz*/
+    HI_DRV_DISP_FMT_1080i_60, //5        /**<1080i 60 Hz*/
+    HI_DRV_DISP_FMT_1080i_50, //6        /**<1080i 60 Hz*/
 
-    HI_DRV_DISP_FMT_720P_60,          /**<720p 60 Hz*/
-    HI_DRV_DISP_FMT_720P_50,          /**<720p 50 Hz */
+    HI_DRV_DISP_FMT_720P_60, //7          /**<720p 60 Hz*/
+    HI_DRV_DISP_FMT_720P_50, //8         /**<720p 50 Hz */
 
-    HI_DRV_DISP_FMT_576P_50,          /**<576p 50 Hz*/
-    HI_DRV_DISP_FMT_480P_60,          /**<480p 60 Hz*/
+    HI_DRV_DISP_FMT_576P_50, //9         /**<576p 50 Hz*/
+    HI_DRV_DISP_FMT_480P_60, //10         /**<480p 60 Hz*/
 
-    HI_DRV_DISP_FMT_PAL,              /* B D G H I PAL */
+    HI_DRV_DISP_FMT_PAL, //11             /* B D G H I PAL */
     HI_DRV_DISP_FMT_PAL_B,            /* B PAL�� Australia */
     HI_DRV_DISP_FMT_PAL_B1,           /* B1 PAL, Hungary */
     HI_DRV_DISP_FMT_PAL_D,            /* D PAL, China */
@@ -118,32 +118,32 @@ typedef enum hiDRV_DISP_FMT_E
     HI_DRV_DISP_FMT_PAL_H,            /* H PAL�� Europe */
     HI_DRV_DISP_FMT_PAL_K,            /* K PAL�� Europe */
     HI_DRV_DISP_FMT_PAL_I,            /* I PAL��U.K. */
-    HI_DRV_DISP_FMT_PAL_N,            /* N PAL, Jamaica/Uruguay */
-    HI_DRV_DISP_FMT_PAL_Nc,           /* Nc PAL, Argentina */
+    HI_DRV_DISP_FMT_PAL_N, //20           /* N PAL, Jamaica/Uruguay */
+    HI_DRV_DISP_FMT_PAL_Nc, //21          /* Nc PAL, Argentina */
 
-    HI_DRV_DISP_FMT_PAL_M,            /* M PAL, 525 lines */
+    HI_DRV_DISP_FMT_PAL_M, //22           /* M PAL, 525 lines */
     HI_DRV_DISP_FMT_PAL_60,           /* 60 PAL */
-    HI_DRV_DISP_FMT_NTSC,             /* (M)NTSC       */
+    HI_DRV_DISP_FMT_NTSC, //24            /* (M)NTSC       */
     HI_DRV_DISP_FMT_NTSC_J,           /* NTSC-J        */
-    HI_DRV_DISP_FMT_NTSC_443,          /* (M)PAL        */
+    HI_DRV_DISP_FMT_NTSC_443, //26         /* (M)PAL        */
 
-    HI_DRV_DISP_FMT_SECAM_SIN,      /**< SECAM_SIN*/
+    HI_DRV_DISP_FMT_SECAM_SIN, //27     /**< SECAM_SIN*/
     HI_DRV_DISP_FMT_SECAM_COS,      /**< SECAM_COS*/
     HI_DRV_DISP_FMT_SECAM_L,        /**< France*/
     HI_DRV_DISP_FMT_SECAM_B,        /**< Middle East*/
     HI_DRV_DISP_FMT_SECAM_G,        /**< Middle East*/
     HI_DRV_DISP_FMT_SECAM_D,        /**< Eastern Europe*/
     HI_DRV_DISP_FMT_SECAM_K,        /**< Eastern Europe*/
-    HI_DRV_DISP_FMT_SECAM_H,        /**< Line SECAM*/
+    HI_DRV_DISP_FMT_SECAM_H, //34       /**< Line SECAM*/
 
-    HI_DRV_DISP_FMT_1440x576i_50,
-    HI_DRV_DISP_FMT_1440x480i_60,
+    HI_DRV_DISP_FMT_1440x576i_50, //35
+    HI_DRV_DISP_FMT_1440x480i_60, //36
 
-    HI_DRV_DISP_FMT_1080P_24_FP,
-    HI_DRV_DISP_FMT_720P_60_FP,
-    HI_DRV_DISP_FMT_720P_50_FP,
+    HI_DRV_DISP_FMT_1080P_24_FP, //37
+    HI_DRV_DISP_FMT_720P_60_FP, //38
+    HI_DRV_DISP_FMT_720P_50_FP, //39
     
-    HI_DRV_DISP_FMT_861D_640X480_60,
+    HI_DRV_DISP_FMT_861D_640X480_60, //40
     HI_DRV_DISP_FMT_VESA_800X600_60,
     HI_DRV_DISP_FMT_VESA_1024X768_60,
     HI_DRV_DISP_FMT_VESA_1280X720_60,
@@ -163,19 +163,23 @@ typedef enum hiDRV_DISP_FMT_E
     HI_DRV_DISP_FMT_VESA_1920X1440_60,
     HI_DRV_DISP_FMT_VESA_2048X1152_60,
     HI_DRV_DISP_FMT_VESA_2560X1440_60_RB,
-    HI_DRV_DISP_FMT_VESA_2560X1600_60_RB,
+    HI_DRV_DISP_FMT_VESA_2560X1600_60_RB, //60
 
     //ADD
-    HI_DRV_DISP_FMT_CUSTOM,
+    HI_DRV_DISP_FMT_61, //61
+    HI_DRV_DISP_FMT_62, //62
+    HI_DRV_DISP_FMT_63, //63
+    HI_DRV_DISP_FMT_64, //64
 
-    HI_DRV_DISP_FMT_BUTT
+    HI_DRV_DISP_FMT_CUSTOM, //65
+    HI_DRV_DISP_FMT_BUTT //66
 }HI_DRV_DISP_FMT_E;
 
 typedef enum hiDRV_DISP_VDAC_SIGNAL_E
 {
     HI_DRV_DISP_VDAC_NONE = 0,
     HI_DRV_DISP_VDAC_CVBS,
-    HI_DRV_DISP_VDAC_Y,
+    HI_DRV_DISP_VDAC_Y, //2
     HI_DRV_DISP_VDAC_PB,
     HI_DRV_DISP_VDAC_PR,
     HI_DRV_DISP_VDAC_SV_Y,
@@ -184,18 +188,18 @@ typedef enum hiDRV_DISP_VDAC_SIGNAL_E
     HI_DRV_DISP_VDAC_G,
     HI_DRV_DISP_VDAC_B,
     HI_DRV_DISP_VDAC_G_NOSYNC,
-    HI_DRV_DISP_VDAC_SIGNAL_BUTT
+    HI_DRV_DISP_VDAC_SIGNAL_BUTT //11
 }HI_DRV_DISP_VDAC_SIGNAL_E;
 
 typedef enum hiDRV_DISP_INTF_ID_E
 {
     HI_DRV_DISP_INTF_YPBPR0 = 0,
-    HI_DRV_DISP_INTF_RGB0,
-    HI_DRV_DISP_INTF_SVIDEO0,
-    HI_DRV_DISP_INTF_CVBS0,
-    HI_DRV_DISP_INTF_VGA0,
+    HI_DRV_DISP_INTF_RGB0, //1
+    HI_DRV_DISP_INTF_SVIDEO0, //2
+    HI_DRV_DISP_INTF_CVBS0, //3
+    HI_DRV_DISP_INTF_VGA0, //4
 
-    HI_DRV_DISP_INTF_HDMI0,
+    HI_DRV_DISP_INTF_HDMI0, //5
     HI_DRV_DISP_INTF_HDMI1,
     HI_DRV_DISP_INTF_HDMI2,
 
@@ -211,7 +215,7 @@ typedef enum hiDRV_DISP_INTF_ID_E
     HI_DRV_DISP_INTF_LCD1,
     HI_DRV_DISP_INTF_LCD2,
 
-    HI_DRV_DISP_INTF_ID_MAX
+    HI_DRV_DISP_INTF_ID_MAX //17?
 }HI_DRV_DISP_INTF_ID_E;
 
 
@@ -219,10 +223,10 @@ typedef enum hiDRV_DISP_INTF_ID_E
 #define HI_DISP_VDAC_INVALID_ID 0xff
 typedef struct hiDRV_DISP_INTF_S
 {
-    HI_DRV_DISP_INTF_ID_E eID;
-    HI_U8 u8VDAC_Y_G;
-    HI_U8 u8VDAC_Pb_B;
-    HI_U8 u8VDAC_Pr_R;
+    HI_DRV_DISP_INTF_ID_E eID; //0
+    HI_U8 u8VDAC_Y_G; //4
+    HI_U8 u8VDAC_Pb_B; //5
+    HI_U8 u8VDAC_Pr_R; //6
     HI_BOOL bDacSync;
 }HI_DRV_DISP_INTF_S;
 
@@ -238,12 +242,12 @@ typedef enum hiDRV_DISP_INTF_DATA_FMT
 
 typedef struct hiDRV_DISP_TIMING_S
 {
-    HI_U32  u32VFB;
-    HI_U32  u32VBB;
-    HI_U32  u32VACT;
-    HI_U32  u32HFB;
-    HI_U32  u32HBB;
-    HI_U32  u32HACT;
+    HI_U32  u32VFB; //0
+    HI_U32  u32VBB; //4
+    HI_U32  u32VACT; //8
+    HI_U32  u32HFB; //12
+    HI_U32  u32HBB; //16
+    HI_U32  u32HACT; //20
     HI_U32  u32VPW;
     HI_U32  u32HPW;
     HI_BOOL bIDV;
@@ -254,19 +258,20 @@ typedef struct hiDRV_DISP_TIMING_S
     HI_DRV_DISP_INTF_DATA_FMT_E eDataFmt;
 
     HI_BOOL bDitherEnable;
-    HI_U32  u32ClkPara0;
-    HI_U32  u32ClkPara1;
+    HI_U32  u32ClkPara0; //60
+    HI_U32  u32ClkPara1; //64
 
     HI_BOOL bInterlace;
     HI_U32  u32PixFreq;
-    HI_U32  u32VertFreq;
+    HI_U32  u32VertFreq; //76
     HI_U32  u32AspectRatioW;
     HI_U32  u32AspectRatioH;
 
     HI_BOOL u32bUseGamma;
 
     HI_U32  u32Reserve0; 
-    HI_U32  u32Reserve1; 
+    HI_U32  u32Reserve1;
+    //100
 }HI_DRV_DISP_TIMING_S;
 
 typedef struct hiDRV_DISP_COLOR_S
@@ -308,30 +313,30 @@ typedef struct hiDRV_DISP_OFFSET_S
  
 typedef struct hiDISP_DISPLAY_INFO_S
 {
-    HI_BOOL bIsMaster;
-    HI_BOOL bIsSlave;
-    HI_DRV_DISPLAY_E enAttachedDisp;
+    HI_BOOL bIsMaster; //0
+    HI_BOOL bIsSlave; //4
+    HI_DRV_DISPLAY_E enAttachedDisp; //8
     
-    HI_DRV_DISP_STEREO_E eDispMode;
-    HI_BOOL bRightEyeFirst;
-    HI_BOOL bInterlace;
+    HI_DRV_DISP_STEREO_E eDispMode; //12
+    HI_BOOL bRightEyeFirst; //16
+    HI_BOOL bInterlace; //20
     HI_BOOL bIsBottomField;
     HI_U32 u32Vline;
 
     /*just a back of display setting, for virt screen and  offset set.*/
-    HI_RECT_S stVirtaulScreen;        
-    HI_DRV_DISP_OFFSET_S stOffsetInfo;
+    HI_RECT_S stVirtaulScreen; //32
+    HI_DRV_DISP_OFFSET_S stOffsetInfo; //48
     HI_RECT_S stFmtResolution;
     HI_RECT_S stPixelFmtResolution;
 
-    HI_DRV_ASPECT_RATIO_S stAR;
-    HI_U32 u32RefreshRate;
-    HI_DRV_COLOR_SPACE_E eColorSpace;
+    HI_DRV_ASPECT_RATIO_S stAR; //96
+    HI_U32 u32RefreshRate; //104
+    HI_DRV_COLOR_SPACE_E eColorSpace; //108
 
-    HI_U32 u32Bright;
-    HI_U32 u32Hue;
-    HI_U32 u32Satur;
-    HI_U32 u32Contrst;
+    HI_U32 u32Bright; //112
+    HI_U32 u32Hue; //116
+    HI_U32 u32Satur; //120
+    HI_U32 u32Contrst; //124
 
     HI_U32 u32Kr;
     HI_U32 u32Kg;
@@ -420,8 +425,8 @@ typedef struct hiDRV_DISP_HDMI_S
 
 typedef struct hiDRV_DISP_COLOR_SETTING_S
 {
-    HI_DRV_COLOR_SPACE_E enInCS;
-    HI_DRV_COLOR_SPACE_E enOutCS;
+    HI_DRV_COLOR_SPACE_E enInCS; //0
+    HI_DRV_COLOR_SPACE_E enOutCS; //4
 
     HI_U32 u32Bright;      //bright adjust value,range[0,100],default setting 50; 
     HI_U32 u32Hue;         //hue adjust value,range[0,100],default setting 50;
@@ -434,8 +439,9 @@ typedef struct hiDRV_DISP_COLOR_SETTING_S
     HI_BOOL bGammaEnable;
     HI_BOOL bUseCustGammaTable; 
 
-    HI_VOID *pReserve;    /* must be 0 */
-    HI_U32   u32Reserve;  /* must be 0 */
+    HI_VOID *pReserve; //44   /* must be 0 */
+    HI_U32   u32Reserve; //48  /* must be 0 */
+    //52
 }HI_DRV_DISP_COLOR_SETTING_S;
 
 typedef struct hiDRV_DISP_INIT_PARAM_S
@@ -459,7 +465,7 @@ typedef struct hiDRV_DISP_INIT_PARAM_S
     HI_U32                u32CustomRatioWidth;
     HI_U32                u32CustomRatioHeight;
     HI_DRV_DISP_INTF_S    stIntf[HI_DRV_DISP_INTF_ID_MAX];
-    HI_DRV_DISP_TIMING_S  stDispTiming;
+    HI_DRV_DISP_TIMING_S  stDispTiming; //284
 
     HI_U32  u32Reseve;
     HI_VOID *pRevData;
@@ -467,41 +473,42 @@ typedef struct hiDRV_DISP_INIT_PARAM_S
 
 typedef struct hiDRV_DISP_SETTING_S
 {
-    HI_U32  u32BootVersion;
-    HI_BOOL bGetPDMParam;
+    HI_U32  u32BootVersion; //0
+    HI_BOOL bGetPDMParam; //4
     //HI_BOOL bSelfStart;
-    HI_BOOL bIsMaster;
-    HI_BOOL bIsSlave;
-    HI_DRV_DISPLAY_E enAttachedDisp;
+    HI_BOOL bIsMaster; //8
+    HI_BOOL bIsSlave; //12
+    HI_DRV_DISPLAY_E enAttachedDisp; //16
 
     /* output format */
-    HI_DRV_DISP_STEREO_E eDispMode;
-    HI_DRV_DISP_FMT_E enFormat;
-    HI_DRV_DISP_TIMING_S stCustomTimg;
+    HI_DRV_DISP_STEREO_E eDispMode; //20
+    HI_DRV_DISP_FMT_E enFormat; //24
+    HI_DRV_DISP_TIMING_S stCustomTimg; //28
 
     /* about color */
-    HI_DRV_DISP_COLOR_SETTING_S stColor;
+    HI_DRV_DISP_COLOR_SETTING_S stColor; //128
 
     /* background color */
-    HI_DRV_DISP_COLOR_S stBgColor;    
+    HI_DRV_DISP_COLOR_S stBgColor; //180
 
     /*just for screen ajust.*/
-    HI_RECT_S stVirtaulScreen;
+    HI_RECT_S stVirtaulScreen; //184
     HI_DRV_DISP_OFFSET_S stOffsetInfo;
 
     /* interface setting */
     HI_U32 u32IntfNumber;
-    HI_DRV_DISP_INTF_S stIntf[HI_DRV_DISP_INTF_ID_MAX];
+    HI_DRV_DISP_INTF_S stIntf[HI_DRV_DISP_INTF_ID_MAX]; //220
 
     HI_U32 u32LayerNumber;
     HI_DRV_DISP_LAYER_E enLayer[HI_DRV_DISP_LAYER_BUTT]; /* Z-order is from bottom to top */
     
-    HI_BOOL bCustomRatio;
-    HI_U32 u32CustomRatioWidth;
-    HI_U32 u32CustomRatioHeight;
+    HI_BOOL bCustomRatio; //440
+    HI_U32 u32CustomRatioWidth; //444
+    HI_U32 u32CustomRatioHeight; //448
 
     HI_U32  u32Reseve;
     HI_VOID *pRevData;
+    //460
 }HI_DRV_DISP_SETTING_S;
 
 #define DEF_HI_DRV_DISP_MIRROR_BUFFER_MAX_NUMBER 16
@@ -561,13 +568,13 @@ typedef enum hiDRV_DISP_CALLBACK_TYPE_E
     /* �жϷ���λ�ã�������Ч��Ϊ�ο���0Ϊ��һ�У�100Ϊ���һ�н��� */
     HI_DRV_DISP_C_TYPE_NONE = 0,
     //HI_DRV_DISP_C_SHOW_MODE,
-    HI_DRV_DISP_C_INTPOS_0_PERCENT,
+    HI_DRV_DISP_C_INTPOS_0_PERCENT, //1
     HI_DRV_DISP_C_INTPOS_90_PERCENT, //2
     HI_DRV_DISP_C_GFX_WBC, //3
-    HI_DRV_DISP_C_REG_UP,
+    HI_DRV_DISP_C_REG_UP, //4
     HI_DRV_DISP_C_5, //5
     HI_DRV_DISP_C_6, //6
-    HI_DRV_DISP_C_TYPE_BUTT
+    HI_DRV_DISP_C_TYPE_BUTT //7
 }HI_DRV_DISP_CALLBACK_TYPE_E;
 
 typedef enum hiDRV_DISP_CALLBACK_EVENT_E
@@ -599,10 +606,10 @@ typedef enum hiDRV_DISP_FIELD_FLAG_E
 
 typedef struct hiDRV_DISP_CALLBACK_INFO_S
 {
-    HI_DRV_DISP_CALLBACK_EVENT_E eEventType;
+    HI_DRV_DISP_CALLBACK_EVENT_E eEventType; //0
     HI_DRV_DISP_FIELD_FLAG_E eField;
 
-    HI_DISP_DISPLAY_INFO_S stDispInfo;
+    HI_DISP_DISPLAY_INFO_S stDispInfo; //8
 }HI_DRV_DISP_CALLBACK_INFO_S;
 
 typedef struct hiDRV_DISP_Cast_Attr_S

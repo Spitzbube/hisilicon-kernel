@@ -117,9 +117,9 @@ HI_S32 DISP_CheckParam(HI_UNF_DISP_E enDisp, HI_DISP_PARAM_S* pP)
 
     if (enDisp == HI_UNF_DISPLAY1)
     {
-        if (pP->enFormat >= HI_UNF_ENC_FMT_BUTT)
+        if (pP->enFormat > 260) //>= HI_UNF_ENC_FMT_BUTT)
         {
-            DISP_ERROR("invalid enformt!\n");
+            DISP_ERROR("invalid enformt!\n"); //134
             return HI_FAILURE;
         }
 
@@ -137,7 +137,7 @@ HI_S32 DISP_CheckParam(HI_UNF_DISP_E enDisp, HI_DISP_PARAM_S* pP)
                            || ( pP->stIntf[i].unIntf.stYPbPr.u8DacPb == pP->stIntf[i].unIntf.stYPbPr.u8DacPr)
                        )
                     {
-                        DISP_ERROR("invalid vadc id!\n");
+                        DISP_ERROR("invalid vadc id!\n"); //152
                         return HI_FAILURE;
                     }
                 }
@@ -148,9 +148,9 @@ HI_S32 DISP_CheckParam(HI_UNF_DISP_E enDisp, HI_DISP_PARAM_S* pP)
     else
     {
         //HI_UNF_DISPLAY1
-         if (pP->enFormat >= HI_UNF_ENC_FMT_BUTT)
+         if (pP->enFormat > 260) //>= HI_UNF_ENC_FMT_BUTT)
         {
-            DISP_ERROR("invalid enformt!\n");
+            DISP_ERROR("invalid enformt!\n"); //165
             return HI_FAILURE;
         }
 
@@ -162,7 +162,7 @@ HI_S32 DISP_CheckParam(HI_UNF_DISP_E enDisp, HI_DISP_PARAM_S* pP)
                 {
                     if ( pP->stIntf[i].unIntf.stCVBS.u8Dac > 3)
                     {
-                        DISP_ERROR("invalid vadc id!\n");
+                        DISP_ERROR("invalid vadc id!\n"); //177
                         return HI_FAILURE;
                     }
                 }
@@ -176,7 +176,7 @@ HI_S32 DISP_CheckParam(HI_UNF_DISP_E enDisp, HI_DISP_PARAM_S* pP)
           || (pP->u32Saturation > 100)
           || (pP->u32HuePlus > 100) )
     {
-        DISP_ERROR("invalid color param!\n");
+        DISP_ERROR("invalid color param!\n"); //191
         return HI_FAILURE;
     }
 
@@ -190,7 +190,7 @@ HI_S32 DISP_CheckParam(HI_UNF_DISP_E enDisp, HI_DISP_PARAM_S* pP)
     */
     if (pP->stAspectRatio.enDispAspectRatio > HI_UNF_DISP_ASPECT_RATIO_USER)
     {
-        DISP_ERROR("invalid aspect ratio param!\n");
+        DISP_ERROR("invalid aspect ratio param!\n"); //205
         return HI_FAILURE;
     }
 
@@ -199,7 +199,7 @@ HI_S32 DISP_CheckParam(HI_UNF_DISP_E enDisp, HI_DISP_PARAM_S* pP)
         if (  (pP->stAspectRatio.u32UserAspectWidth > (pP->stAspectRatio.u32UserAspectHeight * 16))
               || (pP->stAspectRatio.u32UserAspectHeight > (pP->stAspectRatio.u32UserAspectWidth * 16)))
         {
-            DISP_ERROR("invalid aspect ratio param!\n");
+            DISP_ERROR("invalid aspect ratio param!\n"); //214
             return HI_FAILURE;
         }
     }
@@ -278,21 +278,22 @@ HI_DRV_DISP_FMT_E DISP_Disp0FmtRevise_Attach(HI_DRV_DISP_FMT_E U)
     {
         case HI_DRV_DISP_FMT_1080P_50:
         case HI_DRV_DISP_FMT_1080P_25:
-        case HI_DRV_DISP_FMT_1080P_24:
         case HI_DRV_DISP_FMT_1080i_50:
         case HI_DRV_DISP_FMT_720P_50:
         case HI_DRV_DISP_FMT_576P_50:
         case HI_DRV_DISP_FMT_720P_50_FP:
-        case HI_DRV_DISP_FMT_1080P_24_FP:
         case HI_DRV_DISP_FMT_1440x576i_50:
+        case HI_DRV_DISP_FMT_62:
             return HI_DRV_DISP_FMT_PAL;
         case HI_DRV_DISP_FMT_1080P_60:
         case HI_DRV_DISP_FMT_1080P_30:
+        case HI_DRV_DISP_FMT_1080P_24:
         case HI_DRV_DISP_FMT_1080i_60:
         case HI_DRV_DISP_FMT_720P_60:
         case HI_DRV_DISP_FMT_480P_60:
         case HI_DRV_DISP_FMT_1440x480i_60:
         case HI_DRV_DISP_FMT_720P_60_FP:
+        case HI_DRV_DISP_FMT_1080P_24_FP:
         default:
             return HI_DRV_DISP_FMT_NTSC;
     }
@@ -375,13 +376,17 @@ HI_DRV_DISP_FMT_E DISP_GetEncFmt(HI_UNF_ENC_FMT_E enUnFmt)
     {
         return DISP_3DFmtU2V(enUnFmt);
     }
-    else if (enUnFmt <= HI_UNF_ENC_FMT_VESA_2048X1152_60)
+    else if (enUnFmt <= HI_UNF_ENC_FMT_VESA_2560X1600_60_RB) //<= HI_UNF_ENC_FMT_VESA_2048X1152_60)
     {
         return DISP_DVIFmtU2V(enUnFmt);
     }
-    else if (enUnFmt == HI_UNF_ENC_FMT_BUTT)
+    else if (enUnFmt < 260)
     {
-        return HI_DRV_DISP_FMT_CUSTOM;
+    	return enUnFmt-195;
+    }
+    else if (enUnFmt == 260) //== HI_UNF_ENC_FMT_BUTT)
+    {
+    	return HI_DRV_DISP_FMT_CUSTOM;
         return HI_SUCCESS;
     }
     else
@@ -431,20 +436,27 @@ HI_S32 DISP_GetDrvIntf(HI_UNF_DISP_INTF_S* pU, HI_DRV_DISP_INTF_S* pM, HI_BOOL b
                 pM->u8VDAC_Y_G  = DISP_GetVdacIdFromPinIDForMPW(pU->unIntf.stYPbPr.u8DacY);
                 pM->u8VDAC_Pb_B = DISP_GetVdacIdFromPinIDForMPW(pU->unIntf.stYPbPr.u8DacPb);
                 pM->u8VDAC_Pr_R = DISP_GetVdacIdFromPinIDForMPW(pU->unIntf.stYPbPr.u8DacPr);
+#if 0
                 DISP_INFO("=================Y=%d,Pb=%d, Pr=%d\n",
                           pM->u8VDAC_Y_G, pM->u8VDAC_Pb_B, pM->u8VDAC_Pr_R);
+#endif
                 break;
+
             case HI_UNF_DISP_INTF_TYPE_SVIDEO:
                 pM->eID = HI_DRV_DISP_INTF_SVIDEO0;
                 pM->u8VDAC_Y_G  = DISP_GetVdacIdFromPinIDForMPW(pU->unIntf.stSVideo.u8DacY);
                 pM->u8VDAC_Pb_B = DISP_GetVdacIdFromPinIDForMPW(pU->unIntf.stSVideo.u8DacC);
                 break;
+
             case HI_UNF_DISP_INTF_TYPE_CVBS:
                 pM->eID = HI_DRV_DISP_INTF_CVBS0;
                 pM->u8VDAC_Y_G  = DISP_GetVdacIdFromPinIDForMPW(pU->unIntf.stCVBS.u8Dac);
+#if 0
                 DISP_INFO("=================CVBS=%d\n",
                           pM->u8VDAC_Y_G);
+#endif
                 break;
+
                 /*
                             case HI_UNF_DISP_INTF_TYPE_LCD:
                                 pM->eID =  + (pU->unIntf.enLCD - );
@@ -475,6 +487,29 @@ HI_S32 DISP_GetDrvIntf(HI_UNF_DISP_INTF_S* pU, HI_DRV_DISP_INTF_S* pM, HI_BOOL b
                                 }
                                 break;
                 */
+
+            case HI_UNF_DISP_INTF_TYPE_VGA:
+                pM->eID = HI_DRV_DISP_INTF_VGA0;
+#if 1
+                pM->u8VDAC_Y_G  = DISP_GetVdacIdFromPinIDForMPW(pU->unIntf.stRGB.u8DacG);
+                pM->u8VDAC_Pb_B = DISP_GetVdacIdFromPinIDForMPW(pU->unIntf.stRGB.u8DacB);
+                pM->u8VDAC_Pr_R = DISP_GetVdacIdFromPinIDForMPW(pU->unIntf.stRGB.u8DacR);
+                break;
+#else
+                pM->u8VDAC_Y_G  = DISP_GetVdacIdFromPinIDForMPW(pU->unIntf.stYPbPr.u8DacY);
+                pM->u8VDAC_Pb_B = DISP_GetVdacIdFromPinIDForMPW(pU->unIntf.stYPbPr.u8DacPb);
+                pM->u8VDAC_Pr_R = DISP_GetVdacIdFromPinIDForMPW(pU->unIntf.stYPbPr.u8DacPr);
+                break;
+#endif
+
+            case HI_UNF_DISP_INTF_TYPE_RGB:
+                pM->eID = HI_DRV_DISP_INTF_RGB0;
+                pM->u8VDAC_Y_G  = DISP_GetVdacIdFromPinIDForMPW(pU->unIntf.stRGB.u8DacG);
+                pM->u8VDAC_Pb_B = DISP_GetVdacIdFromPinIDForMPW(pU->unIntf.stRGB.u8DacB);
+                pM->u8VDAC_Pr_R = DISP_GetVdacIdFromPinIDForMPW(pU->unIntf.stRGB.u8DacR);
+                pM->bDacSync = DISP_GetVdacIdFromPinIDForMPW(pU->unIntf.stRGB.bDacSync);
+            	break;
+
             default:
                 return HI_FAILURE;
         }
@@ -483,6 +518,66 @@ HI_S32 DISP_GetDrvIntf(HI_UNF_DISP_INTF_S* pU, HI_DRV_DISP_INTF_S* pM, HI_BOOL b
     return HI_SUCCESS;
 }
 
+
+HI_S32 ParaTransfer_Timing(HI_UNF_DISP_TIMING_S* a, HI_DRV_DISP_TIMING_S* b, HI_BOOL c)
+{
+	if (c != HI_FALSE)
+	{
+	    b->u32VFB = a->VFB;
+	    b->u32VBB = a->VBB;
+	    b->u32VACT = a->VACT;
+	    b->u32HFB = a->HFB;
+	    b->u32HBB = a->HBB;
+	    b->u32HACT = a->HACT;
+	    b->u32VPW = a->VPW;
+	    b->u32HPW = a->HPW;
+	    b->bIDV = a->IDV;
+	    b->bIHS = a->IHS;
+	    b->bIVS = a->IVS;
+	    b->bClkReversal = a->ClockReversal;
+	    b->u32DataWidth = a->DataWidth;
+	    b->u32ClkPara0 = a->ClkPara0;
+	    b->u32ClkPara1 = a->ClkPara1;
+	    b->bDitherEnable = a->DitherEnable;
+	    b->bInterlace = a->bInterlace;
+	    b->u32PixFreq = a->PixFreq;
+	    b->u32VertFreq = a->VertFreq;
+	    b->u32AspectRatioW = a->AspectRatioW;
+	    b->u32AspectRatioH = a->AspectRatioH;
+	    b->u32bUseGamma = a->bUseGamma;
+	    b->u32Reserve0 = a->Reserve0;
+	    b->u32Reserve1 = a->Reserve1;
+	}
+	else
+	{
+	    a->VFB = b->u32VFB;
+	    a->VBB = b->u32VBB;
+	    a->VACT = b->u32VACT;
+	    a->HFB = b->u32HFB;
+	    a->HBB = b->u32HBB;
+	    a->HACT = b->u32HACT;
+	    a->VPW = b->u32VPW;
+	    a->HPW = b->u32HPW;
+	    a->IDV = b->bIDV;
+	    a->IHS = b->bIHS;
+	    a->IVS = b->bIVS;
+	    a->ClockReversal = b->bClkReversal;
+	    a->DataWidth = b->u32DataWidth;
+	    a->ClkPara0 = b->u32ClkPara0;
+	    a->ClkPara1 = b->u32ClkPara1;
+	    a->DitherEnable = b->bDitherEnable;
+	    a->bInterlace = b->bInterlace;
+	    a->PixFreq = b->u32PixFreq;
+	    a->VertFreq = b->u32VertFreq;
+	    a->AspectRatioW = b->u32AspectRatioW;
+	    a->AspectRatioH = b->u32AspectRatioH;
+	    a->bUseGamma = b->u32bUseGamma;
+	    a->Reserve0 = b->u32Reserve0;
+	    a->Reserve1 = b->u32Reserve1;
+	}
+
+	return HI_SUCCESS;
+}
 
 
 #define DISP_VERSION_HI3716CV200_MPW 0x20130417ul
@@ -495,6 +590,9 @@ HI_S32 DispGetInitParam(HI_DRV_DISPLAY_E enDisp, HI_DRV_DISP_INIT_PARAM_S* pstSe
     HI_UNF_DISP_E enUnfDisp;
     HI_S32 i, j, nRet;
 
+    memset(&stDispParam0, 0, sizeof(HI_DISP_PARAM_S));
+    memset(&stDispParam1, 0, sizeof(HI_DISP_PARAM_S));
+
     if (enDisp > HI_DRV_DISPLAY_1)
     {
         return HI_FAILURE;
@@ -506,17 +604,18 @@ HI_S32 DispGetInitParam(HI_DRV_DISPLAY_E enDisp, HI_DRV_DISP_INIT_PARAM_S* pstSe
         nRet = HI_DRV_MODULE_GetFunction(HI_ID_PDM, (HI_VOID**)&pst_PDMFunc);
         if (nRet || !pst_PDMFunc->pfnPDM_GetDispParam)
         {
-            DISP_ERROR("DISP_get PDM funt failed!");
+            DISP_ERROR("DISP_get PDM funt failed!"); //668
             return HI_FAILURE;;
         }
 
         enUnfDisp = (HI_DRV_DISPLAY_0 == enDisp) ? HI_UNF_DISPLAY0 : HI_UNF_DISPLAY1;
         
+#warning CHECK: DRV_PDM_GetDispParam
         nRet  = pst_PDMFunc->pfnPDM_GetDispParam(HI_UNF_DISPLAY0, &stDispParam0);
         nRet |= pst_PDMFunc->pfnPDM_GetDispParam(HI_UNF_DISPLAY1, &stDispParam1);
         if (nRet)
         {
-            DISP_ERROR("DISP get param failed!\n");
+            DISP_WARN("DISP get param failed!\n"); //678
             return HI_FAILURE;
         }
          
@@ -524,7 +623,7 @@ HI_S32 DispGetInitParam(HI_DRV_DISPLAY_E enDisp, HI_DRV_DISP_INIT_PARAM_S* pstSe
         nRet |= DISP_CheckParam(HI_UNF_DISPLAY1, &stDispParam1);		
         if (nRet)
         {
-            DISP_ERROR("DISP0 Param invalid!\n");
+            DISP_ERROR("DISP0 Param invalid!\n"); //686
             return HI_FAILURE;
         }
 #else
@@ -555,6 +654,11 @@ HI_S32 DispGetInitParam(HI_DRV_DISPLAY_E enDisp, HI_DRV_DISP_INIT_PARAM_S* pstSe
     pstSetting->u32Version = DISP_VERSION_HI3716CV200_MPW;
     //pstSetting->bSelfStart = HI_TRUE;
     pstSetting->enFormat   = DISP_GetEncFmt(pstDispParam->enFormat);
+
+    if (pstDispParam->enFormat == 260)
+    {
+    	ParaTransfer_Timing(&pstDispParam->stDispTiming, &pstSetting->stDispTiming, HI_TRUE);
+    }
 
 
     if (HI_DRV_DISPLAY_1 == stDispParam0.enSrcDisp)

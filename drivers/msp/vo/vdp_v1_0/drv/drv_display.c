@@ -31,6 +31,8 @@ History       :
 #include "hi_drv_sys.h"
 #endif
 
+#include "drv_pq.h"
+
 #ifdef __cplusplus
 #if __cplusplus
 extern "C" {
@@ -45,6 +47,8 @@ static DISP_DEV_S s_stDisplayDevice;
 
 /* OPTM ISR handle */
 HI_U32 g_DispIrqHandle = 0;
+
+extern HI_U32 s_u32VdpBaseAddr;
 
 #ifdef __DISP_PLATFORM_BOOT__
 
@@ -62,7 +66,7 @@ static HDMI_EXPORT_FUNC_S* s_pstHDMIFunc;
     {                                \
         if (DISP_DEVICE_STATE_OPEN != s_s32DisplayGlobalFlag)  \
         {                            \
-            DISP_ERROR("DISP ERROR! DISP is not inited in %s!\n", __FUNCTION__); \
+            DISP_ERROR("DISP ERROR! DISP is not inited in %s,status:%d!\n", __FUNCTION__, s_s32DisplayGlobalFlag); \
             return HI_ERR_DISP_NO_INIT;  \
         }                             \
     }
@@ -150,7 +154,7 @@ HI_VOID DispResetHardware(HI_VOID)
         s_stDisplayDevice.stIntfOpt.PF_ResetHardware();
         s_stDisplayDevice.bHwReseted = HI_TRUE;
 
-        DISP_WARN("========DispResetHardware=======\n");
+        DISP_WARN("========DispResetHardware=======\n"); //159
     }
 }
 HI_VOID DispCloseClkResetModule(HI_VOID)
@@ -165,11 +169,12 @@ HI_S32 DispGetHdmiFunction(void)
     HI_S32 nRet = HI_SUCCESS;
 
     s_pstHDMIFunc = HI_NULL;
+#warning Module HI_ID_HDMI not yet implemented!!
     nRet = HI_DRV_MODULE_GetFunction(HI_ID_HDMI, (HI_VOID**)&s_pstHDMIFunc);
     
     if ((nRet != HI_SUCCESS) || (s_pstHDMIFunc == HI_NULL))
     {
-        DISP_ERROR("DISP_get HDMI func failed!");
+        DISP_ERROR("DISP_get HDMI func failed!"); //178
         return HI_FAILURE;
     }
     return nRet;
@@ -308,12 +313,12 @@ HI_S32 DispSetMasterAndSlace(HI_DRV_DISPLAY_E enMaster, HI_DRV_DISPLAY_E enSlave
 HI_S32 DispCheckReadyForOpen(HI_DRV_DISPLAY_E enDisp)
 {
     DISP_S* pstDisp;
-    DispGetPointerByID(enDisp, pstDisp);
+    DispGetPointerByID(enDisp, pstDisp); //322
     
     if (HI_DRV_DISP_FMT_BUTT == pstDisp->stSetting.enFormat)
     {
-        DISP_WARN("WARNING! Fmt is not set!\n");
-        return HI_FAILURE;
+        DISP_WARN("WARNING! Fmt is not set!\n"); //326
+        return 0x8010000c; //HI_FAILURE;
     }
 
     return HI_SUCCESS;
@@ -573,7 +578,7 @@ HI_S32 DispAddIntf(DISP_S* pstDisp, HI_DRV_DISP_INTF_S* pstIntf)
     HI_DRV_DISP_INTF_S stBackup;
     HI_BOOL bBkFlag = HI_FALSE;
     HI_S32 nRet = HI_SUCCESS;
-    DispCheckNullPointer(pfOpt);
+    DispCheckNullPointer(pfOpt); //587
 
     //printk("DispAddIntf ***0**add (%d)----%d (%d)(%d)(%d)\n",pstDisp->enDisp,pstIntf->eID,pstIntf->u8VDAC_Y_G,pstIntf->u8VDAC_Pb_B,pstIntf->u8VDAC_Pr_R);
     /* if intf exist, release firstly */
@@ -584,22 +589,22 @@ HI_S32 DispAddIntf(DISP_S* pstDisp, HI_DRV_DISP_INTF_S* pstIntf)
         stBackup = pstIt->stIf;
 
         // s1 release vdac
-        DispCheckNullPointer(pfOpt->PF_ReleaseIntf2);
+        DispCheckNullPointer(pfOpt->PF_ReleaseIntf2); //598
         pfOpt->PF_ReleaseIntf2(pstDisp->enDisp, pstIt);
     }
 
     /* clean */
     DispCleanIntf(pstIt);
 
-    DISP_PRINT("DispAddIntf  pstIntf->u8VDAC_Y_G = %d\n", pstIntf->u8VDAC_Y_G);
+    DISP_PRINT("DispAddIntf  pstIntf->u8VDAC_Y_G = %d\n", pstIntf->u8VDAC_Y_G); //605
 
     pstIt->stIf = *pstIntf;
-        DispCheckNullPointer(pfOpt->PF_AcquireIntf2);
+        DispCheckNullPointer(pfOpt->PF_AcquireIntf2); //608
     nRet = pfOpt->PF_AcquireIntf2(pstDisp->enDisp, pstIt);
 
     if (nRet)
     {
-        DISP_ERROR("DISP %d acquire  (%d) failed\n", pstDisp->enDisp, pstIt->stIf.eID);
+        DISP_ERROR("DISP %d acquire  (%d) failed\n", pstDisp->enDisp, pstIt->stIf.eID); //613
         goto __SET_BACKUP__;
     }
 #ifdef __DISP_PLATFORM_BOOT__	
@@ -634,14 +639,15 @@ __SET_BACKUP__:
 */
 HI_S32 DispProduceDisplayInfo(DISP_S* pstDisp, HI_DISP_DISPLAY_INFO_S* pstInfo)
 {
+	DRV_PQ_GetPictureSettingStruct fp56;
     DISP_HAL_ENCFMT_PARAM_S stFmt;
     HI_DRV_DISP_FMT_E eFmt; 
     HI_S32 nRet;
 
     if (!pstDisp)
     {
-        DISP_ERROR("Found null pointer in %s\n", __FUNCTION__);
-        return HI_FAILURE;
+        DISP_ERROR("Found null pointer in %s\n", __FUNCTION__); //658
+        return 0x80100005; //HI_FAILURE;
     }
     
     eFmt = pstDisp->stSetting.enFormat;
@@ -690,6 +696,7 @@ HI_S32 DispProduceDisplayInfo(DISP_S* pstDisp, HI_DISP_DISPLAY_INFO_S* pstInfo)
 
         pstInfo->u32RefreshRate = stFmt.u32RefreshRate;
 
+#if 0
         pstInfo->u32Bright  = pstDisp->stSetting.stColor.u32Bright;
         pstInfo->u32Contrst = pstDisp->stSetting.stColor.u32Contrst;
         pstInfo->u32Hue     = pstDisp->stSetting.stColor.u32Hue;
@@ -697,8 +704,23 @@ HI_S32 DispProduceDisplayInfo(DISP_S* pstDisp, HI_DISP_DISPLAY_INFO_S* pstInfo)
         pstInfo->u32Kr      = pstDisp->stSetting.stColor.u32Kr;
         pstInfo->u32Kg      = pstDisp->stSetting.stColor.u32Kg;
         pstInfo->u32Kb      = pstDisp->stSetting.stColor.u32Kb;
+#endif
+        if (pstDisp->enDisp == HI_DRV_DISPLAY_1)
+        {
+        	DRV_PQ_GetHDPictureSetting(&fp56);
+        }
+        else
+        {
+        	DRV_PQ_GetSDPictureSetting(&fp56);
+        }
+
+        pstInfo->u32Bright = fp56.wData_0;
+        pstInfo->u32Contrst = fp56.wData_2;
+        pstInfo->u32Hue = fp56.wData_4;
+        pstInfo->u32Satur = fp56.wData_6;
+
     }
-    else if ((eFmt == HI_DRV_DISP_FMT_CUSTOM) && (pstDisp->stSetting.bCustomTimingIsSet))
+    else if ((eFmt == HI_DRV_DISP_FMT_CUSTOM) /* && (pstDisp->stSetting.bCustomTimingIsSet)*/)
     {
         pstInfo->bIsMaster = pstDisp->bIsMaster;
         pstInfo->bIsSlave  = pstDisp->bIsSlave;
@@ -761,8 +783,23 @@ HI_S32 DispProduceDisplayInfo(DISP_S* pstDisp, HI_DISP_DISPLAY_INFO_S* pstInfo)
         pstInfo->stAR.u8ARw = pstDisp->stSetting.stCustomTimg.u32AspectRatioW;
 
         /*set  Rate*/
-        pstInfo->u32RefreshRate = pstDisp->stSetting.stCustomTimg.u32VertFreq;
+        pstInfo->u32RefreshRate = ((int) pstDisp->stSetting.stCustomTimg.u32VertFreq) / 10;
 
+        if (pstDisp->enDisp == HI_DRV_DISPLAY_1)
+        {
+        	DRV_PQ_GetHDPictureSetting(&fp56);
+        }
+        else
+        {
+        	DRV_PQ_GetSDPictureSetting(&fp56);
+        }
+
+        pstInfo->u32Bright = fp56.wData_0;
+        pstInfo->u32Contrst = fp56.wData_2;
+        pstInfo->u32Hue = fp56.wData_4;
+        pstInfo->u32Satur = fp56.wData_6;
+
+#if 0
         pstInfo->u32Bright  = pstDisp->stSetting.stColor.u32Bright;
         pstInfo->u32Contrst = pstDisp->stSetting.stColor.u32Contrst;
         pstInfo->u32Hue     = pstDisp->stSetting.stColor.u32Hue;
@@ -770,11 +807,12 @@ HI_S32 DispProduceDisplayInfo(DISP_S* pstDisp, HI_DISP_DISPLAY_INFO_S* pstInfo)
         pstInfo->u32Kr      = pstDisp->stSetting.stColor.u32Kr;
         pstInfo->u32Kg      = pstDisp->stSetting.stColor.u32Kg;
         pstInfo->u32Kb      = pstDisp->stSetting.stColor.u32Kb;
+#endif
     }
     else
     {
-        DISP_WARN("Invalid display encoding format now\n");
-        return HI_FAILURE;
+        DISP_WARN("Invalid display encoding format now\n"); //794
+        return 0x8010000c; //HI_FAILURE;
     }
 
     return HI_SUCCESS;
@@ -789,6 +827,7 @@ HI_VOID DispInitCSC(HI_DRV_DISPLAY_E enDisp, HI_DRV_DISP_COLOR_SETTING_S* pstCol
     pstColor->enInCS  = HI_DRV_CS_DEFAULT;
     pstColor->enOutCS = HI_DRV_CS_DEFAULT;
 
+#if 0
     pstColor->u32Bright  = DISP_DEFAULT_BRIGHT;
     pstColor->u32Contrst = DISP_DEFAULT_CONTRAST;
     pstColor->u32Satur   = DISP_DEFAULT_SATURATION;
@@ -801,6 +840,7 @@ HI_VOID DispInitCSC(HI_DRV_DISPLAY_E enDisp, HI_DRV_DISP_COLOR_SETTING_S* pstCol
     // s2 Gamma
     pstColor->bGammaEnable       = HI_FALSE;
     pstColor->bUseCustGammaTable = HI_FALSE;
+#endif
 
     pstColor->pReserve = HI_NULL;
     pstColor->u32Reserve = 0;
@@ -848,7 +888,7 @@ HI_S32 DispGetInitParamPriv(HI_DRV_DISPLAY_E enDisp, HI_DRV_DISP_SETTING_S* pstS
 
     if (enDisp > HI_DRV_DISPLAY_1)
     {
-        return HI_FAILURE;
+        return 0x80100007; //HI_FAILURE;
     }
 
 
@@ -927,12 +967,17 @@ HI_S32 DispGetInitParamPriv(HI_DRV_DISPLAY_E enDisp, HI_DRV_DISP_SETTING_S* pstS
         pstSetting->enAttachedDisp = stInitParam.enAttachedDisp;
 		
 
-        pstSetting->enFormat = DispTransferFormat(enDisp, stInitParam.enFormat);		
+        pstSetting->enFormat = DispTransferFormat(enDisp, stInitParam.enFormat);
+
+        pstSetting->stCustomTimg = stInitParam.stDispTiming;
+
+#if 0
         pstSetting->stColor.u32Bright = stInitParam.u32Brightness;
         pstSetting->stColor.u32Contrst = stInitParam.u32Contrast;
         pstSetting->stColor.u32Satur = stInitParam.u32Saturation;
         pstSetting->stColor.u32Hue = stInitParam.u32HuePlus;
         pstSetting->stColor.bGammaEnable = stInitParam.bGammaEnable;
+#endif
         pstSetting->stBgColor = stInitParam.stBgColor;
 
         pstSetting->bCustomRatio = stInitParam.bCustomRatio;
@@ -952,7 +997,7 @@ HI_S32 DispGetInitParamPriv(HI_DRV_DISPLAY_E enDisp, HI_DRV_DISP_SETTING_S* pstS
             {
                 pstSetting->stIntf[enIf] = stInitParam.stIntf[enIf];
                 DISP_PRINT(">>>>>>>>>> intf %d id=%d\n", enIf,
-                           stInitParam.stIntf[enIf].eID);
+                           stInitParam.stIntf[enIf].eID); //956
             }
         }
 
@@ -983,6 +1028,7 @@ HI_VOID DispParserInitParam(DISP_S* pstDisp, HI_DRV_DISP_SETTING_S* pstSetting)
 
     pstS->stCustomTimg = pstSetting->stCustomTimg;
 
+#if 0
     if (pstS->enFormat == HI_DRV_DISP_FMT_CUSTOM)
     {
         pstS->bCustomTimingIsSet = HI_TRUE;
@@ -993,6 +1039,7 @@ HI_VOID DispParserInitParam(DISP_S* pstDisp, HI_DRV_DISP_SETTING_S* pstSetting)
     }
 
     pstS->bCustomTimingChange = HI_FALSE;
+#endif
 
     /* about color */
     pstS->stColor = pstSetting->stColor;
@@ -1025,6 +1072,13 @@ HI_VOID DispParserInitParam(DISP_S* pstDisp, HI_DRV_DISP_SETTING_S* pstSetting)
         {
             //todo
             DispAddIntf(pstDisp, &pstSetting->stIntf[t]);
+
+            if (( !pstIntfOpt) || (!pstIntfOpt->PF_GetChnEnable) )
+            {
+                DISP_ERROR(" %s has null ptr!\n", __FUNCTION__); //1019
+                return ;
+            }
+            pstIntfOpt->PF_InitDacDetect(&pstSetting->stIntf[t]);
         }
     }
 
@@ -1050,7 +1104,7 @@ HI_VOID DispParserInitParam(DISP_S* pstDisp, HI_DRV_DISP_SETTING_S* pstSetting)
         // todo
         if (( !pstIntfOpt) || (!pstIntfOpt->PF_GetChnEnable) )
         {
-            DISP_ERROR(" %s has null ptr!\n", __FUNCTION__);
+            DISP_ERROR(" %s has null ptr!\n", __FUNCTION__); //1048
             return ;
         }
         pstIntfOpt->PF_GetChnEnable(pstDisp->enDisp, &bOutput);
@@ -1058,7 +1112,7 @@ HI_VOID DispParserInitParam(DISP_S* pstDisp, HI_DRV_DISP_SETTING_S* pstSetting)
         if (bOutput)
         {
             pstDisp->bEnable = HI_TRUE;
-            DISP_PRINT("DISP %d is working......\n", pstDisp->enDisp);
+            DISP_PRINT("DISP %d is working......\n", pstDisp->enDisp); //1056
 
             // VDP is working, not to reset.
             DispSetHardwareState();
@@ -1075,7 +1129,7 @@ HI_VOID DispInitDisplay(HI_DRV_DISPLAY_E enDisp)
     DISP_S* pstDisp;
     HI_DRV_DISP_SETTING_S stDefSetting;
 
-    DispGetPointerByIDNoReturn(enDisp, pstDisp);
+    DispGetPointerByIDNoReturn(enDisp, pstDisp); //1075
 
     DISP_MEMSET(pstDisp, 0, sizeof(DISP_S));
 
@@ -1086,7 +1140,7 @@ HI_VOID DispInitDisplay(HI_DRV_DISPLAY_E enDisp)
     if (DispGetInitParamPriv(enDisp, &stDefSetting))
     {
         pstDisp->bSupport = HI_FALSE;
-        DISP_PRINT("DispGetInitParam  failed\n");
+        DISP_PRINT("DispGetInitParam  failed\n"); //1085
         return;
     }
 
@@ -1150,61 +1204,41 @@ HI_S32 DispSetFormat(HI_DRV_DISPLAY_E eDisp, HI_DRV_DISP_FMT_E eFmt,HI_DRV_DISP_
     HI_U32 u;
     HI_S32 nRet;
 
-    DispGetPointerByID(eDisp, pstDisp);
-    DispCheckNullPointer(pfOpt);
-    DispCheckNullPointer(pfOpt->PF_ResetIntfFmt2);
+    DispGetPointerByID(eDisp, pstDisp); //1147
+    DispCheckNullPointer(pfOpt); //1148
+    DispCheckNullPointer(pfOpt->PF_ResetIntfFmt2); //1149
 
-    if (HI_DRV_DISP_FMT_CUSTOM != eFmt)
-    {
-        // s1 set channel
+    // s1 set channel
+    if (HI_DRV_DISP_FMT_CUSTOM == eFmt)
+		nRet = pstDisp->pstIntfOpt->PF_SetChnTiming(pstDisp->enDisp, &pstDisp->stSetting.stCustomTimg);
+    else
         nRet = pstDisp->pstIntfOpt->PF_SetChnFmt(pstDisp->enDisp, eFmt, enStereo);
 
-        // s2 set interface  if necessarily
-        for (u = 0; u < HI_DRV_DISP_INTF_ID_MAX; u++)
-        {
-            if (pstDisp->stSetting.stIntf[u].bOpen)
-            {
-                //DispSetIntfFmt(pstDisp, u, eFmt);
-                //pstDisp->pstIntfOpt->PF_ResetIntfFmt(enIntfId, enEncFmt);
-                pfOpt->PF_ResetIntfFmt2(pstDisp->enDisp, &pstDisp->stSetting.stIntf[u], eFmt);
-            }
-        }
-
-        // s3 produce
-        /*set corlor space */
-        //pstDisp->stSetting.stColor.enInCS = HI_DRV_CS_BT709_YUV_LIMITED;
-        //pstDisp->stSetting.stColor.enOutCS = HI_DRV_CS_BT709_RGB_LIMITED;
-
-
-        DispProduceDisplayInfo(pstDisp, &pstDisp->stDispInfo);
-        //printk("xxxxxxxxxxxxx eFmt = %d\n", eFmt);
-    }
-    else
+    if (nRet)
     {
-        if (!pstDisp->stSetting.bCustomTimingIsSet)
-        {
-            DISP_ERROR("User customer format without setting timming\n");
-            return HI_ERR_DISP_INVALID_PARA;
-        }
-        else
-        {
-            // s1 set channel
-            nRet = pstDisp->pstIntfOpt->PF_SetChnTiming(pstDisp->enDisp, &pstDisp->stSetting.stCustomTimg);
-        }
-
-        for (u = 0; u < HI_DRV_DISP_INTF_ID_MAX; u++)
-        {
-            if (pstDisp->stSetting.stIntf[u].bOpen)
-            {
-                pfOpt->PF_ResetIntfFmt2(pstDisp->enDisp, &pstDisp->stSetting.stIntf[u], eFmt);
-                //DISP_AddIntf(eDisp,&pstDisp->stSetting.stIntf[u]);
-            }
-        }
-
-        /*set corlor space */
-
-        DispProduceDisplayInfo(pstDisp, &pstDisp->stDispInfo);
+    	DISP_ERROR("set disp%d  fmt %d err !(%d)\n", eDisp, eFmt, nRet); //1159
+    	return nRet;
     }
+
+    // s2 set interface  if necessarily
+    for (u = 0; u < HI_DRV_DISP_INTF_ID_MAX; u++)
+    {
+        if (pstDisp->stSetting.stIntf[u].bOpen)
+        {
+            //DispSetIntfFmt(pstDisp, u, eFmt);
+            //pstDisp->pstIntfOpt->PF_ResetIntfFmt(enIntfId, enEncFmt);
+            pfOpt->PF_ResetIntfFmt2(pstDisp->enDisp, &pstDisp->stSetting.stIntf[u], eFmt, &pstDisp->stSetting.stCustomTimg);
+        }
+    }
+
+    // s3 produce
+    /*set corlor space */
+    //pstDisp->stSetting.stColor.enInCS = HI_DRV_CS_BT709_YUV_LIMITED;
+    //pstDisp->stSetting.stColor.enOutCS = HI_DRV_CS_BT709_RGB_LIMITED;
+
+
+    DispProduceDisplayInfo(pstDisp, &pstDisp->stDispInfo);
+    //printk("xxxxxxxxxxxxx eFmt = %d\n", eFmt);
 
     return HI_SUCCESS;
 }
@@ -1221,6 +1255,7 @@ HI_S32 DispSetColor(DISP_S* pstDisp)
     stColor.enInputCS  = pstC->enInCS;
     stColor.enOutputCS = HI_DRV_CS_BT709_RGB_FULL;
     //printk("in(%d),out ***(%d)\n",stColor.enInputCS,stColor.enOutputCS );
+#if 0
     stColor.u32Bright  = 50;
     stColor.u32Contrst = 50;
     stColor.u32Hue     = 50;
@@ -1229,7 +1264,7 @@ HI_S32 DispSetColor(DISP_S* pstDisp)
     stColor.u32Kg      = 50;
     stColor.u32Kb      = 50;
     stColor.bGammaEnable = pstC->bGammaEnable;
-
+#endif
 
     // s1 set channel
     nRet = pstDisp->pstIntfOpt->PF_SetChnColor(pstDisp->enDisp, &stColor);
@@ -1255,7 +1290,7 @@ HI_S32 DispSetColor(DISP_S* pstDisp)
                                                           pstDisp->stSetting.stBgColor.u8Blue);
     */
     pstDisp->pstIntfOpt->PF_SetChnBgColor(pstDisp->enDisp,
-                                          pstDisp->stSetting.stColor.enOutCS,
+                                          pstDisp->stSetting.stColor.enInCS, //enOutCS,
                                           &pstDisp->stSetting.stBgColor);
 
 
@@ -1267,8 +1302,8 @@ HI_S32 DispSetIntfEnable(DISP_S* pstDisp, HI_BOOL bEnable)
     DISP_INTF_OPERATION_S* pfOpt = DISP_HAL_GetOperationPtr();
     HI_U32 u;
 
-    DispCheckNullPointer(pfOpt);
-    DispCheckNullPointer(pfOpt->PF_SetIntfEnable2);
+    DispCheckNullPointer(pfOpt); //1202
+    DispCheckNullPointer(pfOpt->PF_SetIntfEnable2); //1203
     // s1 set interface if necessarily
     for (u = 0; u < HI_DRV_DISP_INTF_ID_MAX; u++)
     {
@@ -1337,9 +1372,9 @@ HI_S32 DISP_GetVersion(HI_DRV_DISP_VERSION_S* pstVersion)
 HI_BOOL DISP_IsOpened(HI_DRV_DISPLAY_E enDisp)
 {
     // s1 check input parameters
-    DispCheckDeviceState();
+    DispCheckDeviceState(); //1272
 
-    DispCheckID(enDisp);
+    DispCheckID(enDisp); //1274
 
     // s2 return display OPEN state
     return s_stDisplayDevice.stDisp[enDisp - HI_DRV_DISPLAY_0].bOpen;
@@ -1360,11 +1395,14 @@ HI_S32 DISP_Init(HI_VOID)
 {
     HI_DRV_DISPLAY_E eDisp;
     HI_DRV_DISP_VERSION_S stDispVersion;
+    DRV_PQ_UpdateVdpPQ_Struct fp80;
     HI_S32 nRet;
+
+    memset(&stDispVersion, 0, sizeof(HI_DRV_DISP_VERSION_S));
     
     if (s_s32DisplayGlobalFlag != DISP_DEVICE_STATE_CLOSE)
     {
-        DISP_INFO("DISPLAY has been inited");
+        DISP_INFO("DISPLAY has been inited"); //1327
         return HI_SUCCESS;
     }
 
@@ -1376,7 +1414,7 @@ HI_S32 DISP_Init(HI_VOID)
     nRet = DISP_HAL_Init(DISP_BASE_ADDRESS);
     if (nRet)
     {
-        DISP_ERROR("DISP_HAL_Init failed!");
+        DISP_ERROR("DISP_HAL_Init failed!"); //1337
         goto __ERR_EXIT__;
     }
 
@@ -1387,12 +1425,13 @@ HI_S32 DISP_Init(HI_VOID)
     nRet = DISP_DA_Init(&stDispVersion);
     if (nRet)
     {
-        DISP_ERROR("DISP_DA_Init failed!");
+        DISP_ERROR("DISP_DA_Init failed!"); //1348
         goto __ERR_EXIT__;
     }
 
 
 #ifdef HI_DISP_BUILD_FULL
+#if 0
     // s1.2 init alg
     nRet = DISP_UA_Init(&stDispVersion);
 
@@ -1401,7 +1440,7 @@ HI_S32 DISP_Init(HI_VOID)
         DISP_ERROR("DISP_UA_Init failed!");
         goto __ERR_EXIT__;
     }
-
+#endif
 #endif
 
     // s2 inited display
@@ -1415,14 +1454,20 @@ HI_S32 DISP_Init(HI_VOID)
     nRet = DISP_ISR_Init();
     if (request_irq(DISP_INT_NUMBER, (irq_handler_t)DISP_ISR_Main, IRQF_SHARED, "hi_vdp_irq", &g_DispIrqHandle) != 0)
     {
-        DISP_ERROR("DISP registe IRQ failed!\n");
-        nRet = HI_FAILURE;
+        DISP_ERROR("DISP registe IRQ failed!\n"); //1365
+        nRet = 0x80100008; //HI_FAILURE;
         goto __ERR_EXIT__;
     }
 
 #endif
 
     DispResetHardware();
+
+    fp80.Data_32 = fp80.Data_4 = 1280;
+    fp80.Data_36 = fp80.Data_8 = 720;
+    fp80.Data_40 = 0;
+
+    DRV_PQ_UpdateVdpPQ(1, &fp80, s_u32VdpBaseAddr);
 
     s_s32DisplayGlobalFlag = DISP_DEVICE_STATE_OPEN;
 
@@ -1452,11 +1497,12 @@ HI_S32 DISP_Init(HI_VOID)
 
 #else
 
-        if ( pstDisp->bEnable )
+        if ( pstDisp->bEnable  || pstDisp->bSupport)
         {
             DISP_Open(eDisp);
             
 #ifndef HI_MCE_SUPPORT
+#if 0
             if ((pstDisp->stSetting.stIntf[HI_DRV_DISP_INTF_HDMI0].bOpen) && (!DispGetHdmiFunction()))
             {                
                     if (s_pstHDMIFunc->pfnHdmiInit && s_pstHDMIFunc->pfnHdmiOpen)
@@ -1466,6 +1512,7 @@ HI_S32 DISP_Init(HI_VOID)
                         s_pstHDMIFunc->pfnHdmiOpen(HI_UNF_HDMI_ID_0);
                     }                
             }
+#endif
 #endif
         }
 
@@ -1478,7 +1525,7 @@ HI_S32 DISP_Init(HI_VOID)
 
 __ERR_EXIT__:
 #ifdef HI_DISP_BUILD_FULL
-    DISP_UA_DeInit();
+    //DISP_UA_DeInit();
 #endif
 
     DISP_HAL_DeInit();
@@ -1711,7 +1758,7 @@ HI_VOID DISP_CB_PreProcess(HI_HANDLE hHandle, const HI_DRV_DISP_CALLBACK_INFO_S*
     HI_U8 u8DacReg;
     if ((!pfHal) || (!pfHal->PF_GetUnmaskedIntState) || (!pfHal->PF_CleanIntState) )
     {
-        DISP_ERROR("has null ptr!\n");
+        DISP_ERROR("has null ptr!\n"); //1719
         return ;
     }
 
@@ -1732,6 +1779,13 @@ HI_VOID DISP_CB_PreProcess(HI_HANDLE hHandle, const HI_DRV_DISP_CALLBACK_INFO_S*
    // printk("---State:0x%x\n",uIntState);
     u8DacReg = (uIntState & VDAC_STATE_INT)>>12; 
     pfHal->PF_DACIsr(u8DacReg);// shielding function, subsequent to continue to use this functio
+
+    memcpy(&pstDisp->stDispInfo, &pstInfo->stDispInfo, sizeof(HI_DISP_DISPLAY_INFO_S));
+
+    DispProduceDisplayInfo(pstDisp, &pstDisp->stDispInfo);
+
+    DISP_ISR_SetDispInfo(pstDisp->enDisp, &pstDisp->stDispInfo);
+
     // display state change
     switch (pstDisp->eState)
     {
@@ -1741,7 +1795,7 @@ HI_VOID DISP_CB_PreProcess(HI_HANDLE hHandle, const HI_DRV_DISP_CALLBACK_INFO_S*
                 DISP_ISR_SetEvent(pstDisp->enDisp, HI_DRV_DISP_C_OPEN);
                 DISP_ISR_SetDispInfo(pstDisp->enDisp, &pstDisp->stDispInfo);
                 pstDisp->eState = DISP_PRIV_STATE_WILL_ENABLE;
-                DISP_PRINT("DISP_CB_PreProcess001 id=%d,en=%d\n", pstDisp->enDisp, pstDisp->bEnable);
+                DISP_PRINT("DISP_CB_PreProcess001 id=%d,en=%d\n", pstDisp->enDisp, pstDisp->bEnable); //1758
             }
 
             break;
@@ -1751,7 +1805,7 @@ HI_VOID DISP_CB_PreProcess(HI_HANDLE hHandle, const HI_DRV_DISP_CALLBACK_INFO_S*
             DISP_ISR_SetDispInfo(pstDisp->enDisp, &pstDisp->stDispInfo);
             pstDisp->eState = DISP_PRIV_STATE_ENABLE;
 
-            DISP_PRINT("DISP_CB_PreProcess002 id=%d,en=%d\n", pstDisp->enDisp, pstDisp->bEnable);
+            DISP_PRINT("DISP_CB_PreProcess002 id=%d,en=%d\n", pstDisp->enDisp, pstDisp->bEnable); //1768
 
             break;
 
@@ -1760,15 +1814,17 @@ HI_VOID DISP_CB_PreProcess(HI_HANDLE hHandle, const HI_DRV_DISP_CALLBACK_INFO_S*
             {
                 DISP_ISR_SetEvent(pstDisp->enDisp, HI_DRV_DISP_C_PREPARE_CLOSE);
                 pstDisp->eState = DISP_PRIV_STATE_WILL_DISABLE;
-                DISP_PRINT("DISP_CB_PreProcess003 id=%d,en=%d\n", pstDisp->enDisp, pstDisp->bEnable);
+                DISP_PRINT("DISP_CB_PreProcess003 id=%d,en=%d\n", pstDisp->enDisp, pstDisp->bEnable); //1777
             }
             else
             {
                 if (pstDisp->bDispSettingChange)
                 {
-                    DISP_PRINT("DISP_CB_PreProcess0031 id=%d,en=%d\n", pstDisp->enDisp, pstDisp->bEnable);
+                    DISP_PRINT("DISP_CB_PreProcess0031 id=%d,en=%d\n", pstDisp->enDisp, pstDisp->bEnable); //1783
+#if 0
                     DispProduceDisplayInfo(pstDisp, &pstDisp->stDispInfo);
                     DISP_ISR_SetDispInfo(pstDisp->enDisp, &pstDisp->stDispInfo);
+#endif
                     DISP_ISR_SetEvent(pstDisp->enDisp, HI_DRV_DISP_C_DISPLAY_SETTING_CHANGE);
                     pstDisp->bDispSettingChange = HI_FALSE;
                 }
@@ -1785,7 +1841,7 @@ HI_VOID DISP_CB_PreProcess(HI_HANDLE hHandle, const HI_DRV_DISP_CALLBACK_INFO_S*
             DISP_ISR_SetEvent(pstDisp->enDisp, HI_DRV_DISP_C_EVET_NONE);
             pstDisp->eState = DISP_PRIV_STATE_DISABLE;
 
-            DISP_PRINT("DISP_CB_PreProcess004 id=%d, en=%d\n", pstDisp->enDisp,  pstDisp->bEnable);
+            DISP_PRINT("DISP_CB_PreProcess004 id=%d, en=%d\n", pstDisp->enDisp,  pstDisp->bEnable); //1799
 
             break;
 
@@ -1808,21 +1864,21 @@ HI_S32 DISP_Open(HI_DRV_DISPLAY_E enDisp)
 #endif
 
     // s1 check input parameters
-    DispCheckDeviceState();
+    DispCheckDeviceState(); //1826
 
-    DispCheckID(enDisp);
+    DispCheckID(enDisp); //1828
 
     // s2 check whether display opened
     if (DISP_IsOpened(enDisp))
     {
-        DISP_INFO("Display has been opened!\n");
+        DISP_INFO("Display has been opened!\n"); //1833
         return HI_SUCCESS;
     }
 
     if(HI_SUCCESS != DispCheckReadyForOpen(enDisp))
     {
-        DISP_INFO("format has not  been set!\n");
-        return HI_FAILURE;
+        DISP_INFO("format has not  been set!\n"); //1839
+        return 0x8010000c; //HI_FAILURE;
     }
     // s2.0 reset hardware
     //DispResetHardware();
@@ -1831,13 +1887,13 @@ HI_S32 DISP_Open(HI_DRV_DISPLAY_E enDisp)
     DispGetPointerByID(enDisp, pstDisp);
     if (( !pstDisp) || (!pstDisp->pstIntfOpt) ||  (!pstDisp->pstIntfOpt->PF_TestChnSupport))
     {
-        DISP_ERROR(" %s has null ptr!\n", __FUNCTION__);
+        DISP_ERROR(" %s has null ptr!\n", __FUNCTION__); //1849
         return HI_ERR_DISP_NULL_PTR;
     }
 
     if (!pstDisp->pstIntfOpt->PF_TestChnSupport(enDisp))
     {
-        DISP_ERROR("DISP ERROR! This version does not support display %d\n", (HI_S32)enDisp);
+        DISP_ERROR("DISP ERROR! This version does not support display %d\n", (HI_S32)enDisp); //1855
         return HI_ERR_DISP_INVALID_OPT;
     }
 
@@ -1854,7 +1910,7 @@ HI_S32 DISP_Open(HI_DRV_DISPLAY_E enDisp)
     stCB.hDst = (HI_HANDLE)pstDisp;
     stCB.pfDISP_Callback = DISP_CB_PreProcess;
     nRet = DISP_ISR_RegCallback(enDisp, HI_DRV_DISP_C_INTPOS_0_PERCENT, &stCB);
-    DISP_ASSERT(!nRet);
+    DISP_ASSERT(!nRet); //1872
     //DISP_PRINT(" DISP_ISR_OpenChn = 0x%x\n", nRet);
 #endif
     // s5 Product ask for that display must be enabled at the same time.
@@ -1969,16 +2025,16 @@ HI_S32 DISP_SetEnable(HI_DRV_DISPLAY_E enDisp, HI_BOOL bEnable)
     HI_S32 nRet, u;
     DISP_INTF_OPERATION_S* pfOpt = DISP_HAL_GetOperationPtr();
 
-    DispCheckDeviceState();
+    DispCheckDeviceState(); //1986
 
     // s1 check input parameters
-    DispCheckID(enDisp);
+    DispCheckID(enDisp); //1989
     DispGetPointerByID(enDisp, pstDisp);
 
     // s2 check state
     if (bEnable == pstDisp->bEnable)
     {
-        DISP_PRINT(" DISP Set enable return!\n");
+        DISP_PRINT(" DISP Set enable return!\n"); //1995
         return HI_SUCCESS;
     }
 
@@ -1991,9 +2047,9 @@ HI_S32 DISP_SetEnable(HI_DRV_DISPLAY_E enDisp, HI_BOOL bEnable)
 
     if (pstDisp->bIsMaster)
     {
-        DispGetPointerByID(pstDisp->enAttachedDisp, pstDispS);
-        DispCheckNullPointer(pfOpt);
-        DispCheckNullPointer(pfOpt->PF_SetMSChnEnable);
+        DispGetPointerByID(pstDisp->enAttachedDisp, pstDispS); //2008
+        DispCheckNullPointer(pfOpt); //2009
+        DispCheckNullPointer(pfOpt->PF_SetMSChnEnable); //2010
 
         // s3 if Enable, set all config
         if (bEnable)
@@ -2002,6 +2058,7 @@ HI_S32 DISP_SetEnable(HI_DRV_DISPLAY_E enDisp, HI_BOOL bEnable)
 
             if (nRet)
             {
+            	DISP_ERROR("not  Ready to Open!\n"); //2018
                 return nRet;
             }
 
@@ -2009,6 +2066,7 @@ HI_S32 DISP_SetEnable(HI_DRV_DISPLAY_E enDisp, HI_BOOL bEnable)
 
             if (nRet)
             {
+            	DISP_ERROR("not  Ready to Open!\n"); //2026
                 return nRet;
             }
 
@@ -2017,7 +2075,7 @@ HI_S32 DISP_SetEnable(HI_DRV_DISPLAY_E enDisp, HI_BOOL bEnable)
 
             if (nRet)
             {
-                DISP_ERROR("Set format failed\n");
+                DISP_ERROR("Set format failed\n"); //2035
                 return nRet;
             }
 
@@ -2026,7 +2084,7 @@ HI_S32 DISP_SetEnable(HI_DRV_DISPLAY_E enDisp, HI_BOOL bEnable)
 
             if (nRet)
             {
-                DISP_ERROR("Set color failed\n");
+                DISP_ERROR("Set color failed\n"); //2044
                 return nRet;
             }
 
@@ -2036,7 +2094,7 @@ HI_S32 DISP_SetEnable(HI_DRV_DISPLAY_E enDisp, HI_BOOL bEnable)
 
             if (nRet)
             {
-                DISP_ERROR("Set format failed\n");
+                DISP_ERROR("Set format failed\n"); //2054
                 return nRet;
             }
 
@@ -2045,7 +2103,7 @@ HI_S32 DISP_SetEnable(HI_DRV_DISPLAY_E enDisp, HI_BOOL bEnable)
 
             if (nRet)
             {
-                DISP_ERROR("Set color failed\n");
+                DISP_ERROR("Set color failed\n"); //2063
                 return nRet;
             }
 
@@ -2087,7 +2145,7 @@ HI_S32 DISP_SetEnable(HI_DRV_DISPLAY_E enDisp, HI_BOOL bEnable)
 
                 if (u > DISP_SET_TIMEOUT_THRESHOLD)
                 {
-                    DISP_WARN("Set enable timeout\n");
+                    DISP_WARN("Set enable timeout\n"); //2105
                     break;
                 }
             }
@@ -2123,7 +2181,7 @@ HI_S32 DISP_SetEnable(HI_DRV_DISPLAY_E enDisp, HI_BOOL bEnable)
 
             if (nRet)
             {
-                DISP_ERROR("Set format failed\n");
+                DISP_ERROR("Set format failed\n"); //2141
                 return nRet;
             }
 
@@ -2132,7 +2190,7 @@ HI_S32 DISP_SetEnable(HI_DRV_DISPLAY_E enDisp, HI_BOOL bEnable)
 
             if (nRet)
             {
-                DISP_ERROR("Set color failed\n");
+                DISP_ERROR("Set color failed\n"); //2150
                 return nRet;
             }
 
@@ -2168,7 +2226,7 @@ HI_S32 DISP_SetEnable(HI_DRV_DISPLAY_E enDisp, HI_BOOL bEnable)
 
                 if (u > DISP_SET_TIMEOUT_THRESHOLD)
                 {
-                    DISP_WARN("Set enable timeout\n");
+                    DISP_WARN("Set enable timeout\n"); //2186
                     break;
                 }
             }
@@ -2690,11 +2748,15 @@ HI_S32 DISPCheckCustomTiming(HI_DRV_DISP_TIMING_S* pstTiming)
 HI_S32 DISPCheckCustomTimingIsSet(HI_DRV_DISP_TIMING_S* pstTiming, DISP_SETTING_S* pstSetting)
 {
     HI_S32 nRet = HI_FAILURE;
+#if 1
+#warning TODO
+#else
     if (pstSetting->bCustomTimingIsSet)
     {
         if (!memcmp(pstTiming, &(pstSetting->stCustomTimg), sizeof(HI_DRV_DISP_TIMING_S)))
         { nRet = HI_SUCCESS; }
     }
+#endif
     return nRet;
 }
 #if 1
@@ -2884,7 +2946,7 @@ HI_S32 DispCheckCustomTimingPllPara(HI_U32 u32TestPixClk, REG_PARA_S* pstRegPara
 
     return HI_SUCCESS;
 }
-HI_S32 DISP_GetTimingReg(HI_DRV_DISPLAY_E eChn, HI_DRV_DISP_TIMING_S* pstTiming)
+HI_S32 DISP_GetTimingReg(/*HI_DRV_DISPLAY_E eChn,*/ HI_DRV_DISP_TIMING_S* pstTiming)
 {
     HI_S32 Ret;
     /*VESA and CUSTOM  format need calculate Reg value!*/
@@ -2893,13 +2955,13 @@ HI_S32 DISP_GetTimingReg(HI_DRV_DISPLAY_E eChn, HI_DRV_DISP_TIMING_S* pstTiming)
 
     if ((pstTiming->u32ClkPara0) || (pstTiming->u32ClkPara1))
     {
-        DISP_ERROR("used custom clk reg value! (0x%x)(0x%x)\n", pstTiming->u32ClkPara0, pstTiming->u32ClkPara1);
+        DISP_WARN("used custom clk reg value! (0x%x)(0x%x)\n", pstTiming->u32ClkPara0, pstTiming->u32ClkPara1); //884
         return HI_SUCCESS;
     }
 
-    if ( (pstTiming->u32VertFreq / 100) > 120)
+    if ( (pstTiming->u32VertFreq / /*100*/1000) > 120)
     {
-        DISP_ERROR("freshRate  out of rang  (0~120)!!\n");
+        DISP_ERROR("freshRate  out of rang  (0~120)!!\n"); //890
         return HI_FAILURE;
     }
 
@@ -2907,12 +2969,12 @@ HI_S32 DISP_GetTimingReg(HI_DRV_DISPLAY_E eChn, HI_DRV_DISP_TIMING_S* pstTiming)
     {
         pstTiming->u32PixFreq =  (( pstTiming->u32HBB + pstTiming->u32HACT + pstTiming->u32HFB)
                                   * ( pstTiming->u32VBB + pstTiming->u32VACT + pstTiming->u32VFB)
-                                  * (pstTiming->u32VertFreq / 100)) / 1000;
+                                  * (pstTiming->u32VertFreq / /*100*/1000)) / 1000;
     }
 
     if ((20000 > pstTiming->u32PixFreq) || (600000 < pstTiming->u32PixFreq))
     {
-        DISP_ERROR("u32PixClk (%d)out of rang  (20000~600000)!!\n", pstTiming->u32PixFreq);
+        DISP_ERROR("u32PixClk (%d)out of rang  (20000~600000)!!\n", pstTiming->u32PixFreq); //903
         return HI_FAILURE;
     }
 
@@ -2921,13 +2983,13 @@ HI_S32 DISP_GetTimingReg(HI_DRV_DISPLAY_E eChn, HI_DRV_DISP_TIMING_S* pstTiming)
 
     if (HI_SUCCESS != Ret)
     {
-        DISP_ERROR("make  REG  err!!\n");
+        DISP_ERROR("make  REG  err!!\n"); //912
         return HI_FAILURE;
     }
 
     pstTiming->u32ClkPara0 = stRegPara.u32ClkPara0;
     pstTiming->u32ClkPara1 = stRegPara.u32ClkPara1;
-    DISP_INFO("u32PixClk (%d)reg(0x%x)(0x%x)!!\n", pstTiming->u32PixFreq, pstTiming->u32ClkPara0, pstTiming->u32ClkPara1);
+    DISP_INFO("u32PixClk (%d)reg(0x%x)(0x%x)!!\n", pstTiming->u32PixFreq, pstTiming->u32ClkPara0, pstTiming->u32ClkPara1); //918
     return HI_SUCCESS;
 }
 
@@ -2961,7 +3023,7 @@ HI_S32 DISP_SetCustomTiming(HI_DRV_DISPLAY_E enDisp, HI_DRV_DISP_TIMING_S* pstTi
         DISP_ERROR(" Custom Timing set yet! (%d)\n", nRet);
         return nRet;
     }
-    nRet = DISP_GetTimingReg( enDisp, pstTiming);
+    nRet = DISP_GetTimingReg( /*enDisp,*/ pstTiming);
 
     if (HI_SUCCESS != nRet)
     {
@@ -2971,8 +3033,12 @@ HI_S32 DISP_SetCustomTiming(HI_DRV_DISPLAY_E enDisp, HI_DRV_DISP_TIMING_S* pstTi
 
     pstDisp->stSetting.stCustomTimg = *pstTiming;
 
+#if 1
+#warning TODO
+#else
     pstDisp->stSetting.bCustomTimingIsSet = HI_TRUE;
     pstDisp->stSetting.bCustomTimingChange  = HI_TRUE;
+#endif
 
     return HI_SUCCESS;
 }
@@ -3058,7 +3124,7 @@ HI_S32 DISP_SetLayerZorder(HI_DRV_DISPLAY_E enDisp, HI_DRV_DISP_LAYER_E enLayer,
 {
     HI_DRV_DISP_LAYER_E enUpLayer;
     DISP_S *pstDisp = HI_NULL;
-    DispGetPointerByID(enDisp, pstDisp);
+    DispGetPointerByID(enDisp, pstDisp); //2995
 
     if ((HI_DRV_DISP_ZORDER_MOVETOP == enZFlag) || (HI_DRV_DISP_ZORDER_MOVEUP == enZFlag))
     {
@@ -3706,7 +3772,8 @@ HI_S32 DISP_AddIntf(HI_DRV_DISPLAY_E enDisp, HI_DRV_DISP_INTF_S* pstIntf)
         DispCheckNullPointer(pfOpt->PF_SetIntfEnable2);
         pfOpt->PF_ResetIntfFmt2(pstDisp->enDisp,
                                 DispGetIntfPtr(pstDisp, pstIntf->eID),
-                                pstDisp->stSetting.enFormat);
+                                pstDisp->stSetting.enFormat,
+                                &pstDisp->stSetting.stCustomTimg);
 
         pfOpt->PF_SetIntfEnable2(pstDisp->enDisp,
                                  DispGetIntfPtr(pstDisp, pstIntf->eID),

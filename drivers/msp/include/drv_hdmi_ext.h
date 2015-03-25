@@ -40,8 +40,9 @@ typedef struct
     FN_HDMI_GetSinkCapability   pfnHdmiGetSinkCapability;
     FN_HDMI_GetAudioCapability  pfnHdmiGetAudioCapability;
     FN_HDMI_AudioChange         pfnHdmiAudioChange;
-    FN_HDMI_PreFormat           pfnHdmiPreFormat;
-    FN_HDMI_SetFormat           pfnHdmiSetFormat;
+    int fill[2]; //??????
+    FN_HDMI_PreFormat           pfnHdmiPreFormat; //44
+    FN_HDMI_SetFormat           pfnHdmiSetFormat; //48
 //  FN_HDMI_Set3DMode           pfnHdmiSet3DMode;
 }HDMI_EXPORT_FUNC_S;
 

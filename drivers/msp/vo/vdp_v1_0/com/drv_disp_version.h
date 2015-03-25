@@ -45,9 +45,9 @@ BIT[   22] = vdac_ch2_clk_sel  <= 0, sd; 1, hd
 BIT[   21] = vdac_ch1_clk_sel  <= 0, sd; 1, hd
 BIT[   20] = vdac_ch0_clk_sel  <= 0, sd; 1, hd
 BIT[19-18] = vo_hd_clk_div     <= 00, 1/2; 01, 1/4; 1X, 1
-BIT[17-16] = vo_hd_clk_sel     <= 00£ºsd_ini£»01£ºhd0_ini£»10£ºhd1_ini£»11£ºreserved
+BIT[17-16] = vo_hd_clk_sel     <= 00ï¿½ï¿½sd_iniï¿½ï¿½01ï¿½ï¿½hd0_iniï¿½ï¿½10ï¿½ï¿½hd1_iniï¿½ï¿½11ï¿½ï¿½reserved
 BIT[15-14] = vo_sd_clk_div     <= 00, 1/2; 01, 1/4; 1X, 1
-BIT[13-12] = vo_sd_clk_sel     <= 00£ºsd_ini£»01£ºhd0_ini£»10£ºhd1_ini£»11£ºreserved
+BIT[13-12] = vo_sd_clk_sel     <= 00ï¿½ï¿½sd_iniï¿½ï¿½01ï¿½ï¿½hd0_iniï¿½ï¿½10ï¿½ï¿½hd1_iniï¿½ï¿½11ï¿½ï¿½reserved
 BIT[   11] = reserved          <=
 BIT[   10] = vo_clkout_cken    <= 0,dis; 1, en;
 BIT[    9] = vdac_ch3_cken     <= 0,dis; 1, en;
@@ -96,8 +96,8 @@ BIT[    0] = vdac_rct_cken    <= 0,dis; 1,en
 #define DISP_X5HD2_MPW_INT_NUMBER (32 + 90)
 #endif
 
-#define DISP_BASE_ADDRESS DISP_CV200_ES_BASE
-#define DISP_INT_NUMBER   DISP_X5HD2_MPW_INT_NUMBER
+#define DISP_BASE_ADDRESS 0xff120000 //DISP_CV200_ES_BASE
+#define DISP_INT_NUMBER   106 //DISP_X5HD2_MPW_INT_NUMBER
 
 
 #ifdef __cplusplus

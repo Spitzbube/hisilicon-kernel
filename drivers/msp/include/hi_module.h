@@ -52,13 +52,13 @@ typedef enum hiMOD_ID_E
     HI_ID_VFMW        = 0x20,
     HI_ID_SVDEC       ,
     HI_ID_DISP        , //34
-    HI_ID_HDMI        ,
+    HI_ID_HDMI        , //35
     HI_ID_VO          ,
     HI_ID_VPSS        ,
     HI_ID_VDEC        ,
     HI_ID_VI          ,
     HI_ID_VENC        ,
-    HI_ID_PQ         ,
+    HI_ID_PQ         , //41
     /**< graphics. */ /**< CNcomment: ͼ�β��ֳ����� */
     HI_ID_TDE         = 0x30,
     HI_ID_JPGDEC      ,

@@ -2575,7 +2575,7 @@ HI_S32 HI_DRV_DISP_Init(HI_VOID)
         Ret = DISP_Init();
         if (Ret != HI_SUCCESS)
         {
-            HI_FATAL_DISP("call DISP_Init failed.\n");
+            HI_FATAL_DISP("call DISP_Init failed.\n"); //2494
             atomic_dec(&g_DispCount);
             up(&g_DispMutex);
             return -1;
@@ -2693,7 +2693,7 @@ HI_S32 DRV_DISP_Register(HI_VOID)
     Ret = HI_DRV_MODULE_Register((HI_U32)HI_ID_DISP, "HI_DISP", (HI_VOID *)(&s_stDispExportFuncs));     
     if (HI_SUCCESS != Ret)
     {
-        HI_FATAL_DISP("HI_DRV_MODULE_Register DISP failed\n");
+        HI_FATAL_DISP("HI_DRV_MODULE_Register DISP failed\n"); //2606
         return Ret;
     }
 

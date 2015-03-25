@@ -513,10 +513,10 @@ HI_VOID VDP_DATE_ResetFmt(DISP_VENC_E eDate, HI_DRV_DISP_FMT_E enFmt);
 
 HI_VOID VDP_SetLayerConnect(HI_U32 u32Data);
 HI_VOID VDP_VDAC_Reset(HI_VOID);
-HI_VOID VDP_VDAC_ResetFmt(DISP_VENC_E enVenc ,HI_U32 uVdac, HI_DRV_DISP_FMT_E enFmt);
+HI_VOID VDP_VDAC_ResetFmt(DISP_VENC_E enVenc ,HI_U32 uVdac, HI_DRV_DISP_FMT_E enFmt, HI_U32 u32PixFreq);
 
 HI_VOID VDP_VDAC_SetLink(DISP_VENC_E eDate, HI_U32 uVdac, HI_DRV_DISP_VDAC_SIGNAL_E signal);
-HI_VOID VDP_VDAC_SetEnable(HI_U32 uVdac, HI_U32 enable);
+HI_VOID VDP_VDAC_SetEnable(HI_U32 uVdac, HI_U32 enable, int c);
 // VIDEO LAYER CONFIG
 HI_VOID VDP_VID_SetInReso2(HI_U32 u32Data, HI_RECT_S *pstRect, HI_RECT_S *pstRectOrigin);
 HI_VOID  VDP_VID_SetInCrop(HI_U32 u32Data, HI_U32 xstartposition, HI_U32 xstopposition);
@@ -652,7 +652,7 @@ HI_BOOL HDATE_SetCgmsData(HI_U32  u32Data,HI_U32 u32Data1);
 HI_BOOL HDATE_SetMvEn(HI_U32  u32Data);
 HI_BOOL HDATE_SetOvsCoef(HI_S32 * psts32Data);
 
-HI_VOID VDP_DATE_SetDACDET(DISP_VENC_E enDate,HI_DRV_DISP_FMT_E enFmt);
+HI_VOID VDP_DATE_SetDACDET(DISP_VENC_E enDate,HI_DRV_DISP_FMT_E enFmt, int c);
 HI_VOID VDP_DATE_SetDACDetEn(DISP_VENC_E enDate, HI_U32 enable);
 HI_VOID VDP_VDAC_GetEnable(HI_U32 uVdac, HI_U32 *penable);
 HI_VOID VDP_SelectClk(HI_U32 u32VDPClkMode);
@@ -668,4 +668,9 @@ HI_VOID VDP_CloseClkResetModule(HI_VOID);
 extern HI_U32 u32aSDDATESrcCoef[];
 extern HI_U32 u32aSDDATEDefSrcCoef[];
 HI_VOID VDP_DATE_SetSrcCoef(DISP_VENC_E eDate, HI_U32 *pu32Src13);
+
+HI_VOID VDP_DATE_SetSignal(HI_DRV_DISP_INTF_ID_E enIntfId,DISP_VENC_E eDate, HI_BOOL bRGBSync);
+HI_S32 VDP_SetDACDET(DISP_VENC_E enDate,HI_DRV_DISP_FMT_E enFmt);
+HI_VOID VDP_VDAC_SetClockEnable(HI_U32 a, HI_BOOL bEnable);
+
 #endif

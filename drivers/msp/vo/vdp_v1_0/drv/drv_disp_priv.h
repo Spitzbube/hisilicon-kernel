@@ -56,35 +56,37 @@ extern "C" {
 typedef enum tagDISP_PRIV_STATE_E
 {
     DISP_PRIV_STATE_DISABLE = 0,
-    DISP_PRIV_STATE_WILL_ENABLE,
-    DISP_PRIV_STATE_ENABLE,
-    DISP_PRIV_STATE_WILL_DISABLE,
+    DISP_PRIV_STATE_WILL_ENABLE, //1
+    DISP_PRIV_STATE_ENABLE, //2
+    DISP_PRIV_STATE_WILL_DISABLE, //3
     DISP_PRIV_STATE_BUTT
 }DISP_PRIV_STATE_E;
 
 
 typedef struct tagDISP_SETTING_S
 {
-    HI_U32  u32Version;
-    HI_U32  u32BootVersion;
+    HI_U32  u32Version; //0
+    HI_U32  u32BootVersion; //4
     //HI_BOOL bSelfStart;
-    HI_BOOL bGetPDMParam;
+    HI_BOOL bGetPDMParam; //8
     
     /* output format */
-    HI_DRV_DISP_STEREO_E eDispMode;
-    HI_BOOL bRightEyeFirst;
-    HI_DRV_DISP_FMT_E enFormat;
+    HI_DRV_DISP_STEREO_E eDispMode; //12
+    HI_BOOL bRightEyeFirst; //16
+    HI_DRV_DISP_FMT_E enFormat; //20
     HI_BOOL bFmtChanged;
 
-    HI_DRV_DISP_TIMING_S stCustomTimg;
+    HI_DRV_DISP_TIMING_S stCustomTimg; //28
+#if 0
     HI_BOOL bCustomTimingIsSet;
     HI_BOOL bCustomTimingChange;
+#endif
 
     /* about color */
-    HI_DRV_DISP_COLOR_SETTING_S stColor;
+    HI_DRV_DISP_COLOR_SETTING_S stColor; //128
 
     /* background color */
-    HI_DRV_DISP_COLOR_S stBgColor;
+    HI_DRV_DISP_COLOR_S stBgColor; //180
 
     //HI_BOOL bCGMSAEnable;
     //HI_DRV_DISP_CGMSA_TYPE_E  eCGMSAType;
@@ -95,9 +97,9 @@ typedef struct tagDISP_SETTING_S
     /* interface setting */
     HI_U32 u32IntfNumber;
     //HI_DRV_DISP_INTF_S stIntf[HI_DRV_DISP_INTF_ID_MAX];
-    DISP_INTF_S stIntf[HI_DRV_DISP_INTF_ID_MAX];
+    DISP_INTF_S stIntf[HI_DRV_DISP_INTF_ID_MAX]; //188
 
-    HI_U32 u32LayerNumber;
+    HI_U32 u32LayerNumber; //800
     HI_DRV_DISP_LAYER_E enLayer[HI_DRV_DISP_LAYER_BUTT]; /* Z-order is from bottom to top */
 
 
@@ -105,58 +107,59 @@ typedef struct tagDISP_SETTING_S
      *      * so users can make a fixed setting not according to the real format size such as 1280*720 50hz.
      *           * it's manual-kindly. When setting to devices, we make a transfer according the real resolution.
      *                */     
-    HI_RECT_S stVirtaulScreen;
+    HI_RECT_S stVirtaulScreen; //816
 
     /*as a result of cutting off by crt tv, we make a offset setting to make sure
      *      * that the display is complete, not cut by tv.*/
-    HI_DRV_DISP_OFFSET_S stOffsetInfo;
+    HI_DRV_DISP_OFFSET_S stOffsetInfo; //832
 
 
     
-    HI_BOOL bCustomRatio;
-    HI_U32 u32CustomRatioWidth;
-    HI_U32 u32CustomRatioHeight;
+    HI_BOOL bCustomRatio; //848
+    HI_U32 u32CustomRatioWidth; //852
+    HI_U32 u32CustomRatioHeight; //856
 
-    HI_U32  u32Reseve;
-    HI_VOID *pRevData;
+    HI_U32  u32Reseve; //860
+    HI_VOID *pRevData; //864
+    //868
 }DISP_SETTING_S;
 
 typedef struct tagDISP_S
 {
-    HI_DRV_DISPLAY_E enDisp;
+    HI_DRV_DISPLAY_E enDisp; //0
 
     //state
-    HI_BOOL bSupport;
-    HI_BOOL bOpen;
-    HI_BOOL bEnable;
+    HI_BOOL bSupport; //4
+    HI_BOOL bOpen; //8
+    HI_BOOL bEnable; //12
     HI_BOOL bStateBackup;
         
     /* for attach display */
-    HI_BOOL bIsMaster;
-    HI_BOOL bIsSlave;
-    HI_DRV_DISPLAY_E enAttachedDisp;
+    HI_BOOL bIsMaster; //20
+    HI_BOOL bIsSlave; //24
+    HI_DRV_DISPLAY_E enAttachedDisp; //28
 
-    DISP_SETTING_S stSetting;
-    HI_BOOL bDispSettingChange;
+    DISP_SETTING_S stSetting; //32
+    HI_BOOL bDispSettingChange; //900
 
-    volatile DISP_PRIV_STATE_E eState;
-    HI_U32 u32Underflow;
-    HI_U32 u32StartTime;
+    volatile DISP_PRIV_STATE_E eState; //904
+    HI_U32 u32Underflow; //908
+    HI_U32 u32StartTime; //912
 
     // for other module get
     //HI_BOOL bDispInfoValid;
-    HI_DISP_DISPLAY_INFO_S stDispInfo;
+    HI_DISP_DISPLAY_INFO_S stDispInfo; //916
     
     //mirrorcast
-    HI_HANDLE hCast;
+    HI_HANDLE hCast; //1056
     HI_HANDLE Cast_ptr;
 
     //algrithm operation
     //HI_HANDLE hAlgOpt;
 
     //component operation
-    DISP_INTF_OPERATION_S *pstIntfOpt;
-
+    DISP_INTF_OPERATION_S *pstIntfOpt; //1064
+    //1068
 }DISP_S;
 
 typedef struct tagDISP_ATTACH_ID_S
@@ -167,12 +170,13 @@ typedef struct tagDISP_ATTACH_ID_S
 
 typedef struct tagDISP_DEV_S
 {
-    HI_BOOL bHwReseted;
-    DISP_S  stDisp[HI_DRV_DISPLAY_BUTT+1];
+    HI_BOOL bHwReseted; //0
+    DISP_S  stDisp[HI_DRV_DISPLAY_BUTT+1]; //4
 
     HI_BOOL bAttachEnable;
     DISP_ATTACH_ID_S stAttchDisp;
-    DISP_INTF_OPERATION_S stIntfOpt;
+    DISP_INTF_OPERATION_S stIntfOpt; //4288
+    //4508
 }DISP_DEV_S;
 
 

@@ -25,35 +25,38 @@ extern "C" {
 #endif /* __cplusplus */
 
 
-#define DEF_DISP_ISR_LIST_LENGTH 16
+#define DEF_DISP_ISR_LIST_LENGTH 20//16
 
 
 typedef struct tagDISP_ISR_C_LIST_S
 {
     HI_U32 u32NodeFlag;
     HI_DRV_DISP_CALLBACK_S stNode[DEF_DISP_ISR_LIST_LENGTH];
+    //164
 }DISP_ISR_C_LIST_S;
 
 //typedef HI_VOID (*PF_DISP_PRE_PROC)(HI_DRV_DISPLAY_E enDisp, const HI_DRV_DISP_CALLBACK_INFO_S *pstInfo);
 
 typedef struct tagDISP_ISR_CHN_S
 {
-    HI_DRV_DISPLAY_E enDisp;
-    volatile HI_BOOL bEnable;
+    HI_DRV_DISPLAY_E enDisp; //0
+    volatile HI_BOOL bEnable; //4
 
     volatile DISP_ISR_C_LIST_S stList[HI_DRV_DISP_C_TYPE_BUTT];
-    HI_DRV_DISP_CALLBACK_INFO_S stCBInfo;
+    HI_DRV_DISP_CALLBACK_INFO_S stCBInfo; //1156
 
     //volatile HI_BOOL bDispInfoUp;
     //volatile HI_BOOL bDispInfoIsSet;
     //volatile HI_DISP_DISPLAY_INFO_S stDispInfoNew;
+    //1304
 }DISP_ISR_CHN_S;
 
 typedef struct tagDISP_ISR_M_S
 {
-    DISP_ISR_CHN_S stDispChn[HI_DRV_DISPLAY_BUTT+1];
-    HI_U32 u32ChnNumber;
+    DISP_ISR_CHN_S stDispChn[HI_DRV_DISPLAY_BUTT+1]; //0
+    HI_U32 u32ChnNumber; //5216
     HI_U32 u32IntMaskSave4Suspend;
+    //5224
 }DISP_ISR_M_S;
 
 HI_S32 DISP_ISR_Init(HI_VOID);

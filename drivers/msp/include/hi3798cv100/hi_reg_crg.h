@@ -1702,6 +1702,49 @@ typedef union
 
 } U_PERI_CRG97;
 
+/* Define the union U_PERI_CRG0x1f8 */
+typedef union
+{
+    /* Define the struct bits */
+    struct
+    {
+        unsigned int    vdac_rct_cken         : 1   ; /* [0]  */
+        unsigned int    vdac_bg_cken          : 1   ; /* [1]  */
+        unsigned int    reserved_3            : 2   ; /* [3..2]  */
+        unsigned int    vdac_c_srst_req       : 1   ; /* [4]  */
+        unsigned int    vdac_r_srst_req       : 1   ; /* [5]  */
+        unsigned int    vdac_g_srst_req       : 1   ; /* [6]  */
+        unsigned int    vdac_b_srst_req       : 1   ; /* [7]  */
+        unsigned int    reserved_2            : 4   ; /* [11..8]  */
+        unsigned int    vdac_bg_clk_div       : 2   ; /* [13..12]  */
+        unsigned int    reserved_1            : 2   ; /* [15..14]  */
+        unsigned int    vdac_c_clk_pctrl      : 1   ; /* [16]  */
+        unsigned int    vdac_r_clk_pctrl      : 1   ; /* [17]  */
+        unsigned int    vdac_g_clk_pctrl      : 1   ; /* [18]  */
+        unsigned int    vdac_b_clk_pctrl      : 1   ; /* [19]  */
+        unsigned int    reserved_0            : 12  ; /* [31..20]  */
+    } bits;
+
+    /* Define an unsigned member */
+    unsigned int    u32;
+
+} U_PERI_CRG0x1f8;
+
+typedef union
+{
+    /* Define the struct bits */
+    struct
+    {
+    	unsigned int    Bit0	   : 4  ; /* [3..0]  */
+        unsigned int    Bit4       : 2  ; /* [5..4]  */
+    } bits;
+
+    /* Define an unsigned member */
+    unsigned int    u32;
+
+} U_PERI_CRG0x1fc;
+
+
 //==============================================================================
 /* Define the global struct */
 typedef struct
@@ -1800,6 +1843,9 @@ typedef struct
     volatile U_PERI_CRG95           PERI_CRG95               ; /* 0x17c */
     volatile U_PERI_CRG96           PERI_CRG96               ; /* 0x180 */
     volatile U_PERI_CRG97           PERI_CRG97               ; /* 0x184 */
+    int fill_0x188[28]; //0x188
+    volatile U_PERI_CRG0x1f8/*U_PERI_CRG71*/        PERI_CRG0x1f8               ; /* 0x1F8 */
+    volatile U_PERI_CRG0x1fc        PERI_CRG0x1fc               ; /* 0x1FC */
 } S_CRG_REGS_TYPE;
 
 #endif /* __HI_REG_CRG_H__ */

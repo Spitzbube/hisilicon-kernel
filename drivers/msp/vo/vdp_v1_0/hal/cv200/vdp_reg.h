@@ -223,7 +223,10 @@ typedef union
         unsigned int    m0_outstd_rid0        : 4   ; // [3..0] 
         unsigned int    m0_outstd_rid1        : 4   ; // [7..4] 
         unsigned int    m0_wr_ostd            : 4   ; // [11..8] 
-        unsigned int    Reserved_9            : 20  ; // [31..12] 
+        unsigned int    Reserved_9            : 4   ; // [15..12]
+        unsigned int    m1_outstd_rid0        : 4   ; // [19..16]
+        unsigned int    m1_outstd_rid1        : 4   ; // [23..20]
+        unsigned int    m1_wr_ostd            : 4   ; // [27..24]
     } bits;
 
     // Define an unsigned member
@@ -252,6 +255,52 @@ typedef union
     unsigned int    u32;
 
 } U_VOWBCARB0;
+
+// Define the union U_VO_0x38
+typedef union
+{
+    // Define the struct bits
+    struct
+    {
+        unsigned int    bit0                 : 1   ; // [0]
+        unsigned int    bit1                 : 1   ; // [1]
+        unsigned int    bit2                 : 1   ; // [2]
+        unsigned int    bit3                 : 1   ; // [3]
+        unsigned int    bit4                 : 1   ; // [4]
+        unsigned int    bit5                 : 1   ; // [5]
+        unsigned int    bit6                 : 1   ; // [6]
+        unsigned int    bit7                 : 1   ; // [7]
+        unsigned int    bit8                 : 1   ; // [8]
+        unsigned int    bit9                 : 1   ; // [9]
+        unsigned int    bit10                 : 1   ; // [10]
+        unsigned int    bit11                 : 1   ; // [11]
+        unsigned int    bit12                 : 1   ; // [12]
+        unsigned int    bit13                 : 1   ; // [13]
+        unsigned int    bit14                 : 1   ; // [14]
+        unsigned int    bit15                 : 1   ; // [15]
+        unsigned int    bit16                 : 1   ; // [16]
+        unsigned int    bit17                 : 1   ; // [17]
+        unsigned int    bit18                 : 1   ; // [18]
+        unsigned int    bit19                 : 1   ; // [19]
+        unsigned int    bit20                 : 1   ; // [20]
+        unsigned int    bit21                 : 1   ; // [21]
+        unsigned int    bit22                 : 1   ; // [22]
+        unsigned int    bit23                 : 1   ; // [23]
+        unsigned int    bit24                 : 1   ; // [24]
+        unsigned int    bit25                 : 1   ; // [25]
+        unsigned int    bit26                 : 1   ; // [26]
+        unsigned int    bit27                 : 1   ; // [27]
+        unsigned int    bit28                 : 1   ; // [28]
+        unsigned int    bit29                 : 1   ; // [29]
+        unsigned int    bit30                 : 1   ; // [30]
+        unsigned int    bit31                 : 1   ; // [31]
+    } bits;
+
+    // Define an unsigned member
+    unsigned int    u32;
+
+} U_VO_0x38;
+
 
 // Define the union U_VOWBCARB1
 typedef union
@@ -3032,7 +3081,8 @@ typedef union
     {
         unsigned int    vp_galpha             : 8   ; // [7..0] 
         unsigned int    mute_en               : 1   ; // [8] 
-        unsigned int    Reserved_187          : 23  ; // [31..9] 
+        unsigned int    Bit9                  : 1   ; // [9]
+        unsigned int    Reserved_187          : 22  ; // [31..10]
     } bits;
 
     // Define an unsigned member
@@ -3752,6 +3802,21 @@ typedef union
     unsigned int    u32;
 
 } U_VP0_CSC1_P4;
+
+// Define the union U_VP0_0x6000
+typedef union
+{
+    // Define the struct bits
+    struct
+    {
+        unsigned int    fill                  : 9   ; // [8..0]
+        unsigned int    Bit9                  : 1   ; // [9]
+    } bits;
+
+    // Define an unsigned member
+    unsigned int    u32;
+
+} U_VP0_0x6000;
 
 // Define the union U_G0_CTRL
 typedef union
@@ -6030,7 +6095,13 @@ typedef union
         unsigned int    gmm_mode              : 1   ; // [12] 
         unsigned int    gmm_en                : 1   ; // [13] 
         unsigned int    hdmi_mode             : 1   ; // [14] 
-        unsigned int    Reserved_421          : 3   ; // [17..15] 
+#if 0
+        unsigned int    Reserved_421          : 3   ; // [17..15]
+#else
+        unsigned int    bit15             : 1   ; // [15]
+        unsigned int    bit16             : 1   ; // [16]
+        unsigned int    bit17             : 1   ; // [17]
+#endif
         unsigned int    sin_en                : 1   ; // [18] 
         unsigned int    Reserved_420          : 1   ; // [19] 
         unsigned int    fpga_lmt_width        : 7   ; // [26..20] 
@@ -6193,6 +6264,18 @@ typedef union
     unsigned int    u32;
 
 } U_DHD0_SYNC_INV;
+// Define the union U_DHD0_0xc02c
+typedef union
+{
+    // Define the struct bits
+    struct
+    {
+    } bits;
+
+    // Define an unsigned member
+    unsigned int    u32;
+
+} U_DHD0_0xc02c;
 
 // Define the union U_DHD0_ABUFTHD
 typedef union
@@ -8597,45 +8680,117 @@ typedef union
 
 } U_DATE_COEFF55;
 
+
+typedef union
+{
+    // Define the struct bits
+    struct
+    {
+        unsigned int    ovs_coeff0            : 11  ; // [10..0]
+        unsigned int    Reserved_636          : 5   ; // [15..11]
+        unsigned int    ovs_coeff1            : 11  ; // [26..16]
+        unsigned int    Reserved_635          : 5   ; // [31..27]
+    } bits;
+
+    // Define an unsigned member
+    unsigned int    u32;
+
+} U_DATE_0xcee0;
+
+typedef union
+{
+    // Define the struct bits
+    struct
+    {
+        unsigned int    ovs_coeff0            : 11  ; // [10..0]
+        unsigned int    Reserved_636          : 5   ; // [15..11]
+        unsigned int    ovs_coeff1            : 11  ; // [26..16]
+        unsigned int    Reserved_635          : 5   ; // [31..27]
+    } bits;
+
+    // Define an unsigned member
+    unsigned int    u32;
+
+} U_DATE_0xcee4;
+
+typedef union
+{
+    // Define the struct bits
+    struct
+    {
+        unsigned int    ovs_coeff0            : 11  ; // [10..0]
+        unsigned int    Reserved_636          : 5   ; // [15..11]
+        unsigned int    ovs_coeff1            : 11  ; // [26..16]
+        unsigned int    Reserved_635          : 5   ; // [31..27]
+    } bits;
+
+    // Define an unsigned member
+    unsigned int    u32;
+
+} U_DATE_0xcee8;
+
+typedef union
+{
+    // Define the struct bits
+    struct
+    {
+        unsigned int    ovs_coeff0            : 11  ; // [10..0]
+        unsigned int    Reserved_636          : 5   ; // [15..11]
+        unsigned int    ovs_coeff1            : 11  ; // [26..16]
+        unsigned int    Reserved_635          : 5   ; // [31..27]
+    } bits;
+
+    // Define an unsigned member
+    unsigned int    u32;
+
+} U_DATE_0xceec;
+
 //==============================================================================
 // Define the global struct
 typedef struct
 {
-    U_VOCTRL             VOCTRL;
-    U_VOINTSTA           VOINTSTA;
-    U_VOMSKINTSTA        VOMSKINTSTA;
-    U_VOINTMSK           VOINTMSK;
+    U_VOCTRL             VOCTRL; //0
+    U_VOINTSTA           VOINTSTA; //4
+    U_VOMSKINTSTA        VOMSKINTSTA; //8
+    U_VOINTMSK           VOINTMSK; //0x0c
     U_VOUVERSION1        VOUVERSION1;
     U_VOUVERSION2        VOUVERSION2;
     unsigned int         Reserved_0[2];
     U_VODEBUG            VODEBUG;
-    unsigned int         Reserved_1[4];
-    U_VOAXICTRL          VOAXICTRL;
+    unsigned int         Reserved_1[3];
+    U_VOAXICTRL          VOAXICTRL; //0x30
+    U_VOAXICTRL          VOAXICTRL1; //0x34
+#if 0
     U_VOWBCARB0          VOWBCARB0;
+#else
+    U_VO_0x38		     VO_0x38; //0x38
+#endif
     U_VOWBCARB1          VOWBCARB1;
     U_VOUFSTA            VOUFSTA;
     U_VOUFCLR            VOUFCLR;
     unsigned int         Reserved_2[2];
     U_VOINTPROC_TIM      VOINTPROC_TIM;
     unsigned int         Reserved_3[43];
-    U_VO_MUX             VO_MUX;
-    U_VO_MUX_DAC         VO_MUX_DAC;
+    U_VO_MUX             VO_MUX; //0x100
+    U_VO_MUX_DAC         VO_MUX_DAC; //0x104
     U_VO_MUX_TESTSYNC    VO_MUX_TESTSYNC;
     U_VO_MUX_TESTDATA    VO_MUX_TESTDATA;
     unsigned int         Reserved_4[4];
-    U_VO_DAC_CTRL        VO_DAC_CTRL;
+    U_VO_DAC_CTRL        VO_DAC_CTRL; //0x120
     unsigned int         Reserved_5[3];
-    U_VO_DAC_C_CTRL      VO_DAC_C_CTRL;
-    U_VO_DAC_R_CTRL      VO_DAC_R_CTRL;
-    U_VO_DAC_G_CTRL      VO_DAC_G_CTRL;
-    U_VO_DAC_B_CTRL      VO_DAC_B_CTRL;
+    U_VO_DAC_C_CTRL      VO_DAC_C_CTRL; //0x130
+    U_VO_DAC_R_CTRL      VO_DAC_R_CTRL; //0x134
+    U_VO_DAC_G_CTRL      VO_DAC_G_CTRL; //0x138
+    U_VO_DAC_B_CTRL      VO_DAC_B_CTRL; //0x13C
     U_VO_DAC_STAT0       VO_DAC_STAT0;
     U_VO_DAC_STAT1       VO_DAC_STAT1;
     unsigned int         Reserved_6[110];
-    U_WBC_DHD_LOCATE     WBC_DHD_LOCATE;
+    U_WBC_DHD_LOCATE     WBC_DHD_LOCATE; //0x300
+    int fill_0x304[5951]; //0x304?
+#if 0
     U_WBC_OFL_EN         WBC_OFL_EN;
     unsigned int         Reserved_7[62];
-    U_COEF_DATA          COEF_DATA;
+    U_COEF_DATA          COEF_DATA; //0x400
     unsigned int         Reserved_8[3];
     U_V0_PARARD          V0_PARARD;
     U_V1_PARARD          V1_PARARD;
@@ -8652,7 +8807,7 @@ typedef struct
     U_DHD0_PARARD        DHD0_PARARD;
     U_DHD1_PARARD        DHD1_PARARD;
     unsigned int         Reserved_14[194];
-    U_V0_CTRL            V0_CTRL;
+    U_V0_CTRL            V0_CTRL; //0x800
     U_V0_UPD             V0_UPD;
     unsigned int         Reserved_15[6];
     U_V0_PRERD           V0_PRERD;
@@ -8831,14 +8986,19 @@ typedef struct
     U_VO_DCMPERRCLR      VO_DCMPERRCLR;
     U_V0_DCMP_ERR        V0_DCMP_ERR;
     unsigned int         Reserved_46[3122];
-    U_VP0_CTRL           VP0_CTRL;
-    U_VP0_UPD            VP0_UPD;
+#endif
+    U_VP0_CTRL           VP0_CTRL; //0x6000
+    U_VP0_UPD            VP0_UPD; //0x6004
+#if 0
     unsigned int         Reserved_47[2];
     U_VP0_ACC_CAD        VP0_ACC_CAD;
     U_VP0_ACM_CAD        VP0_ACM_CAD;
     U_VP0_PARAUP         VP0_PARAUP;
     unsigned int         Reserved_48;
-    U_VP0_IRESO          VP0_IRESO;
+#endif
+    U_VP0_IRESO          VP0_IRESO; //0x6008
+    int fill_0x600c[13]; //0x600c
+#if 0
     unsigned int         Reserved_49[31];
     U_VP0_DOF_CTRL       VP0_DOF_CTRL;
     U_VP0_DOF_STEP       VP0_DOF_STEP;
@@ -8866,10 +9026,13 @@ typedef struct
     U_VP0_ACM_CTRL       VP0_ACM_CTRL;
     U_VP0_ACM_ADJ        VP0_ACM_ADJ;
     unsigned int         Reserved_58[26];
-    U_VP0_DFPOS          VP0_DFPOS;
-    U_VP0_DLPOS          VP0_DLPOS;
-    U_VP0_VFPOS          VP0_VFPOS;
-    U_VP0_VLPOS          VP0_VLPOS;
+#endif
+    U_VP0_DFPOS          VP0_DFPOS; //0x6040
+    U_VP0_DLPOS          VP0_DLPOS; //0x6044
+    U_VP0_VFPOS          VP0_VFPOS; //0x6048
+    U_VP0_VLPOS          VP0_VLPOS; //0x604c
+    int fill_0x6050[3052]; //0x6050
+#if 0
     U_VP0_BK             VP0_BK;
     U_VP0_ALPHA          VP0_ALPHA;
     unsigned int         Reserved_59[58];
@@ -8890,6 +9053,8 @@ typedef struct
     U_VP0_CSC1_P3        VP0_CSC1_P3;
     U_VP0_CSC1_P4        VP0_CSC1_P4;
     unsigned int         Reserved_60[1840];
+#endif
+#if 0
     U_G0_CTRL            G0_CTRL;
     U_G0_UPD             G0_UPD;
     unsigned int         Reserved_61[2];
@@ -8990,7 +9155,8 @@ typedef struct
     U_WBC_GP0_DITHER_COEF0 WBC_GP0_DITHER_COEF0;
     U_WBC_GP0_DITHER_COEF1 WBC_GP0_DITHER_COEF1;
     unsigned int         Reserved_80[189];
-    U_WBC_DHD0_CTRL      WBC_DHD0_CTRL;
+#endif
+    U_WBC_DHD0_CTRL      WBC_DHD0_CTRL; //0x9000
     U_WBC_DHD0_UPD       WBC_DHD0_UPD;
     unsigned int         Reserved_81[2];
     U_WBC_DHD0_YADDR     WBC_DHD0_YADDR;
@@ -9052,38 +9218,44 @@ typedef struct
     U_WBC_DHD0_CSCP2     WBC_DHD0_CSCP2;
     U_WBC_DHD0_CSCP3     WBC_DHD0_CSCP3;
     U_WBC_DHD0_CSCP4     WBC_DHD0_CSCP4;
+#if 0
     unsigned int         Reserved_92[57];
-    U_MIXV0_BKG          MIXV0_BKG;
+#else
+    unsigned int         Reserved_92[1849];
+#endif
+    U_MIXV0_BKG          MIXV0_BKG; //0xb000
     unsigned int         Reserved_93;
-    U_MIXV0_MIX          MIXV0_MIX;
+    U_MIXV0_MIX          MIXV0_MIX; //0xb008
     unsigned int         Reserved_94[125];
-    U_MIXG0_BKG          MIXG0_BKG;
-    U_MIXG0_BKALPHA      MIXG0_BKALPHA;
-    U_MIXG0_MIX          MIXG0_MIX;
+    U_MIXG0_BKG          MIXG0_BKG; //0xb200
+    U_MIXG0_BKALPHA      MIXG0_BKALPHA; //0xb204
+    U_MIXG0_MIX          MIXG0_MIX; //0xb208
     unsigned int         Reserved_95[125];
-    U_CBM_BKG1           CBM_BKG1;
+    U_CBM_BKG1           CBM_BKG1; //0xb400
     unsigned int         Reserved_96;
-    U_CBM_MIX1           CBM_MIX1;
+    U_CBM_MIX1           CBM_MIX1; //0xb408
     unsigned int         Reserved_97[5];
-    U_CBM_BKG2           CBM_BKG2;
+    U_CBM_BKG2           CBM_BKG2; //0xb500 ????
     unsigned int         Reserved_98;
-    U_CBM_MIX2           CBM_MIX2;
+    U_CBM_MIX2           CBM_MIX2; //0xb508 ????
     unsigned int         Reserved_99[5];
     U_CBM_ATTR           CBM_ATTR;
     unsigned int         Reserved_100[751];
-    U_DHD0_CTRL          DHD0_CTRL;
-    U_DHD0_VSYNC         DHD0_VSYNC;
-    U_DHD0_HSYNC1        DHD0_HSYNC1;
-    U_DHD0_HSYNC2        DHD0_HSYNC2;
-    U_DHD0_VPLUS         DHD0_VPLUS;
-    U_DHD0_PWR           DHD0_PWR;
-    U_DHD0_VTTHD3        DHD0_VTTHD3;
-    U_DHD0_VTTHD         DHD0_VTTHD;
-    U_DHD0_SYNC_INV      DHD0_SYNC_INV;
-    unsigned int         Reserved_101[4];
+    U_DHD0_CTRL          DHD0_CTRL; //0xc000 (+u32hd_id*CHN_OFFSET)
+    U_DHD0_VSYNC         DHD0_VSYNC; //0xc004
+    U_DHD0_HSYNC1        DHD0_HSYNC1; //0xc008
+    U_DHD0_HSYNC2        DHD0_HSYNC2; //0xc00c
+    U_DHD0_VPLUS         DHD0_VPLUS; //0xc010
+    U_DHD0_PWR           DHD0_PWR; //0xc014
+    U_DHD0_VTTHD3        DHD0_VTTHD3; //0xc018
+    U_DHD0_VTTHD         DHD0_VTTHD; //0xc01c
+    U_DHD0_SYNC_INV      DHD0_SYNC_INV; //0xc020
+    unsigned int         Reserved_101[2];
+    U_DHD0_0xc02c		 DHD0_0xc02c; //0xc02c
+    int fill_0xc430; //????
     U_DHD0_ABUFTHD       DHD0_ABUFTHD;
     unsigned int         Reserved_102[2];
-    U_DHD0_CSC_IDC       DHD0_CSC_IDC;
+    U_DHD0_CSC_IDC       DHD0_CSC_IDC; //0xc040
     U_DHD0_CSC_ODC       DHD0_CSC_ODC;
     U_DHD0_CSC_IODC      DHD0_CSC_IODC;
     U_DHD0_CSC_P0        DHD0_CSC_P0;
@@ -9099,16 +9271,16 @@ typedef struct
     U_DHD0_DITHER1_COEF0 DHD0_DITHER1_COEF0;
     U_DHD0_DITHER1_COEF1 DHD0_DITHER1_COEF1;
     unsigned int         Reserved_104;
-    U_DHD0_CLIP0_L       DHD0_CLIP0_L;
-    U_DHD0_CLIP0_H       DHD0_CLIP0_H;
-    U_DHD0_CLIP1_L       DHD0_CLIP1_L;
-    U_DHD0_CLIP1_H       DHD0_CLIP1_H;
-    U_DHD0_CLIP2_L       DHD0_CLIP2_L;
-    U_DHD0_CLIP2_H       DHD0_CLIP2_H;
-    U_DHD0_CLIP3_L       DHD0_CLIP3_L;
-    U_DHD0_CLIP3_H       DHD0_CLIP3_H;
-    U_DHD0_CLIP4_L       DHD0_CLIP4_L;
-    U_DHD0_CLIP4_H       DHD0_CLIP4_H;
+    U_DHD0_CLIP2_L       DHD0_CLIP2_L; //0xc080
+    U_DHD0_CLIP2_H       DHD0_CLIP2_H; //0xc084
+    U_DHD0_CLIP3_L       DHD0_CLIP3_L; //0xc088
+    U_DHD0_CLIP3_H       DHD0_CLIP3_H; //0xc08c
+    U_DHD0_CLIP4_L       DHD0_CLIP4_L; //0xc090
+    U_DHD0_CLIP4_H       DHD0_CLIP4_H; //0xc094
+    U_DHD0_CLIP0_L       DHD0_CLIP0_L; //0xc098
+    U_DHD0_CLIP0_H       DHD0_CLIP0_H; //0xc09c
+    U_DHD0_CLIP1_L       DHD0_CLIP1_L; //0xc0a0
+    U_DHD0_CLIP1_H       DHD0_CLIP1_H; //0xc0a4
     unsigned int         Reserved_105[2];
     U_DHD0_PARATHD       DHD0_PARATHD;
     unsigned int         Reserved_106[3];
@@ -9121,30 +9293,30 @@ typedef struct
     U_DHD0_GMM_COEFAD    DHD0_GMM_COEFAD;
     unsigned int         Reserved_108[2];
     U_DHD0_PARAUP        DHD0_PARAUP;
-    U_DHD0_STATE         DHD0_STATE;
+    U_DHD0_STATE         DHD0_STATE; //0xc0f0 (+u32hd_id*CHN_OFFSET)
     unsigned int         Reserved_109;
     U_DHD0_DEBUG         DHD0_DEBUG;
     U_DHD0_DEBUG_STATE   DHD0_DEBUG_STATE;
-    unsigned int         Reserved_110[3008];
-    U_HDATE_VERSION      HDATE_VERSION;
+    unsigned int         Reserved_110[/*3008*/704];
+    U_HDATE_VERSION      HDATE_VERSION; //0xcc00
     U_HDATE_EN           HDATE_EN;
-    U_HDATE_POLA_CTRL    HDATE_POLA_CTRL;
-    U_HDATE_VIDEO_FORMAT HDATE_VIDEO_FORMAT;
+    U_HDATE_POLA_CTRL    HDATE_POLA_CTRL; //0xcc08
+    U_HDATE_VIDEO_FORMAT HDATE_VIDEO_FORMAT; //0xcc0c
     U_HDATE_STATE        HDATE_STATE;
-    U_HDATE_OUT_CTRL     HDATE_OUT_CTRL;
-    U_HDATE_SRC_13_COEF1 HDATE_SRC_13_COEF1;
-    U_HDATE_SRC_13_COEF2 HDATE_SRC_13_COEF2;
-    U_HDATE_SRC_13_COEF3 HDATE_SRC_13_COEF3;
-    U_HDATE_SRC_13_COEF4 HDATE_SRC_13_COEF4;
-    U_HDATE_SRC_13_COEF5 HDATE_SRC_13_COEF5;
-    U_HDATE_SRC_13_COEF6 HDATE_SRC_13_COEF6;
-    U_HDATE_SRC_13_COEF7 HDATE_SRC_13_COEF7;
-    U_HDATE_SRC_13_COEF8 HDATE_SRC_13_COEF8;
-    U_HDATE_SRC_13_COEF9 HDATE_SRC_13_COEF9;
-    U_HDATE_SRC_13_COEF10 HDATE_SRC_13_COEF10;
-    U_HDATE_SRC_13_COEF11 HDATE_SRC_13_COEF11;
-    U_HDATE_SRC_13_COEF12 HDATE_SRC_13_COEF12;
-    U_HDATE_SRC_13_COEF13 HDATE_SRC_13_COEF13;
+    U_HDATE_OUT_CTRL     HDATE_OUT_CTRL; //0xcc14
+    U_HDATE_SRC_13_COEF1 HDATE_SRC_13_COEF1; //0xcc18
+    U_HDATE_SRC_13_COEF2 HDATE_SRC_13_COEF2; //0xcc1c
+    U_HDATE_SRC_13_COEF3 HDATE_SRC_13_COEF3; //0xcc20
+    U_HDATE_SRC_13_COEF4 HDATE_SRC_13_COEF4; //0xcc24
+    U_HDATE_SRC_13_COEF5 HDATE_SRC_13_COEF5; //0xcc28
+    U_HDATE_SRC_13_COEF6 HDATE_SRC_13_COEF6; //0xcc2c
+    U_HDATE_SRC_13_COEF7 HDATE_SRC_13_COEF7; //0xcc30
+    U_HDATE_SRC_13_COEF8 HDATE_SRC_13_COEF8; //0xcc34
+    U_HDATE_SRC_13_COEF9 HDATE_SRC_13_COEF9; //0xcc38
+    U_HDATE_SRC_13_COEF10 HDATE_SRC_13_COEF10; //0xcc3c
+    U_HDATE_SRC_13_COEF11 HDATE_SRC_13_COEF11; //0xcc40
+    U_HDATE_SRC_13_COEF12 HDATE_SRC_13_COEF12; //0xcc44
+    U_HDATE_SRC_13_COEF13 HDATE_SRC_13_COEF13; //0xcc48
     U_HDATE_SRC_24_COEF1 HDATE_SRC_24_COEF1;
     U_HDATE_SRC_24_COEF2 HDATE_SRC_24_COEF2;
     U_HDATE_SRC_24_COEF3 HDATE_SRC_24_COEF3;
@@ -9174,20 +9346,20 @@ typedef struct
     U_HDATE_CGMSB_DATA4  HDATE_CGMSB_DATA4;
     U_HDATE_DACDET1      HDATE_DACDET1;
     U_HDATE_DACDET2      HDATE_DACDET2;
-    U_HDATE_SRC_13_COEF14 HDATE_SRC_13_COEF14;
-    U_HDATE_SRC_13_COEF15 HDATE_SRC_13_COEF15;
-    U_HDATE_SRC_13_COEF16 HDATE_SRC_13_COEF16;
-    U_HDATE_SRC_13_COEF17 HDATE_SRC_13_COEF17;
-    U_HDATE_SRC_13_COEF18 HDATE_SRC_13_COEF18;
+    U_HDATE_SRC_13_COEF14 HDATE_SRC_13_COEF14; //0xccc8
+    U_HDATE_SRC_13_COEF15 HDATE_SRC_13_COEF15; //0xcccc
+    U_HDATE_SRC_13_COEF16 HDATE_SRC_13_COEF16; //0xccd0
+    U_HDATE_SRC_13_COEF17 HDATE_SRC_13_COEF17; //0xccd4
+    U_HDATE_SRC_13_COEF18 HDATE_SRC_13_COEF18; //0xccd8
     U_HDATE_SRC_24_COEF14 HDATE_SRC_24_COEF14;
     U_HDATE_SRC_24_COEF15 HDATE_SRC_24_COEF15;
     U_HDATE_SRC_24_COEF16 HDATE_SRC_24_COEF16;
     U_HDATE_SRC_24_COEF17 HDATE_SRC_24_COEF17;
     U_HDATE_SRC_24_COEF18 HDATE_SRC_24_COEF18;
-    U_HDATE_CLIP         HDATE_CLIP;
+    U_HDATE_CLIP         HDATE_CLIP; //0xccf0
     unsigned int         Reserved_112[67];
-    U_DATE_COEFF0        DATE_COEFF0;
-    U_DATE_COEFF1        DATE_COEFF1;
+    U_DATE_COEFF0        DATE_COEFF0; //0xce00
+    U_DATE_COEFF1        DATE_COEFF1; //0xce04
     U_DATE_COEFF2        DATE_COEFF2;
     U_DATE_COEFF3        DATE_COEFF3;
     U_DATE_COEFF4        DATE_COEFF4;
@@ -9207,8 +9379,8 @@ typedef struct
     U_DATE_COEFF18       DATE_COEFF18;
     U_DATE_COEFF19       DATE_COEFF19;
     U_DATE_COEFF20       DATE_COEFF20;
-    U_DATE_COEFF21       DATE_COEFF21;
-    U_DATE_COEFF22       DATE_COEFF22;
+    U_DATE_COEFF21       DATE_COEFF21; //0xce54
+    U_DATE_COEFF22       DATE_COEFF22; //0xce58
     U_DATE_COEFF23       DATE_COEFF23;
     U_DATE_COEFF24       DATE_COEFF24;
     U_DATE_COEFF25       DATE_COEFF25;
@@ -9232,12 +9404,16 @@ typedef struct
     unsigned int         Reserved_115[5];
     U_DATE_DACDET1       DATE_DACDET1;
     U_DATE_DACDET2       DATE_DACDET2;
-    U_DATE_COEFF50       DATE_COEFF50;
-    U_DATE_COEFF51       DATE_COEFF51;
-    U_DATE_COEFF52       DATE_COEFF52;
-    U_DATE_COEFF53       DATE_COEFF53;
-    U_DATE_COEFF54       DATE_COEFF54;
-    U_DATE_COEFF55       DATE_COEFF55;
+    U_DATE_COEFF50       DATE_COEFF50; //0xcec8
+    U_DATE_COEFF51       DATE_COEFF51; //0xcecc
+    U_DATE_COEFF52       DATE_COEFF52; //0xced0
+    U_DATE_COEFF53       DATE_COEFF53; //0xced4
+    U_DATE_COEFF54       DATE_COEFF54; //0xced8
+    U_DATE_COEFF55       DATE_COEFF55; //0xcedc
+    U_DATE_0xcee0       DATE_0xcee0; //0xcee0
+    U_DATE_0xcee4       DATE_0xcee4; //0xcee4
+    U_DATE_0xcee8       DATE_0xcee8; //0xcee8
+    U_DATE_0xceec       DATE_0xceec; //0xceec
 
 
 } S_VOU_CV200_REGS_TYPE;

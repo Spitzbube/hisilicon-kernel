@@ -33,7 +33,7 @@ extern "C" {
 /*==========================================
      VDP / SYS / VDAC phy-address
 */
-static HI_U32 s_u32VdpBaseAddr  = 0;
+/*static*/ HI_U32 s_u32VdpBaseAddr  = 0;
 /*==========================================
      HAL global parameters
 */
@@ -42,14 +42,15 @@ static DISP_CAPA_S s_stDispCapability[HI_DRV_DISPLAY_BUTT];
 static DISP_CH_CFG_S s_stDispConfig[HI_DRV_DISPLAY_BUTT];
 
 static HI_DRV_DISP_VERSION_S s_stVersion = {0};
-static DISP_INTF_OPERATION_S s_stIntfOps = {0};
+static DISP_INTF_OPERATION_S s_stIntfOps = {0}; //81141c44
+static Struct_81141c20 Data_81141c20 = {0}; //81141c20
 
 /*==========================================
     HAL module
 */
-static DISP_LOCAL_INTF_S s_stHalIntf[HI_DRV_DISP_INTF_ID_MAX];
+static DISP_LOCAL_INTF_S s_stHalIntf[HI_DRV_DISP_INTF_ID_MAX]; //81141b48
 //static DISP_LOCAL_VDAC_S s_stHalVEnc[DISP_VENC_MAX];
-static DISP_LOCAL_VDAC_S s_stHalVDac[HI_DISP_VDAC_MAX_NUMBER];
+static DISP_LOCAL_VDAC_S s_stHalVDac[HI_DISP_VDAC_MAX_NUMBER]; //81141b28
 static DISP_LOCAL_WBC_S  s_stWBC[DISP_WBC_BUTT];
 
 #define DISP_CLOCK_SOURCE_SD0  0
@@ -158,6 +159,14 @@ HI_S32 DispHalGetEnFmtIndex(HI_DRV_DISP_FMT_E eFmt)
             return 39;
         case HI_DRV_DISP_FMT_1440x480i_60:
             return 40;
+        case HI_DRV_DISP_FMT_61:
+        	return 41;
+        case HI_DRV_DISP_FMT_62:
+        	return 42;
+        case HI_DRV_DISP_FMT_63:
+        	return 43;
+        case HI_DRV_DISP_FMT_64:
+        	return 44;
         default :
             return 0;
     }
@@ -282,6 +291,7 @@ HI_S32 PF_ResetVdpHardware(HI_VOID)
     
     g_pstRegCrg->PERI_CRG54.u32 = DISP_CV200_ES_SYSCTRL_RESET_VALUE; 
 #else
+#if 0
     /*cv200es cv200 are differentf, so there should be 2 branches.
       This is for cv200es*/
     U_PERI_CRG54 unTmpValue;
@@ -300,6 +310,11 @@ HI_S32 PF_ResetVdpHardware(HI_VOID)
     /*cancel reset*/
     unTmpValue.bits.vou_srst_req = 0;
     g_pstRegCrg->PERI_CRG54.u32 = unTmpValue.u32;
+#else
+	extern void DISP_ResetCRG(void);
+
+    DISP_ResetCRG();
+#endif
 #endif
 
     // init vdp
@@ -489,7 +504,11 @@ HI_S32 PF_ResetChn(HI_U32 u32DispId, HI_U32 bIntMode)
     stClipData.u32ClipLow_y  = 64;
     stClipData.u32ClipLow_cb = 64;
     stClipData.u32ClipLow_cr = 64;
+#if 1
+#warning TODO
+#else
     VDP_DISP_SetClipCoef(u32DispId, VDP_DISP_INTF_DATE, stClipData);
+#endif
 
     VDP_DISP_SetRegUp(u32DispId);
 
@@ -510,12 +529,14 @@ HI_S32 PF_ConfigChn(HI_DRV_DISPLAY_E eChn, DISP_CH_CFG_S *pstCfg)
 
 HI_S32 PF_SetChnBaseTiming(HI_DRV_DISPLAY_E eChn, DISP_FMT_CFG_S *pstCfg)
 {
+	extern HI_U32 DISP_GFX_GetIsrPoint(HI_U32 u32DispId, DISP_FMT_CFG_S *pstCfg);
     HI_S32 thd;
     VDP_DISP_RECT_S DispRect;
     VDP_LAYER_VP_E vdp_layer;
     HI_U32 u32DispId = DISP_HAL_GetChID(eChn);
    
-    DISP_PRINT(">>>>>>>>>>>>>>>u32DispId=%d>>> bact=%d\n",u32DispId, pstCfg->stTiming.u32Bvact);    
+    //DISP_PRINT(">>>>>>>>>>>>>>>u32DispId=%d>>> bact=%d\n",u32DispId, pstCfg->stTiming.u32Bvact);
+    DISP_PRINT(">>>>>>>>>>>>>>>u32DispId=%d>>> (%d)(%d)\n", u32DispId, pstCfg->stTiming.u32Vact, pstCfg->stTiming.u32Hact); //550
 
     if(pstCfg->stInfo.eDispMode == DISP_STEREO_FPK)
         PF_ResetChn(u32DispId, DHD_VTXTHD_FRAME_MODE);
@@ -550,14 +571,36 @@ HI_S32 PF_SetChnBaseTiming(HI_DRV_DISPLAY_E eChn, DISP_FMT_CFG_S *pstCfg)
                                          And Pos1 is thd1
     */
     VDP_DISP_SetTiming(u32DispId, &(pstCfg->stTiming));
-    thd = pstCfg->stTiming.u32Vfb + pstCfg->stTiming.u32Vbb + DISP_VTTHD_VIDEO_OFFSET;
 
-    if (u32DispId == 1)
+    if (pstCfg->stTiming.bIop)
+    	VDP_DISP_SetProToInterEnable(u32DispId, 0);
+    else
+    	VDP_DISP_SetProToInterEnable(u32DispId, 1);
+
+    if (pstCfg->stInfo.eDispMode == DISP_STEREO_FPK)
     {
-        thd = thd + DISP_VTTHD_DISP0_TO_DISP1;
+    	thd = (pstCfg->stTiming.u32Vbb + pstCfg->stTiming.u32Vfb);
+        thd = thd + pstCfg->stTiming.u32Vbb + pstCfg->stTiming.u32Vfb +  pstCfg->stTiming.u32Vact;
+
+        if (u32DispId == 1)
+        {
+            thd = thd + DISP_VTTHD_DISP0_TO_DISP1;
+        }
     }
+    else
+    {
+    	thd = pstCfg->stTiming.u32Vfb + pstCfg->stTiming.u32Vbb + DISP_VTTHD_VIDEO_OFFSET;
+        if (u32DispId == 1)
+        {
+            thd = thd + DISP_VTTHD_DISP0_TO_DISP1;
+        }
+    }
+
     VDP_DISP_SetVtThd(u32DispId, 1, (HI_U32)thd);
 
+    VDP_DISP_SetVtThd(u32DispId, 2, DISP_GFX_GetIsrPoint(u32DispId, pstCfg));
+
+#if 0
     /*
       ||<--------- FRRAME 0--------->||<--------- FRRAME 1--------->||
       -----------------------------------------------------------------
@@ -586,6 +629,23 @@ HI_S32 PF_SetChnBaseTiming(HI_DRV_DISPLAY_E eChn, DISP_FMT_CFG_S *pstCfg)
     }
 
     VDP_DISP_SetVtThd(u32DispId, 2, (HI_U32)thd);
+#else
+
+    if (pstCfg->stInfo.eDispMode == DISP_STEREO_FPK)
+    {
+    	thd = pstCfg->stTiming.u32Vbb + pstCfg->stTiming.u32Vfb +  pstCfg->stTiming.u32Vact;
+    	thd += pstCfg->stTiming.u32Bvact + pstCfg->stTiming.u32Bvbb + pstCfg->stTiming.u32Bvfb;
+    }
+    else
+    {
+    	thd = pstCfg->stTiming.u32Vbb + pstCfg->stTiming.u32Vfb +  pstCfg->stTiming.u32Vact;
+    }
+
+    thd -= 5;
+
+    VDP_DISP_SetVtThd(u32DispId, 3, (HI_U32)thd);
+
+#endif
 
     // set vp
     DISP_MEMSET(&DispRect, 0, sizeof(VDP_DISP_RECT_S));
@@ -634,6 +694,7 @@ HI_S32 PF_SetChnFmt(HI_DRV_DISPLAY_E eChn, HI_DRV_DISP_FMT_E eFmt, HI_DRV_DISP_S
 
 HI_S32 PF_SetChnTiming(HI_DRV_DISPLAY_E eChn, HI_DRV_DISP_TIMING_S *pstTiming)
 {
+	extern HI_S32 DISP_GetTimingReg(/*HI_DRV_DISPLAY_E eChn,*/ HI_DRV_DISP_TIMING_S* pstTiming);
     DISP_FMT_CFG_S stCfg;
     HI_S32 Ret;
 
@@ -641,10 +702,19 @@ HI_S32 PF_SetChnTiming(HI_DRV_DISPLAY_E eChn, HI_DRV_DISP_TIMING_S *pstTiming)
     DISP_MEMSET(&stCfg, 0, sizeof(DISP_FMT_CFG_S));
 
     /*make Reg para */
+#if 0
     if (( pstTiming->u32VertFreq  > 12000) || ( pstTiming->u32VertFreq  < 2000))
     {
         return HI_FAILURE;
     }
+#else
+    Ret = DISP_GetTimingReg(pstTiming);
+    if (HI_SUCCESS != Ret)
+    {
+    	DISP_ERROR("Get Custom Timing Reg Para err! (%d)\n", Ret); //934
+    	return Ret;
+    }
+#endif
     
     /*select clk source*/
     if  ((stCfg.stInfo.eFmt >= HI_DRV_DISP_FMT_576P_50 )&& (stCfg.stInfo.eFmt <= HI_DRV_DISP_FMT_1440x480i_60 ))
@@ -792,7 +862,11 @@ HI_S32 PF_SetChnColor(HI_DRV_DISPLAY_E eChn, DISP_HAL_COLOR_S *pstColor)
                pstColor->u32Kb);
 
 
+#if 1
+#warning TODO: pstDA->pfCalcCscCoef
+#else
     pstDA->pfCalcCscCoef(&stIn, &stOut);
+#endif
 
 
     DISP_PRINT(">>>>>>>>PF_SetChnColor D1=%d, D2=%d, C00=%d, C11=%d, C22=%d\n",
@@ -918,12 +992,118 @@ HI_S32 PF_GetChnEnable(HI_DRV_DISPLAY_E eChn, HI_BOOL *pbEnalbe)
     return HI_SUCCESS;
 }
 
+HI_S32 PF_InitDacDetect(HI_DRV_DISP_INTF_S * a)
+{
+	HI_U32 fp24 = 0;
+	HI_U32 c;
 
+	if (a->eID == HI_DRV_DISP_INTF_VGA0) //4)
+	{
+		if (a->u8VDAC_Y_G < 4)
+		{
+			Data_81141c20.Data_81141c24[a->u8VDAC_Y_G].Data_4 = 0;
+		}
+		if (a->u8VDAC_Pb_B < 4)
+		{
+			Data_81141c20.Data_81141c24[a->u8VDAC_Pb_B].Data_4 = 0;
+		}
+		if (a->u8VDAC_Pr_R < 4)
+		{
+			Data_81141c20.Data_81141c24[a->u8VDAC_Pr_R].Data_4 = 0;
+		}
+	}
+	else
+	{
+		VDP_VDAC_GetEnable(a->u8VDAC_Y_G, &fp24);
+		c = fp24;
+		if (a->u8VDAC_Y_G < 4)
+		{
+			Data_81141c20.Data_81141c24[a->u8VDAC_Y_G].Data_4 = c;
+		}
 
+		VDP_VDAC_GetEnable(a->u8VDAC_Pb_B, &fp24);
+		c = fp24;
+		if (a->u8VDAC_Pb_B < 4)
+		{
+			Data_81141c20.Data_81141c24[a->u8VDAC_Pb_B].Data_4 = c;
+		}
 
+		VDP_VDAC_GetEnable(a->u8VDAC_Pr_R, &fp24);
+		c = fp24;
+		if (a->u8VDAC_Pr_R < 4)
+		{
+			Data_81141c20.Data_81141c24[a->u8VDAC_Pr_R].Data_4 = c;
+		}
+	}
 
+	return HI_SUCCESS;
+}
 
+HI_S32 PF_UpdateGamma(void)
+{
+#warning TODO: PF_UpdateGamma
+	printk("PF_UpdateGamma: TODO\n");
+}
 
+HI_S32 PF_SetGammaCtrl(void)
+{
+#warning TODO: PF_SetGammaCtrl
+	printk("PF_SetGammaCtrl: TODO\n");
+}
+
+HI_S32 PF_SetGammaRWZBCtrl(void)
+{
+#warning TODO: PF_SetGammaRWZBCtrl
+	printk("PF_SetGammaRWZBCtrl: TODO\n");
+}
+
+HI_S32 PF_SetWbcLowdlyEnable(void)
+{
+#warning TODO: PF_SetWbcLowdlyEnable
+	printk("PF_SetWbcLowdlyEnable: TODO\n");
+}
+
+HI_S32 PF_SetWbcPartfnsLineNum(void)
+{
+#warning TODO: PF_SetWbcPartfnsLineNum
+	printk("PF_SetWbcPartfnsLineNum: TODO\n");
+}
+
+HI_S32 PF_SetWbcLineNumInterval(void)
+{
+#warning TODO: PF_SetWbcLineNumInterval
+	printk("PF_SetWbcLineNumInterval: TODO\n");
+}
+
+HI_S32 PF_SetWbcLineAddr(void)
+{
+#warning TODO: PF_SetWbcLineAddr
+	printk("PF_SetWbcLineAddr: TODO\n");
+}
+
+HI_S32 PF_SetDACDetEn(void)
+{
+#warning TODO: PF_SetDACDetEn
+	printk("PF_SetDACDetEn: TODO\n");
+}
+
+HI_S32 PF_GetDACAttr(Struct_81141c20* p)
+{
+	*p = Data_81141c20;
+	return HI_SUCCESS;
+}
+
+HI_S32 PF_DATE_SetIRE(void)
+{
+#warning TODO: PF_DATE_SetIRE
+	printk("PF_DATE_SetIRE: TODO\n");
+}
+
+HI_S32 PF_SetAllDACEn(void)
+{
+#warning TODO: PF_SetAllDACEn
+	printk("PF_SetAllDACEn: TODO\n");
+}
 
 
 /********************************************/
@@ -1152,7 +1332,7 @@ HI_S32 PF_ReleaseVDAC(HI_U32 uVdac)
 
 
 #define VDP_SYSCTRL_VDAC_BIT_SHIFT 20
-HI_VOID VDP_VDAC_SetClk(DISP_VENC_E eDate, HI_U32 uVdac)
+HI_VOID VDP_VDAC_SetClk(HI_DRV_DISPLAY_E enDisp, DISP_VENC_E eDate, HI_U32 uVdac)
 {
 #if 0
     HI_U32 vdac_hd_sel = 1;
@@ -1179,16 +1359,28 @@ HI_VOID VDP_VDAC_SetClk(DISP_VENC_E eDate, HI_U32 uVdac)
     switch(uVdac)
     {
         case 0:
-            unTmpValue.bits.vdac_ch0_clk_sel = (DISP_VENC_SDATE0 == eDate) ? 0 : 1;
+        	if (eDate == DISP_VENC_VGA0)
+        		unTmpValue.bits.vdac_ch0_clk_sel = (HI_DRV_DISPLAY_0 == enDisp) ? 0 : 1;
+        	else
+        		unTmpValue.bits.vdac_ch0_clk_sel = (DISP_VENC_SDATE0 == eDate) ? 0 : 1;
             break;
         case 1:
-            unTmpValue.bits.vdac_ch1_clk_sel = (DISP_VENC_SDATE0 == eDate) ? 0 : 1;
+        	if (eDate == DISP_VENC_VGA0)
+        		unTmpValue.bits.vdac_ch1_clk_sel = (HI_DRV_DISPLAY_0 == enDisp) ? 0 : 1;
+        	else
+        		unTmpValue.bits.vdac_ch1_clk_sel = (DISP_VENC_SDATE0 == eDate) ? 0 : 1;
             break;
         case 2:
-            unTmpValue.bits.vdac_ch2_clk_sel = (DISP_VENC_SDATE0 == eDate) ? 0 : 1;
+        	if (eDate == DISP_VENC_VGA0)
+        		unTmpValue.bits.vdac_ch2_clk_sel = (HI_DRV_DISPLAY_0 == enDisp) ? 0 : 1;
+        	else
+        		unTmpValue.bits.vdac_ch2_clk_sel = (DISP_VENC_SDATE0 == eDate) ? 0 : 1;
             break;
         case 3:
-            unTmpValue.bits.vdac_ch3_clk_sel = (DISP_VENC_SDATE0 == eDate) ? 0 : 1;
+        	if (eDate == DISP_VENC_VGA0)
+        		unTmpValue.bits.vdac_ch3_clk_sel = (HI_DRV_DISPLAY_0 == enDisp) ? 0 : 1;
+        	else
+        		unTmpValue.bits.vdac_ch3_clk_sel = (DISP_VENC_SDATE0 == eDate) ? 0 : 1;
             break;
         default:
             break;
@@ -1197,7 +1389,7 @@ HI_VOID VDP_VDAC_SetClk(DISP_VENC_E eDate, HI_U32 uVdac)
     g_pstRegCrg->PERI_CRG54.u32 = unTmpValue.u32;
 #endif
 }
-HI_S32 PF_AddVDacToVenc(DISP_VENC_E eVenc, HI_U32 uVdac, HI_DRV_DISP_VDAC_SIGNAL_E signal)
+HI_S32 PF_AddVDacToVenc(HI_DRV_DISPLAY_E enDisp, DISP_VENC_E eVenc, HI_U32 uVdac, HI_DRV_DISP_VDAC_SIGNAL_E signal)
 {
     HI_U32 v0;
 
@@ -1206,7 +1398,7 @@ HI_S32 PF_AddVDacToVenc(DISP_VENC_E eVenc, HI_U32 uVdac, HI_DRV_DISP_VDAC_SIGNAL
     if (v0 < HI_DISP_VDAC_MAX_NUMBER)
     {
         VDP_VDAC_SetLink(eVenc, v0, signal);
-        VDP_VDAC_SetClk(eVenc, v0);
+        VDP_VDAC_SetClk(enDisp, eVenc, v0);
     }
     return HI_SUCCESS;
 }
@@ -1230,7 +1422,7 @@ HI_S32 DISP_HAL_SetIdleVDACDisable(HI_VOID)
         if (s_stHalVDac[i].bSupport && s_stHalVDac[i].bIdle)
         {
             //printk("================Vdac %d is idle and close it\n", i);
-            VDP_VDAC_SetEnable(i, 0);
+            VDP_VDAC_SetEnable(i, 0, 0);
         }
         
     }
@@ -1239,7 +1431,7 @@ HI_S32 DISP_HAL_SetIdleVDACDisable(HI_VOID)
 }
 
 
-HI_S32 PF_SetVDACEnable(HI_U32 uVdac, HI_BOOL bEnable)
+HI_S32 PF_SetVDACEnable(HI_U32 uVdac, HI_BOOL bEnable, int c)
 {
     HI_U32 v0;
     
@@ -1249,13 +1441,13 @@ HI_S32 PF_SetVDACEnable(HI_U32 uVdac, HI_BOOL bEnable)
     {
         if (HI_TRUE == bEnable)
         {
-            //VDP_VDAC_SetClockEnable(v0, bEnable);
-            VDP_VDAC_SetEnable(v0, bEnable);
+            VDP_VDAC_SetClockEnable(v0, bEnable);
+            VDP_VDAC_SetEnable(v0, bEnable, c);
         }
         else
         {
-            VDP_VDAC_SetEnable(v0, bEnable);
-            //VDP_VDAC_SetClockEnable(v0, bEnable);
+            VDP_VDAC_SetEnable(v0, bEnable, c);
+            VDP_VDAC_SetClockEnable(v0, bEnable);
         }
     }
 
@@ -1445,7 +1637,30 @@ VDP_DISP_INTF_E DISP_HAL_GetHalIntfId(HI_DRV_DISP_INTF_ID_E eIntf)
     }
 }
 
-HI_S32 PF_ResetIntfFmt2(HI_DRV_DISPLAY_E enDisp, DISP_INTF_S *pstIf, HI_DRV_DISP_FMT_E eFmt)
+HI_S32 DISP_HAL_SetSyncInv(HI_DRV_DISPLAY_E enDisp, HI_DRV_DISP_INTF_ID_E eID, HI_DRV_DISP_FMT_E eFmt, HI_DRV_DISP_TIMING_S * p)
+{
+#warning TODO: DISP_HAL_SetSyncInv
+
+	printk("DISP_HAL_SetSyncInv: TODO\n");
+	printk("DISP_HAL_SetSyncInv: TODO\n");
+	printk("DISP_HAL_SetSyncInv: TODO\n");
+	printk("DISP_HAL_SetSyncInv: TODO\n");
+	printk("DISP_HAL_SetSyncInv: TODO\n");
+	printk("DISP_HAL_SetSyncInv: TODO\n");
+	printk("DISP_HAL_SetSyncInv: TODO\n");
+	printk("DISP_HAL_SetSyncInv: TODO\n");
+	printk("DISP_HAL_SetSyncInv: TODO\n");
+	printk("DISP_HAL_SetSyncInv: TODO\n");
+	printk("DISP_HAL_SetSyncInv: TODO\n");
+	printk("DISP_HAL_SetSyncInv: TODO\n");
+	printk("DISP_HAL_SetSyncInv: TODO\n");
+	printk("DISP_HAL_SetSyncInv: TODO\n");
+	printk("DISP_HAL_SetSyncInv: TODO\n");
+	printk("DISP_HAL_SetSyncInv: TODO\n");
+}
+
+
+HI_S32 PF_ResetIntfFmt2(HI_DRV_DISPLAY_E enDisp, DISP_INTF_S *pstIf, HI_DRV_DISP_FMT_E eFmt, HI_DRV_DISP_TIMING_S* p)
 {
     HI_DRV_DISP_INTF_S *pstIntf = &pstIf->stIf;
 
@@ -1455,9 +1670,9 @@ HI_S32 PF_ResetIntfFmt2(HI_DRV_DISPLAY_E enDisp, DISP_INTF_S *pstIf, HI_DRV_DISP
     */
 
     enVdpIntf = DISP_HAL_GetHalIntfIdForVenc(enDisp,pstIf,eFmt);
-    VDP_DATE_SetDACDET(pstIf->eVencId,eFmt);
+    /*VDP_DATE_SetDACDET*/VDP_SetDACDET(pstIf->eVencId,eFmt);
 
-    if (VDP_DISP_INTF_SDDATE == enVdpIntf )
+    if (VDP_DISP_INTF_SDDATE/*3*/ == enVdpIntf )
     {
         /*DTS2013090205265  SDate attach to DHD1 all the time.
         */
@@ -1484,6 +1699,14 @@ HI_S32 PF_ResetIntfFmt2(HI_DRV_DISPLAY_E enDisp, DISP_INTF_S *pstIf, HI_DRV_DISP
         VDP_DATE_ResetFmt(pstIf->eVencId, eFmt);
 #endif
     }
+
+    DISP_HAL_SetSyncInv(enDisp, pstIf->stIf.eID, eFmt, p);
+
+    if ((pstIf->stIf.eID == HI_DRV_DISP_INTF_YPBPR0) || (pstIf->stIf.eID == HI_DRV_DISP_INTF_RGB0))
+    {
+    	VDP_DATE_SetSignal(pstIf->stIf.eID, pstIf->eVencId, pstIf->stIf.bDacSync);
+    }
+
         // s4 add vdac to venc
     switch (pstIf->stIf.eID)
     {
@@ -1491,39 +1714,39 @@ HI_S32 PF_ResetIntfFmt2(HI_DRV_DISPLAY_E enDisp, DISP_INTF_S *pstIf, HI_DRV_DISP
     
             if (pstIntf->u8VDAC_Y_G != HI_DISP_VDAC_INVALID_ID)
             {
-                PF_AddVDacToVenc(pstIf->eVencId, pstIntf->u8VDAC_Y_G, HI_DRV_DISP_VDAC_Y);
-                VDP_VDAC_ResetFmt(pstIf->eVencId, pstIntf->u8VDAC_Y_G, eFmt);
+                PF_AddVDacToVenc(enDisp, pstIf->eVencId, pstIntf->u8VDAC_Y_G, HI_DRV_DISP_VDAC_Y);
+                VDP_VDAC_ResetFmt(pstIf->eVencId, pstIntf->u8VDAC_Y_G, eFmt, p->u32PixFreq);
             }
 
             if (pstIntf->u8VDAC_Pb_B != HI_DISP_VDAC_INVALID_ID)
             {
-                PF_AddVDacToVenc(pstIf->eVencId, pstIntf->u8VDAC_Pb_B, HI_DRV_DISP_VDAC_PB);
-                VDP_VDAC_ResetFmt(pstIf->eVencId, pstIntf->u8VDAC_Pb_B, eFmt);
+                PF_AddVDacToVenc(enDisp, pstIf->eVencId, pstIntf->u8VDAC_Pb_B, HI_DRV_DISP_VDAC_PB);
+                VDP_VDAC_ResetFmt(pstIf->eVencId, pstIntf->u8VDAC_Pb_B, eFmt, p->u32PixFreq);
             }
 
             if (pstIntf->u8VDAC_Pr_R != HI_DISP_VDAC_INVALID_ID)
             {
-                PF_AddVDacToVenc(pstIf->eVencId, pstIntf->u8VDAC_Pr_R, HI_DRV_DISP_VDAC_PR);
-                VDP_VDAC_ResetFmt(pstIf->eVencId, pstIntf->u8VDAC_Pr_R, eFmt);
+                PF_AddVDacToVenc(enDisp, pstIf->eVencId, pstIntf->u8VDAC_Pr_R, HI_DRV_DISP_VDAC_PR);
+                VDP_VDAC_ResetFmt(pstIf->eVencId, pstIntf->u8VDAC_Pr_R, eFmt, p->u32PixFreq);
             }
             break;
         case HI_DRV_DISP_INTF_RGB0:
             if (pstIntf->u8VDAC_Y_G != HI_DISP_VDAC_INVALID_ID)
             {
-                PF_AddVDacToVenc(pstIf->eVencId, pstIntf->u8VDAC_Y_G, HI_DRV_DISP_VDAC_G);
-                VDP_VDAC_ResetFmt(pstIf->eVencId, pstIntf->u8VDAC_Y_G, eFmt);
+                PF_AddVDacToVenc(enDisp, pstIf->eVencId, pstIntf->u8VDAC_Y_G, HI_DRV_DISP_VDAC_G);
+                VDP_VDAC_ResetFmt(pstIf->eVencId, pstIntf->u8VDAC_Y_G, eFmt, p->u32PixFreq);
             }
 
             if (pstIntf->u8VDAC_Pb_B != HI_DISP_VDAC_INVALID_ID)
             {
-                PF_AddVDacToVenc(pstIf->eVencId, pstIntf->u8VDAC_Pb_B, HI_DRV_DISP_VDAC_B);
-                VDP_VDAC_ResetFmt(pstIf->eVencId, pstIntf->u8VDAC_Pb_B, eFmt);
+                PF_AddVDacToVenc(enDisp, pstIf->eVencId, pstIntf->u8VDAC_Pb_B, HI_DRV_DISP_VDAC_B);
+                VDP_VDAC_ResetFmt(pstIf->eVencId, pstIntf->u8VDAC_Pb_B, eFmt, p->u32PixFreq);
             }
 
             if (pstIntf->u8VDAC_Pr_R != HI_DISP_VDAC_INVALID_ID)
             {
-                PF_AddVDacToVenc(pstIf->eVencId, pstIntf->u8VDAC_Pr_R, HI_DRV_DISP_VDAC_R);
-                VDP_VDAC_ResetFmt(pstIf->eVencId, pstIntf->u8VDAC_Pr_R, eFmt);
+                PF_AddVDacToVenc(enDisp, pstIf->eVencId, pstIntf->u8VDAC_Pr_R, HI_DRV_DISP_VDAC_R);
+                VDP_VDAC_ResetFmt(pstIf->eVencId, pstIntf->u8VDAC_Pr_R, eFmt, p->u32PixFreq);
             }
             break;
 
@@ -1531,8 +1754,8 @@ HI_S32 PF_ResetIntfFmt2(HI_DRV_DISPLAY_E enDisp, DISP_INTF_S *pstIf, HI_DRV_DISP
 
             if (pstIntf->u8VDAC_Y_G != HI_DISP_VDAC_INVALID_ID)
             {
-                PF_AddVDacToVenc(pstIf->eVencId, pstIntf->u8VDAC_Y_G, HI_DRV_DISP_VDAC_CVBS);
-                VDP_VDAC_ResetFmt(pstIf->eVencId, pstIntf->u8VDAC_Y_G, eFmt);
+                PF_AddVDacToVenc(enDisp, pstIf->eVencId, pstIntf->u8VDAC_Y_G, HI_DRV_DISP_VDAC_CVBS);
+                VDP_VDAC_ResetFmt(pstIf->eVencId, pstIntf->u8VDAC_Y_G, eFmt, p->u32PixFreq);
             }
             break;
 
@@ -1540,35 +1763,35 @@ HI_S32 PF_ResetIntfFmt2(HI_DRV_DISPLAY_E enDisp, DISP_INTF_S *pstIf, HI_DRV_DISP
 
             if (pstIntf->u8VDAC_Y_G != HI_DISP_VDAC_INVALID_ID)
             {
-                PF_AddVDacToVenc(pstIf->eVencId, pstIntf->u8VDAC_Pb_B, HI_DRV_DISP_VDAC_SV_Y);
-                VDP_VDAC_ResetFmt(pstIf->eVencId, pstIntf->u8VDAC_Pb_B, eFmt);
+                PF_AddVDacToVenc(enDisp, pstIf->eVencId, pstIntf->u8VDAC_Pb_B, HI_DRV_DISP_VDAC_SV_Y);
+                VDP_VDAC_ResetFmt(pstIf->eVencId, pstIntf->u8VDAC_Pb_B, eFmt, p->u32PixFreq);
             }
 
             if (pstIntf->u8VDAC_Pb_B != HI_DISP_VDAC_INVALID_ID)
             {
-                PF_AddVDacToVenc(pstIf->eVencId, pstIntf->u8VDAC_Pr_R, HI_DRV_DISP_VDAC_SV_C);
-                VDP_VDAC_ResetFmt(pstIf->eVencId, pstIntf->u8VDAC_Pr_R, eFmt);
+                PF_AddVDacToVenc(enDisp, pstIf->eVencId, pstIntf->u8VDAC_Pr_R, HI_DRV_DISP_VDAC_SV_C);
+                VDP_VDAC_ResetFmt(pstIf->eVencId, pstIntf->u8VDAC_Pr_R, eFmt, p->u32PixFreq);
             }
             break;
 
         case HI_DRV_DISP_INTF_VGA0:
             if (pstIntf->u8VDAC_Y_G != HI_DISP_VDAC_INVALID_ID)
             {
-                PF_AddVDacToVenc(pstIf->eVencId, pstIntf->u8VDAC_Y_G, HI_DRV_DISP_VDAC_G);
+                PF_AddVDacToVenc(enDisp, pstIf->eVencId, pstIntf->u8VDAC_Y_G, HI_DRV_DISP_VDAC_G);
 
-                VDP_VDAC_ResetFmt(pstIf->eVencId, pstIntf->u8VDAC_Y_G, eFmt);
+                VDP_VDAC_ResetFmt(pstIf->eVencId, pstIntf->u8VDAC_Y_G, eFmt, p->u32PixFreq);
             }
 
             if (pstIntf->u8VDAC_Pb_B != HI_DISP_VDAC_INVALID_ID)
             {
-                PF_AddVDacToVenc(pstIf->eVencId, pstIntf->u8VDAC_Pb_B, HI_DRV_DISP_VDAC_B);
-                VDP_VDAC_ResetFmt(pstIf->eVencId, pstIntf->u8VDAC_Pb_B, eFmt);
+                PF_AddVDacToVenc(enDisp, pstIf->eVencId, pstIntf->u8VDAC_Pb_B, HI_DRV_DISP_VDAC_B);
+                VDP_VDAC_ResetFmt(pstIf->eVencId, pstIntf->u8VDAC_Pb_B, eFmt, p->u32PixFreq);
             }
 
             if (pstIntf->u8VDAC_Pr_R != HI_DISP_VDAC_INVALID_ID)
             {
-                PF_AddVDacToVenc(pstIf->eVencId, pstIntf->u8VDAC_Pr_R, HI_DRV_DISP_VDAC_R);
-                VDP_VDAC_ResetFmt(pstIf->eVencId, pstIntf->u8VDAC_Pr_R, eFmt);
+                PF_AddVDacToVenc(enDisp, pstIf->eVencId, pstIntf->u8VDAC_Pr_R, HI_DRV_DISP_VDAC_R);
+                VDP_VDAC_ResetFmt(pstIf->eVencId, pstIntf->u8VDAC_Pr_R, eFmt, p->u32PixFreq);
             }
 
             break;
@@ -1576,7 +1799,7 @@ HI_S32 PF_ResetIntfFmt2(HI_DRV_DISPLAY_E enDisp, DISP_INTF_S *pstIf, HI_DRV_DISP
             /*select hdmi corlor space 
         vdp set  yuv ,so need  hdmi judge whether  use CSC yuv to rgb;
          */
-            if  ((eFmt >= HI_DRV_DISP_FMT_861D_640X480_60) && (eFmt <= HI_DRV_DISP_FMT_CUSTOM))
+            if  ((eFmt >= HI_DRV_DISP_FMT_861D_640X480_60) && (eFmt <= HI_DRV_DISP_FMT_VESA_2560X1600_60_RB/*HI_DRV_DISP_FMT_CUSTOM*/))
             { pstIf ->enHDMIDataType = DISP_HDMI_DATA_RGB; }
             else
             { pstIf ->enHDMIDataType = DISP_HDMI_DATA_YUV; }
@@ -1603,7 +1826,7 @@ HI_S32 PF_ResetIntfFmt2(HI_DRV_DISPLAY_E enDisp, DISP_INTF_S *pstIf, HI_DRV_DISP
             break;
 
         default:
-            return VDP_DISP_INTF_BUTT;
+            return 6; //VDP_DISP_INTF_BUTT;
     }
 
 
@@ -1656,26 +1879,52 @@ HI_S32 PF_SetIntfEnable2(HI_DRV_DISPLAY_E enDisp, DISP_INTF_S *pstIt, HI_BOOL bE
             enVencId = DISP_VENC_HDATE0;
         else
             enVencId = DISP_VENC_MAX;
-            
+
+#if 0
         VDP_DATE_SetEnable(enVencId, (HI_U32)bEnable);
+#endif
         VDP_DATE_SetDACDetEn(enVencId, (HI_U32)bEnable);
     }
 
     // set vdac link
     if (pstIt->stIf.u8VDAC_Y_G != HI_DISP_VDAC_INVALID_ID)
     {
-        PF_SetVDACEnable(pstIt->stIf.u8VDAC_Y_G, bEnable);
+    	if (pstIt->eVencId == DISP_VENC_VGA0)
+    		Data_81141c20.Data_81141c24[pstIt->stIf.u8VDAC_Y_G].Data_4 = 0;
+    	else
+    		Data_81141c20.Data_81141c24[pstIt->stIf.u8VDAC_Y_G].Data_4 = bEnable;
+
+    	if (bEnable)
+    		PF_SetVDACEnable(pstIt->stIf.u8VDAC_Y_G, bEnable, 0);
+    	else
+    		PF_SetVDACEnable(pstIt->stIf.u8VDAC_Y_G, bEnable, 40);
     //printk("DispSetIntfEnable  002\n");
     }
 
     if (pstIt->stIf.u8VDAC_Pb_B != HI_DISP_VDAC_INVALID_ID)
     {
-        PF_SetVDACEnable(pstIt->stIf.u8VDAC_Pb_B, bEnable);
+    	if (pstIt->eVencId == DISP_VENC_VGA0)
+    		Data_81141c20.Data_81141c24[pstIt->stIf.u8VDAC_Pb_B].Data_4 = 0;
+    	else
+    		Data_81141c20.Data_81141c24[pstIt->stIf.u8VDAC_Pb_B].Data_4 = bEnable;
+
+    	if (bEnable)
+    		PF_SetVDACEnable(pstIt->stIf.u8VDAC_Pb_B, bEnable, 0);
+    	else
+    		PF_SetVDACEnable(pstIt->stIf.u8VDAC_Pb_B, bEnable, 20);
     }
 
     if (pstIt->stIf.u8VDAC_Pr_R != HI_DISP_VDAC_INVALID_ID)
     {
-        PF_SetVDACEnable(pstIt->stIf.u8VDAC_Pr_R, bEnable);
+    	if (pstIt->eVencId == DISP_VENC_VGA0)
+    		Data_81141c20.Data_81141c24[pstIt->stIf.u8VDAC_Pr_R].Data_4 = 0;
+    	else
+    		Data_81141c20.Data_81141c24[pstIt->stIf.u8VDAC_Pr_R].Data_4 = bEnable;
+
+    	if (bEnable)
+    		PF_SetVDACEnable(pstIt->stIf.u8VDAC_Pr_R, bEnable, 0);
+    	else
+    		PF_SetVDACEnable(pstIt->stIf.u8VDAC_Pr_R, bEnable, 20);
     }
 
     return HI_SUCCESS;
@@ -2030,7 +2279,7 @@ HI_S32 DAC_PoweDown(HI_U8 u8DAC)
     VDP_VDAC_GetEnable(u8DAC, &s32Enable);
     if(s32Enable)
     {
-        VDP_VDAC_SetEnable(u8DAC, HI_FALSE);
+        VDP_VDAC_SetEnable(u8DAC, HI_FALSE, 0/*TODO*/);
     }
     return HI_SUCCESS;
 }
@@ -2042,7 +2291,7 @@ HI_S32 DAC_PoweUp(HI_U8 u8DAC)
     VDP_VDAC_GetEnable(u8DAC, &s32Enable);
     if(!s32Enable)
     {
-        VDP_VDAC_SetEnable(u8DAC, HI_TRUE);
+        VDP_VDAC_SetEnable(u8DAC, HI_TRUE, 1/*TODO*/);
     }
     return HI_SUCCESS;
 }
@@ -2133,8 +2382,9 @@ HI_S32 PF_DACIsr(HI_U8 u8DAC)
 }
 
 /*==============================================*/
-HI_VOID DispGetVersion(HI_U32 *pu32VirBaseAddr, HI_DRV_DISP_VERSION_S * pVersion)
+HI_VOID DispGetVersion(/*HI_U32 *pu32VirBaseAddr,*/ HI_DRV_DISP_VERSION_S * pVersion)
 {
+#if 0
     if (pu32VirBaseAddr)
     {
         pVersion->u32VersionPartL = pu32VirBaseAddr[4];
@@ -2145,6 +2395,10 @@ HI_VOID DispGetVersion(HI_U32 *pu32VirBaseAddr, HI_DRV_DISP_VERSION_S * pVersion
         pVersion->u32VersionPartL = 0;
         pVersion->u32VersionPartH = 0;
     }
+#else
+    extern void Chip_Specific_GetVersion(HI_DRV_DISP_VERSION_S * pVersion);
+    Chip_Specific_GetVersion(pVersion);
+#endif
     
     return;
 }
@@ -2242,6 +2496,7 @@ HI_S32 PF_DATE_SetCoef(HI_DRV_DISPLAY_E enDisp, HI_BOOL bDefault)
 HI_S32 DISP_HAL_Init(HI_U32 u32Base)
 {
     HI_S32 nRet;
+    extern HI_S32 Chip_Specific_DISP_OpenClock(void);
     
     // s1 if input version
     if(s_DispIntfFlag > 0)
@@ -2250,7 +2505,7 @@ HI_S32 DISP_HAL_Init(HI_U32 u32Base)
     }
 
     // s1.2 open vdp clock. 
-    nRet = DISP_OpenClock();
+    nRet = Chip_Specific_DISP_OpenClock(); //DISP_OpenClock();
     if (nRet != HI_SUCCESS)
     {
         return nRet;
@@ -2258,7 +2513,14 @@ HI_S32 DISP_HAL_Init(HI_U32 u32Base)
 
     // s2 if input Base
     // s2.1 get virual address
-    s_u32VdpBaseAddr = (HI_U32)DISP_IOADDRESS(u32Base);
+    if (u32Base < 0xff000000)
+    {
+    	s_u32VdpBaseAddr = (HI_U32)DISP_IOADDRESS(u32Base);
+    }
+    else
+    {
+    	s_u32VdpBaseAddr = u32Base + 0xfc000000;
+    }
         
     if (!s_u32VdpBaseAddr)
     {
@@ -2268,25 +2530,31 @@ HI_S32 DISP_HAL_Init(HI_U32 u32Base)
     nRet = DISP_OS_MMZ_Alloc("VDP_RegBackBuff", HI_NULL, 0x10000, 16, &g_RegBackBuf);
     if (nRet)
     {
-        DISP_FATAL("Alloc MMZ VDP_RegBackBuff failed\n");
+        DISP_FATAL("Alloc MMZ VDP_RegBackBuff failed\n"); //3488
         return nRet;
     }
 #endif
-    DispGetVersion((HI_U32 *)s_u32VdpBaseAddr, &s_stVersion);
+    DispGetVersion(/*(HI_U32 *)s_u32VdpBaseAddr,*/ &s_stVersion);
     //printk(">>>>>>>>>>>Base=%x, vir=%x, vh=%x, vl=%x\n", 
     //      u32Base, RegVirAddr, s_stVersion.u32VersionPartH, s_stVersion.u32VersionPartL);
 
     // s2.3 initial ops
     DISP_MEMSET(&s_stIntfOps, 0, sizeof(DISP_INTF_OPERATION_S));
 
+    DISP_MEMSET(&Data_81141c20, 0, sizeof(Struct_81141c20));
+
+    Data_81141c20.Data_0 = 0;
+
+#if 0
     if (  (s_stVersion.u32VersionPartH == DISP_CV200_ES_VERSION_H)
         &&(s_stVersion.u32VersionPartL == DISP_CV200_ES_VERSION_L)
         )
+#endif
     {
         nRet = DISP_HAL_InitVDPState();
         if (nRet)
         {
-            DISP_FATAL("Hal init vdp state failed\n");
+            DISP_FATAL("Hal init vdp state failed\n"); //3505
             return nRet;
         }
 
@@ -2312,11 +2580,17 @@ HI_S32 DISP_HAL_Init(HI_U32 u32Base)
         s_stIntfOps.PF_SetChnPixFmt  = PF_SetChnPixFmt;
         s_stIntfOps.PF_SetChnBgColor = PF_SetChnBgColor;
         s_stIntfOps.PF_SetChnColor   = PF_SetChnColor;
+#if 0
         s_stIntfOps.PF_SetDispSignal = PF_SetDispSignal;
+#endif
 
         s_stIntfOps.PF_SetChnEnable  = PF_SetChnEnable;
         s_stIntfOps.PF_GetChnEnable  = PF_GetChnEnable;
+        s_stIntfOps.PF_InitDacDetect = PF_InitDacDetect;
         s_stIntfOps.PF_SetMSChnEnable = PF_SetMSChnEnable;
+        s_stIntfOps.PF_UpdateGamma = PF_UpdateGamma;
+        s_stIntfOps.PF_SetGammaCtrl = PF_SetGammaCtrl;
+        s_stIntfOps.PF_SetGammaRWZBCtrl = PF_SetGammaRWZBCtrl;
 
         /* interrypt */
         s_stIntfOps.PF_SetIntEnable = PF_SetIntEnable;
@@ -2345,20 +2619,32 @@ HI_S32 DISP_HAL_Init(HI_U32 u32Base)
         s_stIntfOps.PF_SetWbcPixFmt = PF_SetWbcPixFmt;
         s_stIntfOps.PF_SetWbcAddr = PF_SetWbcAddr;
         s_stIntfOps.PF_SetWbcEnable = PF_SetWbcEnable;
+        s_stIntfOps.PF_SetWbcLowdlyEnable = PF_SetWbcLowdlyEnable;
+        s_stIntfOps.PF_SetWbcPartfnsLineNum = PF_SetWbcPartfnsLineNum;
+        s_stIntfOps.PF_SetWbcLineNumInterval = PF_SetWbcLineNumInterval;
+        s_stIntfOps.PF_SetWbcLineAddr = PF_SetWbcLineAddr;
+
         s_stIntfOps.PF_UpdateWbc= PF_UpdateWbc;
         s_stIntfOps.PF_DACIsr = PF_DACIsr;
+        s_stIntfOps.PF_SetDACDetEn = PF_SetDACDetEn;
+        s_stIntfOps.PF_GetDACAttr = PF_GetDACAttr;
+
         /*set CBM Zorder*/
         s_stIntfOps.PF_CBM_MovTOP = PF_CBM_MovTOP;
         s_stIntfOps.PF_VDP_RegSave = PF_VDP_RegSave;
         s_stIntfOps.PF_VDP_RegReStore = PF_VDP_RegReStore;
         s_stIntfOps.PF_DATE_SetCoef = PF_DATE_SetCoef;
+        s_stIntfOps.PF_DATE_SetIRE = PF_DATE_SetIRE;
 
+        s_stIntfOps.PF_SetAllDACEn = PF_SetAllDACEn;
     }
+#if 0
     else
     {
         DISP_ERROR("Not support version : %x %x\n", 
             s_stVersion.u32VersionPartH, s_stVersion.u32VersionPartL);
     }
+#endif
 
     s_DispIntfFlag++;
 
@@ -2367,10 +2653,12 @@ HI_S32 DISP_HAL_Init(HI_U32 u32Base)
 
 HI_S32 DISP_HAL_DeInit(HI_VOID)
 {
+	extern HI_S32 Chip_Specific_DISP_CloseClock(void);
+
 #ifndef __DISP_PLATFORM_BOOT__
     DISP_OS_MMZ_Release( &g_RegBackBuf);
 #endif
-    DISP_CloseClock();    
+    Chip_Specific_DISP_CloseClock(); //    DISP_CloseClock();
     s_DispIntfFlag = 0;
     return HI_SUCCESS;
 }
@@ -2379,7 +2667,7 @@ HI_S32 DISP_HAL_GetOperation(DISP_INTF_OPERATION_S *pstFunction)
 {
     if(s_DispIntfFlag < 0)
     {
-        DISP_ERROR("DISP_INTF Not inited\n");
+        DISP_ERROR("DISP_INTF Not inited\n"); //3606
         return HI_FAILURE;
     }
     
@@ -2392,7 +2680,7 @@ DISP_INTF_OPERATION_S *DISP_HAL_GetOperationPtr(HI_VOID)
 {
     if(s_DispIntfFlag < 0)
     {
-        DISP_ERROR("DISP_INTF Not inited\n");
+        DISP_ERROR("DISP_INTF Not inited\n"); //3619
         return HI_NULL;
     }
 
@@ -2403,7 +2691,7 @@ HI_S32 DISP_HAL_GetVersion(HI_DRV_DISP_VERSION_S *pstVersion)
 {
     if(s_DispIntfFlag < 0)
     {
-        DISP_ERROR("DISP_INTF Not inited\n");
+        DISP_ERROR("DISP_INTF Not inited\n"); //3630
         return HI_FAILURE;
     }
 
@@ -2433,6 +2721,36 @@ HI_S32 DISP_DEBUG_PrintPtr(HI_VOID)
 
 
     return HI_SUCCESS;
+}
+
+
+HI_U32 DISP_GFX_GetIsrPoint(HI_U32 u32DispId, DISP_FMT_CFG_S *pstCfg)
+{
+	HI_U32 thd;
+	HI_U32 r0 = 100000 / pstCfg->stInfo.u32RefreshRate;
+
+	if (pstCfg->stInfo.eDispMode == DISP_STEREO_FPK)
+	{
+    	thd = pstCfg->stTiming.u32Vbb + pstCfg->stTiming.u32Vfb +  pstCfg->stTiming.u32Vact;
+    	thd += pstCfg->stTiming.u32Bvact + pstCfg->stTiming.u32Bvbb + pstCfg->stTiming.u32Bvfb;
+	}
+	else
+	{
+		thd = pstCfg->stTiming.u32Vbb + pstCfg->stTiming.u32Vfb +  pstCfg->stTiming.u32Vact;
+	}
+
+	if (u32DispId == 0)
+	{
+		r0 = (thd * 2) / r0;
+	}
+	else
+	{
+		r0 = (thd * 7) / (r0 * 4);
+	}
+
+	r0 = r0 - pstCfg->stTiming.u32Vfb;
+
+	return thd - r0;
 }
 
 

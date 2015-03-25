@@ -144,15 +144,15 @@ typedef enum hiUNF_LCD_E
 /**CNcomment:����ӿ�����*/
 typedef enum  hiUNF_DISP_INTF_TYPE_E
 {
-    HI_UNF_DISP_INTF_TYPE_HDMI,     /**<HDMI interface type *//**<CNcomment:HDMI�ӿ�����*/
-    HI_UNF_DISP_INTF_TYPE_LCD,      /**<LCD interface type *//**<CNcomment:LCD�ӿ�����*/
-    HI_UNF_DISP_INTF_TYPE_BT1120,   /**<bt1120 digital interface type *//**<CNcomment:BT1120���ֽӿ�����*/
-    HI_UNF_DISP_INTF_TYPE_BT656,    /**<bt656 digital interface type*//**<CNcomment:BT656���ֽӿ�����*/
-    HI_UNF_DISP_INTF_TYPE_YPBPR,    /**<YPBPR interface type*//**<CNcomment:YPBPR�ӿ�����*/
-    HI_UNF_DISP_INTF_TYPE_RGB,      /**<RGB interface type*//**<CNcomment:RGB�ӿ�����*/
-    HI_UNF_DISP_INTF_TYPE_CVBS,     /**<CVBS interface type*//**<CNcomment:CVBS�ӿ�����*/
-    HI_UNF_DISP_INTF_TYPE_SVIDEO,   /**<SVIDEO interface type*//**<CNcomment:SVIDEO�ӿ�����*/
-    HI_UNF_DISP_INTF_TYPE_VGA,
+    HI_UNF_DISP_INTF_TYPE_HDMI, //0    /**<HDMI interface type *//**<CNcomment:HDMI�ӿ�����*/
+    HI_UNF_DISP_INTF_TYPE_LCD, //1     /**<LCD interface type *//**<CNcomment:LCD�ӿ�����*/
+    HI_UNF_DISP_INTF_TYPE_BT1120, //2  /**<bt1120 digital interface type *//**<CNcomment:BT1120���ֽӿ�����*/
+    HI_UNF_DISP_INTF_TYPE_BT656, //3   /**<bt656 digital interface type*//**<CNcomment:BT656���ֽӿ�����*/
+    HI_UNF_DISP_INTF_TYPE_YPBPR, //4   /**<YPBPR interface type*//**<CNcomment:YPBPR�ӿ�����*/
+    HI_UNF_DISP_INTF_TYPE_RGB, //5     /**<RGB interface type*//**<CNcomment:RGB�ӿ�����*/
+    HI_UNF_DISP_INTF_TYPE_CVBS, //6    /**<CVBS interface type*//**<CNcomment:CVBS�ӿ�����*/
+    HI_UNF_DISP_INTF_TYPE_SVIDEO, //7  /**<SVIDEO interface type*//**<CNcomment:SVIDEO�ӿ�����*/
+    HI_UNF_DISP_INTF_TYPE_VGA, //8
     HI_UNF_DISP_INTF_TYPE_BUTT
 }HI_UNF_DISP_INTF_TYPE_E;
 
@@ -169,10 +169,10 @@ typedef struct  hiUNF_DISP_INTF_YPBPR_S
 /**CNcomment:����RGB�ӿڽṹ*/
 typedef struct  hiUNF_DISP_INTF_RGB_S
 {
-    HI_U8  u8DacR;            /**<DAC num of R  *//**<CNcomment:R����dac�˿ں�*/
-    HI_U8  u8DacG;            /**<DAC num of G  *//**<CNcomment:G����dac�˿ں�*/
-    HI_U8  u8DacB;            /**<DAC num of B  *//**<CNcomment:B����dac�˿ں�*/
-    HI_BOOL bDacSync;         /**<G without sync signal  *//**<CNcomment:G��������ͬ���ź�*/
+    HI_U8  u8DacR; //0           /**<DAC num of R  *//**<CNcomment:R����dac�˿ں�*/
+    HI_U8  u8DacG; //1           /**<DAC num of G  *//**<CNcomment:G����dac�˿ں�*/
+    HI_U8  u8DacB; //2           /**<DAC num of B  *//**<CNcomment:B����dac�˿ں�*/
+    HI_BOOL bDacSync; //4        /**<G without sync signal  *//**<CNcomment:G��������ͬ���ź�*/
 }HI_UNF_DISP_INTF_RGB_S;
 
 /**define the CVBS type struct of interface*/
@@ -217,7 +217,7 @@ typedef enum hiUNF_DISP_ASPECT_RATIO_E
     HI_UNF_DISP_ASPECT_RATIO_4TO3,              /**<4:3*//**<CNcomment: 4��3*/
     HI_UNF_DISP_ASPECT_RATIO_16TO9,             /**<16:9*//**<CNcomment: 16��9*/
     HI_UNF_DISP_ASPECT_RATIO_221TO1,            /**<221:100*//**<CNcomment: 221��100*/
-    HI_UNF_DISP_ASPECT_RATIO_USER,              /**<user define*//**<CNcomment: �û�����*/
+    HI_UNF_DISP_ASPECT_RATIO_USER, //4             /**<user define*//**<CNcomment: �û�����*/
 
     HI_UNF_DISP_ASPECT_RATIO_BUTT
 }HI_UNF_DISP_ASPECT_RATIO_E;

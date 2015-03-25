@@ -32,7 +32,7 @@ typedef struct tagPQ_EXPORT_FUNC_S
 
 HI_S32 PQ_DRV_ModInit(HI_VOID);
 HI_VOID PQ_DRV_ModExit(HI_VOID);
-HI_S32 HI_DRV_PQ_Init(HI_VOID);
+HI_S32 HI_DRV_PQ_Init(HI_U32);
 
 #ifdef __cplusplus
 }

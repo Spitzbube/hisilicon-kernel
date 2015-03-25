@@ -46,12 +46,12 @@ static VDP_DISP_SYNCINFO_S s_stSyncTiming[] =
 /* Synm,Iop, Itf, Vact,Vbb,Vfb,  Hact, Hbb,Hfb,Hmid,  Bvact,Bvbb,Bvfb, Hpw,Vpw, Idv,Ihs,Ivs */
   //0 HI_UNF_ENC_FMT_PAL
   {0,   0,   0,   288,  22,  2,  720, 132, 12,     288,  23,  2,    126, 3, 0, 0,  0,  0},/* 576I(PAL) */
-  //576I: HDMIÊä³öÒªÇóhmid=300, ¶øYPbPrÒªÇóhmid=0, 
-  //¿¼ÂÇÒ»°ãÓÃ»§²»»áÊ¹ÓÃHDMIÊä³ö576I£¬ËùÒÔ²»Ö§³ÖHDMI_567IÊä³ö£¬Ñ¡Ôñhmid=0
+  //576I: HDMIï¿½ï¿½ï¿½Òªï¿½ï¿½hmid=300, ï¿½ï¿½YPbPrÒªï¿½ï¿½hmid=0, 
+  //ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½Ã»ï¿½ï¿½ï¿½ï¿½ï¿½Ê¹ï¿½ï¿½HDMIï¿½ï¿½ï¿½576Iï¿½ï¿½ï¿½ï¿½ï¿½Ô²ï¿½Ö§ï¿½ï¿½HDMI_567Iï¿½ï¿½ï¿½ï¿½ï¿½Ñ¡ï¿½ï¿½hmid=0
   //1 HI_UNF_ENC_FMT_NTSC
   {0,   0,   0,   240,  18,  4,   720, 119, 19,     240,  19,  4,    124, 3,  0, 0, 0,  0},/* 480I(NTSC) */
-  //480I: HDMIÊä³öÒªÇóhmid=310, ¶øYPbPrÒªÇóhmid=0, 
-  //¿¼ÂÇÒ»°ãÓÃ»§²»»áÊ¹ÓÃHDMIÊä³ö480I£¬ËùÒÔ²»Ö§³ÖHDMI_480IÊä³ö£¬Ñ¡Ôñhmid=0
+  //480I: HDMIï¿½ï¿½ï¿½Òªï¿½ï¿½hmid=310, ï¿½ï¿½YPbPrÒªï¿½ï¿½hmid=0, 
+  //ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½Ã»ï¿½ï¿½ï¿½ï¿½ï¿½Ê¹ï¿½ï¿½HDMIï¿½ï¿½ï¿½480Iï¿½ï¿½ï¿½ï¿½ï¿½Ô²ï¿½Ö§ï¿½ï¿½HDMI_480Iï¿½ï¿½ï¿½ï¿½ï¿½Ñ¡ï¿½ï¿½hmid=0
   //2 HI_UNF_ENC_FMT_720P_60
   {1,   1,   2,   720,  25,  5,  1280, 260,110,      1,   1,  1,    40,  5,  1, 0,  0,  0}, /* 720P@60Hz */
   //3 HI_UNF_ENC_FMT_1080i_60
@@ -95,6 +95,11 @@ static VDP_DISP_SYNCINFO_S s_stSyncTiming[] =
 };
 #endif
 
+HI_VOID VDP_SetM0AndM1Sel(int a, int b);
+HI_VOID VDP_WBC_SetConnection(int a, int b);
+HI_VOID VDP_SetG3Position(int a);
+HI_VOID VDP_VP_SetVpSel(HI_U32 u32Data, HI_U32 bEnable);
+
 //-------------------------------------------------
 // 
 //-------------------------------------------------
@@ -109,10 +114,13 @@ HI_VOID  VDP_DRIVER_SetVirtualAddr(HI_U32 virAddr)
 
 HI_VOID  VDP_DRIVER_Initial()
 {
+	VDP_BKG_S fp40;
+
     U_CBM_ATTR CBM_ATTR;
     U_CBM_MIX1 CBM_MIX1;
     U_CBM_MIX2 CBM_MIX2;
 
+#if 0
     /* initail layer link */
     CBM_ATTR.u32 = pVdpReg->CBM_ATTR.u32;
     CBM_ATTR.bits.sur_attr5 = 0;  /*g3 to mixer1*/
@@ -122,24 +130,58 @@ HI_VOID  VDP_DRIVER_Initial()
     CBM_ATTR.bits.sur_attr1 = 0;  /*ga to mixer1*/
     CBM_ATTR.bits.sur_attr0 = 0;  /*ga to mixer1*/
     pVdpReg->CBM_ATTR.u32 = CBM_ATTR.u32;
+#endif
+
+    memset(&fp40, 0, sizeof(VDP_BKG_S));
 
     VDP_SetRdOutStd(VDP_MASTER0, 0, 7);
     VDP_SetRdOutStd(VDP_MASTER0, 1, 7);
-    VDP_SetWrOutStd(VDP_MASTER0, 0, 4);
+    VDP_SetWrOutStd(VDP_MASTER0, 0, 7); //4);
+
+    VDP_SetRdOutStd(VDP_MASTER1, 0, 7);
+    VDP_SetRdOutStd(VDP_MASTER1, 1, 7);
+    VDP_SetWrOutStd(VDP_MASTER1, 0, 7);
+
+    VDP_SetRdOutStd(VDP_MASTER2, 0, 7);
+    VDP_SetRdOutStd(VDP_MASTER2, 1, 7);
+    VDP_SetWrOutStd(VDP_MASTER2, 0, 7);
+
+    VDP_SetRdOutStd(VDP_MASTER3, 0, 7);
+    VDP_SetRdOutStd(VDP_MASTER3, 1, 7);
+    VDP_SetWrOutStd(VDP_MASTER3, 0, 7);
+
+    VDP_SetM0AndM1Sel(0, 1);
+    VDP_SetM0AndM1Sel(1, 1);
+    VDP_SetM0AndM1Sel(3, 1);
+    VDP_SetM0AndM1Sel(4, 1);
+    VDP_SetM0AndM1Sel(22, 0);
+    VDP_SetM0AndM1Sel(14, 0);
+    VDP_SetM0AndM1Sel(15, 0);
+    VDP_SetM0AndM1Sel(16, 0);
+    VDP_SetM0AndM1Sel(17, 0);
+    VDP_SetM0AndM1Sel(18, 0);
+
+    VDP_CBM_SetMixerBkg(VDP_CBM_MIXV0, fp40);
+    VDP_CBM_SetMixerBkg(VDP_CBM_MIXG0, fp40);
+    VDP_CBM_SetMixerBkg(VDP_CBM_MIX0, fp40);
+    VDP_CBM_SetMixerBkg(VDP_CBM_MIX1, fp40);
 
     /* initail video mixer */
     VDP_MIXV_SetPrio(VDP_LAYER_VID0);
     VDP_MIXV_SetPrio1(VDP_LAYER_VID1);
 
+#if 0
     /* initail mixer1, clear all layer */
     CBM_MIX1.u32 = pVdpReg->CBM_MIX1.u32;
     CBM_MIX1.bits.mixer_prio1 = 0; /* no layer */
     CBM_MIX1.bits.mixer_prio0 = 0; /* no layer */
     pVdpReg->CBM_MIX1.u32 = CBM_MIX1.u32;
+#endif
     
-    VDP_CBM_SetMixerPrio(VDP_CBM_MIX0, VDP_CBM_VP0, 0);
-    VDP_CBM_SetMixerPrio(VDP_CBM_MIX0, VDP_CBM_GP0, 1);
+    VDP_CBM_SetMixerPrio(4, 1, 0); //VDP_CBM_MIX0, VDP_CBM_VP0, 0);
+    VDP_CBM_SetMixerPrio(4, 2, 1); //VDP_CBM_MIX0, VDP_CBM_GP0, 1);
 
+#if 0
     /* initail mixer2, clear all layer */
     CBM_MIX2.u32 = pVdpReg->CBM_MIX2.u32;
     CBM_MIX2.bits.mixer_prio3 = 0; /* no layer */
@@ -147,11 +189,17 @@ HI_VOID  VDP_DRIVER_Initial()
     CBM_MIX2.bits.mixer_prio1 = 0; /* no layer */
     CBM_MIX2.bits.mixer_prio0 = 0; /* no layer */
     pVdpReg->CBM_MIX2.u32 = CBM_MIX2.u32;
+#endif
 
-    VDP_CBM_SetMixerPrio(VDP_CBM_MIX1, VDP_CBM_VID3, 0);
-    VDP_CBM_SetMixerPrio(VDP_CBM_MIX1, VDP_CBM_VID4, 1);
-    VDP_CBM_SetMixerPrio(VDP_CBM_MIX1, VDP_CBM_GP1, 2);
+    VDP_CBM_SetMixerPrio(6, 1, 0); //VDP_CBM_MIX1, VDP_CBM_VID3, 0);
+    VDP_CBM_SetMixerPrio(6, 4, 1); //VDP_CBM_MIX1, VDP_CBM_VID4, 1);
+    VDP_CBM_SetMixerPrio(7, 1, 0); //VDP_CBM_MIX1, VDP_CBM_GP1, 2);
+    VDP_CBM_SetMixerPrio(7, 2, 1);
+    VDP_CBM_SetMixerPrio(7, 3, 2);
 
+    VDP_WBC_SetConnection(0, 1);
+    VDP_SetG3Position(1);
+    VDP_VP_SetVpSel(0, 1);
 
     //VDP_INTF_DEFAULT();
     VDP_DHD_DEFAULT();
@@ -178,19 +226,40 @@ HI_VOID  VDAC_DRIVER_Initial()
 }
 
 
-HI_U32 VDP_RegRead(HI_U32 a)
+HI_U32 VDP_RegRead1(HI_U32 a)
 {
    //msleep(5);
-   //HI_PRINT("\nread---addr = 0x%x,date = 0x%x",a,*a);
+   HI_PRINT("\nread---addr = 0x%x,date = 0x%x",a, (*((HI_U32 *)a)));
+#if 0
+   return (*((HI_U32 *)a));
+#else
+    volatile HI_U32 p = a;
+    return (*((HI_U32 *)p));
+#endif
+}
+
+HI_U32 VDP_RegRead(HI_U32 a)
+{
    return (*((HI_U32 *)a));
 }
 
-HI_VOID VDP_RegWrite(HI_U32 a, HI_U32 b)
+HI_VOID VDP_RegWrite1(HI_U32 a, HI_U32 b)
 {
     //msleep(5);
-    //HI_PRINT("\nwrite---addr = 0x%x,date = 0x%x",a,b);
+    HI_PRINT("\nwrite---addr = 0x%x,date = 0x%x",a,b);
+#if 0
     *(HI_U32 *)a = b;       // ENV cfg
+#else
+    volatile HI_U32 p = a;
+    *(HI_U32 *)p = b;
+#endif
 }     
+
+HI_VOID VDP_RegWrite(HI_U32 a, HI_U32 b)
+{
+    *(HI_U32 *)a = b;       // ENV cfg
+}
+
 
 
 
@@ -200,6 +269,10 @@ HI_VOID VDP_RegWrite(HI_U32 a, HI_U32 b)
 //--------------------------------------------------------------------
 HI_VOID  VDP_VID_SetPreReadEnable    (HI_U32 u32Data, HI_U32 u32Enable )
 {
+#if 1
+#warning TODO: VDP_VID_SetPreReadEnable
+	printk("VDP_VID_SetPreReadEnable: TODO\n");
+#else
     volatile U_V0_PRERD     V0_PRERD;
 
     if(u32Data >= VID_MAX)
@@ -212,11 +285,15 @@ HI_VOID  VDP_VID_SetPreReadEnable    (HI_U32 u32Data, HI_U32 u32Enable )
     V0_PRERD.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->V0_PRERD.u32) + u32Data * VID_OFFSET));
     V0_PRERD.bits.pre_rd_en = u32Enable ;
     VDP_RegWrite((HI_U32)(&(pVdpReg->V0_PRERD.u32) + u32Data * VID_OFFSET), V0_PRERD.u32);
-   
+#endif
     return ;
 }
 HI_VOID  VDP_VID_SetNoSecFlag    (HI_U32 u32Data, HI_U32 u32Enable )
 {
+#if 1
+#warning TODO: VDP_VID_SetNoSecFlag
+	printk("VDP_VID_SetNoSecFlag: TODO\n");
+#else
     volatile U_V0_CTRL  V0_CTRL;
     if(u32Data >= VID_MAX)
     {
@@ -226,10 +303,15 @@ HI_VOID  VDP_VID_SetNoSecFlag    (HI_U32 u32Data, HI_U32 u32Enable )
     V0_CTRL.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->V0_CTRL.u32) + u32Data * VID_OFFSET));
     V0_CTRL.bits.nosec_flag= u32Enable ;
     VDP_RegWrite((HI_U32)(&(pVdpReg->V0_CTRL.u32) + u32Data * VID_OFFSET), V0_CTRL.u32);
+#endif
     return ;
 }
 HI_VOID  VDP_VID_SetLayerEnable    (HI_U32 u32Data, HI_U32 u32bEnable )
 {
+#if 1
+#warning TODO: VDP_VID_SetLayerEnable
+	printk("VDP_VID_SetLayerEnable: TODO\n");
+#else
     volatile U_V0_CTRL V0_CTRL;
     U_V0_16REGIONENL V0_16REGIONENL;
 
@@ -247,11 +329,16 @@ HI_VOID  VDP_VID_SetLayerEnable    (HI_U32 u32Data, HI_U32 u32bEnable )
     V0_16REGIONENL.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->V0_16REGIONENL.u32) + u32Data * VID_OFFSET));
     V0_16REGIONENL.u32 = 1;
     VDP_RegWrite((HI_U32)(&(pVdpReg->V0_16REGIONENL.u32) + u32Data * VID_OFFSET), V0_16REGIONENL.u32);
+#endif
 
     return ;
 }
 HI_VOID  VDP_VID_SetDcmpEnable    (HI_U32 u32Data, HI_U32 u32bEnable )
 {
+#if 1
+#warning TODO: VDP_VID_SetDcmpEnable
+	printk("VDP_VID_SetDcmpEnable: TODO\n");
+#else
     volatile     U_V0_CTRL V0_CTRL;
 
     if(u32Data >= VID_MAX)
@@ -263,12 +350,16 @@ HI_VOID  VDP_VID_SetDcmpEnable    (HI_U32 u32Data, HI_U32 u32bEnable )
     V0_CTRL.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->V0_CTRL.u32) + u32Data * VID_OFFSET));
     V0_CTRL.bits.dcmp_en = u32bEnable ;
     VDP_RegWrite((HI_U32)(&(pVdpReg->V0_CTRL.u32) + u32Data * VID_OFFSET), V0_CTRL.u32);
-   
+#endif
 
     return ;
 }
 HI_VOID  VDP_VID_SetUvorder(HI_U32 u32Data, HI_U32 u32bUvorder)
 {
+#if 1
+#warning TODO: VDP_VID_SetUvorder
+	printk("VDP_VID_SetUvorder: TODO\n");
+#else
     volatile U_V0_CTRL V0_CTRL;
 
     if(u32Data >= VID_MAX)
@@ -280,13 +371,17 @@ HI_VOID  VDP_VID_SetUvorder(HI_U32 u32Data, HI_U32 u32bUvorder)
     V0_CTRL.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->V0_CTRL.u32) + u32Data * VID_OFFSET));
     V0_CTRL.bits.uv_order= u32bUvorder;
     VDP_RegWrite((HI_U32)(&(pVdpReg->V0_CTRL.u32) + u32Data * VID_OFFSET), V0_CTRL.u32);
-   
+#endif
 
     return ;
 }
 
 HI_VOID  VDP_VID_SetDcmpOffset    (HI_U32 u32Data,HI_U32 u32laddr_offset,HI_U32  u32caddr_offset )
 {
+#if 1
+#warning TODO: VDP_VID_SetDcmpOffset
+	printk("VDP_VID_SetDcmpOffset: TODO\n");
+#else
     volatile     U_V0_LADDROFFSET V0_LADDROFFSET;
     volatile     U_V0_CADDROFFSET V0_CADDROFFSET;
 
@@ -304,13 +399,17 @@ HI_VOID  VDP_VID_SetDcmpOffset    (HI_U32 u32Data,HI_U32 u32laddr_offset,HI_U32 
     V0_CADDROFFSET.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->V0_CADDROFFSET.u32) + u32Data * VID_OFFSET));
     V0_CADDROFFSET.u32 = u32caddr_offset ;
     VDP_RegWrite((HI_U32)(&(pVdpReg->V0_CADDROFFSET.u32) + u32Data * VID_OFFSET), V0_CADDROFFSET.u32);
-   
+#endif
 
     return ;
 }
 
 HI_VOID  VDP_VID_SetDcmpErrorClr    (HI_U32 u32Data,HI_U32 u32dcmp_lerror_clr,HI_U32  u32dcmp_cerror_clr)
 {
+#if 1
+#warning TODO: VDP_VID_SetDcmpErrorClr
+	printk("VDP_VID_SetDcmpErrorClr: TODO\n");
+#else
     volatile U_VO_DCMPERRCLR  VO_DCMPERRCLR;
 
 
@@ -327,7 +426,7 @@ HI_VOID  VDP_VID_SetDcmpErrorClr    (HI_U32 u32Data,HI_U32 u32dcmp_lerror_clr,HI
     VO_DCMPERRCLR.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->VO_DCMPERRCLR.u32) + u32Data * VID_OFFSET));
     VO_DCMPERRCLR.bits.dcmp_c_errclr= u32dcmp_cerror_clr;
     VDP_RegWrite((HI_U32)(&(pVdpReg->VO_DCMPERRCLR.u32) + u32Data * VID_OFFSET), VO_DCMPERRCLR.u32);
-   
+#endif
 
     return ;
 }
@@ -337,6 +436,10 @@ HI_VOID  VDP_VID_SetDcmpErrorClr    (HI_U32 u32Data,HI_U32 u32dcmp_lerror_clr,HI
 
 HI_VOID  VDP_VID_SetInDataFmt       (HI_U32 u32Data, VDP_VID_IFMT_E  enDataFmt)
 {
+#if 1
+#warning TODO: VDP_VID_SetInDataFmt
+	printk("VDP_VID_SetInDataFmt: TODO\n");
+#else
     volatile U_V0_CTRL V0_CTRL;
 
     if(u32Data >= VID_MAX)
@@ -348,12 +451,16 @@ HI_VOID  VDP_VID_SetInDataFmt       (HI_U32 u32Data, VDP_VID_IFMT_E  enDataFmt)
     V0_CTRL.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->V0_CTRL.u32) + u32Data * VID_OFFSET));
     V0_CTRL.bits.ifmt = enDataFmt;
     VDP_RegWrite((HI_U32)(&(pVdpReg->V0_CTRL.u32) + u32Data * VID_OFFSET), V0_CTRL.u32); 
-
+#endif
     return ;
 }
     
 HI_VOID  VDP_VID_SetReadMode    (HI_U32 u32Data, VDP_DATA_RMODE_E enLRMode,VDP_DATA_RMODE_E enCRMode)
 {
+#if 1
+#warning TODO: VDP_VID_SetReadMode
+	printk("VDP_VID_SetReadMode: TODO\n");
+#else
     volatile U_V0_CTRL V0_CTRL;
 
     if(u32Data >= VID_MAX)
@@ -366,12 +473,16 @@ HI_VOID  VDP_VID_SetReadMode    (HI_U32 u32Data, VDP_DATA_RMODE_E enLRMode,VDP_D
     V0_CTRL.bits.lm_rmode = enLRMode;
     V0_CTRL.bits.chm_rmode = enCRMode;
     VDP_RegWrite((HI_U32)(&(pVdpReg->V0_CTRL.u32) + u32Data * VID_OFFSET), V0_CTRL.u32); 
-
+#endif
     return ;
 }
 
 HI_VOID VDP_VID_SetIfirMode(HI_U32 u32Data, VDP_IFIRMODE_E enMode)
 {
+#if 1
+#warning TODO: VDP_VID_SetIfirMode
+	printk("VDP_VID_SetIfirMode: TODO\n");
+#else
     volatile U_V0_CTRL V0_CTRL;
 
     if(u32Data >= VID_MAX)
@@ -383,12 +494,16 @@ HI_VOID VDP_VID_SetIfirMode(HI_U32 u32Data, VDP_IFIRMODE_E enMode)
     V0_CTRL.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->V0_CTRL.u32) + u32Data * VID_OFFSET));
     V0_CTRL.bits.ifir_mode = enMode;
     VDP_RegWrite((HI_U32)(&(pVdpReg->V0_CTRL.u32) + u32Data * VID_OFFSET), V0_CTRL.u32); 
-
+#endif
     return ;
 }
     
 HI_VOID  VDP_VID_SetIfirCoef    (HI_U32 u32Data, HI_S32 * s32Coef)
 {
+#if 1
+#warning TODO: VDP_VID_SetIfirCoef
+	printk("VDP_VID_SetIfirCoef: TODO\n");
+#else
     volatile U_V0_IFIRCOEF01 V0_IFIRCOEF01;
     volatile U_V0_IFIRCOEF23 V0_IFIRCOEF23;
     volatile U_V0_IFIRCOEF45 V0_IFIRCOEF45;
@@ -418,11 +533,15 @@ HI_VOID  VDP_VID_SetIfirCoef    (HI_U32 u32Data, HI_S32 * s32Coef)
         VDP_RegWrite((HI_U32)(&(pVdpReg->V0_IFIRCOEF23.u32) + u32Data * VID_OFFSET), V0_IFIRCOEF23.u32); 
         VDP_RegWrite((HI_U32)(&(pVdpReg->V0_IFIRCOEF45.u32) + u32Data * VID_OFFSET), V0_IFIRCOEF45.u32); 
         VDP_RegWrite((HI_U32)(&(pVdpReg->V0_IFIRCOEF67.u32) + u32Data * VID_OFFSET), V0_IFIRCOEF67.u32); 
-   
+#endif
     return ;
 }
 HI_VOID  VDP_VID_SetMuteEnable   (HI_U32 u32Data, HI_U32 bEnable)
 {
+#if 1
+#warning TODO: VDP_VID_SetMuteEnable
+	printk("VDP_VID_SetMuteEnable: TODO\n");
+#else
     volatile U_V0_CTRL V0_CTRL;
 
     if(u32Data >= VID_MAX)
@@ -434,12 +553,16 @@ HI_VOID  VDP_VID_SetMuteEnable   (HI_U32 u32Data, HI_U32 bEnable)
     V0_CTRL.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->V0_CTRL.u32) + u32Data * VID_OFFSET));
     V0_CTRL.bits.mute_en = bEnable;
     VDP_RegWrite((HI_U32)(&(pVdpReg->V0_CTRL.u32) + u32Data * VID_OFFSET), V0_CTRL.u32); 
-
+#endif
     return ;
 }
 
 HI_VOID  VDP_VID_SetFlipEnable(HI_U32 u32Data, HI_U32 u32bEnable)
 {
+#if 1
+#warning TODO: VDP_VID_SetFlipEnable
+	printk("VDP_VID_SetFlipEnable: TODO\n");
+#else
     volatile U_V0_CTRL V0_CTRL;
     
     if(u32Data >= VID_MAX)
@@ -451,6 +574,7 @@ HI_VOID  VDP_VID_SetFlipEnable(HI_U32 u32Data, HI_U32 u32bEnable)
     V0_CTRL.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->V0_CTRL.u32)+ u32Data * VID_OFFSET));
     V0_CTRL.bits.flip_en = u32bEnable;
     VDP_RegWrite((HI_U32)(&(pVdpReg->V0_CTRL.u32)+ u32Data * VID_OFFSET), V0_CTRL.u32); 
+#endif
 }
 
 
@@ -475,6 +599,10 @@ HI_VOID  VDP_VID_SetFlipEnable(HI_U32 u32Data, HI_U32 u32bEnable)
 
 HI_VOID  VDP_SetParaUpMode(HI_U32 u32Data,HI_U32 u32Mode)
 {
+#if 1
+#warning TODO: VDP_SetParaUpMode
+	printk("VDP_SetParaUpMode: TODO\n");
+#else
     volatile U_V0_CTRL V0_CTRL;
 
     if(u32Data >= VID_MAX)
@@ -486,13 +614,17 @@ HI_VOID  VDP_SetParaUpMode(HI_U32 u32Data,HI_U32 u32Mode)
     V0_CTRL.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->V0_CTRL.u32) + u32Data * VID_OFFSET));
     V0_CTRL.bits.vup_mode = u32Mode;
     VDP_RegWrite((HI_U32)(&(pVdpReg->V0_CTRL.u32) + u32Data * VID_OFFSET), V0_CTRL.u32); 
-
+#endif
     return ;
 }
 
 
 HI_VOID VDP_SetTimeOut(HI_U32 u32Data, HI_U32 u32TData)
 {
+#if 1
+#warning TODO: VDP_SetTimeOut
+	printk("VDP_SetTimeOut: TODO\n");
+#else
     volatile U_V0_CTRL V0_CTRL;
 
     if(u32Data >= VID_MAX)
@@ -504,7 +636,7 @@ HI_VOID VDP_SetTimeOut(HI_U32 u32Data, HI_U32 u32TData)
     V0_CTRL.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->V0_CTRL.u32) + u32Data * VID_OFFSET));
     V0_CTRL.bits.time_out = u32TData;
     VDP_RegWrite((HI_U32)(&(pVdpReg->V0_CTRL.u32) + u32Data * VID_OFFSET), V0_CTRL.u32); 
-
+#endif
     return ;
 }
 
@@ -540,6 +672,10 @@ HI_VOID VDP_SetTimeOut(HI_U32 u32Data, HI_U32 u32TData)
 
 HI_VOID  VDP_VID_SetLayerAddr   (HI_U32 u32Data, HI_U32 u32Chan, HI_U32 u32LAddr,HI_U32 u32CAddr,HI_U32 u32LStr, HI_U32 u32CStr)
 {
+#if 1
+#warning TODO: VDP_VID_SetLayerAddr
+	printk("VDP_VID_SetLayerAddr: TODO\n");
+#else
     volatile U_V0_P0STRIDE V0_P0STRIDE;
 
     if(u32Data >= VID_MAX)
@@ -566,12 +702,16 @@ HI_VOID  VDP_VID_SetLayerAddr   (HI_U32 u32Data, HI_U32 u32Chan, HI_U32 u32LAddr
     V0_P0STRIDE.bits.surface_stride = u32LStr;
     V0_P0STRIDE.bits.surface_cstride = u32CStr;
     VDP_RegWrite((HI_U32)(&(pVdpReg->V0_P0STRIDE.u32) + u32Data * VID_OFFSET), V0_P0STRIDE.u32); 
-
+#endif
     return ;
 }
     
 HI_VOID  VDP_VID_SetLayerReso     (HI_U32 u32Data, VDP_DISP_RECT_S  stRect)
 {
+#if 1
+#warning TODO: VDP_VID_SetLayerReso
+	printk("VDP_VID_SetLayerReso: TODO\n");
+#else
     volatile U_V0_VFPOS V0_VFPOS;
     volatile U_V0_VLPOS V0_VLPOS;
     volatile U_V0_DFPOS V0_DFPOS;
@@ -645,11 +785,16 @@ HI_VOID  VDP_VID_SetLayerReso     (HI_U32 u32Data, VDP_DISP_RECT_S  stRect)
     V0_P0RESO.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->V0_P0RESO.u32) + u32Data * VID_OFFSET));
     V0_P0RESO.bits.w = stRect.u32OWth - 1;
     VDP_RegWrite((HI_U32)(&(pVdpReg->V0_P0RESO.u32) + u32Data * VID_OFFSET), V0_P0RESO.u32); 
+#endif
    return ;
 }   
 
 HI_VOID  VDP_VID_SetInReso      (HI_U32 u32Data, VDP_RECT_S  stRect)
 {
+#if 1
+#warning TODO: VDP_VID_SetInReso
+	printk("VDP_VID_SetInReso: TODO\n");
+#else
     volatile U_V0_IRESO V0_IRESO;    
     //for crop
     volatile U_V0_CPOS          V0_CPOS;
@@ -672,12 +817,16 @@ HI_VOID  VDP_VID_SetInReso      (HI_U32 u32Data, VDP_RECT_S  stRect)
     VDP_RegWrite((HI_U32)(&(pVdpReg->V0_CPOS.u32) + u32Data * VID_OFFSET), V0_CPOS.u32); 
 
     //for multi region
-
+#endif
     return ;
 }
  
 HI_VOID  VDP_VID_SetOutReso     (HI_U32 u32Data, VDP_RECT_S  stRect)
 {
+#if 1
+#warning TODO: VDP_VID_SetOutReso
+	printk("VDP_VID_SetOutReso: TODO\n");
+#else
     volatile U_V0_ORESO V0_ORESO;
 
    if(u32Data >= VID_MAX)
@@ -691,12 +840,16 @@ HI_VOID  VDP_VID_SetOutReso     (HI_U32 u32Data, VDP_RECT_S  stRect)
    V0_ORESO.bits.ow = stRect.u32Wth - 1;
    V0_ORESO.bits.oh = stRect.u32Hgt - 1;
    VDP_RegWrite((HI_U32)(&(pVdpReg->V0_ORESO.u32) + u32Data * VID_OFFSET), V0_ORESO.u32); 
-
+#endif
    return ;
 }   
     
 HI_VOID  VDP_VID_SetVideoPos     (HI_U32 u32Data, VDP_RECT_S  stRect)
 {
+#if 1
+#warning TODO: VDP_VID_SetVideoPos
+	printk("VDP_VID_SetVideoPos: TODO\n");
+#else
    volatile U_V0_VFPOS V0_VFPOS;
    volatile U_V0_VLPOS V0_VLPOS;
    
@@ -716,11 +869,16 @@ HI_VOID  VDP_VID_SetVideoPos     (HI_U32 u32Data, VDP_RECT_S  stRect)
    V0_VLPOS.bits.video_xlpos = stRect.u32X + stRect.u32Wth - 1;
    V0_VLPOS.bits.video_ylpos = stRect.u32Y + stRect.u32Hgt - 1;
    VDP_RegWrite((HI_U32)(&(pVdpReg->V0_VLPOS.u32) + u32Data * VID_OFFSET), V0_VLPOS.u32); 
+#endif
    return ;
 }   
     
 HI_VOID  VDP_VID_SetDispPos     (HI_U32 u32Data, VDP_RECT_S  stRect)
 {
+#if 1
+#warning TODO: VDP_VID_SetDispPos
+	printk("VDP_VID_SetDispPos: TODO\n");
+#else
    volatile U_V0_DFPOS V0_DFPOS;
    volatile U_V0_DLPOS V0_DLPOS;
    
@@ -740,11 +898,16 @@ HI_VOID  VDP_VID_SetDispPos     (HI_U32 u32Data, VDP_RECT_S  stRect)
    V0_DLPOS.bits.disp_xlpos = stRect.u32X + stRect.u32Wth - 1;
    V0_DLPOS.bits.disp_ylpos = stRect.u32Y + stRect.u32Hgt - 1;
    VDP_RegWrite((HI_U32)(&(pVdpReg->V0_DLPOS.u32) + u32Data * VID_OFFSET), V0_DLPOS.u32); 
+#endif
    return ;
 }   
 
 HI_VOID VDP_VID_SetMultiModeEnable(HI_U32 u32Data, HI_U32 u32Enable )
 {
+#if 1
+#warning TODO: VDP_VID_SetMultiModeEnable
+	printk("VDP_VID_SetMultiModeEnable: TODO\n");
+#else
     volatile U_V0_MULTI_MODE      V0_MULTI_MODE;
 
     if(u32Data >= VID_MAX)
@@ -756,12 +919,16 @@ HI_VOID VDP_VID_SetMultiModeEnable(HI_U32 u32Data, HI_U32 u32Enable )
     V0_MULTI_MODE.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->V0_MULTI_MODE.u32) + u32Data * VID_OFFSET));
     V0_MULTI_MODE.bits.mrg_mode = u32Enable;
     VDP_RegWrite((HI_U32)(&(pVdpReg->V0_MULTI_MODE.u32) + u32Data * VID_OFFSET), V0_MULTI_MODE.u32);
-   
+#endif
     return ;
 }
 
 HI_VOID VDP_VID_SetRegionEnable(HI_U32 u32Data, HI_U32 u32Num, HI_U32 u32bEnable )
 {
+#if 1
+#warning TODO: VDP_VID_SetRegionEnable
+	printk("VDP_VID_SetRegionEnable: TODO\n");
+#else
     volatile U_V0_16REGIONENL V0_16REGIONENL;
 
     if(u32Data >= VID_MAX)
@@ -788,12 +955,16 @@ HI_VOID VDP_VID_SetRegionEnable(HI_U32 u32Data, HI_U32 u32Num, HI_U32 u32bEnable
     }
     
     VDP_RegWrite((HI_U32)(&(pVdpReg->V0_16REGIONENL.u32) + u32Data * VID_OFFSET), V0_16REGIONENL.u32);
-   
+#endif
     return ;
 }
 
 HI_VOID VDP_VID_SetAllRegionDisable(HI_U32 u32Data )
 {
+#if 1
+#warning TODO: VDP_VID_SetAllRegionDisable
+	printk("VDP_VID_SetAllRegionDisable: TODO\n");
+#else
     if(u32Data >= VID_MAX)
     {
         HI_PRINT("Error,VDP_VID_SetAllRegionDisable() Select Wrong Video Layer ID\n");
@@ -801,12 +972,16 @@ HI_VOID VDP_VID_SetAllRegionDisable(HI_U32 u32Data )
     }
 
     VDP_RegWrite((HI_U32)(&(pVdpReg->V0_16REGIONENL.u32) + u32Data * VID_OFFSET), 0); 
-
+#endif
     return ;
 }
 
 HI_VOID VDP_VID_SetRegionAddr(HI_U32 u32Data, HI_U32 u32Num, HI_U32 u32LAddr,HI_U32 u32CAddr,HI_U32 u32LStr, HI_U32 u32CStr)
 {
+#if 1
+#warning TODO: VDP_VID_SetRegionAddr
+	printk("VDP_VID_SetRegionAddr: TODO\n");
+#else
     volatile U_V0_P0STRIDE V0_P0STRIDE;
 
     if(u32Data >= VID_MAX)
@@ -827,12 +1002,17 @@ HI_VOID VDP_VID_SetRegionAddr(HI_U32 u32Data, HI_U32 u32Num, HI_U32 u32LAddr,HI_
     V0_P0STRIDE.bits.surface_stride = u32LStr;
     V0_P0STRIDE.bits.surface_cstride = u32CStr;
     VDP_RegWrite((HI_U32)(&(pVdpReg->V0_P0STRIDE.u32) + u32Data * VID_OFFSET + u32Num * REGION_OFFSET), V0_P0STRIDE.u32); 
-   
+#endif
     return ;
 }
 
 HI_VOID VDP_VID_SetRegionReso(HI_U32 u32Data, HI_U32 u32Num, VDP_RECT_S  stRect)
 {
+#if 1
+#warning TODO: VDP_VID_SetRegionReso
+	printk("VDP_VID_SetRegionReso: TODO\n");
+#else
+
     volatile U_V0_P0RESO          V0_P0RESO;
     volatile U_V0_P0VFPOS         V0_P0VFPOS;
     volatile U_V0_P0VLPOS         V0_P0VLPOS;
@@ -863,7 +1043,7 @@ HI_VOID VDP_VID_SetRegionReso(HI_U32 u32Data, HI_U32 u32Num, VDP_RECT_S  stRect)
     V0_P0RESO.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->V0_P0RESO.u32) + u32Data * VID_OFFSET + u32Num * REGION_OFFSET));
     V0_P0RESO.bits.w = stRect.u32Wth - 1;
     VDP_RegWrite((HI_U32)(&(pVdpReg->V0_P0RESO.u32) + u32Data * VID_OFFSET + u32Num * REGION_OFFSET), V0_P0RESO.u32); 
-
+#endif
    return ;
 }
 
@@ -934,6 +1114,10 @@ HI_VOID VDP_VID_SetRegionReso(HI_U32 u32Data, HI_U32 u32Num, VDP_DISP_RECT_S  st
 
 HI_VOID VDP_VID_SetRegionMuteEnable(HI_U32 u32Data, HI_U32 u32Num, HI_U32 bEnable)
 {
+#if 1
+#warning TODO: VDP_VID_SetRegionMuteEnable
+	printk("VDP_VID_SetRegionMuteEnable: TODO\n");
+#else
     volatile U_V0_16MUTE V0_16MUTE;
 
     if(u32Data >= VID_MAX)
@@ -959,12 +1143,16 @@ HI_VOID VDP_VID_SetRegionMuteEnable(HI_U32 u32Data, HI_U32 u32Num, HI_U32 bEnabl
     }
 
     VDP_RegWrite((HI_U32)(&(pVdpReg->V0_16MUTE.u32) + u32Data * VID_OFFSET), V0_16MUTE.u32); 
-
+#endif
     return ;
 }
     
 HI_VOID  VDP_VID_SetRegUp       (HI_U32 u32Data)
 {
+#if 1
+#warning TODO: VDP_VID_SetRegUp
+	printk("VDP_VID_SetRegUp: TODO\n");
+#else
     volatile U_V0_UPD V0_UPD;
     
     /* VHD layer register update */
@@ -976,7 +1164,7 @@ HI_VOID  VDP_VID_SetRegUp       (HI_U32 u32Data)
     
     V0_UPD.bits.regup = 0x1;
     VDP_RegWrite((HI_U32)(&(pVdpReg->V0_UPD.u32) + u32Data * VID_OFFSET), V0_UPD.u32); 
-
+#endif
     return ;
 }
     
@@ -984,6 +1172,10 @@ HI_VOID  VDP_VID_SetRegUp       (HI_U32 u32Data)
    
 HI_VOID  VDP_VID_SetLayerGalpha (HI_U32 u32Data, HI_U32 u32Alpha0)
 {
+#if 1
+#warning TODO: VDP_VID_SetLayerGalpha
+	printk("VDP_VID_SetLayerGalpha: TODO\n");
+#else
     volatile U_V0_CBMPARA V0_CBMPARA;
     volatile U_V0_ALPHA V0_ALPHA;
     
@@ -1001,11 +1193,16 @@ HI_VOID  VDP_VID_SetLayerGalpha (HI_U32 u32Data, HI_U32 u32Alpha0)
     V0_ALPHA.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->V0_ALPHA.u32) + u32Data * VID_OFFSET));
     V0_ALPHA.bits.vbk_alpha = u32Alpha0;
     VDP_RegWrite((HI_U32)(&(pVdpReg->V0_ALPHA.u32) + u32Data * VID_OFFSET), V0_ALPHA.u32); 
+#endif
     return ;
 }
 
 HI_VOID  VDP_VID_SetCropReso    (HI_U32 u32Data, VDP_RECT_S stRect)
 {
+#if 1
+#warning TODO: VDP_VID_SetCropReso
+	printk("VDP_VID_SetCropReso: TODO\n");
+#else
     volatile  U_V0_CPOS V0_CPOS;
     
     if(u32Data >= VID_MAX)
@@ -1019,12 +1216,16 @@ HI_VOID  VDP_VID_SetCropReso    (HI_U32 u32Data, VDP_RECT_S stRect)
     V0_CPOS.bits.src_xfpos = stRect.u32X;
     V0_CPOS.bits.src_xlpos = stRect.u32X+stRect.u32Wth-1;
     VDP_RegWrite((HI_U32)(&(pVdpReg->V0_CPOS.u32) + u32Data * VID_OFFSET), V0_CPOS.u32); 
-
+#endif
     return ;
 }
 
 HI_VOID  VDP_VID_SetLayerBkg    (HI_U32 u32Data, VDP_BKG_S stBkg)
 {
+#if 1
+#warning TODO: VDP_VID_SetLayerBkg
+	printk("VDP_VID_SetLayerBkg: TODO\n");
+#else
     volatile U_V0_BK    V0_BK;
     
     if(u32Data >= VID_MAX)
@@ -1042,7 +1243,7 @@ HI_VOID  VDP_VID_SetLayerBkg    (HI_U32 u32Data, VDP_BKG_S stBkg)
     //V0_ALPHA.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->V0_ALPHA.u32) + u32Data * VID_OFFSET));
     //V0_ALPHA.bits.vbk_alpha = stBkg.u32BkgA;
     //VDP_RegWrite((HI_U32)(&(pVdpReg->V0_ALPHA.u32) + u32Data * VID_OFFSET), V0_ALPHA.u32); 
-    
+#endif
     return ;
 }
 
@@ -1052,6 +1253,10 @@ HI_VOID  VDP_VID_SetLayerBkg    (HI_U32 u32Data, VDP_BKG_S stBkg)
     
 HI_VOID  VDP_VID_SetCscDcCoef   (HI_U32 u32Data, VDP_CSC_DC_COEF_S pstCscCoef)
 {
+#if 1
+#warning TODO: VDP_VID_SetCscDcCoef
+	printk("VDP_VID_SetCscDcCoef: TODO\n");
+#else
     volatile U_V0_CSC_IDC  V0_CSC_IDC;
     volatile U_V0_CSC_ODC  V0_CSC_ODC;
     volatile U_V0_CSC_IODC V0_CSC_IODC;
@@ -1085,12 +1290,17 @@ HI_VOID  VDP_VID_SetCscDcCoef   (HI_U32 u32Data, VDP_CSC_DC_COEF_S pstCscCoef)
         V0_CSC_IODC.bits.cscidc2 = pstCscCoef.csc_in_dc2;
         VDP_RegWrite((HI_U32)(&(pVdpReg->V0_CSC_IODC.u32) + u32Data * VID_OFFSET), V0_CSC_IODC.u32);     
     }
-    
+#endif
     return ;
 }
 
 HI_VOID   VDP_VID_SetCscCoef(HI_U32 u32Data, VDP_CSC_COEF_S stCscCoef)
 {   
+#if 1
+#warning TODO: VDP_VID_SetCscCoef
+	printk("VDP_VID_SetCscCoef: TODO\n");
+#else
+
     volatile U_V0_CSC_P0 V0_CSC_P0;
     volatile U_V0_CSC_P1 V0_CSC_P1;
     volatile U_V0_CSC_P2 V0_CSC_P2;
@@ -1134,7 +1344,7 @@ HI_VOID   VDP_VID_SetCscCoef(HI_U32 u32Data, VDP_CSC_COEF_S stCscCoef)
     V0_CSC_P4.bits.cscp22 = stCscCoef.csc_coef22;
     VDP_RegWrite((HI_U32)(&(pVdpReg->V0_CSC_P4.u32)+u32Data*VID_OFFSET), V0_CSC_P4.u32);
     }
-        
+#endif
 }
 
  
@@ -1142,6 +1352,10 @@ HI_VOID   VDP_VID_SetCscCoef(HI_U32 u32Data, VDP_CSC_COEF_S stCscCoef)
     
 HI_VOID  VDP_VID_SetCscEnable   (HI_U32 u32Data, HI_U32 u32bCscEn)
 {
+#if 1
+#warning TODO: VDP_VID_SetCscEnable
+	printk("VDP_VID_SetCscEnable: TODO\n");
+#else
     volatile U_V0_CSC_IDC V0_CSC_IDC;
     
     if(u32Data >= VID_MAX)
@@ -1161,7 +1375,7 @@ HI_VOID  VDP_VID_SetCscEnable   (HI_U32 u32Data, HI_U32 u32bCscEn)
         V0_CSC_IDC.bits.csc_en = u32bCscEn;
         VDP_RegWrite((HI_U32)(&(pVdpReg->V0_CSC_IDC.u32) + u32Data * VID_OFFSET), V0_CSC_IDC.u32); 
     }
-
+#endif
     return ;
 }
 
@@ -1355,6 +1569,11 @@ HI_VOID VDP_VID_SetDispMode(HI_U32 u32Data, VDP_DISP_MODE_E enDispMode)
 
 HI_VOID VDP_VID_SetDrawMode (HI_U32 u32Data, HI_U32 u32Mode)
 {
+#if 1
+#warning TODO: VDP_VID_SetDrawMode
+	printk("VDP_VID_SetDrawMode: TODO\n");
+#else
+
     volatile U_V0_DRAWMODE V0_DRAWMODE;
     
     if(u32Data >= VID_MAX)
@@ -1366,12 +1585,16 @@ HI_VOID VDP_VID_SetDrawMode (HI_U32 u32Data, HI_U32 u32Mode)
     V0_DRAWMODE.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->V0_DRAWMODE.u32) + u32Data * VID_OFFSET));
     V0_DRAWMODE.bits.draw_mode = u32Mode;
     VDP_RegWrite((HI_U32)(&(pVdpReg->V0_DRAWMODE.u32) + u32Data * VID_OFFSET), V0_DRAWMODE.u32); 
-
+#endif
     return ;
 }
     
 HI_VOID  VDP_VID_SetZmeEnable   (HI_U32 u32Data, VDP_ZME_MODE_E enMode,HI_U32 u32bEnable)
 {
+#if 1
+#warning TODO: VDP_VID_SetZmeEnable
+	printk("VDP_VID_SetZmeEnable: TODO\n");
+#else
     volatile U_V0_HSP V0_HSP;
     volatile U_V0_VSP V0_VSP;
     
@@ -1421,7 +1644,7 @@ HI_VOID  VDP_VID_SetZmeEnable   (HI_U32 u32Data, VDP_ZME_MODE_E enMode,HI_U32 u3
         V0_VSP.bits.vchfir_en = 1;
         VDP_RegWrite((HI_U32)(&(pVdpReg->V0_VSP.u32) + u32Data * VID_OFFSET), V0_VSP.u32); 
     }
-
+#endif
     return ;
 }
 
@@ -1431,6 +1654,10 @@ HI_VOID  VDP_VID_SetZmeEnable   (HI_U32 u32Data, VDP_ZME_MODE_E enMode,HI_U32 u3
     
 HI_VOID  VDP_VID_SetZmePhase    (HI_U32 u32Data, VDP_ZME_MODE_E enMode,HI_S32 s32Phase)
 {
+#if 1
+#warning TODO: VDP_VID_SetZmePhase
+	printk("VDP_VID_SetZmePhase: TODO\n");
+#else
     volatile U_V0_HLOFFSET  V0_HLOFFSET;
     volatile U_V0_HCOFFSET  V0_HCOFFSET;
     volatile U_V0_VOFFSET   V0_VOFFSET;
@@ -1484,13 +1711,17 @@ HI_VOID  VDP_VID_SetZmePhase    (HI_U32 u32Data, VDP_ZME_MODE_E enMode,HI_S32 s3
         V0_VBOFFSET.bits.vbchroma_offset = s32Phase;
         VDP_RegWrite((HI_U32)(&(pVdpReg->V0_VBOFFSET.u32) + u32Data * VID_OFFSET), V0_VBOFFSET.u32); 
     }
-
+#endif
     return ;
 }
     
     
 HI_VOID  VDP_VID_SetZmeFirEnable(HI_U32 u32Data, VDP_ZME_MODE_E enMode, HI_U32 u32bEnable)
 {
+#if 1
+#warning TODO
+	printk("TODO\n");
+#else
     volatile U_V0_HSP V0_HSP;
     volatile U_V0_VSP V0_VSP;
     
@@ -1527,7 +1758,7 @@ HI_VOID  VDP_VID_SetZmeFirEnable(HI_U32 u32Data, VDP_ZME_MODE_E enMode, HI_U32 u
          V0_VSP.bits.vchfir_en = u32bEnable;
          VDP_RegWrite((HI_U32)(&(pVdpReg->V0_VSP.u32) + u32Data * VID_OFFSET), V0_VSP.u32); 
      }
-
+#endif
     return ;
 }
 
@@ -1535,6 +1766,10 @@ HI_VOID  VDP_VID_SetZmeFirEnable(HI_U32 u32Data, VDP_ZME_MODE_E enMode, HI_U32 u
     
 HI_VOID  VDP_VID_SetZmeMidEnable   (HI_U32 u32Data, VDP_ZME_MODE_E enMode,HI_U32 u32bEnable)
 {
+#if 1
+#warning TODO
+	printk("TODO\n");
+#else
     volatile U_V0_HSP V0_HSP;
     volatile U_V0_VSP V0_VSP;
     
@@ -1572,13 +1807,17 @@ HI_VOID  VDP_VID_SetZmeMidEnable   (HI_U32 u32Data, VDP_ZME_MODE_E enMode,HI_U32
         V0_VSP.bits.vchmid_en = u32bEnable;
         VDP_RegWrite((HI_U32)(&(pVdpReg->V0_VSP.u32) + u32Data * VID_OFFSET), V0_VSP.u32); 
     }
-
+#endif
     return ;
 }
 
     
 HI_VOID  VDP_VID_SetZmeVerRatio(HI_U32 u32Data, HI_U32 u32Ratio)
 {
+#if 1
+#warning TODO
+	printk("TODO\n");
+#else
     volatile U_V0_VSR V0_VSR;
     
     if(u32Data >= VID_MAX)
@@ -1590,12 +1829,16 @@ HI_VOID  VDP_VID_SetZmeVerRatio(HI_U32 u32Data, HI_U32 u32Ratio)
     V0_VSR.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->V0_VSR.u32) + u32Data * VID_OFFSET));
     V0_VSR.bits.vratio = u32Ratio;
     VDP_RegWrite((HI_U32)(&(pVdpReg->V0_VSR.u32) + u32Data * VID_OFFSET), V0_VSR.u32); 
-
+#endif
     return ;
 }
 
 HI_VOID  VDP_VID_SetZmeInFmt(HI_U32 u32Data, VDP_PROC_FMT_E u32Fmt)
 {
+#if 1
+#warning TODO
+	printk("TODO\n");
+#else
     volatile U_V0_VSP V0_VSP;
     
     if(u32Data >= VID_MAX)
@@ -1607,12 +1850,16 @@ HI_VOID  VDP_VID_SetZmeInFmt(HI_U32 u32Data, VDP_PROC_FMT_E u32Fmt)
     V0_VSP.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->V0_VSP.u32) + u32Data * VID_OFFSET));
     V0_VSP.bits.zme_in_fmt = u32Fmt;
     VDP_RegWrite((HI_U32)(&(pVdpReg->V0_VSP.u32) + u32Data * VID_OFFSET), V0_VSP.u32); 
-
+#endif
     return ;
 }
 
 HI_VOID  VDP_VID_SetZmeOutFmt(HI_U32 u32Data, VDP_PROC_FMT_E u32Fmt)
 {
+#if 1
+#warning TODO
+	printk("TODO\n");
+#else
     volatile U_V0_VSP V0_VSP;
     
     if(u32Data >= VID_MAX)
@@ -1624,13 +1871,17 @@ HI_VOID  VDP_VID_SetZmeOutFmt(HI_U32 u32Data, VDP_PROC_FMT_E u32Fmt)
     V0_VSP.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->V0_VSP.u32) + u32Data * VID_OFFSET));
     V0_VSP.bits.zme_out_fmt = u32Fmt;
     VDP_RegWrite((HI_U32)(&(pVdpReg->V0_VSP.u32) + u32Data * VID_OFFSET), V0_VSP.u32); 
-
+#endif
     return ;
 }
 
 // Vou set coef or lut read update
 HI_VOID  VDP_VID_SetParaUpd       (HI_U32 u32Data, VDP_VID_PARA_E enMode)
 {
+#if 1
+#warning TODO
+	printk("TODO\n");
+#else
     volatile U_V0_PARAUP V0_PARAUP;
     V0_PARAUP.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->V0_PARAUP.u32) + u32Data * VID_OFFSET));
     
@@ -1657,12 +1908,17 @@ HI_VOID  VDP_VID_SetParaUpd       (HI_U32 u32Data, VDP_VID_PARA_E enMode)
     }
     
     VDP_RegWrite((HI_U32)(&(pVdpReg->V0_PARAUP.u32) + u32Data * VID_OFFSET), V0_PARAUP.u32); 
+#endif
     return ;
 }
 
 
 HI_VOID VDP_VID_SetZmeHfirOrder(HI_U32 u32Data, HI_U32 u32HfirOrder)
 {
+#if 1
+#warning TODO
+	printk("TODO\n");
+#else
     volatile U_V0_HSP V0_HSP;
     
     if(u32Data >= VID_MAX)
@@ -1674,14 +1930,18 @@ HI_VOID VDP_VID_SetZmeHfirOrder(HI_U32 u32Data, HI_U32 u32HfirOrder)
     V0_HSP.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->V0_HSP.u32) + u32Data * VID_OFFSET));
     V0_HSP.bits.hfir_order = u32HfirOrder;
     VDP_RegWrite((HI_U32)(&(pVdpReg->V0_HSP.u32) + u32Data * VID_OFFSET), V0_HSP.u32); 
-
+#endif
     return ;
 }
 
 HI_VOID VDP_VID_SetZmeCoefAddr(HI_U32 u32Data, HI_U32 u32Mode, HI_U32 u32Addr, HI_U32 u32AddrChr)
 {
 
-    
+#if 1
+#warning TODO
+	printk("TODO\n");
+#else
+
     volatile U_V0_HLCOEFAD V0_HLCOEFAD;
     volatile U_V0_HCCOEFAD V0_HCCOEFAD;
     volatile U_V0_VLCOEFAD V0_VLCOEFAD;
@@ -1720,7 +1980,7 @@ HI_VOID VDP_VID_SetZmeCoefAddr(HI_U32 u32Data, HI_U32 u32Mode, HI_U32 u32Addr, H
     {
         HI_PRINT("Error,VDP_VID_SetZmeCoefAddr() Select a Wrong Mode!\n");
     }
-
+#endif
     return ;
 }
 
@@ -1728,6 +1988,10 @@ HI_VOID VDP_VID_SetZmeCoefAddr(HI_U32 u32Data, HI_U32 u32Mode, HI_U32 u32Addr, H
 HI_VOID VDP_VID_SetZmeHorRatio(HI_U32 u32Data, HI_U32 u32Ratio)
 
 {
+#if 1
+#warning TODO
+	printk("TODO\n");
+#else
     volatile U_V0_HSP V0_HSP;
     
     if(u32Data >= VID_MAX)
@@ -1739,7 +2003,7 @@ HI_VOID VDP_VID_SetZmeHorRatio(HI_U32 u32Data, HI_U32 u32Ratio)
     V0_HSP.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->V0_HSP.u32) + u32Data * VID_OFFSET));
     V0_HSP.bits.hratio = u32Ratio;
     VDP_RegWrite((HI_U32)(&(pVdpReg->V0_HSP.u32) + u32Data * VID_OFFSET), V0_HSP.u32); 
-
+#endif
     return ;
 }
 
@@ -1748,6 +2012,10 @@ HI_VOID VDP_VID_SetZmeHorRatio(HI_U32 u32Data, HI_U32 u32Ratio)
 //-------------------------------------------------------------------
 HI_VOID  VDP_VP_SetThreeDimDofEnable    (HI_U32 u32Data, HI_U32 bEnable)
 {
+#if 1
+#warning TODO
+	printk("TODO\n");
+#else
     volatile U_VP0_DOF_CTRL  VP0_DOF_CTRL;
     
     if(u32Data >= VID_MAX)
@@ -1759,10 +2027,15 @@ HI_VOID  VDP_VP_SetThreeDimDofEnable    (HI_U32 u32Data, HI_U32 bEnable)
     VP0_DOF_CTRL.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->VP0_DOF_CTRL.u32)));
     VP0_DOF_CTRL.bits.dof_en = bEnable;
     VDP_RegWrite((HI_U32)(&(pVdpReg->VP0_DOF_CTRL.u32)), VP0_DOF_CTRL.u32);
+#endif
 }
 
 HI_VOID  VDP_VP_SetThreeDimDofStep(HI_U32 u32Data, HI_S32 s32LStep, HI_S32 s32RStep)
 {
+#if 1
+#warning TODO
+	printk("TODO\n");
+#else
     volatile U_VP0_DOF_STEP  VP0_DOF_STEP;
     
     if(u32Data >= VID_MAX)
@@ -1775,6 +2048,7 @@ HI_VOID  VDP_VP_SetThreeDimDofStep(HI_U32 u32Data, HI_S32 s32LStep, HI_S32 s32RS
     VP0_DOF_STEP.bits.right_step= s32RStep;
     VP0_DOF_STEP.bits.left_step = s32LStep;
     VDP_RegWrite((HI_U32)(&(pVdpReg->VP0_DOF_STEP.u32)), VP0_DOF_STEP.u32);
+#endif
 }
 
 
@@ -1782,11 +2056,11 @@ HI_VOID  VDP_VP_SetThreeDimDofStep(HI_U32 u32Data, HI_S32 s32LStep, HI_S32 s32RS
 
 HI_VOID  VDP_VP_SetLayerReso     (HI_U32 u32Data, VDP_DISP_RECT_S  stRect)
 {
-    volatile U_VP0_VFPOS VP0_VFPOS;
-    volatile U_VP0_VLPOS VP0_VLPOS;
-    volatile U_VP0_DFPOS VP0_DFPOS;
-    volatile U_VP0_DLPOS VP0_DLPOS;
-    volatile U_VP0_IRESO VP0_IRESO;
+    /*volatile*/ U_VP0_VFPOS VP0_VFPOS;
+    /*volatile*/ U_VP0_VLPOS VP0_VLPOS;
+    /*volatile*/ U_VP0_DFPOS VP0_DFPOS;
+    /*volatile*/ U_VP0_DLPOS VP0_DLPOS;
+    /*volatile*/ U_VP0_IRESO VP0_IRESO;
     
     if(u32Data >= VID_MAX)
     {
@@ -1797,37 +2071,41 @@ HI_VOID  VDP_VP_SetLayerReso     (HI_U32 u32Data, VDP_DISP_RECT_S  stRect)
     
 
     /*video position */ 
-    VP0_VFPOS.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->VP0_VFPOS.u32) + u32Data * VID_OFFSET));
+    VP0_VFPOS.u32 = VDP_RegRead1((HI_U32)(&(pVdpReg->VP0_VFPOS.u32) + u32Data * VID_OFFSET));
     VP0_VFPOS.bits.video_xfpos = stRect.u32VX;
     VP0_VFPOS.bits.video_yfpos = stRect.u32VY;
-    VDP_RegWrite((HI_U32)(&(pVdpReg->VP0_VFPOS.u32) + u32Data * VID_OFFSET), VP0_VFPOS.u32); 
+    VDP_RegWrite1((HI_U32)(&(pVdpReg->VP0_VFPOS.u32) + u32Data * VID_OFFSET), VP0_VFPOS.u32);
 
-    VP0_VLPOS.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->VP0_VLPOS.u32) + u32Data * VID_OFFSET));
+    VP0_VLPOS.u32 = VDP_RegRead1((HI_U32)(&(pVdpReg->VP0_VLPOS.u32) + u32Data * VID_OFFSET));
     VP0_VLPOS.bits.video_xlpos = stRect.u32VX + stRect.u32OWth - 1;
     VP0_VLPOS.bits.video_ylpos = stRect.u32VY + stRect.u32OHgt - 1;
-    VDP_RegWrite((HI_U32)(&(pVdpReg->VP0_VLPOS.u32) + u32Data * VID_OFFSET), VP0_VLPOS.u32); 
+    VDP_RegWrite1((HI_U32)(&(pVdpReg->VP0_VLPOS.u32) + u32Data * VID_OFFSET), VP0_VLPOS.u32);
 
-    VP0_DFPOS.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->VP0_DFPOS.u32) + u32Data * VID_OFFSET));
+    VP0_DFPOS.u32 = VDP_RegRead1((HI_U32)(&(pVdpReg->VP0_DFPOS.u32) + u32Data * VID_OFFSET));
     VP0_DFPOS.bits.disp_xfpos = stRect.u32DXS;
     VP0_DFPOS.bits.disp_yfpos = stRect.u32DYS;
-    VDP_RegWrite((HI_U32)(&(pVdpReg->VP0_DFPOS.u32) + u32Data * VID_OFFSET), VP0_DFPOS.u32); 
+    VDP_RegWrite1((HI_U32)(&(pVdpReg->VP0_DFPOS.u32) + u32Data * VID_OFFSET), VP0_DFPOS.u32);
 
-    VP0_DLPOS.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->VP0_DLPOS.u32) + u32Data * VID_OFFSET));
+    VP0_DLPOS.u32 = VDP_RegRead1((HI_U32)(&(pVdpReg->VP0_DLPOS.u32) + u32Data * VID_OFFSET));
     VP0_DLPOS.bits.disp_xlpos = stRect.u32DXL-1;
     VP0_DLPOS.bits.disp_ylpos = stRect.u32DYL-1;
-    VDP_RegWrite((HI_U32)(&(pVdpReg->VP0_DLPOS.u32) + u32Data * VID_OFFSET), VP0_DLPOS.u32); 
+    VDP_RegWrite1((HI_U32)(&(pVdpReg->VP0_DLPOS.u32) + u32Data * VID_OFFSET), VP0_DLPOS.u32);
 
     //VDP_RegWrite((HI_U32)(&(pVdpReg->VP0_IRESO.u32) + u32Data * VID_OFFSET), VP0_IRESO.u32); 
-    VP0_IRESO.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->VP0_IRESO.u32) + u32Data * VID_OFFSET));
+    VP0_IRESO.u32 = VDP_RegRead1((HI_U32)(&(pVdpReg->VP0_IRESO.u32) + u32Data * VID_OFFSET));
     VP0_IRESO.bits.iw = stRect.u32IWth - 1;
     VP0_IRESO.bits.ih = stRect.u32IHgt - 1;
-    VDP_RegWrite((HI_U32)(&(pVdpReg->VP0_IRESO.u32) + u32Data * VID_OFFSET), VP0_IRESO.u32); 
+    VDP_RegWrite1((HI_U32)(&(pVdpReg->VP0_IRESO.u32) + u32Data * VID_OFFSET), VP0_IRESO.u32);
 
    return ;
 }   
 
 HI_VOID  VDP_VP_SetVideoPos     (HI_U32 u32Data, VDP_RECT_S  stRect)
 {
+#if 1
+#warning TODO
+	printk("TODO\n");
+#else
     volatile U_VP0_VFPOS VP0_VFPOS;
    volatile U_VP0_VLPOS VP0_VLPOS;
    
@@ -1848,12 +2126,17 @@ HI_VOID  VDP_VP_SetVideoPos     (HI_U32 u32Data, VDP_RECT_S  stRect)
    VP0_VLPOS.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->VP0_VLPOS.u32) + u32Data * VP_OFFSET));
    VP0_VLPOS.bits.video_xlpos = stRect.u32X + stRect.u32Wth - 1;
    VP0_VLPOS.bits.video_ylpos = stRect.u32Y + stRect.u32Hgt - 1;
-   VDP_RegWrite((HI_U32)(&(pVdpReg->VP0_VLPOS.u32) + u32Data * VP_OFFSET), VP0_VLPOS.u32); 
+   VDP_RegWrite((HI_U32)(&(pVdpReg->VP0_VLPOS.u32) + u32Data * VP_OFFSET), VP0_VLPOS.u32);
+#endif
    return ;
 }   
     
 HI_VOID  VDP_VP_SetDispPos     (HI_U32 u32Data, VDP_RECT_S  stRect)
 {
+#if 1
+#warning TODO
+	printk("TODO\n");
+#else
    volatile U_VP0_DFPOS VP0_DFPOS;
    volatile U_VP0_DLPOS VP0_DLPOS;
    
@@ -1873,11 +2156,16 @@ HI_VOID  VDP_VP_SetDispPos     (HI_U32 u32Data, VDP_RECT_S  stRect)
    VP0_DLPOS.bits.disp_xlpos = stRect.u32X + stRect.u32Wth - 1;
    VP0_DLPOS.bits.disp_ylpos = stRect.u32Y + stRect.u32Hgt - 1;
    VDP_RegWrite((HI_U32)(&(pVdpReg->VP0_DLPOS.u32) + u32Data * VP_OFFSET), VP0_DLPOS.u32); 
+#endif
    return ;
 }   
     
 HI_VOID  VDP_VP_SetInReso      (HI_U32 u32Data, VDP_RECT_S  stRect)
 {
+#if 1
+#warning TODO
+	printk("TODO\n");
+#else
     volatile U_VP0_IRESO VP0_IRESO;
 
     if(u32Data >= VP_MAX)
@@ -1890,13 +2178,17 @@ HI_VOID  VDP_VP_SetInReso      (HI_U32 u32Data, VDP_RECT_S  stRect)
     VP0_IRESO.bits.iw = stRect.u32Wth - 1;
     VP0_IRESO.bits.ih = stRect.u32Hgt - 1;
     VDP_RegWrite((HI_U32)(&(pVdpReg->VP0_IRESO.u32) + u32Data * VP_OFFSET), VP0_IRESO.u32); 
-
+#endif
     return ;
 }
  
 
 HI_VOID  VDP_VP_SetLayerGalpha (HI_U32 u32Data, HI_U32 u32Alpha)
 {
+#if 1
+#warning TODO
+	printk("TODO\n");
+#else
     volatile U_VP0_CTRL VP0_CTRL;
     
     //special for bk alpha = video alpha
@@ -1917,12 +2209,16 @@ HI_VOID  VDP_VP_SetLayerGalpha (HI_U32 u32Data, HI_U32 u32Alpha)
     VP0_ALPHA.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->VP0_ALPHA.u32)));
     VP0_ALPHA.bits.vbk_alpha = u32Alpha;
     VDP_RegWrite((HI_U32)&(pVdpReg->VP0_ALPHA.u32), VP0_ALPHA.u32); 
-
+#endif
     return ;
 }
 
 HI_VOID  VDP_VP_SetLayerBkg(HI_U32 u32Data, VDP_BKG_S stBkg)
 {
+#if 1
+#warning TODO
+	printk("TODO\n");
+#else
     volatile U_VP0_BK VP0_BK;
 
     if(u32Data == VDP_LAYER_VP0)
@@ -1941,7 +2237,7 @@ HI_VOID  VDP_VP_SetLayerBkg(HI_U32 u32Data, VDP_BKG_S stBkg)
     {
         HI_PRINT("Error,VDP_VP_SetLayerBkg() Select Wrong VP Layer ID\n");
     }
-
+#endif
     return ;
 }
 
@@ -1965,7 +2261,7 @@ HI_VOID VDP_VP_SetDispMode(HI_U32 u32Data, VDP_DISP_MODE_E enDispMode)
 
 HI_VOID  VDP_VP_SetRegUp  (HI_U32 u32Data)
 {
-    volatile U_VP0_UPD VP0_UPD;
+    /*volatile*/ U_VP0_UPD VP0_UPD;
 
     /* VP layer register update */
     if(u32Data >= VP_MAX)
@@ -1975,14 +2271,13 @@ HI_VOID  VDP_VP_SetRegUp  (HI_U32 u32Data)
     }
 
     VP0_UPD.bits.regup = 0x1;
-    VDP_RegWrite((HI_U32)(&(pVdpReg->VP0_UPD.u32) + u32Data * VP_OFFSET), VP0_UPD.u32); 
-
+    VDP_RegWrite1((HI_U32)(&(pVdpReg->VP0_UPD.u32) + u32Data * VP_OFFSET), VP0_UPD.u32);
     return ;
 }
 
 HI_VOID VDP_VP_SetMuteEnable     (HI_U32 u32Data, HI_U32 bEnable)
 {
-    volatile U_VP0_CTRL VP0_CTRL;
+    /*volatile*/ U_VP0_CTRL VP0_CTRL;
 
     if(u32Data >= VP_MAX)
     {
@@ -1990,15 +2285,19 @@ HI_VOID VDP_VP_SetMuteEnable     (HI_U32 u32Data, HI_U32 bEnable)
         return ;
     }
 
-    VP0_CTRL.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->VP0_CTRL.u32) + u32Data * VP_OFFSET));
+    VP0_CTRL.u32 = VDP_RegRead1((HI_U32)(&(pVdpReg->VP0_CTRL.u32) + u32Data * VP_OFFSET));
     VP0_CTRL.bits.mute_en = bEnable;
-    VDP_RegWrite((HI_U32)(&(pVdpReg->VP0_CTRL.u32) + u32Data * VP_OFFSET), VP0_CTRL.u32); 
+    VDP_RegWrite1((HI_U32)(&(pVdpReg->VP0_CTRL.u32) + u32Data * VP_OFFSET), VP0_CTRL.u32);
 
     return ;
 }
 
 HI_VOID  VDP_VP0_SetAccCad(HI_U32 u32Data, HI_U32 u32addr)
 {
+#if 1
+#warning TODO
+	printk("TODO\n");
+#else
     volatile U_VP0_ACC_CAD VP0_ACC_CAD;
     VP0_ACC_CAD.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->VP0_ACC_CAD.u32) + u32Data * VID_OFFSET));
     
@@ -2011,11 +2310,16 @@ HI_VOID  VDP_VP0_SetAccCad(HI_U32 u32Data, HI_U32 u32addr)
            VP0_ACC_CAD.bits.coef_addr= u32addr;
     
     VDP_RegWrite((HI_U32)(&(pVdpReg->VP0_ACC_CAD.u32) + u32Data * VID_OFFSET), VP0_ACC_CAD.u32); 
+#endif
     return ;
 }
 
 HI_VOID  VDP_VP0_SetParaUpd       (HI_U32 u32Data, VDP_DISP_COEFMODE_E  enMode)
 {
+#if 1
+#warning TODO
+	printk("TODO\n");
+#else
     volatile U_VP0_PARAUP  VP0_PARAUP;
     VP0_PARAUP.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->VP0_PARAUP.u32) + u32Data * VID_OFFSET));
     
@@ -2037,11 +2341,16 @@ HI_VOID  VDP_VP0_SetParaUpd       (HI_U32 u32Data, VDP_DISP_COEFMODE_E  enMode)
 
     
     VDP_RegWrite((HI_U32)(&(pVdpReg->VP0_PARAUP.u32) + u32Data * VID_OFFSET), VP0_PARAUP.u32); 
+#endif
     return ;
 }
 
 HI_VOID VDP_VP_SetAccThd( HI_U32 u32Data,ACCTHD_S stAccThd)
 {
+#if 1
+#warning TODO
+	printk("TODO\n");
+#else
     volatile U_VP0_ACCTHD1 VP0_ACCTHD1;
     volatile U_VP0_ACCTHD2 VP0_ACCTHD2;
 
@@ -2064,11 +2373,15 @@ HI_VOID VDP_VP_SetAccThd( HI_U32 u32Data,ACCTHD_S stAccThd)
     
     VDP_RegWrite((HI_U32)(&(pVdpReg->VP0_ACCTHD2.u32)+ u32Data * VP_OFFSET), VP0_ACCTHD2.u32);
     VDP_RegWrite((HI_U32)(&(pVdpReg->VP0_ACCTHD1.u32) + u32Data * VP_OFFSET), VP0_ACCTHD1.u32);
-
+#endif
 }
 
 HI_VOID VDP_VP_SetAccTab(HI_U32 u32Data,HI_U32 *upTable)
 {
+#if 1
+#warning TODO
+	printk("TODO\n");
+#else
     volatile U_VP0_ACCLOWN  VP0_ACCLOW[3];
     volatile U_VP0_ACCMEDN  VP0_ACCMED[3];
     volatile U_VP0_ACCHIGHN VP0_ACCHIGH[3];
@@ -2127,11 +2440,15 @@ HI_VOID VDP_VP_SetAccTab(HI_U32 u32Data,HI_U32 *upTable)
         VP0_ACCMH[ii].bits.table_data3n = upTable[36 + 2 + ii*3];
         VDP_RegWrite((HI_U32)(&(pVdpReg->VP0_ACCMHN[ii].u32)+ u32Data * VP_OFFSET), VP0_ACCMH[ii].u32);
     }
-
+#endif
 }
 
 HI_VOID VDP_VP_SetAccCtrl(HI_U32 u32Data,HI_U32 uAccEn, HI_U32 uAccMode)
 {
+#if 1
+#warning TODO
+	printk("TODO\n");
+#else
     volatile U_VP0_ACCTHD1  VP0_ACCTHD1;
     
      if(u32Data >= VP_MAX)
@@ -2146,7 +2463,7 @@ HI_VOID VDP_VP_SetAccCtrl(HI_U32 u32Data,HI_U32 uAccEn, HI_U32 uAccMode)
     VP0_ACCTHD1.bits.acc_en   = uAccEn  ;
     VP0_ACCTHD1.bits.acc_mode = uAccMode;
     VDP_RegWrite((HI_U32)(&(pVdpReg->VP0_ACCTHD1.u32)+ u32Data * VP_OFFSET), VP0_ACCTHD1.u32);
-
+#endif
 }
 
 //HI_VOID VDP_VP_SetAccWeightAddr(HI_U32 u32Data,HI_U32 uAccAddr)
@@ -2165,6 +2482,10 @@ HI_VOID VDP_VP_SetAccCtrl(HI_U32 u32Data,HI_U32 uAccEn, HI_U32 uAccMode)
 
 HI_VOID VDP_VP_SetAccRst(HI_U32 u32Data,HI_U32 uAccRst)
 {
+#if 1
+#warning TODO
+	printk("TODO\n");
+#else
     volatile U_VP0_ACCTHD2 VP0_ACCTHD2;
     
     if(u32Data >= VP_MAX)
@@ -2179,7 +2500,7 @@ HI_VOID VDP_VP_SetAccRst(HI_U32 u32Data,HI_U32 uAccRst)
     VP0_ACCTHD2.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->VP0_ACCTHD2.u32)+ u32Data * VP_OFFSET));
     VP0_ACCTHD2.bits.acc_rst   = uAccRst  ;
     VDP_RegWrite((HI_U32)(&(pVdpReg->VP0_ACCTHD2.u32)+ u32Data * VP_OFFSET), VP0_ACCTHD2.u32);
-
+#endif
 }
 
 //-------------------------------------------------------------------
@@ -2451,7 +2772,7 @@ HI_VOID VDP_DHD_Reset(HI_U32 u32hd_id)
         unsigned int    intf_en               : 1   ; // [31] 
     } bits;
 */
-    DHD0_CTRL.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->DHD0_CTRL.u32)+u32hd_id*CHN_OFFSET));
+    DHD0_CTRL.u32 = VDP_RegRead1((HI_U32)(&(pVdpReg->DHD0_CTRL.u32)+u32hd_id*CHN_OFFSET));
     DHD0_CTRL.bits.intf_en = 0;
     DHD0_CTRL.bits.cbar_en = 0;
     DHD0_CTRL.bits.fpga_lmt_en = 0;
@@ -2459,7 +2780,9 @@ HI_VOID VDP_DHD_Reset(HI_U32 u32hd_id)
     DHD0_CTRL.bits.gmm_en = 0;
     DHD0_CTRL.bits.disp_mode = 0;
     DHD0_CTRL.bits.regup = 1;
-    VDP_RegWrite((HI_U32)(&(pVdpReg->DHD0_CTRL.u32)+u32hd_id*CHN_OFFSET),DHD0_CTRL.u32);
+    DHD0_CTRL.bits.bit15 = 0;
+    DHD0_CTRL.bits.bit17 = 0;
+    VDP_RegWrite1((HI_U32)(&(pVdpReg->DHD0_CTRL.u32)+u32hd_id*CHN_OFFSET),DHD0_CTRL.u32);
 }
 
 
@@ -2496,43 +2819,44 @@ HI_VOID VDP_DISP_SetProToInterEnable   (HI_U32 u32hd_id, HI_U32 u32Enable)
         return ;
     }
 
-    DHD0_CTRL.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->DHD0_CTRL.u32)+u32hd_id*CHN_OFFSET));
+    DHD0_CTRL.u32 = VDP_RegRead1((HI_U32)(&(pVdpReg->DHD0_CTRL.u32)+u32hd_id*CHN_OFFSET));
     DHD0_CTRL.bits.p2i_en = u32Enable;
-    VDP_RegWrite((HI_U32)(&(pVdpReg->DHD0_CTRL.u32)+u32hd_id*CHN_OFFSET),DHD0_CTRL.u32);
+    VDP_RegWrite1((HI_U32)(&(pVdpReg->DHD0_CTRL.u32)+u32hd_id*CHN_OFFSET),DHD0_CTRL.u32);
 }
 
 
 HI_VOID VDP_DISP_SetDispMode  (HI_U32 u32hd_id, HI_U32 u32DispMode)
 {
-    volatile U_DHD0_CTRL DHD0_CTRL;
+    /*volatile*/ U_DHD0_CTRL DHD0_CTRL;
     if(u32hd_id >= CHN_MAX)
     {
         HI_PRINT("Error,VDP_DISP_SetFramePackingEn Select Wrong CHANNEL ID\n");
         return ;
     }
 
-    DHD0_CTRL.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->DHD0_CTRL.u32)+u32hd_id*CHN_OFFSET));
+    DHD0_CTRL.u32 = VDP_RegRead1((HI_U32)(&(pVdpReg->DHD0_CTRL.u32)+u32hd_id*CHN_OFFSET));
     DHD0_CTRL.bits.disp_mode = u32DispMode;
-    VDP_RegWrite((HI_U32)(&(pVdpReg->DHD0_CTRL.u32)+u32hd_id*CHN_OFFSET),DHD0_CTRL.u32);
+    VDP_RegWrite1((HI_U32)(&(pVdpReg->DHD0_CTRL.u32)+u32hd_id*CHN_OFFSET),DHD0_CTRL.u32);
 }
 
 
 HI_VOID VDP_DISP_SetHdmiMode  (HI_U32 u32hd_id, HI_U32 u32hdmi_md)
 {
-    volatile U_DHD0_CTRL DHD0_CTRL;
+    /*volatile*/ U_DHD0_CTRL DHD0_CTRL;
     if(u32hd_id >= CHN_MAX)
     {
         HI_PRINT("Error,VDP_DISP_SetHdmiMode Select Wrong CHANNEL ID\n");
         return ;
     }
 
-    DHD0_CTRL.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->DHD0_CTRL.u32)+u32hd_id*CHN_OFFSET));
+    DHD0_CTRL.u32 = VDP_RegRead1((HI_U32)(&(pVdpReg->DHD0_CTRL.u32)+u32hd_id*CHN_OFFSET));
     DHD0_CTRL.bits.hdmi_mode = u32hdmi_md;
-    VDP_RegWrite((HI_U32)(&(pVdpReg->DHD0_CTRL.u32)+u32hd_id*CHN_OFFSET),DHD0_CTRL.u32);
+    VDP_RegWrite1((HI_U32)(&(pVdpReg->DHD0_CTRL.u32)+u32hd_id*CHN_OFFSET),DHD0_CTRL.u32);
 }
 
 HI_VOID VDP_DISP_SetHdmiClk  (HI_U32 u32hd_id, HI_U32 u32hdmi_clkdiv)
 {
+#if 0
     U_PERI_CRG54 PERI_CRG54Tmp;
 
     PERI_CRG54Tmp.u32 = g_pstRegCrg->PERI_CRG54.u32;
@@ -2555,19 +2879,20 @@ HI_VOID VDP_DISP_SetHdmiClk  (HI_U32 u32hd_id, HI_U32 u32hdmi_clkdiv)
         PERI_CRG54Tmp.bits.vo_hd_hdmi_clk_sel = u32hdmi_clkdiv;
     }
     g_pstRegCrg->PERI_CRG54.u32= PERI_CRG54Tmp.u32;
+#endif
 }
 HI_VOID VDP_DISP_SetRegUp (HI_U32 u32hd_id)
 {
-    volatile U_DHD0_CTRL DHD0_CTRL;
+    /*volatile*/ U_DHD0_CTRL DHD0_CTRL;
     if(u32hd_id >= CHN_MAX)
     {
         HI_PRINT("Error,VDP_DISP_SetIntfEnable Select Wrong CHANNEL ID\n");
         return ;
     }
         
-    DHD0_CTRL.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->DHD0_CTRL.u32)+u32hd_id*CHN_OFFSET));
+    DHD0_CTRL.u32 = VDP_RegRead1((HI_U32)(&(pVdpReg->DHD0_CTRL.u32)+u32hd_id*CHN_OFFSET));
     DHD0_CTRL.bits.regup = 0x1;
-    VDP_RegWrite((HI_U32)(&(pVdpReg->DHD0_CTRL.u32)+u32hd_id*CHN_OFFSET),DHD0_CTRL.u32);
+    VDP_RegWrite1((HI_U32)(&(pVdpReg->DHD0_CTRL.u32)+u32hd_id*CHN_OFFSET),DHD0_CTRL.u32);
 }
 
 
@@ -2700,8 +3025,8 @@ HI_VOID VDP_DISP_SetCbarSel(HI_U32 u32hd_id,HI_U32 u32_cbar_sel)
 HI_VOID VDP_DISP_SetVtThd(HI_U32 u32hd_id, HI_U32 u32uthdnum, HI_U32 u32vtthd)
 {
     
-    volatile U_DHD0_VTTHD DHD0_VTTHD;
-    volatile U_DHD0_VTTHD3 DHD0_VTTHD3;
+    /*volatile*/ U_DHD0_VTTHD DHD0_VTTHD;
+    /*volatile*/ U_DHD0_VTTHD3 DHD0_VTTHD3;
     if(u32hd_id >= CHN_MAX)
     {
         HI_PRINT("Error,VDP_DISP_SetVtThd Select Wrong CHANNEL ID\n");
@@ -2710,32 +3035,32 @@ HI_VOID VDP_DISP_SetVtThd(HI_U32 u32hd_id, HI_U32 u32uthdnum, HI_U32 u32vtthd)
 
     if(u32uthdnum == 1)
     {
-        DHD0_VTTHD.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->DHD0_VTTHD.u32)+u32hd_id*CHN_OFFSET));
+        DHD0_VTTHD.u32 = VDP_RegRead1((HI_U32)(&(pVdpReg->DHD0_VTTHD.u32)+u32hd_id*CHN_OFFSET));
         DHD0_VTTHD.bits.vtmgthd1 = u32vtthd;
-        VDP_RegWrite((HI_U32)(&(pVdpReg->DHD0_VTTHD.u32)+u32hd_id*CHN_OFFSET), DHD0_VTTHD.u32);
+        VDP_RegWrite1((HI_U32)(&(pVdpReg->DHD0_VTTHD.u32)+u32hd_id*CHN_OFFSET), DHD0_VTTHD.u32);
     }
     else if(u32uthdnum == 2)
     {
-        DHD0_VTTHD.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->DHD0_VTTHD.u32)+u32hd_id*CHN_OFFSET));        
+        DHD0_VTTHD.u32 = VDP_RegRead1((HI_U32)(&(pVdpReg->DHD0_VTTHD.u32)+u32hd_id*CHN_OFFSET));
         DHD0_VTTHD.bits.vtmgthd2 = u32vtthd;
-        VDP_RegWrite((HI_U32)(&(pVdpReg->DHD0_VTTHD.u32)+u32hd_id*CHN_OFFSET), DHD0_VTTHD.u32);
+        VDP_RegWrite1((HI_U32)(&(pVdpReg->DHD0_VTTHD.u32)+u32hd_id*CHN_OFFSET), DHD0_VTTHD.u32);
     }
     else if(u32uthdnum== 3)
     {
-        DHD0_VTTHD3.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->DHD0_VTTHD3.u32)+u32hd_id*CHN_OFFSET));        
+        DHD0_VTTHD3.u32 = VDP_RegRead1((HI_U32)(&(pVdpReg->DHD0_VTTHD3.u32)+u32hd_id*CHN_OFFSET));
         DHD0_VTTHD3.bits.vtmgthd3 = u32vtthd;
-        VDP_RegWrite((HI_U32)(&(pVdpReg->DHD0_VTTHD3.u32)+u32hd_id*CHN_OFFSET), DHD0_VTTHD3.u32);            
+        VDP_RegWrite1((HI_U32)(&(pVdpReg->DHD0_VTTHD3.u32)+u32hd_id*CHN_OFFSET), DHD0_VTTHD3.u32);
     }
 }
 
 HI_VOID VDP_DISP_SetIntMask  (HI_U32 u32masktypeen)
 {
-    volatile U_VOINTMSK VOINTMSK;
+    /*volatile*/ U_VOINTMSK VOINTMSK;
 
     /* Dispaly interrupt mask enable */
-    VOINTMSK.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->VOINTMSK.u32)));
+    VOINTMSK.u32 = VDP_RegRead1((HI_U32)(&(pVdpReg->VOINTMSK.u32)));
     VOINTMSK.u32 = VOINTMSK.u32 | u32masktypeen;
-    VDP_RegWrite((HI_U32)(&(pVdpReg->VOINTMSK.u32)), VOINTMSK.u32); 
+    VDP_RegWrite1((HI_U32)(&(pVdpReg->VOINTMSK.u32)), VOINTMSK.u32);
 
     return ;
 }
@@ -3634,7 +3959,11 @@ HI_VOID VDP_DISP_SetSyncInv(HI_U32 u32hd_id, VDP_DISP_INTF_E enIntf, VDP_DISP_SY
     
     switch(enIntf)
     {
+#if 1
+#warning TODO
+#else
         case VDP_DISP_INTF_DATE:
+
         {
             DHD0_SYNC_INV.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->DHD0_SYNC_INV.u32)));
             DHD0_SYNC_INV.bits.date_dv_inv = enInv.u32Dinv; 
@@ -3642,6 +3971,7 @@ HI_VOID VDP_DISP_SetSyncInv(HI_U32 u32hd_id, VDP_DISP_INTF_E enIntf, VDP_DISP_SY
 
             break;
         }
+#endif
         case VDP_DISP_INTF_HDMI:
         {
             DHD0_SYNC_INV.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->DHD0_SYNC_INV.u32)));
@@ -3685,7 +4015,7 @@ HI_VOID VDP_DISP_SetSyncInv(HI_U32 u32hd_id, VDP_DISP_INTF_E enIntf, VDP_DISP_SY
 
 HI_VOID  VDP_DISP_SetIntfMuxSel(HI_U32 u32hd_id,VDP_DISP_INTF_E enIntf)
 {
-    volatile U_VO_MUX VO_MUX;
+    /*volatile*/ U_VO_MUX VO_MUX;
     
     if(u32hd_id >= CHN_MAX)
      {
@@ -3695,52 +4025,51 @@ HI_VOID  VDP_DISP_SetIntfMuxSel(HI_U32 u32hd_id,VDP_DISP_INTF_E enIntf)
 
     switch(enIntf)
     {
-        case VDP_DISP_INTF_LCD:
+		case VDP_DISP_INTF_LCD: //4 (0)
+		{
+			VO_MUX.u32 = VDP_RegRead1((HI_U32)(&(pVdpReg->VO_MUX.u32)));;
+			VO_MUX.bits.digital_sel = u32hd_id*2;
+			VDP_RegWrite1((HI_U32)&(pVdpReg->VO_MUX.u32), VO_MUX.u32);
+
+			break;
+		}
+        case VDP_DISP_INTF_BT1120: //2 (1)
         {
-            VO_MUX.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->VO_MUX.u32)));;
-            VO_MUX.bits.digital_sel = u32hd_id*2; 
-            VDP_RegWrite((HI_U32)&(pVdpReg->VO_MUX.u32), VO_MUX.u32); 
+            VO_MUX.u32 = VDP_RegRead1((HI_U32)(&(pVdpReg->VO_MUX.u32)));;
+            VO_MUX.bits.digital_sel = 1+u32hd_id*2;
+            VDP_RegWrite1((HI_U32)&(pVdpReg->VO_MUX.u32), VO_MUX.u32);
 
             break;
         }
-        case VDP_DISP_INTF_BT1120:
-        {
-            VO_MUX.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->VO_MUX.u32)));;
-            VO_MUX.bits.digital_sel = 1+u32hd_id*2; 
-            VDP_RegWrite((HI_U32)&(pVdpReg->VO_MUX.u32), VO_MUX.u32); 
+		case VDP_DISP_INTF_HDMI: //0 (2)
+		{
+			VO_MUX.u32 = VDP_RegRead1((HI_U32)(&(pVdpReg->VO_MUX.u32)));;
+			VO_MUX.bits.hdmi_sel = u32hd_id;
+			VDP_RegWrite1((HI_U32)&(pVdpReg->VO_MUX.u32), VO_MUX.u32);
 
-            break;
-        }
-        case VDP_DISP_INTF_HDMI:
+			break;
+		}
+        case VDP_DISP_INTF_VGA: //1 (3)
         {
-            VO_MUX.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->VO_MUX.u32)));;
-            VO_MUX.bits.hdmi_sel = u32hd_id; 
-            VDP_RegWrite((HI_U32)&(pVdpReg->VO_MUX.u32), VO_MUX.u32); 
-
-            break;
-        }
-        case VDP_DISP_INTF_VGA:
-        {
-            VO_MUX.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->VO_MUX.u32)));;
+            VO_MUX.u32 = VDP_RegRead1((HI_U32)(&(pVdpReg->VO_MUX.u32)));;
             VO_MUX.bits.vga_sel = u32hd_id;
-            VDP_RegWrite((HI_U32)&(pVdpReg->VO_MUX.u32), VO_MUX.u32); 
+            VDP_RegWrite1((HI_U32)&(pVdpReg->VO_MUX.u32), VO_MUX.u32);
 
             break;
         }
-        case VDP_DISP_INTF_HDDATE:
+        case VDP_DISP_INTF_HDDATE: //5 (4)
         {
-            VO_MUX.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->VO_MUX.u32)));;
+            VO_MUX.u32 = VDP_RegRead1((HI_U32)(&(pVdpReg->VO_MUX.u32)));;
             VO_MUX.bits.hddate_sel = u32hd_id;
-            VDP_RegWrite((HI_U32)&(pVdpReg->VO_MUX.u32), VO_MUX.u32); 
+            VDP_RegWrite1((HI_U32)&(pVdpReg->VO_MUX.u32), VO_MUX.u32);
 
             break;
         }
-
-        case VDP_DISP_INTF_SDDATE:
+        case VDP_DISP_INTF_SDDATE: //3 (5)
         {
-            VO_MUX.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->VO_MUX.u32)));;
+            VO_MUX.u32 = VDP_RegRead1((HI_U32)(&(pVdpReg->VO_MUX.u32)));;
             VO_MUX.bits.sddate_sel = u32hd_id;
-            VDP_RegWrite((HI_U32)&(pVdpReg->VO_MUX.u32), VO_MUX.u32); 
+            VDP_RegWrite1((HI_U32)&(pVdpReg->VO_MUX.u32), VO_MUX.u32);
 
             break;
         }
@@ -3858,22 +4187,22 @@ HI_VOID VDP_DISP_SetDitherCoef  (HI_U32 u32hd_id, VDP_DISP_INTF_E enIntf, VDP_DI
 // INT SET 
 HI_VOID  VDP_DISP_SetIntDisable(HI_U32 u32masktypeen)
 {
-    volatile U_VOINTMSK VOINTMSK;
+    /*volatile*/ U_VOINTMSK VOINTMSK;
 
     /* Dispaly interrupt mask enable */
-    VOINTMSK.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->VOINTMSK.u32)));;
+    VOINTMSK.u32 = VDP_RegRead1((HI_U32)(&(pVdpReg->VOINTMSK.u32)));;
     VOINTMSK.u32 = VOINTMSK.u32 & (~u32masktypeen);
-    VDP_RegWrite((HI_U32)&(pVdpReg->VOINTMSK.u32), VOINTMSK.u32);
+    VDP_RegWrite1((HI_U32)&(pVdpReg->VOINTMSK.u32), VOINTMSK.u32);
 
     return ;
 }
 
 HI_U32 VDP_DISP_GetIntSta(HI_U32 u32intmask)
 {
-    volatile U_VOINTSTA VOINTSTA;
+    /*volatile*/ U_VOINTSTA VOINTSTA;
     
     /* read interrupt status */
-    VOINTSTA.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->VOINTSTA.u32)));
+    VOINTSTA.u32 = VDP_RegRead1((HI_U32)(&(pVdpReg->VOINTSTA.u32)));
     
     return (VOINTSTA.u32 & u32intmask);
 }
@@ -3890,14 +4219,14 @@ HI_U32 VDP_DISP_GetIntMskStat(HI_U32 u32intmask)
 HI_VOID  VDP_DISP_ClearIntSta(HI_U32 u32intmask)
 {
     /* clear interrupt status */
-    VDP_RegWrite((HI_U32)&(pVdpReg->VOMSKINTSTA.u32), u32intmask);
+    VDP_RegWrite1((HI_U32)&(pVdpReg->VOMSKINTSTA.u32), u32intmask);
 }
 
 ///VTT INT
 HI_VOID VDP_DISP_SetVtThdMode(HI_U32 u32hd_id, HI_U32 u32uthdnum, HI_U32 u32mode)
 {
-    volatile U_DHD0_VTTHD3 DHD0_VTTHD3;
-    volatile U_DHD0_VTTHD  DHD0_VTTHD;
+    /*volatile*/ U_DHD0_VTTHD3 DHD0_VTTHD3;
+    /*volatile*/ U_DHD0_VTTHD  DHD0_VTTHD;
     if(u32hd_id >= CHN_MAX)
     {
         HI_PRINT("Error,VDP_DISP_SetVtThdMode Select Wrong CHANNEL ID\n");
@@ -3906,21 +4235,21 @@ HI_VOID VDP_DISP_SetVtThdMode(HI_U32 u32hd_id, HI_U32 u32uthdnum, HI_U32 u32mode
     
     if(u32uthdnum == 1)//threshold 1 int mode
     {
-        DHD0_VTTHD.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->DHD0_VTTHD.u32)+u32hd_id*CHN_OFFSET));
+        DHD0_VTTHD.u32 = VDP_RegRead1((HI_U32)(&(pVdpReg->DHD0_VTTHD.u32)+u32hd_id*CHN_OFFSET));
         DHD0_VTTHD.bits.thd1_mode = u32mode;// frame or field
-        VDP_RegWrite((HI_U32)(&(pVdpReg->DHD0_VTTHD.u32)+u32hd_id*CHN_OFFSET), DHD0_VTTHD.u32);
+        VDP_RegWrite1((HI_U32)(&(pVdpReg->DHD0_VTTHD.u32)+u32hd_id*CHN_OFFSET), DHD0_VTTHD.u32);
     }
     else if(u32uthdnum == 2)//threshold 2 int mode
     {
-        DHD0_VTTHD.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->DHD0_VTTHD.u32)+u32hd_id*CHN_OFFSET));        
+        DHD0_VTTHD.u32 = VDP_RegRead1((HI_U32)(&(pVdpReg->DHD0_VTTHD.u32)+u32hd_id*CHN_OFFSET));
         DHD0_VTTHD.bits.thd2_mode = u32mode;// frame or field
-        VDP_RegWrite((HI_U32)(&(pVdpReg->DHD0_VTTHD.u32)+u32hd_id*CHN_OFFSET), DHD0_VTTHD.u32);
+        VDP_RegWrite1((HI_U32)(&(pVdpReg->DHD0_VTTHD.u32)+u32hd_id*CHN_OFFSET), DHD0_VTTHD.u32);
     }
     else if(u32uthdnum == 3)//threshold 3 int mode
     {
-        DHD0_VTTHD3.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->DHD0_VTTHD3.u32)+u32hd_id*CHN_OFFSET));        
+        DHD0_VTTHD3.u32 = VDP_RegRead1((HI_U32)(&(pVdpReg->DHD0_VTTHD3.u32)+u32hd_id*CHN_OFFSET));
         DHD0_VTTHD3.bits.thd3_mode = u32mode;// frame or field
-        VDP_RegWrite((HI_U32)(&(pVdpReg->DHD0_VTTHD3.u32)+u32hd_id*CHN_OFFSET), DHD0_VTTHD3.u32);            
+        VDP_RegWrite1((HI_U32)(&(pVdpReg->DHD0_VTTHD3.u32)+u32hd_id*CHN_OFFSET), DHD0_VTTHD3.u32);
           
     }
 }
@@ -3936,16 +4265,16 @@ HI_VOID  VDP_DISP_SetClipEnable  (HI_U32 u32hd_id, VDP_DISP_INTF_E enIntf)
 HI_VOID  VDP_DISP_SetClipCoef (HI_U32 u32hd_id, VDP_DISP_INTF_E clipsel, VDP_DISP_CLIP_S stClipData)
 {   
     
-    volatile U_DHD0_CLIP0_L       DHD0_CLIP0_L;
-    volatile U_DHD0_CLIP0_H       DHD0_CLIP0_H;
-    volatile U_DHD0_CLIP1_L       DHD0_CLIP1_L;
-    volatile U_DHD0_CLIP1_H       DHD0_CLIP1_H;
-    volatile U_DHD0_CLIP2_L       DHD0_CLIP2_L;
-    volatile U_DHD0_CLIP2_H       DHD0_CLIP2_H;
-    volatile U_DHD0_CLIP3_L       DHD0_CLIP3_L;
-    volatile U_DHD0_CLIP3_H       DHD0_CLIP3_H;
-    volatile U_DHD0_CLIP4_L       DHD0_CLIP4_L;
-    volatile U_DHD0_CLIP4_H       DHD0_CLIP4_H;
+    /*volatile*/ U_DHD0_CLIP0_L       DHD0_CLIP0_L;
+    /*volatile*/ U_DHD0_CLIP0_H       DHD0_CLIP0_H;
+    /*volatile*/ U_DHD0_CLIP1_L       DHD0_CLIP1_L;
+    /*volatile*/ U_DHD0_CLIP1_H       DHD0_CLIP1_H;
+    /*volatile*/ U_DHD0_CLIP2_L       DHD0_CLIP2_L;
+    /*volatile*/ U_DHD0_CLIP2_H       DHD0_CLIP2_H;
+    /*volatile*/ U_DHD0_CLIP3_L       DHD0_CLIP3_L;
+    /*volatile*/ U_DHD0_CLIP3_H       DHD0_CLIP3_H;
+    /*volatile*/ U_DHD0_CLIP4_L       DHD0_CLIP4_L;
+    /*volatile*/ U_DHD0_CLIP4_H       DHD0_CLIP4_H;
 
     if(u32hd_id >= CHN_MAX)
     {
@@ -3953,89 +4282,109 @@ HI_VOID  VDP_DISP_SetClipCoef (HI_U32 u32hd_id, VDP_DISP_INTF_E clipsel, VDP_DIS
         return ;
     }
 
-    //BT1120
-    if(clipsel == VDP_DISP_INTF_BT1120)
+    //HDMI
+    if(clipsel == VDP_DISP_INTF_HDMI) //2
     {
-        DHD0_CLIP0_L.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->DHD0_CLIP0_L.u32)+u32hd_id*CHN_OFFSET));        
+
+        DHD0_CLIP2_L.u32 = VDP_RegRead1((HI_U32)(&(pVdpReg->DHD0_CLIP2_L.u32)+u32hd_id*CHN_OFFSET));
+        DHD0_CLIP2_L.bits.clip_cl2 = stClipData.u32ClipLow_y;
+        DHD0_CLIP2_L.bits.clip_cl1 = stClipData.u32ClipLow_cb;
+        DHD0_CLIP2_L.bits.clip_cl0 = stClipData.u32ClipLow_cr;
+        VDP_RegWrite1((HI_U32)(&(pVdpReg->DHD0_CLIP2_L.u32)+u32hd_id*CHN_OFFSET), DHD0_CLIP2_L.u32);
+
+        DHD0_CLIP2_H.u32 = VDP_RegRead1((HI_U32)(&(pVdpReg->DHD0_CLIP2_H.u32)+u32hd_id*CHN_OFFSET));
+        DHD0_CLIP2_H.bits.clip_ch2 = stClipData.u32ClipHigh_y;
+        DHD0_CLIP2_H.bits.clip_ch1 = stClipData.u32ClipHigh_cb;
+        DHD0_CLIP2_H.bits.clip_ch0 = stClipData.u32ClipHigh_cr;
+        VDP_RegWrite1((HI_U32)(&(pVdpReg->DHD0_CLIP2_H.u32)+u32hd_id*CHN_OFFSET), DHD0_CLIP2_H.u32);
+    }
+
+    //VGA
+    else if(clipsel == VDP_DISP_INTF_VGA) //3
+    {
+
+        DHD0_CLIP3_L.u32 = VDP_RegRead1((HI_U32)(&(pVdpReg->DHD0_CLIP3_L.u32)+u32hd_id*CHN_OFFSET));
+        DHD0_CLIP3_L.bits.clip_cl2 = stClipData.u32ClipLow_y;
+        DHD0_CLIP3_L.bits.clip_cl1 = stClipData.u32ClipLow_cb;
+        DHD0_CLIP3_L.bits.clip_cl0 = stClipData.u32ClipLow_cr;
+        VDP_RegWrite1((HI_U32)(&(pVdpReg->DHD0_CLIP3_L.u32)+u32hd_id*CHN_OFFSET), DHD0_CLIP3_L.u32);
+
+        DHD0_CLIP3_H.u32 = VDP_RegRead1((HI_U32)(&(pVdpReg->DHD0_CLIP3_H.u32)+u32hd_id*CHN_OFFSET));
+        DHD0_CLIP3_H.bits.clip_ch2 = stClipData.u32ClipHigh_y;
+        DHD0_CLIP3_H.bits.clip_ch1 = stClipData.u32ClipHigh_cb;
+        DHD0_CLIP3_H.bits.clip_ch0 = stClipData.u32ClipHigh_cr;
+        VDP_RegWrite1((HI_U32)(&(pVdpReg->DHD0_CLIP3_H.u32)+u32hd_id*CHN_OFFSET), DHD0_CLIP3_H.u32);
+    }
+
+    //LCD
+    else if(clipsel == VDP_DISP_INTF_LCD) //0
+    {
+
+        DHD0_CLIP4_L.u32 = VDP_RegRead1((HI_U32)(&(pVdpReg->DHD0_CLIP4_L.u32)+u32hd_id*CHN_OFFSET));
+        DHD0_CLIP4_L.bits.clip_cl2 = stClipData.u32ClipLow_y;
+        DHD0_CLIP4_L.bits.clip_cl1 = stClipData.u32ClipLow_cb;
+        DHD0_CLIP4_L.bits.clip_cl0 = stClipData.u32ClipLow_cr;
+        VDP_RegWrite1((HI_U32)(&(pVdpReg->DHD0_CLIP4_L.u32)+u32hd_id*CHN_OFFSET), DHD0_CLIP4_L.u32);
+
+        DHD0_CLIP4_H.u32 = VDP_RegRead1((HI_U32)(&(pVdpReg->DHD0_CLIP4_H.u32)+u32hd_id*CHN_OFFSET));
+        DHD0_CLIP4_H.bits.clip_ch2 = stClipData.u32ClipHigh_y;
+        DHD0_CLIP4_H.bits.clip_ch1 = stClipData.u32ClipHigh_cb;
+        DHD0_CLIP4_H.bits.clip_ch0 = stClipData.u32ClipHigh_cr;
+        VDP_RegWrite1((HI_U32)(&(pVdpReg->DHD0_CLIP4_H.u32)+u32hd_id*CHN_OFFSET), DHD0_CLIP4_H.u32);
+    }
+
+    //BT1120
+    else if(clipsel == VDP_DISP_INTF_BT1120) //1
+    {
+        DHD0_CLIP0_L.u32 = VDP_RegRead1((HI_U32)(&(pVdpReg->DHD0_CLIP0_L.u32)+u32hd_id*CHN_OFFSET));
         DHD0_CLIP0_L.bits.clip_cl2 = stClipData.u32ClipLow_y;
         DHD0_CLIP0_L.bits.clip_cl1 = stClipData.u32ClipLow_cb;
         DHD0_CLIP0_L.bits.clip_cl0 = stClipData.u32ClipLow_cr;        
-        VDP_RegWrite((HI_U32)(&(pVdpReg->DHD0_CLIP0_L.u32)+u32hd_id*CHN_OFFSET), DHD0_CLIP0_L.u32);
+        VDP_RegWrite1((HI_U32)(&(pVdpReg->DHD0_CLIP0_L.u32)+u32hd_id*CHN_OFFSET), DHD0_CLIP0_L.u32);
 
-        DHD0_CLIP0_H.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->DHD0_CLIP0_H.u32)+u32hd_id*CHN_OFFSET));        
+        DHD0_CLIP0_H.u32 = VDP_RegRead1((HI_U32)(&(pVdpReg->DHD0_CLIP0_H.u32)+u32hd_id*CHN_OFFSET));
         DHD0_CLIP0_H.bits.clip_ch2 = stClipData.u32ClipHigh_y;
         DHD0_CLIP0_H.bits.clip_ch1 = stClipData.u32ClipHigh_cb;
         DHD0_CLIP0_H.bits.clip_ch0 = stClipData.u32ClipHigh_cr;        
-        VDP_RegWrite((HI_U32)(&(pVdpReg->DHD0_CLIP0_H.u32)+u32hd_id*CHN_OFFSET), DHD0_CLIP0_H.u32); 
+        VDP_RegWrite1((HI_U32)(&(pVdpReg->DHD0_CLIP0_H.u32)+u32hd_id*CHN_OFFSET), DHD0_CLIP0_H.u32);
     }
     
+#if 0
     //DATE
     else if(clipsel == VDP_DISP_INTF_DATE)
     {
     
-        DHD0_CLIP1_L.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->DHD0_CLIP1_L.u32)+u32hd_id*CHN_OFFSET));        
+        DHD0_CLIP1_L.u32 = VDP_RegRead1((HI_U32)(&(pVdpReg->DHD0_CLIP1_L.u32)+u32hd_id*CHN_OFFSET));
         DHD0_CLIP1_L.bits.clip_cl2 = stClipData.u32ClipLow_y;
         DHD0_CLIP1_L.bits.clip_cl1 = stClipData.u32ClipLow_cb;
         DHD0_CLIP1_L.bits.clip_cl0 = stClipData.u32ClipLow_cr;        
-        VDP_RegWrite((HI_U32)(&(pVdpReg->DHD0_CLIP1_L.u32)+u32hd_id*CHN_OFFSET), DHD0_CLIP1_L.u32);
+        VDP_RegWrite1((HI_U32)(&(pVdpReg->DHD0_CLIP1_L.u32)+u32hd_id*CHN_OFFSET), DHD0_CLIP1_L.u32);
 
-        DHD0_CLIP1_H.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->DHD0_CLIP1_H.u32)+u32hd_id*CHN_OFFSET));        
+        DHD0_CLIP1_H.u32 = VDP_RegRead1((HI_U32)(&(pVdpReg->DHD0_CLIP1_H.u32)+u32hd_id*CHN_OFFSET));
         DHD0_CLIP1_H.bits.clip_ch2 = stClipData.u32ClipHigh_y;
         DHD0_CLIP1_H.bits.clip_ch1 = stClipData.u32ClipHigh_cb;
         DHD0_CLIP1_H.bits.clip_ch0 = stClipData.u32ClipHigh_cr;        
-        VDP_RegWrite((HI_U32)(&(pVdpReg->DHD0_CLIP1_H.u32)+u32hd_id*CHN_OFFSET), DHD0_CLIP1_H.u32); 
+        VDP_RegWrite1((HI_U32)(&(pVdpReg->DHD0_CLIP1_H.u32)+u32hd_id*CHN_OFFSET), DHD0_CLIP1_H.u32);
     }
-    
-    //HDMI
-    else if(clipsel == VDP_DISP_INTF_HDMI)
+#else
+    //VDP_DISP_INTF_HDDATE
+    else if(clipsel == VDP_DISP_INTF_HDDATE) //4
     {
-    
-        DHD0_CLIP2_L.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->DHD0_CLIP2_L.u32)+u32hd_id*CHN_OFFSET));        
-        DHD0_CLIP2_L.bits.clip_cl2 = stClipData.u32ClipLow_y;
-        DHD0_CLIP2_L.bits.clip_cl1 = stClipData.u32ClipLow_cb;
-        DHD0_CLIP2_L.bits.clip_cl0 = stClipData.u32ClipLow_cr;        
-        VDP_RegWrite((HI_U32)(&(pVdpReg->DHD0_CLIP2_L.u32)+u32hd_id*CHN_OFFSET), DHD0_CLIP2_L.u32);
 
-        DHD0_CLIP2_H.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->DHD0_CLIP2_H.u32)+u32hd_id*CHN_OFFSET));        
-        DHD0_CLIP2_H.bits.clip_ch2 = stClipData.u32ClipHigh_y;
-        DHD0_CLIP2_H.bits.clip_ch1 = stClipData.u32ClipHigh_cb;
-        DHD0_CLIP2_H.bits.clip_ch0 = stClipData.u32ClipHigh_cr;        
-        VDP_RegWrite((HI_U32)(&(pVdpReg->DHD0_CLIP2_H.u32)+u32hd_id*CHN_OFFSET), DHD0_CLIP2_H.u32); 
-    }
-    
-    //VGA
-    else if(clipsel == VDP_DISP_INTF_VGA)
-    {
-    
-        DHD0_CLIP3_L.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->DHD0_CLIP3_L.u32)+u32hd_id*CHN_OFFSET));        
-        DHD0_CLIP3_L.bits.clip_cl2 = stClipData.u32ClipLow_y;
-        DHD0_CLIP3_L.bits.clip_cl1 = stClipData.u32ClipLow_cb;
-        DHD0_CLIP3_L.bits.clip_cl0 = stClipData.u32ClipLow_cr;        
-        VDP_RegWrite((HI_U32)(&(pVdpReg->DHD0_CLIP3_L.u32)+u32hd_id*CHN_OFFSET), DHD0_CLIP3_L.u32);
+        DHD0_CLIP1_L.u32 = VDP_RegRead1((HI_U32)(&(pVdpReg->DHD0_CLIP1_L.u32)+u32hd_id*CHN_OFFSET));
+        DHD0_CLIP1_L.bits.clip_cl2 = stClipData.u32ClipLow_y;
+        DHD0_CLIP1_L.bits.clip_cl1 = stClipData.u32ClipLow_cb;
+        DHD0_CLIP1_L.bits.clip_cl0 = stClipData.u32ClipLow_cr;
+        VDP_RegWrite1((HI_U32)(&(pVdpReg->DHD0_CLIP1_L.u32)+u32hd_id*CHN_OFFSET), DHD0_CLIP1_L.u32);
 
-        DHD0_CLIP3_H.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->DHD0_CLIP3_H.u32)+u32hd_id*CHN_OFFSET));        
-        DHD0_CLIP3_H.bits.clip_ch2 = stClipData.u32ClipHigh_y;
-        DHD0_CLIP3_H.bits.clip_ch1 = stClipData.u32ClipHigh_cb;
-        DHD0_CLIP3_H.bits.clip_ch0 = stClipData.u32ClipHigh_cr;        
-        VDP_RegWrite((HI_U32)(&(pVdpReg->DHD0_CLIP3_H.u32)+u32hd_id*CHN_OFFSET), DHD0_CLIP3_H.u32); 
+        DHD0_CLIP1_H.u32 = VDP_RegRead1((HI_U32)(&(pVdpReg->DHD0_CLIP1_H.u32)+u32hd_id*CHN_OFFSET));
+        DHD0_CLIP1_H.bits.clip_ch2 = stClipData.u32ClipHigh_y;
+        DHD0_CLIP1_H.bits.clip_ch1 = stClipData.u32ClipHigh_cb;
+        DHD0_CLIP1_H.bits.clip_ch0 = stClipData.u32ClipHigh_cr;
+        VDP_RegWrite1((HI_U32)(&(pVdpReg->DHD0_CLIP1_H.u32)+u32hd_id*CHN_OFFSET), DHD0_CLIP1_H.u32);
     }
+#endif
     
-    //LCD
-    else if(clipsel == VDP_DISP_INTF_LCD)
-    {
-    
-        DHD0_CLIP4_L.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->DHD0_CLIP4_L.u32)+u32hd_id*CHN_OFFSET));        
-        DHD0_CLIP4_L.bits.clip_cl2 = stClipData.u32ClipLow_y;
-        DHD0_CLIP4_L.bits.clip_cl1 = stClipData.u32ClipLow_cb;
-        DHD0_CLIP4_L.bits.clip_cl0 = stClipData.u32ClipLow_cr;        
-        VDP_RegWrite((HI_U32)(&(pVdpReg->DHD0_CLIP4_L.u32)+u32hd_id*CHN_OFFSET), DHD0_CLIP4_L.u32);
-
-        DHD0_CLIP4_H.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->DHD0_CLIP4_H.u32)+u32hd_id*CHN_OFFSET));        
-        DHD0_CLIP4_H.bits.clip_ch2 = stClipData.u32ClipHigh_y;
-        DHD0_CLIP4_H.bits.clip_ch1 = stClipData.u32ClipHigh_cb;
-        DHD0_CLIP4_H.bits.clip_ch0 = stClipData.u32ClipHigh_cr;        
-        VDP_RegWrite((HI_U32)(&(pVdpReg->DHD0_CLIP4_H.u32)+u32hd_id*CHN_OFFSET), DHD0_CLIP4_H.u32); 
-    }
     else
     {
         HI_PRINT("Error,VDP_DISP_SetClipVtt Select Wrong Interface Mode\n");
@@ -4059,9 +4408,9 @@ HI_VOID  VDP_DISP_SetCscEnable  (HI_U32 u32hd_id, HI_U32 enCSC)
             HI_PRINT("Error,VDP_DISP_SetCscEnable Select Wrong CHANNEL ID\n");
             return ;
         }
-        DHD0_CSC_IDC.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->DHD0_CSC_IDC.u32)+u32hd_id*CHN_OFFSET));        
+        DHD0_CSC_IDC.u32 = VDP_RegRead1((HI_U32)(&(pVdpReg->DHD0_CSC_IDC.u32)+u32hd_id*CHN_OFFSET));
         DHD0_CSC_IDC.bits.csc_en = enCSC;
-        VDP_RegWrite((HI_U32)(&(pVdpReg->DHD0_CSC_IDC.u32)+u32hd_id*CHN_OFFSET), DHD0_CSC_IDC.u32);
+        VDP_RegWrite1((HI_U32)(&(pVdpReg->DHD0_CSC_IDC.u32)+u32hd_id*CHN_OFFSET), DHD0_CSC_IDC.u32);
     
 }
 
@@ -4412,54 +4761,76 @@ HI_VOID VDP_SetGammaCoef(HI_U32 u32hd_id, HI_U32 *upTable)/// FOR TC GMMA TABLE 
 ///GF AND VIDEO MIX CBM
 HI_VOID VDP_CBM_SetMixerBkg(VDP_CBM_MIX_E u32mixer_id, VDP_BKG_S stBkg)
 {
-    volatile U_CBM_BKG1 CBM_BKG1;
-    volatile U_CBM_BKG2 CBM_BKG2;
-    volatile U_MIXG0_BKG MIXG0_BKG;
-    volatile U_MIXG0_BKALPHA MIXG0_BKALPHA;
-    volatile U_MIXV0_BKG MIXV0_BKG;
+	HI_U32 addr;
+    /*volatile*/ U_CBM_BKG1 CBM_BKG1;
+    /*volatile*/ U_CBM_BKG2 CBM_BKG2;
+    /*volatile*/ U_MIXG0_BKG MIXG0_BKG;
+    /*volatile*/ U_MIXG0_BKALPHA MIXG0_BKALPHA;
+    /*volatile*/ U_MIXV0_BKG MIXV0_BKG;
 
     if(u32mixer_id == VDP_CBM_MIX0)
     {
         /* DHD0  mixer link */
-        CBM_BKG1.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->CBM_BKG1.u32)));;
-        CBM_BKG1.bits.cbm_bkgy1  = stBkg.u32BkgY;
-        CBM_BKG1.bits.cbm_bkgcb1 = stBkg.u32BkgU;
-        CBM_BKG1.bits.cbm_bkgcr1 = stBkg.u32BkgV;
-        VDP_RegWrite((HI_U32)&(pVdpReg->CBM_BKG1.u32), CBM_BKG1.u32); 
+    	addr = (HI_U32)((pVdpReg)) + 0xb400;
+        MIXG0_BKG.u32 = VDP_RegRead(addr);
+        MIXG0_BKG.bits.mixer_bkgy  = stBkg.u32BkgY;
+        MIXG0_BKG.bits.mixer_bkgcb = stBkg.u32BkgU;
+        MIXG0_BKG.bits.mixer_bkgcr = stBkg.u32BkgV;
+        VDP_RegWrite(addr, MIXG0_BKG.u32);
     }
     else if(u32mixer_id == VDP_CBM_MIX1)
     {
         /* DHD1(DSD) mixer link */
-        CBM_BKG2.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->CBM_BKG2.u32)));;
-        CBM_BKG2.bits.cbm_bkgy2  = stBkg.u32BkgY;
-        CBM_BKG2.bits.cbm_bkgcb2 = stBkg.u32BkgU;
-        CBM_BKG2.bits.cbm_bkgcr2 = stBkg.u32BkgV;
-        VDP_RegWrite((HI_U32)&(pVdpReg->CBM_BKG2.u32), CBM_BKG2.u32); 
+    	addr = ((HI_U32)((pVdpReg))) + 0xb500;
+        MIXG0_BKG.u32 = VDP_RegRead(addr);
+        MIXG0_BKG.bits.mixer_bkgy  = stBkg.u32BkgY;
+        MIXG0_BKG.bits.mixer_bkgcb = stBkg.u32BkgU;
+        MIXG0_BKG.bits.mixer_bkgcr = stBkg.u32BkgV;
+        VDP_RegWrite(addr, MIXG0_BKG.u32);
+    }
+    else if (u32mixer_id == VDP_CBM_MIX_6)
+    {
+    	addr = ((HI_U32)((pVdpReg))) + 0xb600;
+        MIXG0_BKG.u32 = VDP_RegRead(addr);
+        MIXG0_BKG.bits.mixer_bkgy  = stBkg.u32BkgY;
+        MIXG0_BKG.bits.mixer_bkgcb = stBkg.u32BkgU;
+        MIXG0_BKG.bits.mixer_bkgcr = stBkg.u32BkgV;
+        VDP_RegWrite(addr, MIXG0_BKG.u32);
     }
     else if(u32mixer_id == VDP_CBM_MIXG0)
     {
         /* G0 mixer link */
-        MIXG0_BKG.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->MIXG0_BKG.u32)));;
+    	addr = ((HI_U32)((pVdpReg))) + 0xb200;
+        MIXG0_BKG.u32 = VDP_RegRead(addr);
         MIXG0_BKG.bits.mixer_bkgy  = stBkg.u32BkgY;
         MIXG0_BKG.bits.mixer_bkgcb = stBkg.u32BkgU;
         MIXG0_BKG.bits.mixer_bkgcr = stBkg.u32BkgV;
-        VDP_RegWrite((HI_U32)&(pVdpReg->MIXG0_BKG.u32), MIXG0_BKG.u32); 
-
-        MIXG0_BKALPHA.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->MIXG0_BKALPHA.u32)));;
-        MIXG0_BKALPHA.bits.mixer_alpha  = stBkg.u32BkgA;
-        VDP_RegWrite((HI_U32)&(pVdpReg->MIXG0_BKALPHA.u32), MIXG0_BKALPHA.u32); 
+        VDP_RegWrite(addr, MIXG0_BKG.u32);
+//        MIXG0_BKALPHA.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->MIXG0_BKALPHA.u32)));;
+//        MIXG0_BKALPHA.bits.mixer_alpha  = stBkg.u32BkgA;
+//        VDP_RegWrite((HI_U32)&(pVdpReg->MIXG0_BKALPHA.u32), MIXG0_BKALPHA.u32);
+    	addr = (HI_U32)&(pVdpReg->MIXG0_BKALPHA.u32); //((HI_U32)((pVdpReg))) + 0xb204;
+    	*((HI_U8*)(addr)) = stBkg.u32BkgA;
     }
     else if(u32mixer_id == VDP_CBM_MIXV0)
     {
-        MIXV0_BKG.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->MIXV0_BKG.u32)));;
-        MIXV0_BKG.bits.mixer_bkgy  = stBkg.u32BkgY;
-        MIXV0_BKG.bits.mixer_bkgcb = stBkg.u32BkgU;
-        MIXV0_BKG.bits.mixer_bkgcr = stBkg.u32BkgV;
-        VDP_RegWrite((HI_U32)&(pVdpReg->MIXV0_BKG.u32), MIXV0_BKG.u32); 
+    	addr = (HI_U32)((pVdpReg)) + 0xb000;
+        MIXG0_BKG.u32 = VDP_RegRead(addr);
+        MIXG0_BKG.bits.mixer_bkgy  = stBkg.u32BkgY;
+        MIXG0_BKG.bits.mixer_bkgcb = stBkg.u32BkgU;
+        MIXG0_BKG.bits.mixer_bkgcr = stBkg.u32BkgV;
+        VDP_RegWrite(addr, MIXG0_BKG.u32);
     }
+#if 0
+    else if (u32mixer_id == VDP_CBM_MIXG1)
+    {
+    	return;
+    }
+#endif
     else
     {
         HI_PRINT("Error! VDP_CBM_SetMixerBkg() Select Wrong mixer ID\n");
+        return;
     }
 
     return ;
@@ -4518,12 +4889,39 @@ HI_VOID VDP_CBM_ResetMixerPrio(VDP_CBM_MIX_E u32mixer_id)
 
 HI_VOID VDP_CBM_SetMixerPrio(VDP_CBM_MIX_E u32mixer_id,HI_U32 u32layer_id,HI_U32 u32prio)
 {
-    volatile U_MIXG0_MIX MIXG0_MIX;
-    volatile U_MIXV0_MIX MIXV0_MIX;
-    volatile U_CBM_MIX1 CBM_MIX1;
-    volatile U_CBM_MIX2 CBM_MIX2;
+#warning TODO: VDP_CBM_SetMixerPrio
+    /*volatile*/ U_MIXG0_MIX MIXG0_MIX;
+    /*volatile*/ U_MIXV0_MIX MIXV0_MIX;
+    /*volatile*/ U_CBM_MIX1 CBM_MIX1;
+    /*volatile*/ U_CBM_MIX2 CBM_MIX2;
     
-    if (u32mixer_id == VDP_CBM_MIXG0)
+    if(u32mixer_id == VDP_CBM_MIX0)//DHD0 //4
+    {
+        switch(u32prio)
+        {
+            case 0:
+            {
+                CBM_MIX1.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->CBM_MIX1.u32)));
+                CBM_MIX1.bits.mixer_prio0 = u32layer_id+1;
+                VDP_RegWrite((HI_U32)(&(pVdpReg->CBM_MIX1.u32)), CBM_MIX1.u32);
+                break;
+            }
+            case 1:
+            {
+                CBM_MIX1.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->CBM_MIX1.u32)));
+                CBM_MIX1.bits.mixer_prio1 = u32layer_id+1;
+                VDP_RegWrite((HI_U32)(&(pVdpReg->CBM_MIX1.u32)), CBM_MIX1.u32);
+                break;
+            }
+            default:
+            {
+                HI_PRINT(" %s: Set mixer  select wrong layer ID\n", __FUNCTION__);
+                return ;
+            }
+
+        }
+    }
+    else if (u32mixer_id == VDP_CBM_MIXG0) //2
     {
         switch(u32prio)
         {
@@ -4557,15 +4955,15 @@ HI_VOID VDP_CBM_SetMixerPrio(VDP_CBM_MIX_E u32mixer_id,HI_U32 u32layer_id,HI_U32
             }
             default:
             {
-                HI_PRINT("Error, Vou_SetCbmMixerPrio() Set mixer  select wrong layer ID\n");
+            	HI_PRINT(" %s: Set mixer  select wrong layer ID\n", __FUNCTION__);
                 return ;
             }
 
         }
     }
-    else if(u32mixer_id == VDP_CBM_MIXG1)
+    else if(u32mixer_id == VDP_CBM_MIXG1) //3
         ;
-    else if(u32mixer_id == VDP_CBM_MIXV0)
+    else if(u32mixer_id == VDP_CBM_MIXV0) //0
     {
         switch(u32prio)
         {
@@ -4585,40 +4983,15 @@ HI_VOID VDP_CBM_SetMixerPrio(VDP_CBM_MIX_E u32mixer_id,HI_U32 u32layer_id,HI_U32
             }
             default:
             {
-                HI_PRINT("Error, Vou_SetCbmMixerPrio() Set mixer  select wrong layer ID\n");
+            	HI_PRINT("%s: Set mixer  select wrong layer ID\n", __FUNCTION__);
                 return ;
             }
 
         }
     }
-    else if(u32mixer_id == VDP_CBM_MIXV1)
+    else if(u32mixer_id == VDP_CBM_MIXV1) //1
         ;
-    else if(u32mixer_id == VDP_CBM_MIX0)//DHD0
-    {
-        switch(u32prio)
-        {
-            case 0:
-            {
-                CBM_MIX1.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->CBM_MIX1.u32)));
-                CBM_MIX1.bits.mixer_prio0 = u32layer_id+1;
-                VDP_RegWrite((HI_U32)(&(pVdpReg->CBM_MIX1.u32)), CBM_MIX1.u32);
-                break;
-            }
-            case 1:
-            {
-                CBM_MIX1.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->CBM_MIX1.u32)));
-                CBM_MIX1.bits.mixer_prio1 = u32layer_id+1;
-                VDP_RegWrite((HI_U32)(&(pVdpReg->CBM_MIX1.u32)), CBM_MIX1.u32);
-                break;
-            }
-            default:
-            {
-                HI_PRINT("Error, Vou_SetCbmMixerPrio() Set mixer  select wrong layer ID\n");
-                return ;
-            }
-
-        }
-    }
+#if 0
     else if(u32mixer_id == VDP_CBM_MIX1)//DHD1
     {
         switch(u32prio)
@@ -4653,11 +5026,74 @@ HI_VOID VDP_CBM_SetMixerPrio(VDP_CBM_MIX_E u32mixer_id,HI_U32 u32layer_id,HI_U32
             }
             default:
             {
-                HI_PRINT("Error, Vou_SetCbmMixerPrio() Set mixer  select wrong layer ID\n");
+            	HI_PRINT(" %s: Set mixer  select wrong layer ID\n", __FUNCTION__);
                 return ;
             }
 
 
+        }
+
+    }
+#endif
+    else if(u32mixer_id == VDP_CBM_MIX_6) //6
+    {
+    	if (u32layer_id == 4) u32layer_id = 2;
+
+        switch(u32prio)
+        {
+            case 0:
+            {
+                CBM_MIX2.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->MIXG0_MIX.u32))+0x300);
+                CBM_MIX2.bits.mixer_prio0 = u32layer_id;
+                VDP_RegWrite((HI_U32)(&(pVdpReg->MIXG0_MIX.u32))+0x300, CBM_MIX2.u32);
+                break;
+            }
+            case 1:
+            {
+                CBM_MIX2.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->MIXG0_MIX.u32))+0x300);
+                CBM_MIX2.bits.mixer_prio1 = u32layer_id;
+                VDP_RegWrite((HI_U32)(&(pVdpReg->MIXG0_MIX.u32))+0x300, CBM_MIX2.u32);
+                break;
+            }
+            default:
+            {
+            	HI_PRINT(" %s: Set mixer  select wrong layer ID\n", __FUNCTION__);
+                return ;
+            }
+
+        }
+
+    }
+    else if(u32mixer_id == VDP_CBM_MIX_7) //7
+    {
+        switch(u32prio)
+        {
+            case 0:
+            {
+                MIXG0_MIX.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->MIXG0_MIX.u32))+0x400);
+                MIXG0_MIX.bits.mixer_prio0 = u32layer_id;
+                VDP_RegWrite((HI_U32)(&(pVdpReg->MIXG0_MIX.u32))+0x400, MIXG0_MIX.u32);
+                break;
+            }
+            case 1:
+            {
+                MIXG0_MIX.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->MIXG0_MIX.u32))+0x400);
+                MIXG0_MIX.bits.mixer_prio1 = u32layer_id;
+                VDP_RegWrite((HI_U32)(&(pVdpReg->MIXG0_MIX.u32))+0x400, MIXG0_MIX.u32);
+                break;
+            }
+            case 2:
+            {
+                MIXG0_MIX.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->MIXG0_MIX.u32))+0x400);
+                MIXG0_MIX.bits.mixer_prio2 = u32layer_id;
+                VDP_RegWrite((HI_U32)(&(pVdpReg->MIXG0_MIX.u32))+0x400, MIXG0_MIX.u32);
+                break;
+            }
+            default:
+            {
+            	HI_PRINT(" %s: Set mixer  select wrong layer ID\n", __FUNCTION__);
+                return ;
+            }
         }
 
     }
@@ -4667,6 +5103,10 @@ HI_VOID VDP_CBM_SetMixerPrio(VDP_CBM_MIX_E u32mixer_id,HI_U32 u32layer_id,HI_U32
 //-------------------------------------------------------------------
 HI_VOID  VDP_GFX_SetLayerEnable(HI_U32 u32Data, HI_U32 u32bEnable )
 {
+#if 1
+#warning TODO
+	printk("TODO: %s\n", __FUNCTION__);
+#else
     volatile U_G0_CTRL G0_CTRL;
 
     if(u32Data >= GFX_MAX)
@@ -4678,11 +5118,15 @@ HI_VOID  VDP_GFX_SetLayerEnable(HI_U32 u32Data, HI_U32 u32bEnable )
     G0_CTRL.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->G0_CTRL.u32) + u32Data * GFX_OFFSET));
     G0_CTRL.bits.surface_en = u32bEnable ;
     VDP_RegWrite((HI_U32)(&(pVdpReg->G0_CTRL.u32) + u32Data * GFX_OFFSET), G0_CTRL.u32); 
-
+#endif
     return ;
 }
 HI_VOID  VDP_GFX_SetNoSecFlag    (HI_U32 u32Data, HI_U32 u32Enable )
 {
+#if 1
+#warning TODO
+	printk("TODO: %s\n", __FUNCTION__);
+#else
     volatile U_G0_CTRL  G0_CTRL;
     if(u32Data >= GFX_MAX)
     {
@@ -4692,10 +5136,15 @@ HI_VOID  VDP_GFX_SetNoSecFlag    (HI_U32 u32Data, HI_U32 u32Enable )
     G0_CTRL.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->G0_CTRL.u32) + u32Data * GFX_OFFSET));
     G0_CTRL.bits.nosec_flag= u32Enable ;
     VDP_RegWrite((HI_U32)(&(pVdpReg->G0_CTRL.u32) + u32Data * GFX_OFFSET), G0_CTRL.u32);
+#endif
     return ;
 }
 HI_VOID  VDP_GFX_SetDcmpEnable(HI_U32 u32Data, HI_U32 u32bEnable )
 {
+#if 1
+#warning TODO
+	printk("TODO: %s\n", __FUNCTION__);
+#else
     volatile U_G0_CTRL G0_CTRL;
 
     if(u32Data >= GFX_MAX)
@@ -4707,12 +5156,16 @@ HI_VOID  VDP_GFX_SetDcmpEnable(HI_U32 u32Data, HI_U32 u32bEnable )
     G0_CTRL.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->G0_CTRL.u32) + u32Data * GFX_OFFSET));
     G0_CTRL.bits.dcmp_en = u32bEnable ;
     VDP_RegWrite((HI_U32)(&(pVdpReg->G0_CTRL.u32) + u32Data * GFX_OFFSET), G0_CTRL.u32); 
-
+#endif
     return ;
 }
 
 HI_VOID VDP_GFX_SetDcmpAddr(HI_U32 u32Data, HI_U32 u32LAddr)
 {
+#if 1
+#warning TODO
+	printk("TODO: %s\n", __FUNCTION__);
+#else
     volatile U_G0_DCMP_ADDR G0_DCMP_ADDR;
     if(u32Data >= GFX_MAX)
     {
@@ -4721,10 +5174,16 @@ HI_VOID VDP_GFX_SetDcmpAddr(HI_U32 u32Data, HI_U32 u32LAddr)
     }
     G0_DCMP_ADDR.u32 = u32LAddr;
     VDP_RegWrite((HI_U32)(&(pVdpReg->G0_DCMP_ADDR.u32)+ u32Data * GFX_OFFSET), G0_DCMP_ADDR.u32);
+#endif
 }
 
 HI_VOID VDP_GFX_SetDcmpNAddr(HI_U32 u32Data, HI_U32 u32NAddr)
 {
+#if 1
+#warning TODO
+	printk("TODO: %s\n", __FUNCTION__);
+#else
+
     volatile U_G0_DCMP_NADDR G0_DCMP_NADDR;
     if(u32Data >= GFX_MAX)
     {
@@ -4733,10 +5192,15 @@ HI_VOID VDP_GFX_SetDcmpNAddr(HI_U32 u32Data, HI_U32 u32NAddr)
     }
     G0_DCMP_NADDR.u32 = u32NAddr;
     VDP_RegWrite((HI_U32)(&(pVdpReg->G0_DCMP_NADDR.u32)+ u32Data * GFX_OFFSET), G0_DCMP_NADDR.u32);
+#endif
 }
 
 HI_VOID VDP_GFX_SetDcmpOffset(HI_U32 u32Data, HI_U32 u32Offset)
 {
+#if 1
+#warning TODO
+	printk("TODO: %s\n", __FUNCTION__);
+#else
     volatile U_G0_DCMP_OFFSET G0_DCMP_OFFSET;
     if(u32Data >= GFX_MAX)
     {
@@ -4745,6 +5209,7 @@ HI_VOID VDP_GFX_SetDcmpOffset(HI_U32 u32Data, HI_U32 u32Offset)
     }
     G0_DCMP_OFFSET.u32 = u32Offset;
     VDP_RegWrite((HI_U32)(&(pVdpReg->G0_DCMP_OFFSET.u32)+ u32Data * GFX_OFFSET), G0_DCMP_OFFSET.u32);
+#endif
 }
 
 
@@ -4754,6 +5219,10 @@ HI_VOID VDP_GFX_SetDcmpOffset(HI_U32 u32Data, HI_U32 u32Offset)
 
 HI_VOID VDP_GFX_SetLayerAddr(HI_U32 u32Data, HI_U32 u32LAddr, HI_U32 u32Stride)
 {
+#if 1
+#warning TODO
+	printk("TODO: %s\n", __FUNCTION__);
+#else
     volatile U_G0_ADDR G0_ADDR;
     volatile U_G0_STRIDE G0_STRIDE;
     if(u32Data >= GFX_MAX)
@@ -4767,10 +5236,15 @@ HI_VOID VDP_GFX_SetLayerAddr(HI_U32 u32Data, HI_U32 u32LAddr, HI_U32 u32Stride)
     G0_STRIDE.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->G0_STRIDE.u32)+ u32Data * GFX_OFFSET));
     G0_STRIDE.bits.surface_stride = u32Stride;
     VDP_RegWrite((HI_U32)(&(pVdpReg->G0_STRIDE.u32)+ u32Data * GFX_OFFSET), G0_STRIDE.u32);
+#endif
 }
 
 HI_VOID VDP_GFX_SetLutAddr(HI_U32 u32Data, HI_U32 u32LutAddr)
 {
+#if 1
+#warning TODO
+	printk("TODO: %s\n", __FUNCTION__);
+#else
     volatile U_G0_PARAADDR G0_PARAADDR;
     if(u32Data >= GFX_MAX)
     {
@@ -4779,6 +5253,7 @@ HI_VOID VDP_GFX_SetLutAddr(HI_U32 u32Data, HI_U32 u32LutAddr)
     }
     G0_PARAADDR.u32 = u32LutAddr;
     VDP_RegWrite((HI_U32)(&(pVdpReg->G0_PARAADDR.u32)+ u32Data * GFX_OFFSET), G0_PARAADDR.u32);
+#endif
 }
 
 //HI_VOID VDP_GFX_SetGammaEnable(HI_U32 u32Data, HI_U32 u32GmmEn)
@@ -4799,6 +5274,10 @@ HI_VOID VDP_GFX_SetLutAddr(HI_U32 u32Data, HI_U32 u32LutAddr)
 
 HI_VOID  VDP_GFX_SetInDataFmt(HI_U32 u32Data, VDP_GFX_IFMT_E  enDataFmt)
 {
+#if 1
+#warning TODO
+	printk("TODO: %s\n", __FUNCTION__);
+#else
     volatile U_G0_CTRL G0_CTRL;
 
     if(u32Data >= GFX_MAX)
@@ -4810,13 +5289,17 @@ HI_VOID  VDP_GFX_SetInDataFmt(HI_U32 u32Data, VDP_GFX_IFMT_E  enDataFmt)
     G0_CTRL.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->G0_CTRL.u32) + u32Data * GFX_OFFSET));
     G0_CTRL.bits.ifmt = enDataFmt;
     VDP_RegWrite((HI_U32)(&(pVdpReg->G0_CTRL.u32) + u32Data * GFX_OFFSET), G0_CTRL.u32); 
-
+#endif
     return ;
 }
 
 
 HI_VOID VDP_GFX_SetBitExtend(HI_U32 u32Data, VDP_GFX_BITEXTEND_E u32mode)
 {
+#if 1
+#warning TODO
+	printk("TODO: %s\n", __FUNCTION__);
+#else
     volatile U_G0_CTRL G0_CTRL;
     if(u32Data >= GFX_MAX)
     {
@@ -4829,13 +5312,17 @@ HI_VOID VDP_GFX_SetBitExtend(HI_U32 u32Data, VDP_GFX_BITEXTEND_E u32mode)
     G0_CTRL.bits.bitext = u32mode;
     VDP_RegWrite((HI_U32)(&(pVdpReg->G0_CTRL.u32)+ u32Data * GFX_OFFSET), G0_CTRL.u32); 
 
-
+#endif
 }
 
 //HI_VOID VDP_SetGfxPalpha(VDP_DISP_LAYER_E enLayer,HI_U32 bAlphaEn,HI_U32 bArange,HI_U32 u32Alpha0,HI_U32 u32Alpha1)//CBM
 
 HI_VOID VDP_GFX_SetColorKey(HI_U32 u32Data,HI_U32  bkeyEn,VDP_GFX_CKEY_S stKey )
 {
+#if 1
+#warning TODO
+	printk("TODO: %s\n", __FUNCTION__);
+#else
     volatile U_G0_CKEYMAX G0_CKEYMAX;
     volatile U_G0_CKEYMIN G0_CKEYMIN;
     volatile U_G0_CBMPARA G0_CBMPARA;
@@ -4861,11 +5348,15 @@ HI_VOID VDP_GFX_SetColorKey(HI_U32 u32Data,HI_U32  bkeyEn,VDP_GFX_CKEY_S stKey )
     G0_CBMPARA.bits.key_en = bkeyEn;
     G0_CBMPARA.bits.key_mode = stKey.bKeyMode;            
     VDP_RegWrite((HI_U32)(&(pVdpReg->G0_CBMPARA.u32)+ u32Data * GFX_OFFSET), G0_CBMPARA.u32); 
-
+#endif
 }
 
 HI_VOID VDP_GFX_SetKeyMask(HI_U32 u32Data, VDP_GFX_MASK_S stMsk)
 {
+#if 1
+#warning TODO
+	printk("TODO: %s\n", __FUNCTION__);
+#else
     volatile U_G0_CMASK G0_CMASK;
     if(u32Data >= GFX_MAX)
     {
@@ -4877,12 +5368,16 @@ HI_VOID VDP_GFX_SetKeyMask(HI_U32 u32Data, VDP_GFX_MASK_S stMsk)
     G0_CMASK.bits.kmsk_g = stMsk.u32Mask_g;
     G0_CMASK.bits.kmsk_b = stMsk.u32Mask_b;
     VDP_RegWrite((HI_U32)(&(pVdpReg->G0_CMASK.u32)+ u32Data * GFX_OFFSET), G0_CMASK.u32);
-
+#endif
 }
 
 
 HI_VOID VDP_GFX_SetReadMode(HI_U32 u32Data, HI_U32 u32Mode)
 {
+#if 1
+#warning TODO
+	printk("TODO: %s\n", __FUNCTION__);
+#else
     volatile U_G0_CTRL G0_CTRL;
     if(u32Data >= GFX_MAX)
     {
@@ -4893,12 +5388,16 @@ HI_VOID VDP_GFX_SetReadMode(HI_U32 u32Data, HI_U32 u32Mode)
     G0_CTRL.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->G0_CTRL.u32)+ u32Data * GFX_OFFSET));
     G0_CTRL.bits.read_mode = u32Mode;
     VDP_RegWrite((HI_U32)(&(pVdpReg->G0_CTRL.u32)+ u32Data * GFX_OFFSET), G0_CTRL.u32); 
-
+#endif
 
 }
 
 HI_VOID  VDP_GFX_SetParaUpd  (HI_U32 u32Data, VDP_DISP_COEFMODE_E enMode )
 {
+#if 1
+#warning TODO
+	printk("TODO: %s\n", __FUNCTION__);
+#else
     volatile U_G0_PARAUP G0_PARAUP;
     if(u32Data >= GFX_MAX)
     {
@@ -4912,11 +5411,15 @@ HI_VOID  VDP_GFX_SetParaUpd  (HI_U32 u32Data, VDP_DISP_COEFMODE_E enMode )
         VDP_RegWrite((HI_U32)(&(pVdpReg->G0_PARAUP.u32)+ u32Data * GFX_OFFSET), G0_PARAUP.u32);
     }
 
-
+#endif
 
 }
 HI_VOID  VDP_GFX_SetThreeDimDofEnable    (HI_U32 u32Data, HI_U32 bEnable)
 {
+#if 1
+#warning TODO
+	printk("TODO: %s\n", __FUNCTION__);
+#else
     volatile U_G0_DOF_CTRL  G0_DOF_CTRL;
     
     if(u32Data >= GFX_MAX)
@@ -4928,10 +5431,15 @@ HI_VOID  VDP_GFX_SetThreeDimDofEnable    (HI_U32 u32Data, HI_U32 bEnable)
     G0_DOF_CTRL.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->G0_DOF_CTRL.u32))+ u32Data * GFX_OFFSET);
     G0_DOF_CTRL.bits.dof_en = bEnable;
     VDP_RegWrite((HI_U32)(&(pVdpReg->G0_DOF_CTRL.u32)+ u32Data * GFX_OFFSET), G0_DOF_CTRL.u32);
+#endif
 }
 //HI_VOID  VDP_GFX_SetThreeDimIsRData(HI_U32 u32Data, HI_U32 u32IsRData)
 HI_VOID  VDP_GFX_SetThreeDimDofStep(HI_U32 u32Data, HI_S32 s32LStep, HI_S32 s32RStep)
 {
+#if 1
+#warning TODO
+	printk("TODO: %s\n", __FUNCTION__);
+#else
     volatile U_G0_DOF_STEP  G0_DOF_STEP;
     
     if(u32Data >= GFX_MAX)
@@ -4944,6 +5452,7 @@ HI_VOID  VDP_GFX_SetThreeDimDofStep(HI_U32 u32Data, HI_S32 s32LStep, HI_S32 s32R
     G0_DOF_STEP.bits.right_step= s32RStep;
     G0_DOF_STEP.bits.left_step = s32LStep;
     VDP_RegWrite((HI_U32)(&(pVdpReg->G0_DOF_STEP.u32)+ u32Data * GFX_OFFSET), G0_DOF_STEP.u32);
+#endif
 }
 
 //3D MODE
@@ -5049,6 +5558,10 @@ HI_VOID VDP_GFX_SetDispMode(HI_U32 u32Data, VDP_DISP_MODE_E enDispMode)
 
 HI_VOID  VDP_GFX_SetLayerReso     (HI_U32 u32Data, VDP_DISP_RECT_S  stRect)
 {
+#if 1
+#warning TODO
+	printk("TODO: %s\n", __FUNCTION__);
+#else
 
     volatile U_G0_SFPOS G0_SFPOS;
     volatile U_G0_VFPOS G0_VFPOS;
@@ -5103,12 +5616,16 @@ HI_VOID  VDP_GFX_SetLayerReso     (HI_U32 u32Data, VDP_DISP_RECT_S  stRect)
     //G0_ORESO.bits.ow = stRect.u32OWth - 1;
     //G0_ORESO.bits.oh = stRect.u32OHgt - 1;
     //VDP_RegWrite((HI_U32)(&(pVdpReg->G0_ORESO.u32)+ u32Data * GFX_OFFSET), G0_ORESO.u32);
-
+#endif
     return ;
 }
 
 HI_VOID  VDP_GFX_SetVideoPos     (HI_U32 u32Data, VDP_RECT_S  stRect)
 {
+#if 1
+#warning TODO
+	printk("TODO: %s\n", __FUNCTION__);
+#else
    volatile U_G0_VFPOS G0_VFPOS;
    volatile U_G0_VLPOS G0_VLPOS;
   
@@ -5129,11 +5646,16 @@ HI_VOID  VDP_GFX_SetVideoPos     (HI_U32 u32Data, VDP_RECT_S  stRect)
    G0_VLPOS.bits.video_xlpos = stRect.u32X + stRect.u32Wth - 1;
    G0_VLPOS.bits.video_ylpos = stRect.u32Y + stRect.u32Hgt - 1;
    VDP_RegWrite((HI_U32)(&(pVdpReg->G0_VLPOS.u32) + u32Data * GFX_OFFSET), G0_VLPOS.u32); 
+#endif
    return ;
 }   
     
 HI_VOID  VDP_GFX_SetDispPos     (HI_U32 u32Data, VDP_RECT_S  stRect)
 {
+#if 1
+#warning TODO
+	printk("TODO: %s\n", __FUNCTION__);
+#else
    volatile U_G0_DFPOS G0_DFPOS;
    volatile U_G0_DLPOS G0_DLPOS;
 
@@ -5153,6 +5675,7 @@ HI_VOID  VDP_GFX_SetDispPos     (HI_U32 u32Data, VDP_RECT_S  stRect)
    G0_DLPOS.bits.disp_xlpos = stRect.u32X + stRect.u32Wth - 1;
    G0_DLPOS.bits.disp_ylpos = stRect.u32Y + stRect.u32Hgt - 1;
    VDP_RegWrite((HI_U32)(&(pVdpReg->G0_DLPOS.u32) + u32Data * GFX_OFFSET), G0_DLPOS.u32); 
+#endif
    return ;
 }   
     
@@ -5160,6 +5683,10 @@ HI_VOID  VDP_GFX_SetDispPos     (HI_U32 u32Data, VDP_RECT_S  stRect)
 
 HI_VOID  VDP_GFX_SetInReso(HI_U32 u32Data, VDP_RECT_S  stRect)
 {
+#if 1
+#warning TODO
+	printk("TODO: %s\n", __FUNCTION__);
+#else
     volatile U_G0_IRESO G0_IRESO;
     
    if(u32Data >= GFX_MAX)
@@ -5175,6 +5702,7 @@ HI_VOID  VDP_GFX_SetInReso(HI_U32 u32Data, VDP_RECT_S  stRect)
    G0_IRESO.bits.iw = stRect.u32Wth - 1;
    G0_IRESO.bits.ih = stRect.u32Hgt - 1;
    VDP_RegWrite((HI_U32)(&(pVdpReg->G0_IRESO.u32) + u32Data * GFX_OFFSET), G0_IRESO.u32); 
+#endif
    return ;
 }
 
@@ -5194,6 +5722,10 @@ HI_VOID  VDP_GFX_SetInReso(HI_U32 u32Data, VDP_RECT_S  stRect)
 //
 HI_VOID  VDP_GFX_SetRegUp (HI_U32 u32Data)
 {
+#if 1
+#warning TODO
+	printk("TODO: %s\n", __FUNCTION__);
+#else
     volatile U_G0_UPD G0_UPD;
 
     /* GO layer register update */
@@ -5205,12 +5737,16 @@ HI_VOID  VDP_GFX_SetRegUp (HI_U32 u32Data)
 
     G0_UPD.bits.regup = 0x1;
     VDP_RegWrite((HI_U32)(&(pVdpReg->G0_UPD.u32) + u32Data * GFX_OFFSET), G0_UPD.u32); 
-
+#endif
     return ;
 }
 
 HI_VOID  VDP_GFX_SetLayerBkg(HI_U32 u32Data, VDP_BKG_S stBkg)
 {
+#if 1
+#warning TODO
+	printk("TODO: %s\n", __FUNCTION__);
+#else
     volatile U_G0_BK    G0_BK;
     volatile U_G0_ALPHA G0_ALPHA;
 
@@ -5229,12 +5765,16 @@ HI_VOID  VDP_GFX_SetLayerBkg(HI_U32 u32Data, VDP_BKG_S stBkg)
     G0_ALPHA.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->G0_ALPHA.u32) + u32Data * GFX_OFFSET));
     G0_ALPHA.bits.vbk_alpha = stBkg.u32BkgA;
     VDP_RegWrite((HI_U32)(&(pVdpReg->G0_ALPHA.u32) + u32Data * GFX_OFFSET), G0_ALPHA.u32); 
-
+#endif
     return ;
 }
 
 HI_VOID  VDP_GFX_SetLayerGalpha (HI_U32 u32Data, HI_U32 u32Alpha0)
 {
+#if 1
+#warning TODO
+	printk("TODO: %s\n", __FUNCTION__);
+#else
     volatile U_G0_CBMPARA G0_CBMPARA;
     
     if(u32Data >= GFX_MAX)
@@ -5247,14 +5787,18 @@ HI_VOID  VDP_GFX_SetLayerGalpha (HI_U32 u32Data, HI_U32 u32Alpha0)
     G0_CBMPARA.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->G0_CBMPARA.u32) + u32Data * GFX_OFFSET));
     G0_CBMPARA.bits.galpha = u32Alpha0;
     VDP_RegWrite((HI_U32)(&(pVdpReg->G0_CBMPARA.u32) + u32Data * GFX_OFFSET), G0_CBMPARA.u32); 
-
+#endif
     return ;
 }
 
 
 HI_VOID VDP_GFX_SetPalpha(HI_U32 u32Data, HI_U32 bAlphaEn,HI_U32 bArange,HI_U32 u32Alpha0,HI_U32 u32Alpha1)
 {
-    
+#if 1
+#warning TODO
+	printk("TODO: %s\n", __FUNCTION__);
+#else
+
     
     volatile U_G0_CBMPARA G0_CBMPARA;
     volatile U_G0_CKEYMIN G0_CKEYMIN;
@@ -5281,13 +5825,17 @@ HI_VOID VDP_GFX_SetPalpha(HI_U32 u32Data, HI_U32 bAlphaEn,HI_U32 bArange,HI_U32 
     G0_CBMPARA.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->G0_CBMPARA.u32)+ u32Data * GFX_OFFSET));
     G0_CBMPARA.bits.palpha_range = bArange;            
     VDP_RegWrite((HI_U32)(&(pVdpReg->G0_CBMPARA.u32)+ u32Data * GFX_OFFSET), G0_CBMPARA.u32);
-    
+#endif
 }
 
 
 
 HI_VOID VDP_GFX_SetLayerNAddr(HI_U32 u32Data, HI_U32 u32NAddr)
 {
+#if 1
+#warning TODO
+	printk("TODO: %s\n", __FUNCTION__);
+#else
     volatile U_G0_NADDR G0_NADDR;
     if(u32Data >= GFX_MAX)
     {
@@ -5296,11 +5844,15 @@ HI_VOID VDP_GFX_SetLayerNAddr(HI_U32 u32Data, HI_U32 u32NAddr)
     }
     G0_NADDR.u32 = u32NAddr;
     VDP_RegWrite((HI_U32)(&(pVdpReg->G0_NADDR.u32)+ u32Data * GFX_OFFSET), G0_NADDR.u32);
-
+#endif
 }
 
 HI_VOID  VDP_GFX_SetMuteEnable(HI_U32 u32Data, HI_U32 bEnable)
 {
+#if 1
+#warning TODO
+	printk("TODO: %s\n", __FUNCTION__);
+#else
     volatile U_G0_CTRL G0_CTRL;
     if(u32Data >= GFX_MAX)
     {
@@ -5310,10 +5862,15 @@ HI_VOID  VDP_GFX_SetMuteEnable(HI_U32 u32Data, HI_U32 bEnable)
     G0_CTRL.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->G0_CTRL.u32)+ u32Data * GFX_OFFSET));
     G0_CTRL.bits.mute_en = bEnable;
     VDP_RegWrite((HI_U32)(&(pVdpReg->G0_CTRL.u32) + u32Data * GFX_OFFSET), G0_CTRL.u32); 
+#endif
 }
 
 HI_VOID VDP_GFX_SetPreMultEnable(HI_U32 u32Data, HI_U32 bEnable)
 {
+#if 1
+#warning TODO
+	printk("TODO: %s\n", __FUNCTION__);
+#else
     volatile U_G0_CBMPARA G0_CBMPARA;
     if(u32Data >= GFX_MAX)
     {
@@ -5323,11 +5880,16 @@ HI_VOID VDP_GFX_SetPreMultEnable(HI_U32 u32Data, HI_U32 bEnable)
     G0_CBMPARA.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->G0_CBMPARA.u32)+ u32Data * GFX_OFFSET));
     G0_CBMPARA.bits.premult_en = bEnable;
     VDP_RegWrite((HI_U32)(&(pVdpReg->G0_CBMPARA.u32)+ u32Data * GFX_OFFSET), G0_CBMPARA.u32); 
+#endif
 }
 
 
 HI_VOID  VDP_GFX_SetUpdMode(HI_U32 u32Data, HI_U32 u32Mode)
 {
+#if 1
+#warning TODO
+	printk("TODO: %s\n", __FUNCTION__);
+#else
     volatile U_G0_CTRL G0_CTRL;
     if(u32Data >= GFX_MAX)
     {
@@ -5339,6 +5901,7 @@ HI_VOID  VDP_GFX_SetUpdMode(HI_U32 u32Data, HI_U32 u32Mode)
     G0_CTRL.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->G0_CTRL.u32)+ u32Data * GFX_OFFSET));
     G0_CTRL.bits.upd_mode = u32Mode;
     VDP_RegWrite((HI_U32)(&(pVdpReg->G0_CTRL.u32)+ u32Data * GFX_OFFSET), G0_CTRL.u32); 
+#endif
 }
 
 //HI_VOID  VDP_GFX_SetDeCmpEnable(HI_U32 u32Data, HI_U32 bEnable)
@@ -5356,6 +5919,10 @@ HI_VOID  VDP_GFX_SetUpdMode(HI_U32 u32Data, HI_U32 u32Mode)
 
 HI_VOID  VDP_GFX_SetFlipEnable(HI_U32 u32Data, HI_U32 bEnable)
 {
+#if 1
+#warning TODO
+	printk("TODO: %s\n", __FUNCTION__);
+#else
     volatile U_G0_CTRL G0_CTRL;
     if(u32Data >= GFX_MAX)
     {
@@ -5365,6 +5932,7 @@ HI_VOID  VDP_GFX_SetFlipEnable(HI_U32 u32Data, HI_U32 bEnable)
     G0_CTRL.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->G0_CTRL.u32)+ u32Data * GFX_OFFSET));
     G0_CTRL.bits.flip_en = bEnable;
     VDP_RegWrite((HI_U32)(&(pVdpReg->G0_CTRL.u32)+ u32Data * GFX_OFFSET), G0_CTRL.u32); 
+#endif
 }
 
     
@@ -5376,6 +5944,10 @@ HI_VOID  VDP_GFX_SetFlipEnable(HI_U32 u32Data, HI_U32 bEnable)
 //
 HI_VOID  VDP_GP_SetParaUpd       (HI_U32 u32Data, VDP_GP_PARA_E enMode)
 {
+#if 1
+#warning TODO
+	printk("TODO: %s\n", __FUNCTION__);
+#else
     volatile U_GP0_PARAUP GP0_PARAUP;
     GP0_PARAUP.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->GP0_PARAUP.u32) + u32Data * GP_OFFSET));
     
@@ -5398,12 +5970,17 @@ HI_VOID  VDP_GP_SetParaUpd       (HI_U32 u32Data, VDP_GP_PARA_E enMode)
     }
     
     VDP_RegWrite((HI_U32)(&(pVdpReg->GP0_PARAUP.u32) + u32Data * GP_OFFSET), GP0_PARAUP.u32); 
+#endif
     return ;
 }
 
 
 HI_VOID VDP_GP_SetIpOrder (HI_U32 u32Data, HI_U32 u32Chn, VDP_GP_ORDER_E enIpOrder)
 {
+#if 1
+#warning TODO
+	printk("TODO: %s\n", __FUNCTION__);
+#else
     volatile U_GP0_CTRL GP0_CTRL ;
 
     if(u32Data >= GP_MAX)
@@ -5555,10 +6132,15 @@ HI_VOID VDP_GP_SetIpOrder (HI_U32 u32Data, HI_U32 u32Chn, VDP_GP_ORDER_E enIpOrd
     }
 
     VDP_RegWrite((HI_U32)(&(pVdpReg->GP0_CTRL.u32)+ u32Data * GP_OFFSET), GP0_CTRL.u32);
+#endif
 }
 
 HI_VOID VDP_GP_SetReadMode(HI_U32 u32Data, HI_U32 u32Mode)
 {
+#if 1
+#warning TODO
+	printk("TODO: %s\n", __FUNCTION__);
+#else
     volatile U_GP0_CTRL GP0_CTRL;
     if(u32Data >= GP_MAX)
     {
@@ -5569,13 +6151,17 @@ HI_VOID VDP_GP_SetReadMode(HI_U32 u32Data, HI_U32 u32Mode)
     GP0_CTRL.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->GP0_CTRL.u32)+ u32Data * GP_OFFSET));
     GP0_CTRL.bits.read_mode = u32Mode;
     VDP_RegWrite((HI_U32)(&(pVdpReg->GP0_CTRL.u32)+ u32Data * GP_OFFSET), GP0_CTRL.u32); 
-
+#endif
 
 }
 
 
 HI_VOID  VDP_GP_SetRect  (HI_U32 u32Data, VDP_DISP_RECT_S  stRect)
 {
+#if 1
+#warning TODO
+	printk("TODO: %s\n", __FUNCTION__);
+#else
     volatile U_GP0_IRESO GP0_IRESO;
     volatile U_GP0_ORESO GP0_ORESO;
 
@@ -5594,13 +6180,17 @@ HI_VOID  VDP_GP_SetRect  (HI_U32 u32Data, VDP_DISP_RECT_S  stRect)
     GP0_ORESO.bits.ow = stRect.u32OWth - 1;
     GP0_ORESO.bits.oh = stRect.u32OHgt - 1;
     VDP_RegWrite((HI_U32)(&(pVdpReg->GP0_ORESO.u32) + u32Data * GP_OFFSET), GP0_ORESO.u32); 
-
+#endif
     return ;
 }
 
 HI_VOID  VDP_GP_SetLayerReso (HI_U32 u32Data, VDP_DISP_RECT_S  stRect)
 {
  
+#if 1
+#warning TODO
+	printk("TODO: %s\n", __FUNCTION__);
+#else
     volatile U_GP0_VFPOS GP0_VFPOS;
     volatile U_GP0_VLPOS GP0_VLPOS;
     volatile U_GP0_DFPOS GP0_DFPOS;
@@ -5644,12 +6234,16 @@ HI_VOID  VDP_GP_SetLayerReso (HI_U32 u32Data, VDP_DISP_RECT_S  stRect)
     GP0_ORESO.bits.ow = stRect.u32OWth - 1;
     GP0_ORESO.bits.oh = stRect.u32OHgt - 1;
     VDP_RegWrite((HI_U32)(&(pVdpReg->GP0_ORESO.u32) + u32Data * GP_OFFSET), GP0_ORESO.u32); 
-
+#endif
     return ;
 }   
 
 HI_VOID  VDP_GP_SetVideoPos     (HI_U32 u32Data, VDP_RECT_S  stRect)
 {
+#if 1
+#warning TODO
+	printk("TODO: %s\n", __FUNCTION__);
+#else
    volatile U_GP0_VFPOS GP0_VFPOS;
    volatile U_GP0_VLPOS GP0_VLPOS;
    
@@ -5671,11 +6265,16 @@ HI_VOID  VDP_GP_SetVideoPos     (HI_U32 u32Data, VDP_RECT_S  stRect)
    GP0_VLPOS.bits.video_xlpos = stRect.u32X + stRect.u32Wth - 1;
    GP0_VLPOS.bits.video_ylpos = stRect.u32Y + stRect.u32Hgt - 1;
    VDP_RegWrite((HI_U32)(&(pVdpReg->GP0_VLPOS.u32) + u32Data * GP_OFFSET), GP0_VLPOS.u32); 
+#endif
    return ;
 }   
     
 HI_VOID  VDP_GP_SetDispPos     (HI_U32 u32Data, VDP_RECT_S  stRect)
 {
+#if 1
+#warning TODO
+	printk("TODO: %s\n", __FUNCTION__);
+#else
 
    volatile U_GP0_DFPOS GP0_DFPOS;
    volatile U_GP0_DLPOS GP0_DLPOS;
@@ -5696,11 +6295,16 @@ HI_VOID  VDP_GP_SetDispPos     (HI_U32 u32Data, VDP_RECT_S  stRect)
    GP0_DLPOS.bits.disp_xlpos = stRect.u32X + stRect.u32Wth - 1;
    GP0_DLPOS.bits.disp_ylpos = stRect.u32Y + stRect.u32Hgt - 1;
    VDP_RegWrite((HI_U32)(&(pVdpReg->GP0_DLPOS.u32) + u32Data * GP_OFFSET), GP0_DLPOS.u32); 
+#endif
    return ;
 }   
 
 HI_VOID  VDP_GP_SetInReso (HI_U32 u32Data, VDP_RECT_S  stRect)
 {
+#if 1
+#warning TODO
+	printk("TODO: %s\n", __FUNCTION__);
+#else
     volatile U_GP0_IRESO GP0_IRESO;
     if(u32Data >= GP_MAX)
     {
@@ -5713,12 +6317,16 @@ HI_VOID  VDP_GP_SetInReso (HI_U32 u32Data, VDP_RECT_S  stRect)
     GP0_IRESO.bits.iw = stRect.u32Wth - 1;
     GP0_IRESO.bits.ih = stRect.u32Hgt - 1;
     VDP_RegWrite((HI_U32)(&(pVdpReg->GP0_IRESO.u32) + u32Data * GP_OFFSET), GP0_IRESO.u32); 
-
+#endif
     return ;
 }  
 
 HI_VOID  VDP_GP_SetOutReso (HI_U32 u32Data, VDP_RECT_S  stRect)
 {
+#if 1
+#warning TODO
+	printk("TODO: %s\n", __FUNCTION__);
+#else
     volatile U_GP0_ORESO GP0_ORESO;
     if(u32Data >= GP_MAX)
     {
@@ -5731,12 +6339,16 @@ HI_VOID  VDP_GP_SetOutReso (HI_U32 u32Data, VDP_RECT_S  stRect)
     GP0_ORESO.bits.ow = stRect.u32Wth - 1;
     GP0_ORESO.bits.oh = stRect.u32Hgt - 1;
     VDP_RegWrite((HI_U32)(&(pVdpReg->GP0_ORESO.u32) + u32Data * GP_OFFSET), GP0_ORESO.u32); 
-
+#endif
     return ;
 }  
 
 HI_VOID  VDP_GP_SetLayerGalpha (HI_U32 u32Data, HI_U32 u32Alpha)
 {
+#if 1
+#warning TODO
+	printk("TODO: %s\n", __FUNCTION__);
+#else
     volatile U_GP0_GALPHA GP0_GALPHA;
     
     if(u32Data >= GP_MAX)
@@ -5749,12 +6361,16 @@ HI_VOID  VDP_GP_SetLayerGalpha (HI_U32 u32Data, HI_U32 u32Alpha)
     GP0_GALPHA.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->GP0_GALPHA.u32) + u32Data * GP_OFFSET));
     GP0_GALPHA.bits.galpha = u32Alpha;
     VDP_RegWrite((HI_U32)(&(pVdpReg->GP0_GALPHA.u32) + u32Data * GP_OFFSET), GP0_GALPHA.u32); 
-
+#endif
     return ;
 }
 
 HI_VOID  VDP_GP_SetLayerBkg(HI_U32 u32Data, VDP_BKG_S stBkg)
 {
+#if 1
+#warning TODO
+	printk("TODO: %s\n", __FUNCTION__);
+#else
     volatile U_GP0_BK GP0_BK;
     volatile U_GP0_ALPHA     GP0_ALPHA;
 
@@ -5773,12 +6389,16 @@ HI_VOID  VDP_GP_SetLayerBkg(HI_U32 u32Data, VDP_BKG_S stBkg)
     GP0_ALPHA.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->GP0_ALPHA.u32) + u32Data * GP_OFFSET));
     GP0_ALPHA.bits.vbk_alpha = stBkg.u32BkgA;
     VDP_RegWrite((HI_U32)(&(pVdpReg->GP0_ALPHA.u32) + u32Data * GP_OFFSET), GP0_ALPHA.u32); 
-
+#endif
     return ;
 }
 
 HI_VOID  VDP_GP_SetRegUp  (HI_U32 u32Data)
 {
+#if 1
+#warning TODO
+	printk("TODO: %s\n", __FUNCTION__);
+#else
     volatile U_GP0_UPD GP0_UPD;
 
     /* GP layer register update */
@@ -5790,7 +6410,7 @@ HI_VOID  VDP_GP_SetRegUp  (HI_U32 u32Data)
 
     GP0_UPD.bits.regup = 0x1;
     VDP_RegWrite((HI_U32)(&(pVdpReg->GP0_UPD.u32) + u32Data * GP_OFFSET), GP0_UPD.u32); 
-
+#endif
     return ;
 }
 
@@ -5800,6 +6420,10 @@ HI_VOID  VDP_GP_SetRegUp  (HI_U32 u32Data)
 
 HI_VOID  VDP_GP_SetCscDcCoef   (HI_U32 u32Data, VDP_CSC_DC_COEF_S pstCscCoef)
 {
+#if 1
+#warning TODO
+	printk("TODO: %s\n", __FUNCTION__);
+#else
     volatile U_GP0_CSC_IDC  GP0_CSC_IDC;
     volatile U_GP0_CSC_ODC  GP0_CSC_ODC;
     volatile U_GP0_CSC_IODC GP0_CSC_IODC;
@@ -5824,12 +6448,16 @@ HI_VOID  VDP_GP_SetCscDcCoef   (HI_U32 u32Data, VDP_CSC_DC_COEF_S pstCscCoef)
     GP0_CSC_IODC.bits.cscodc2 = pstCscCoef.csc_out_dc2;
     GP0_CSC_IODC.bits.cscidc2 = pstCscCoef.csc_in_dc2;
     VDP_RegWrite((HI_U32)(&(pVdpReg->GP0_CSC_IODC.u32) + u32Data * GP_OFFSET), GP0_CSC_IODC.u32); 
-
+#endif
     return ;
 }
 
 HI_VOID   VDP_GP_SetCscCoef(HI_U32 u32Data, VDP_CSC_COEF_S stCscCoef)
 {   
+#if 1
+#warning TODO
+	printk("TODO: %s\n", __FUNCTION__);
+#else
     volatile U_GP0_CSC_P0 GP0_CSC_P0;
     volatile U_GP0_CSC_P1 GP0_CSC_P1;
     volatile U_GP0_CSC_P2 GP0_CSC_P2;
@@ -5865,12 +6493,16 @@ HI_VOID   VDP_GP_SetCscCoef(HI_U32 u32Data, VDP_CSC_COEF_S stCscCoef)
     GP0_CSC_P4.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->GP0_CSC_P4.u32)+u32Data*GP_OFFSET));
     GP0_CSC_P4.bits.cscp22 = stCscCoef.csc_coef22;
     VDP_RegWrite((HI_U32)(&(pVdpReg->GP0_CSC_P4.u32)+u32Data*GP_OFFSET), GP0_CSC_P4.u32);
-        
+#endif
 }
 
     
 HI_VOID  VDP_GP_SetCscEnable   (HI_U32 u32Data, HI_U32 u32bCscEn)
 {
+#if 1
+#warning TODO
+	printk("TODO: %s\n", __FUNCTION__);
+#else
     volatile U_GP0_CSC_IDC GP0_CSC_IDC;
     
     if(u32Data >= GP_MAX)
@@ -5882,7 +6514,7 @@ HI_VOID  VDP_GP_SetCscEnable   (HI_U32 u32Data, HI_U32 u32bCscEn)
     GP0_CSC_IDC.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->GP0_CSC_IDC.u32) + u32Data * GP_OFFSET));
     GP0_CSC_IDC.bits.csc_en = u32bCscEn;
     VDP_RegWrite((HI_U32)(&(pVdpReg->GP0_CSC_IDC.u32) + u32Data * GP_OFFSET), GP0_CSC_IDC.u32); 
-
+#endif
     return ;
 }
 
@@ -6088,6 +6720,10 @@ HI_VOID VDP_GP_SetDispMode(HI_U32 u32Data, VDP_DISP_MODE_E enDispMode)
 
 HI_VOID VDP_GP_SetZmeEnable  (HI_U32 u32Data, VDP_ZME_MODE_E enMode, HI_U32 u32bEnable)
 {
+#if 1
+#warning TODO
+	printk("TODO: %s\n", __FUNCTION__);
+#else
     volatile U_GP0_ZME_HSP GP0_ZME_HSP;
     volatile U_GP0_ZME_VSP GP0_ZME_VSP;
   
@@ -6111,13 +6747,17 @@ HI_VOID VDP_GP_SetZmeEnable  (HI_U32 u32Data, VDP_ZME_MODE_E enMode, HI_U32 u32b
         GP0_ZME_VSP.bits.vsc_en = u32bEnable;
         VDP_RegWrite((HI_U32)(&(pVdpReg->GP0_ZME_VSP.u32) + u32Data * GP_OFFSET), GP0_ZME_VSP.u32); 
     }
-    
+#endif
     return ;
 }
 
 
 HI_VOID VDP_GP_SetZmePhase   (HI_U32 u32Data, VDP_ZME_MODE_E enMode, HI_S32 s32Phase)
 {
+#if 1
+#warning TODO
+	printk("TODO: %s\n", __FUNCTION__);
+#else
     volatile U_GP0_ZME_HOFFSET  GP0_ZME_HOFFSET;
     volatile U_GP0_ZME_VOFFSET  GP0_ZME_VOFFSET;
     
@@ -6155,12 +6795,16 @@ HI_VOID VDP_GP_SetZmePhase   (HI_U32 u32Data, VDP_ZME_MODE_E enMode, HI_S32 s32P
         GP0_ZME_VOFFSET.bits.vtp_offset = s32Phase;
         VDP_RegWrite((HI_U32)(&(pVdpReg->GP0_ZME_VOFFSET.u32) + u32Data * GP_OFFSET), GP0_ZME_VOFFSET.u32); 
     }
-
+#endif
     return ;
 }
 
 HI_VOID VDP_GP_SetZmeFirEnable   (HI_U32 u32Data, VDP_ZME_MODE_E enMode, HI_U32 u32bEnable)
 {
+#if 1
+#warning TODO
+	printk("TODO: %s\n", __FUNCTION__);
+#else
     volatile U_GP0_ZME_HSP        GP0_ZME_HSP;
     volatile U_GP0_ZME_VSP        GP0_ZME_VSP;
     
@@ -6197,12 +6841,16 @@ HI_VOID VDP_GP_SetZmeFirEnable   (HI_U32 u32Data, VDP_ZME_MODE_E enMode, HI_U32 
         GP0_ZME_VSP.bits.vfir_en = u32bEnable;
         VDP_RegWrite((HI_U32)(&(pVdpReg->GP0_ZME_VSP.u32) + u32Data * GP_OFFSET), GP0_ZME_VSP.u32); 
     }
-     
+#endif
     return ;
 }
 
 HI_VOID VDP_GP_SetZmeMidEnable   (HI_U32 u32Data, VDP_ZME_MODE_E enMode, HI_U32 u32bEnable)
 {
+#if 1
+#warning TODO
+	printk("TODO: %s\n", __FUNCTION__);
+#else
     volatile U_GP0_ZME_HSP        GP0_ZME_HSP;
     volatile U_GP0_ZME_VSP        GP0_ZME_VSP;
     
@@ -6252,13 +6900,17 @@ HI_VOID VDP_GP_SetZmeMidEnable   (HI_U32 u32Data, VDP_ZME_MODE_E enMode, HI_U32 
         GP0_ZME_VSP.bits.vchmid_en = u32bEnable;
         VDP_RegWrite((HI_U32)(&(pVdpReg->GP0_ZME_VSP.u32) + u32Data * GP_OFFSET), GP0_ZME_VSP.u32); 
     }
-
+#endif
     return ;
 }
 
 
 HI_VOID VDP_GP_SetZmeHorRatio  (HI_U32 u32Data, HI_U32 u32Ratio)
 {
+#if 1
+#warning TODO
+	printk("TODO: %s\n", __FUNCTION__);
+#else
     volatile U_GP0_ZME_HSP        GP0_ZME_HSP;
     
     if(u32Data >= GP_MAX)
@@ -6270,12 +6922,16 @@ HI_VOID VDP_GP_SetZmeHorRatio  (HI_U32 u32Data, HI_U32 u32Ratio)
     GP0_ZME_HSP.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->GP0_ZME_HSP.u32) + u32Data * GP_OFFSET));
     GP0_ZME_HSP.bits.hratio = u32Ratio;
     VDP_RegWrite((HI_U32)(&(pVdpReg->GP0_ZME_HSP.u32) + u32Data * GP_OFFSET), GP0_ZME_HSP.u32); 
-
+#endif
     return ;
 }
 
 HI_VOID VDP_GP_SetZmeVerRatio  (HI_U32 u32Data, HI_U32 u32Ratio)
 {
+#if 1
+#warning TODO
+	printk("TODO: %s\n", __FUNCTION__);
+#else
     volatile U_GP0_ZME_VSR        GP0_ZME_VSR;
     
     if(u32Data >= GP_MAX)
@@ -6287,7 +6943,7 @@ HI_VOID VDP_GP_SetZmeVerRatio  (HI_U32 u32Data, HI_U32 u32Ratio)
     GP0_ZME_VSR.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->GP0_ZME_VSR.u32) + u32Data * GP_OFFSET));
     GP0_ZME_VSR.bits.vratio = u32Ratio;
     VDP_RegWrite((HI_U32)(&(pVdpReg->GP0_ZME_VSR.u32) + u32Data * GP_OFFSET), GP0_ZME_VSR.u32); 
-
+#endif
     return ;
 }
 
@@ -6295,6 +6951,10 @@ HI_VOID VDP_GP_SetZmeVerRatio  (HI_U32 u32Data, HI_U32 u32Ratio)
 
 HI_VOID VDP_GP_SetZmeHfirOrder        (HI_U32 u32Data, HI_U32 u32HfirOrder)
 {
+#if 1
+#warning TODO
+	printk("TODO: %s\n", __FUNCTION__);
+#else
     volatile U_GP0_ZME_HSP        GP0_ZME_HSP;
     
     if(u32Data >= GP_MAX)
@@ -6306,12 +6966,16 @@ HI_VOID VDP_GP_SetZmeHfirOrder        (HI_U32 u32Data, HI_U32 u32HfirOrder)
     GP0_ZME_HSP.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->GP0_ZME_HSP.u32) + u32Data * GP_OFFSET));
     GP0_ZME_HSP.bits.hfir_order = u32HfirOrder;
     VDP_RegWrite((HI_U32)(&(pVdpReg->GP0_ZME_HSP.u32) + u32Data * GP_OFFSET), GP0_ZME_HSP.u32); 
-
+#endif
     return ;
 }
 
 HI_VOID VDP_GP_SetZmeCoefAddr  (HI_U32 u32Data, HI_U32 u32Mode, HI_U32 u32Addr)
 {
+#if 1
+#warning TODO
+	printk("TODO: %s\n", __FUNCTION__);
+#else
     volatile U_GP0_HCOEFAD    GP0_HCOEFAD;
     volatile U_GP0_VCOEFAD    GP0_VCOEFAD;
     
@@ -6337,13 +7001,17 @@ HI_VOID VDP_GP_SetZmeCoefAddr  (HI_U32 u32Data, HI_U32 u32Mode, HI_U32 u32Addr)
     {
         HI_PRINT("Error,VDP_GP_SetZmeCoefAddr() Select a Wrong Mode!\n");
     }
-
+#endif
     return ;
 }
 
 
 HI_VOID VDP_GP_SetParaRd(HI_U32 u32Data, VDP_GP_PARA_E enMode)
 {
+#if 1
+#warning TODO
+	printk("TODO: %s\n", __FUNCTION__);
+#else
     volatile U_GP0_PARARD GP0_PARARD;
 
     GP0_PARARD.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->GP0_PARARD.u32) + u32Data * GP_OFFSET));
@@ -6399,6 +7067,7 @@ HI_VOID VDP_GP_SetParaRd(HI_U32 u32Data, VDP_GP_PARA_E enMode)
     }
     
     VDP_RegWrite((HI_U32)(&(pVdpReg->GP0_PARARD.u32) + u32Data * GP_OFFSET), GP0_PARARD.u32); 
+#endif
     return ;
 }
 
@@ -6408,6 +7077,10 @@ HI_VOID VDP_GP_SetParaRd(HI_U32 u32Data, VDP_GP_PARA_E enMode)
 
 HI_VOID  VDP_GP_SetTiEnable(HI_U32 u32Data, HI_U32 u32Md,HI_U32 u32Data1)
 {
+#if 1
+#warning TODO
+	printk("TODO: %s\n", __FUNCTION__);
+#else
     volatile U_GP0_ZME_LTICTRL GP0_ZME_LTICTRL;
     volatile U_GP0_ZME_CTICTRL GP0_ZME_CTICTRL;
 
@@ -6429,12 +7102,16 @@ HI_VOID  VDP_GP_SetTiEnable(HI_U32 u32Data, HI_U32 u32Md,HI_U32 u32Data1)
         GP0_ZME_CTICTRL.bits.cti_en = u32Data1;
         VDP_RegWrite((HI_U32)(&(pVdpReg->GP0_ZME_CTICTRL.u32)+ u32Data * GP_OFFSET), GP0_ZME_CTICTRL.u32);
     }
-
+#endif
 }
 
 HI_VOID  VDP_GP_SetTiGainRatio(HI_U32 u32Data, HI_U32 u32Md, HI_S32 s32Data)
 
 {
+#if 1
+#warning TODO
+	printk("TODO: %s\n", __FUNCTION__);
+#else
     volatile U_GP0_ZME_LTICTRL GP0_ZME_LTICTRL;
     volatile U_GP0_ZME_CTICTRL GP0_ZME_CTICTRL;
 
@@ -6457,12 +7134,16 @@ HI_VOID  VDP_GP_SetTiGainRatio(HI_U32 u32Data, HI_U32 u32Md, HI_S32 s32Data)
         GP0_ZME_CTICTRL.bits.cgain_ratio = s32Data;
         VDP_RegWrite((HI_U32)(&(pVdpReg->GP0_ZME_CTICTRL.u32)+ u32Data * GP_OFFSET), GP0_ZME_CTICTRL.u32); 
     }
-
+#endif
 }
 
 HI_VOID  VDP_GP_SetTiMixRatio(HI_U32 u32Data, HI_U32 u32Md, HI_U32 u32mixing_ratio)
 
 {
+#if 1
+#warning TODO
+	printk("TODO: %s\n", __FUNCTION__);
+#else
     volatile U_GP0_ZME_LTICTRL GP0_ZME_LTICTRL;
     volatile U_GP0_ZME_CTICTRL GP0_ZME_CTICTRL;
     if(u32Data >= GP_MAX)
@@ -6485,11 +7166,16 @@ HI_VOID  VDP_GP_SetTiMixRatio(HI_U32 u32Data, HI_U32 u32Md, HI_U32 u32mixing_rat
         GP0_ZME_CTICTRL.bits.cmixing_ratio = u32mixing_ratio;
         VDP_RegWrite((HI_U32)(&(pVdpReg->GP0_ZME_CTICTRL.u32)+ u32Data * GP_OFFSET), GP0_ZME_CTICTRL.u32); 
     }
-
+#endif
 }
 
 HI_VOID  VDP_GP_SetTiHfThd(HI_U32 u32Data, HI_U32 u32Md, HI_U32 * u32TiHfThd)
 {
+#if 1
+#warning TODO
+	printk("TODO: %s\n", __FUNCTION__);
+#else
+
     volatile U_GP0_ZME_LHFREQTHD GP0_ZME_LHFREQTHD;
     if(u32Data >= GP_MAX)
     {
@@ -6504,12 +7190,16 @@ HI_VOID  VDP_GP_SetTiHfThd(HI_U32 u32Data, HI_U32 u32Md, HI_U32 * u32TiHfThd)
         GP0_ZME_LHFREQTHD.bits.lhfreq_thd1 = u32TiHfThd[1];
         VDP_RegWrite((HI_U32)(&(pVdpReg->GP0_ZME_LHFREQTHD.u32)+ u32Data * GP_OFFSET), GP0_ZME_LHFREQTHD.u32); 
     }
-
+#endif
 
 }
 
 HI_VOID  VDP_GP_SetTiHpCoef(HI_U32 u32Data, HI_U32 u32Md, HI_S32 * s32Data)
 {
+#if 1
+#warning TODO
+	printk("TODO: %s\n", __FUNCTION__);
+#else
 
     volatile U_GP0_ZME_LTICTRL GP0_ZME_LTICTRL;
     volatile U_GP0_ZME_CTICTRL GP0_ZME_CTICTRL;
@@ -6544,10 +7234,15 @@ HI_VOID  VDP_GP_SetTiHpCoef(HI_U32 u32Data, HI_U32 u32Md, HI_S32 * s32Data)
         VDP_RegWrite((HI_U32)(&(pVdpReg->GP0_ZME_CTICTRL.u32)+ u32Data * GP_OFFSET), GP0_ZME_CTICTRL.u32); 
         VDP_RegWrite((HI_U32)(&(pVdpReg->GP0_ZME_CHPASSCOEF.u32)+ u32Data * GP_OFFSET), GP0_ZME_CHPASSCOEF.u32); 
     }
+#endif
 }
 
 HI_VOID  VDP_GP_SetTiCoringThd(HI_U32 u32Data, HI_U32 u32Md, HI_U32 u32thd)
 {
+#if 1
+#warning TODO
+	printk("TODO: %s\n", __FUNCTION__);
+#else
     volatile U_GP0_ZME_LTITHD GP0_ZME_LTITHD;
     volatile U_GP0_ZME_CTITHD GP0_ZME_CTITHD;
     if(u32Data >= GP_MAX)
@@ -6569,12 +7264,16 @@ HI_VOID  VDP_GP_SetTiCoringThd(HI_U32 u32Data, HI_U32 u32Md, HI_U32 u32thd)
         GP0_ZME_CTITHD.bits.ccoring_thd = u32thd;
         VDP_RegWrite((HI_U32)(&(pVdpReg->GP0_ZME_CTITHD.u32)+ u32Data * GP_OFFSET), GP0_ZME_CTITHD.u32); 
     }
-
+#endif
 }
 
 //***********************have problem !!!*****************************************************
 HI_VOID  VDP_GP_SetTiSwingThd(HI_U32 u32Data, HI_U32 u32Md, HI_U32 u32thd, HI_U32 u32thd1)//have problem
 {
+#if 1
+#warning TODO
+	printk("TODO: %s\n", __FUNCTION__);
+#else
     volatile U_GP0_ZME_LTITHD GP0_ZME_LTITHD;
     volatile U_GP0_ZME_CTITHD GP0_ZME_CTITHD;
     if(u32Data >= GP_MAX)
@@ -6598,12 +7297,16 @@ HI_VOID  VDP_GP_SetTiSwingThd(HI_U32 u32Data, HI_U32 u32Md, HI_U32 u32thd, HI_U3
         GP0_ZME_CTITHD.bits.cunder_swing = u32thd1;
         VDP_RegWrite((HI_U32)(&(pVdpReg->GP0_ZME_CTITHD.u32)+ u32Data * GP_OFFSET), GP0_ZME_CTITHD.u32); 
     }
-
+#endif
 }
 
 //***********************************************************************************************
 HI_VOID  VDP_GP_SetTiGainCoef(HI_U32 u32Data, HI_U32 u32Md, HI_U32 * u32coef)
 {
+#if 1
+#warning TODO
+	printk("TODO: %s\n", __FUNCTION__);
+#else
     volatile U_GP0_ZME_LGAINCOEF GP0_ZME_LGAINCOEF;
     if(u32Data >= GP_MAX)
     {
@@ -6619,6 +7322,7 @@ HI_VOID  VDP_GP_SetTiGainCoef(HI_U32 u32Data, HI_U32 u32Md, HI_U32 * u32coef)
         GP0_ZME_LGAINCOEF.bits.lgain_coef2 = u32coef[2];
         VDP_RegWrite((HI_U32)(&(pVdpReg->GP0_ZME_LGAINCOEF.u32)+ u32Data * GP_OFFSET), GP0_ZME_LGAINCOEF.u32); 
     }
+#endif
 }
 
 HI_VOID  VDP_GP_SetTiDefThd(HI_U32 u32Data, HI_U32 u32Md)
@@ -6866,6 +7570,10 @@ HI_VOID  VDP_GFX_SetZmePhase(HI_U32 u32Data, VDP_ZME_MODE_E enMode,HI_S32 s32Pha
 //
 HI_VOID VDP_WBC_SetCmpEnable( VDP_LAYER_WBC_E enLayer, HI_U32 bEnable)
 {
+#if 1
+#warning TODO
+	printk("TODO: %s\n", __FUNCTION__);
+#else
     volatile U_WBC_G0_CMP WBC_G0_CMP;
     if(enLayer == VDP_LAYER_WBC_G0)
     {
@@ -6881,10 +7589,14 @@ HI_VOID VDP_WBC_SetCmpEnable( VDP_LAYER_WBC_E enLayer, HI_U32 bEnable)
         VDP_RegWrite((HI_U32)(&(pVdpReg->WBC_G0_CMP.u32)+WBC_OFFSET), WBC_G0_CMP.u32);
 
     }
-
+#endif
 }
 HI_VOID VDP_WBC_SetCmpDrr( VDP_LAYER_WBC_E enLayer, HI_U32 u32CmpDrr)
 {
+#if 1
+#warning TODO
+	printk("TODO: %s\n", __FUNCTION__);
+#else
     volatile U_WBC_G0_CMP WBC_G0_CMP;
     if(enLayer == VDP_LAYER_WBC_G0)
     {
@@ -6900,10 +7612,14 @@ HI_VOID VDP_WBC_SetCmpDrr( VDP_LAYER_WBC_E enLayer, HI_U32 u32CmpDrr)
         VDP_RegWrite((HI_U32)(&(pVdpReg->WBC_G0_CMP.u32)+WBC_OFFSET), WBC_G0_CMP.u32);
 
     }
-
+#endif
 }
 HI_VOID VDP_WBC_SetLossy( VDP_LAYER_WBC_E enLayer, HI_U32 bEnable)
 {
+#if 1
+#warning TODO
+	printk("TODO: %s\n", __FUNCTION__);
+#else
     volatile U_WBC_G0_CMP WBC_G0_CMP;
     if(enLayer == VDP_LAYER_WBC_G0)
     {
@@ -6920,7 +7636,7 @@ HI_VOID VDP_WBC_SetLossy( VDP_LAYER_WBC_E enLayer, HI_U32 bEnable)
 
     }
 
-
+#endif
 }
 
 
@@ -7052,6 +7768,11 @@ HI_VOID VDP_WBC_VtthdMode(VDP_LAYER_WBC_E enLayer, HI_U32 u32wbc_vtthd_mode)
 }
 HI_VOID VDP_WBC_SetAutoSt( VDP_LAYER_WBC_E enLayer, HI_U32 bEnable)
 {
+#if 1
+#warning TODO
+	printk("TODO: %s\n", __FUNCTION__);
+#else
+
     volatile U_WBC_GP0_CTRL  WBC_GP0_CTRL;
 
     if(enLayer == VDP_LAYER_WBC_GP0)
@@ -7060,10 +7781,14 @@ HI_VOID VDP_WBC_SetAutoSt( VDP_LAYER_WBC_E enLayer, HI_U32 bEnable)
         WBC_GP0_CTRL.bits.auto_stop_en=  bEnable;
         VDP_RegWrite((HI_U32)(&(pVdpReg->WBC_GP0_CTRL.u32)), WBC_GP0_CTRL.u32);
     }
-
+#endif
 }
 HI_VOID VDP_WBC_SetThreeMd( VDP_LAYER_WBC_E enLayer, HI_U32 bMode)
 {
+#if 1
+#warning TODO
+	printk("TODO: %s\n", __FUNCTION__);
+#else
     volatile    U_WBC_GP0_CTRL  WBC_GP0_CTRL;
     volatile    U_WBC_DHD0_CTRL    WBC_DHD0_CTRL;
 
@@ -7079,10 +7804,14 @@ HI_VOID VDP_WBC_SetThreeMd( VDP_LAYER_WBC_E enLayer, HI_U32 bMode)
         WBC_DHD0_CTRL.bits.three_d_mode =  bMode;
         VDP_RegWrite((HI_U32)(&(pVdpReg->WBC_DHD0_CTRL.u32)), WBC_DHD0_CTRL.u32);
     }
-
+#endif
 }
 HI_VOID VDP_WBC_SetEnable( VDP_LAYER_WBC_E enLayer, HI_U32 bEnable)
 {
+#if 1
+#warning TODO
+	printk("TODO: %s\n", __FUNCTION__);
+#else
     volatile U_WBC_DHD0_CTRL WBC_DHD0_CTRL;
     volatile U_WBC_GP0_CTRL  WBC_GP0_CTRL;
     volatile U_WBC_G0_CTRL   WBC_G0_CTRL;
@@ -7116,13 +7845,17 @@ HI_VOID VDP_WBC_SetEnable( VDP_LAYER_WBC_E enLayer, HI_U32 bEnable)
         VDP_RegWrite((HI_U32)(&(pVdpReg->WBC_G0_CTRL.u32)+WBC_OFFSET), WBC_G0_CTRL.u32);
 
     }
-
+#endif
 
 
 }
 
 HI_VOID VDP_WBC_SetOffSet( VDP_LAYER_WBC_E enLayer, HI_U32 u32Offset)
 {
+#if 1
+#warning TODO
+	printk("TODO: %s\n", __FUNCTION__);
+#else
 
     volatile U_WBC_G0_OFFSET WBC_G0_OFFSET;
     if(enLayer == VDP_LAYER_WBC_G0)
@@ -7140,13 +7873,17 @@ HI_VOID VDP_WBC_SetOffSet( VDP_LAYER_WBC_E enLayer, HI_U32 u32Offset)
 
     }
 
-
+#endif
 
 }
 
 
 HI_VOID VDP_WBC_SetOutIntf (VDP_LAYER_WBC_E enLayer, VDP_DATA_RMODE_E u32RdMode)
 {
+#if 1
+#warning TODO
+	printk("TODO: %s\n", __FUNCTION__);
+#else
     volatile U_WBC_DHD0_CTRL WBC_DHD0_CTRL;
     volatile U_WBC_GP0_CTRL  WBC_GP0_CTRL;
     if( enLayer == VDP_LAYER_WBC_HD0) 
@@ -7165,10 +7902,15 @@ HI_VOID VDP_WBC_SetOutIntf (VDP_LAYER_WBC_E enLayer, VDP_DATA_RMODE_E u32RdMode)
     {
         HI_PRINT("Error! VDP_WBC_SetOutIntf enRdMode error!\n");
     }
+#endif
 }
 
 HI_VOID  VDP_WBC_SetRegUp (VDP_LAYER_WBC_E enLayer)
 {
+#if 1
+#warning TODO
+	printk("TODO: %s\n", __FUNCTION__);
+#else
     volatile U_WBC_DHD0_UPD WBC_DHD0_UPD;
     volatile U_WBC_GP0_UPD WBC_GP0_UPD;
     volatile U_WBC_G0_UPD WBC_G0_UPD;
@@ -7201,7 +7943,7 @@ HI_VOID  VDP_WBC_SetRegUp (VDP_LAYER_WBC_E enLayer)
 
         return ;
     }
-
+#endif
 
 
 
@@ -7211,6 +7953,10 @@ HI_VOID  VDP_WBC_SetRegUp (VDP_LAYER_WBC_E enLayer)
 HI_VOID VDP_WBC_SetOutFmt(VDP_LAYER_WBC_E enLayer, VDP_WBC_OFMT_E stIntfFmt)
 
 {
+#if 1
+#warning TODO
+	printk("TODO: %s\n", __FUNCTION__);
+#else
     volatile U_WBC_DHD0_CTRL WBC_DHD0_CTRL;
     volatile U_WBC_GP0_CTRL   WBC_GP0_CTRL;
     volatile U_WBC_G0_CTRL   WBC_G0_CTRL;
@@ -7240,7 +7986,7 @@ HI_VOID VDP_WBC_SetOutFmt(VDP_LAYER_WBC_E enLayer, VDP_WBC_OFMT_E stIntfFmt)
         WBC_G0_CTRL.bits.format_out = stIntfFmt;
         VDP_RegWrite((HI_U32)(&(pVdpReg->WBC_G0_CTRL.u32)+WBC_OFFSET), WBC_G0_CTRL.u32);
     }
-
+#endif
 
 
 
@@ -7248,6 +7994,10 @@ HI_VOID VDP_WBC_SetOutFmt(VDP_LAYER_WBC_E enLayer, VDP_WBC_OFMT_E stIntfFmt)
 
 HI_VOID VDP_WBC_SetOutFmtUVOrder(VDP_LAYER_WBC_E enLayer, HI_U32 uvOrder)
 {
+#if 1
+#warning TODO
+	printk("TODO: %s\n", __FUNCTION__);
+#else
     U_WBC_DHD0_CTRL WBC_DHD0_CTRL;
     U_WBC_GP0_CTRL   WBC_GP0_CTRL;
 
@@ -7263,10 +8013,15 @@ HI_VOID VDP_WBC_SetOutFmtUVOrder(VDP_LAYER_WBC_E enLayer, HI_U32 uvOrder)
         WBC_GP0_CTRL.bits.uv_order = uvOrder;
         VDP_RegWrite((HI_U32)(&(pVdpReg->WBC_GP0_CTRL.u32)), WBC_GP0_CTRL.u32);
     }
+#endif
 }
 
 HI_VOID VDP_WBC_SetSpd(VDP_LAYER_WBC_E enLayer, HI_U32 u32ReqSpd)
 {
+#if 1
+#warning TODO
+	printk("TODO: %s\n", __FUNCTION__);
+#else
     volatile U_WBC_DHD0_CTRL WBC_DHD0_CTRL;
     volatile U_WBC_GP0_CTRL WBC_GP0_CTRL;
     volatile U_WBC_G0_CTRL WBC_G0_CTRL;
@@ -7297,12 +8052,16 @@ HI_VOID VDP_WBC_SetSpd(VDP_LAYER_WBC_E enLayer, HI_U32 u32ReqSpd)
     }
 
 
-
+#endif
 
 }
 
 HI_VOID  VDP_WBC_SetLayerAddr   (VDP_LAYER_WBC_E enLayer, HI_U32 u32LAddr,HI_U32 u32CAddr,HI_U32 u32LStr, HI_U32 u32CStr)
 {
+#if 1
+#warning TODO
+	printk("TODO: %s\n", __FUNCTION__);
+#else
     volatile U_WBC_DHD0_STRIDE WBC_DHD0_STRIDE;
     volatile U_WBC_GP0_STRIDE WBC_GP0_STRIDE;
     volatile U_WBC_G0_STRIDE  WBC_G0_STRIDE;
@@ -7348,13 +8107,17 @@ HI_VOID  VDP_WBC_SetLayerAddr   (VDP_LAYER_WBC_E enLayer, HI_U32 u32LAddr,HI_U32
 
         return ;
     }
-
+#endif
 
 
 }
 
 HI_VOID  VDP_WBC_SetLayerReso     (VDP_LAYER_WBC_E enLayer, VDP_DISP_RECT_S  stRect)
 {
+#if 1
+#warning TODO
+	printk("TODO: %s\n", __FUNCTION__);
+#else
     volatile U_WBC_DHD0_ORESO WBC_DHD0_ORESO;
    // volatile U_WBC_GP0_IRESO WBC_GP0_IRESO;//mask by h00226871
     volatile U_WBC_GP0_ORESO WBC_GP0_ORESO;
@@ -7395,11 +8158,16 @@ HI_VOID  VDP_WBC_SetLayerReso     (VDP_LAYER_WBC_E enLayer, VDP_DISP_RECT_S  stR
         WBC_G0_ORESO.bits.oh = stRect.u32OHgt - 1;
         VDP_RegWrite((HI_U32)(&(pVdpReg->WBC_G0_ORESO.u32)+WBC_OFFSET), WBC_G0_ORESO.u32); 
     }
+#endif
 }
 
 HI_VOID VDP_WBC_SetDitherMode  (VDP_LAYER_WBC_E enLayer, VDP_DITHER_E enDitherMode)
 
 {
+#if 1
+#warning TODO
+	printk("TODO: %s\n", __FUNCTION__);
+#else
     volatile U_WBC_DHD0_DITHER_CTRL WBC_DHD0_DITHER_CTRL;
     volatile U_WBC_GP0_DITHER_CTRL WBC_GP0_DITHER_CTRL;
 
@@ -7421,13 +8189,17 @@ HI_VOID VDP_WBC_SetDitherMode  (VDP_LAYER_WBC_E enLayer, VDP_DITHER_E enDitherMo
 
     }
 
-
+#endif
 }
 
 HI_VOID VDP_WBC_SetDitherCoef  (VDP_LAYER_WBC_E enLayer, VDP_DITHER_COEF_S dither_coef)
 
 {
-    
+#if 1
+#warning TODO
+	printk("TODO: %s\n", __FUNCTION__);
+#else
+
     volatile U_WBC_DHD0_DITHER_COEF0 WBC_DHD0_DITHER_COEF0;
     volatile U_WBC_DHD0_DITHER_COEF1 WBC_DHD0_DITHER_COEF1;
 
@@ -7472,12 +8244,16 @@ HI_VOID VDP_WBC_SetDitherCoef  (VDP_LAYER_WBC_E enLayer, VDP_DITHER_COEF_S dithe
         VDP_RegWrite((HI_U32)(&(pVdpReg->WBC_GP0_DITHER_COEF1.u32)), WBC_GP0_DITHER_COEF1.u32);
 
     }
-
+#endif
 
 }
 
 HI_VOID  VDP_WBC_SetCropReso (VDP_LAYER_WBC_E enLayer, VDP_DISP_RECT_S stRect)
 {
+#if 1
+#warning TODO
+	printk("TODO: %s\n", __FUNCTION__);
+#else
     volatile U_WBC_DHD0_FCROP WBC_DHD0_FCROP;
     volatile U_WBC_DHD0_LCROP WBC_DHD0_LCROP;
 
@@ -7537,7 +8313,7 @@ HI_VOID  VDP_WBC_SetCropReso (VDP_LAYER_WBC_E enLayer, VDP_DISP_RECT_S stRect)
         WBC_G0_LCROP.bits.hlcrop = stRect.u32DYL-1;
         VDP_RegWrite((HI_U32)(&(pVdpReg->WBC_G0_LCROP.u32)+WBC_OFFSET), WBC_G0_LCROP.u32); 
     }
-
+#endif
 
 
     
@@ -7549,6 +8325,10 @@ HI_VOID  VDP_WBC_SetCropReso (VDP_LAYER_WBC_E enLayer, VDP_DISP_RECT_S stRect)
 
 HI_VOID VDP_WBC_SetZmeCoefAddr(VDP_LAYER_WBC_E enLayer, VDP_WBC_PARA_E u32Mode, HI_U32 u32Addr,HI_U32 u32Addrchr)
 {
+#if 1
+#warning TODO
+	printk("TODO: %s\n", __FUNCTION__);
+#else
     volatile U_WBC_DHD0_HLCOEFAD WBC_DHD0_HLCOEFAD;
     volatile U_WBC_DHD0_HCCOEFAD WBC_DHD0_HCCOEFAD;
     volatile U_WBC_DHD0_VLCOEFAD WBC_DHD0_VLCOEFAD;
@@ -7607,11 +8387,16 @@ HI_VOID VDP_WBC_SetZmeCoefAddr(VDP_LAYER_WBC_E enLayer, VDP_WBC_PARA_E u32Mode, 
         }
     }
     return ;
-
+#endif
 }
 
 HI_VOID  VDP_WBC_SetParaUpd (VDP_LAYER_WBC_E enLayer, VDP_WBC_PARA_E enMode)
 {
+#if 1
+#warning TODO
+	printk("TODO: %s\n", __FUNCTION__);
+#else
+
     volatile U_WBC_DHD0_PARAUP WBC_DHD0_PARAUP;
     volatile U_GP0_PARAUP GP0_PARAUP;
     
@@ -7657,6 +8442,7 @@ HI_VOID  VDP_WBC_SetParaUpd (VDP_LAYER_WBC_E enLayer, VDP_WBC_PARA_E enMode)
         VDP_RegWrite((HI_U32)(&(pVdpReg->GP0_PARAUP.u32) + WBC_GP0_SEL * GP_OFFSET), GP0_PARAUP.u32); 
         return ;
     }
+#endif
 }
 
 //HI_VOID  VDP_WBC_SetSfifo (VDP_LAYER_WBC_E enLayer, HI_U32 u32Data )
@@ -7674,6 +8460,11 @@ HI_VOID  VDP_WBC_SetParaUpd (VDP_LAYER_WBC_E enLayer, VDP_WBC_PARA_E enMode)
 
 HI_VOID VDP_WBC_SetZmeEnable  (VDP_LAYER_WBC_E enLayer, VDP_ZME_MODE_E enMode, HI_U32 u32bEnable, HI_U32 u32firMode)
 {
+#if 1
+#warning TODO
+	printk("TODO: %s\n", __FUNCTION__);
+#else
+
     volatile U_WBC_DHD0_ZME_HSP WBC_DHD0_ZME_HSP;
     volatile U_WBC_DHD0_ZME_VSP WBC_DHD0_ZME_VSP;
     volatile U_GP0_ZME_HSP      GP0_ZME_HSP;
@@ -7741,7 +8532,7 @@ HI_VOID VDP_WBC_SetZmeEnable  (VDP_LAYER_WBC_E enLayer, VDP_ZME_MODE_E enMode, H
 
         return ;
     }
-
+#endif
     return ;
 
 }
@@ -7796,6 +8587,10 @@ HI_VOID VDP_WBC_SetZmePhaseV(VDP_LAYER_WBC_E enLayer, HI_S32 s32PhaseL, HI_S32 s
 HI_VOID  VDP_WBC_SetMidEnable(VDP_LAYER_WBC_E enLayer, VDP_ZME_MODE_E enMode,HI_U32 bEnable)
 
 {
+#if 1
+#warning TODO
+	printk("TODO: %s\n", __FUNCTION__);
+#else
 
     volatile U_WBC_DHD0_ZME_HSP WBC_DHD0_ZME_HSP;
     volatile U_WBC_DHD0_ZME_VSP WBC_DHD0_ZME_VSP;
@@ -7874,12 +8669,18 @@ HI_VOID  VDP_WBC_SetMidEnable(VDP_LAYER_WBC_E enLayer, VDP_ZME_MODE_E enMode,HI_
             VDP_RegWrite((HI_U32)(&(pVdpReg->GP0_ZME_VSP.u32) + WBC_GP0_SEL * GP_OFFSET), GP0_ZME_VSP.u32); 
         }
     }
+#endif
     return;
 
 }
 
 HI_VOID VDP_WBC_SetFirEnable(VDP_LAYER_WBC_E enLayer, VDP_ZME_MODE_E enMode, HI_U32 bEnable)
 {
+#if 1
+#warning TODO
+	printk("TODO: %s\n", __FUNCTION__);
+#else
+
     volatile U_WBC_DHD0_ZME_HSP WBC_DHD0_ZME_HSP;
     volatile U_WBC_DHD0_ZME_VSP WBC_DHD0_ZME_VSP;
     volatile U_GP0_ZME_HSP      GP0_ZME_HSP;
@@ -7946,7 +8747,7 @@ HI_VOID VDP_WBC_SetFirEnable(VDP_LAYER_WBC_E enLayer, VDP_ZME_MODE_E enMode, HI_
             VDP_RegWrite((HI_U32)(&(pVdpReg->GP0_ZME_VSP.u32) + WBC_GP0_SEL * GP_OFFSET), GP0_ZME_VSP.u32); 
         }
     }
-     
+#endif
      
     return ;
     
@@ -7981,6 +8782,10 @@ HI_VOID VDP_WBC_SetZmeVerTap(VDP_LAYER_WBC_E enLayer, VDP_ZME_MODE_E enMode, HI_
 
 HI_VOID VDP_WBC_SetZmeHfirOrder(VDP_LAYER_WBC_E enLayer, HI_U32 u32HfirOrder)
 {
+#if 1
+#warning TODO
+	printk("TODO: %s\n", __FUNCTION__);
+#else
     volatile U_WBC_DHD0_ZME_HSP WBC_DHD0_ZME_HSP;    
     volatile U_GP0_ZME_HSP      GP0_ZME_HSP;
     if(enLayer == VDP_LAYER_WBC_HD0 )
@@ -7996,12 +8801,17 @@ HI_VOID VDP_WBC_SetZmeHfirOrder(VDP_LAYER_WBC_E enLayer, HI_U32 u32HfirOrder)
         GP0_ZME_HSP.bits.hfir_order = u32HfirOrder;
         VDP_RegWrite((HI_U32)(&(pVdpReg->GP0_ZME_HSP.u32) + WBC_GP0_SEL * GP_OFFSET), GP0_ZME_HSP.u32); 
     }
+#endif
     return ;
 }
 
 HI_VOID VDP_WBC_SetZmeHorRatio(VDP_LAYER_WBC_E enLayer, HI_U32 u32Ratio)
 
 {
+#if 1
+#warning TODO
+	printk("TODO: %s\n", __FUNCTION__);
+#else
     volatile U_WBC_DHD0_ZME_HSP WBC_DHD0_ZME_HSP;
     volatile U_GP0_ZME_HSP      GP0_ZME_HSP;
     if(enLayer == VDP_LAYER_WBC_HD0 )
@@ -8018,6 +8828,7 @@ HI_VOID VDP_WBC_SetZmeHorRatio(VDP_LAYER_WBC_E enLayer, HI_U32 u32Ratio)
         GP0_ZME_HSP.bits.hratio = u32Ratio;
         VDP_RegWrite((HI_U32)(&(pVdpReg->GP0_ZME_HSP.u32) + WBC_GP0_SEL * GP_OFFSET), GP0_ZME_HSP.u32); 
     }
+#endif
     return ;
 }
 
@@ -8053,6 +8864,10 @@ HI_VOID  VDP_WBC_SetZmeOutFmt(VDP_LAYER_WBC_E enLayer, VDP_PROC_FMT_E u32Fmt)
 
 HI_VOID  VDP_WBC_SetZmeVerRatio(VDP_LAYER_WBC_E enLayer, HI_U32 u32Ratio)
 {
+#if 1
+#warning TODO
+	printk("TODO: %s\n", __FUNCTION__);
+#else
     volatile U_WBC_DHD0_ZME_VSR WBC_DHD0_ZME_VSR;
     volatile U_GP0_ZME_VSR        GP0_ZME_VSR;
     
@@ -8069,11 +8884,16 @@ HI_VOID  VDP_WBC_SetZmeVerRatio(VDP_LAYER_WBC_E enLayer, HI_U32 u32Ratio)
         GP0_ZME_VSR.bits.vratio = u32Ratio;
         VDP_RegWrite((HI_U32)(&(pVdpReg->GP0_ZME_VSR.u32) + WBC_GP0_SEL * GP_OFFSET), GP0_ZME_VSR.u32); 
     }
+#endif
     return ;
 }
 
 HI_VOID  VDP_WBC_SetZmePhase    (VDP_LAYER_WBC_E enLayer, VDP_ZME_MODE_E enMode,HI_S32 s32Phase)
 {
+#if 1
+#warning TODO
+	printk("TODO: %s\n", __FUNCTION__);
+#else
     volatile U_WBC_DHD0_ZME_VOFFSET   WBC_DHD0_ZME_VOFFSET;
     volatile U_WBC_DHD0_ZME_VBOFFSET  WBC_DHD0_ZME_VBOFFSET;
     volatile U_GP0_ZME_HOFFSET        GP0_ZME_HOFFSET;
@@ -8140,12 +8960,16 @@ HI_VOID  VDP_WBC_SetZmePhase    (VDP_LAYER_WBC_E enLayer, VDP_ZME_MODE_E enMode,
             VDP_RegWrite((HI_U32)(&(pVdpReg->GP0_ZME_VOFFSET.u32) + WBC_GP0_SEL * GP_OFFSET), GP0_ZME_VOFFSET.u32); 
         }
     }
-
+#endif
     return ;
 }
 
 HI_VOID  VDP_WBC_SetCscEnable  (VDP_LAYER_WBC_E enLayer, HI_U32 enCSC)
 {   
+#if 1
+#warning TODO
+	printk("TODO: %s\n", __FUNCTION__);
+#else
     volatile U_WBC_DHD0_CSCIDC WBC_DHD0_CSCIDC;
     volatile U_GP0_CSC_IDC     GP0_CSC_IDC;
 
@@ -8164,11 +8988,16 @@ HI_VOID  VDP_WBC_SetCscEnable  (VDP_LAYER_WBC_E enLayer, HI_U32 enCSC)
         VDP_RegWrite((HI_U32)(&(pVdpReg->GP0_CSC_IDC.u32) + WBC_GP0_SEL * GP_OFFSET), GP0_CSC_IDC.u32); 
 
     }
+#endif
     return ;
 }
 
 HI_VOID   VDP_WBC_SetCscDcCoef(VDP_LAYER_WBC_E enLayer,VDP_CSC_DC_COEF_S stCscCoef)
 {   
+#if 1
+#warning TODO
+	printk("TODO\n");
+#else
     volatile U_WBC_DHD0_CSCIDC WBC_DHD0_CSCIDC;
     volatile U_WBC_DHD0_CSCODC WBC_DHD0_CSCODC;
     volatile U_GP0_CSC_IDC  GP0_CSC_IDC;
@@ -8208,11 +9037,16 @@ HI_VOID   VDP_WBC_SetCscDcCoef(VDP_LAYER_WBC_E enLayer,VDP_CSC_DC_COEF_S stCscCo
         GP0_CSC_IODC.bits.cscidc2 = stCscCoef.csc_in_dc2;
         VDP_RegWrite((HI_U32)(&(pVdpReg->GP0_CSC_IODC.u32) + WBC_GP0_SEL * GP_OFFSET), GP0_CSC_IODC.u32); 
     }
+#endif
     return ;
 }
 
 HI_VOID   VDP_WBC_SetCscCoef(VDP_LAYER_WBC_E enLayer,VDP_CSC_COEF_S stCscCoef)
 {   
+#if 1
+#warning TODO
+	printk("TODO\n");
+#else
     volatile U_WBC_DHD0_CSCP0        WBC_DHD0_CSCP0;
     volatile U_WBC_DHD0_CSCP1        WBC_DHD0_CSCP1;
     volatile U_WBC_DHD0_CSCP2        WBC_DHD0_CSCP2;
@@ -8277,7 +9111,7 @@ HI_VOID   VDP_WBC_SetCscCoef(VDP_LAYER_WBC_E enLayer,VDP_CSC_COEF_S stCscCoef)
         GP0_CSC_P4.bits.cscp22 = stCscCoef.csc_coef22;
         VDP_RegWrite((HI_U32)(&(pVdpReg->GP0_CSC_P4.u32)+WBC_GP0_SEL*GP_OFFSET), GP0_CSC_P4.u32);
     }    
-
+#endif
 }
 
 HI_VOID VDP_WBC_SetCscMode( VDP_LAYER_WBC_E enLayer, VDP_CSC_MODE_E enCscMode)
@@ -8631,6 +9465,10 @@ HI_VOID VDP_WBC_SetCscMode( VDP_LAYER_WBC_E enLayer, VDP_CSC_MODE_E enCscMode)
 
 HI_VOID  VDP_VP_SetCscDcCoef   (HI_U32 u32Data, VDP_CSC_DC_COEF_S pstCscCoef, HI_U32 u32Num)
 {
+#if 1
+#warning TODO
+	printk("TODO\n");
+#else
     if(u32Data >= VP_MAX)
     {
         HI_PRINT("Error,VDP_VP_SetCscDcCoef() Select Wrong Video Layer ID\n");
@@ -8679,12 +9517,16 @@ HI_VOID  VDP_VP_SetCscDcCoef   (HI_U32 u32Data, VDP_CSC_DC_COEF_S pstCscCoef, HI
         VP0_CSC1_IODC.bits.cscidc2 = pstCscCoef.csc_in_dc2;
         VDP_RegWrite((HI_U32)(&(pVdpReg->VP0_CSC1_IODC.u32) + u32Data * VP_OFFSET), VP0_CSC1_IODC.u32); 
     }
-
+#endif
     return ;
 }
 
 HI_VOID   VDP_VP_SetCscCoef(HI_U32 u32Data, VDP_CSC_COEF_S stCscCoef, HI_U32 u32Num)
 {   
+#if 1
+#warning TODO
+	printk("TODO\n");
+#else
     if(u32Data >= VP_MAX)
     {
         HI_PRINT("Error,VDP_VP_SetCscCoef Select Wrong video ID\n");
@@ -8755,11 +9597,15 @@ HI_VOID   VDP_VP_SetCscCoef(HI_U32 u32Data, VDP_CSC_COEF_S stCscCoef, HI_U32 u32
         VP0_CSC1_P4.bits.cscp22 = stCscCoef.csc_coef22;
         VDP_RegWrite((HI_U32)(&(pVdpReg->VP0_CSC1_P4.u32)+u32Data*VP_OFFSET), VP0_CSC1_P4.u32);
     }
-        
+#endif
 }
 
 HI_VOID  VDP_VP_SetCscEnable   (HI_U32 u32Data, HI_U32 u32bCscEn, HI_U32 u32Num)
 {
+#if 1
+#warning TODO
+	printk("TODO\n");
+#else
     if(u32Data >= VP_MAX)
     {
         HI_PRINT("Error,VDP_VP_SetCscEnable() Select Wrong Video Layer ID\n");
@@ -8782,7 +9628,7 @@ HI_VOID  VDP_VP_SetCscEnable   (HI_U32 u32Data, HI_U32 u32bCscEn, HI_U32 u32Num)
         VP0_CSC1_IDC.bits.csc_en = u32bCscEn;
         VDP_RegWrite((HI_U32)(&(pVdpReg->VP0_CSC1_IDC.u32) + u32Data * VP_OFFSET), VP0_CSC1_IDC.u32); 
     }
-
+#endif
     return ;
 }
 
@@ -8966,6 +9812,10 @@ HI_VOID VDP_VP_SetCscMode(HI_U32 u32Data, VDP_CSC_MODE_E enCscMode, HI_U32 u32Nu
 //-------------------------------------------------------------------
 HI_VOID VDP_VP_SetAcmEnable (HI_U32 u32Data, HI_U32 u32bAcmEn)
 {
+#if 1
+#warning TODO
+	printk("TODO\n");
+#else
     volatile U_VP0_ACM_CTRL  VP0_ACM_CTRL;
 
     if(u32Data>= VP_MAX)
@@ -8979,12 +9829,16 @@ HI_VOID VDP_VP_SetAcmEnable (HI_U32 u32Data, HI_U32 u32bAcmEn)
     VDP_RegWrite((HI_U32)(&(pVdpReg->VP0_ACM_CTRL.u32) + u32Data * VP_OFFSET), VP0_ACM_CTRL.u32); 
 
     return ;
-
+#endif
 }
 
 
 HI_VOID VDP_VP_SetAcmDbgEn(HI_U32 u32Data , HI_U32 u32bAcmDbgEn)
 {
+#if 1
+#warning TODO
+	printk("TODO\n");
+#else
     volatile U_VP0_ACM_CTRL  VP0_ACM_CTRL;
 
     if(u32Data>= VP_MAX)
@@ -8996,12 +9850,16 @@ HI_VOID VDP_VP_SetAcmDbgEn(HI_U32 u32Data , HI_U32 u32bAcmDbgEn)
     VP0_ACM_CTRL.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->VP0_ACM_CTRL.u32) + u32Data * VP_OFFSET));
     VP0_ACM_CTRL.bits.acm_dbg_en = u32bAcmDbgEn;
     VDP_RegWrite((HI_U32)(&(pVdpReg->VP0_ACM_CTRL.u32) + u32Data * VP_OFFSET), VP0_ACM_CTRL.u32); 
-
+#endif
     return ;
 }
 
 HI_VOID VDP_VP_SetAcmStretch(HI_U32 u32Data, HI_U32 u32AcmStrch)
 {
+#if 1
+#warning TODO
+	printk("TODO\n");
+#else
     volatile U_VP0_ACM_CTRL  VP0_ACM_CTRL;
 
     if(u32Data>= VP_MAX)
@@ -9014,12 +9872,16 @@ HI_VOID VDP_VP_SetAcmStretch(HI_U32 u32Data, HI_U32 u32AcmStrch)
     VP0_ACM_CTRL.bits.acm_stretch = u32AcmStrch;
     //cout << "VP0_ACM_CTRL.bits.acm_stretch == " <<  VP0_ACM_CTRL.bits.acm_stretch << endl;
     VDP_RegWrite((HI_U32)(&(pVdpReg->VP0_ACM_CTRL.u32) + u32Data * VP_OFFSET), VP0_ACM_CTRL.u32); 
-
+#endif
     return ;
 }
 
 HI_VOID VDP_VP_SetAcmClipRange(HI_U32 u32Data, HI_U32 u32AcmClipRange)
 {
+#if 1
+#warning TODO
+	printk("TODO\n");
+#else
     volatile U_VP0_ACM_CTRL  VP0_ACM_CTRL;
 
     if(u32Data>= VP_MAX)
@@ -9031,11 +9893,15 @@ HI_VOID VDP_VP_SetAcmClipRange(HI_U32 u32Data, HI_U32 u32AcmClipRange)
     VP0_ACM_CTRL.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->VP0_ACM_CTRL.u32) + u32Data * VP_OFFSET));
     VP0_ACM_CTRL.bits.acm_cliprange = u32AcmClipRange;
     VDP_RegWrite((HI_U32)(&(pVdpReg->VP0_ACM_CTRL.u32) + u32Data * VP_OFFSET), VP0_ACM_CTRL.u32); 
-
+#endif
     return ;
 }
 HI_VOID VDP_VP_SetAcmCliporwrap(HI_U32 u32Data, HI_U32 u32AcmCliporwrap)
 {
+#if 1
+#warning TODO
+	printk("TODO\n");
+#else
     volatile U_VP0_ACM_CTRL  VP0_ACM_CTRL;
     if(u32Data>= VP_MAX)
     {
@@ -9045,10 +9911,15 @@ HI_VOID VDP_VP_SetAcmCliporwrap(HI_U32 u32Data, HI_U32 u32AcmCliporwrap)
     VP0_ACM_CTRL.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->VP0_ACM_CTRL.u32) + u32Data * VP_OFFSET));
     VP0_ACM_CTRL.bits.acm_cliporwrap= u32AcmCliporwrap;
     VDP_RegWrite((HI_U32)(&(pVdpReg->VP0_ACM_CTRL.u32) + u32Data * VP_OFFSET), VP0_ACM_CTRL.u32); 
+#endif
     return ;
 }
 HI_VOID VDP_VP_SetAcmChmThd(HI_U32 u32Data, HI_U32 u32AcmCbcrthr)
 {
+#if 1
+#warning TODO
+	printk("TODO\n");
+#else
     volatile U_VP0_ACM_CTRL  VP0_ACM_CTRL;
 
     if(u32Data>= VP_MAX)
@@ -9060,12 +9931,16 @@ HI_VOID VDP_VP_SetAcmChmThd(HI_U32 u32Data, HI_U32 u32AcmCbcrthr)
     VP0_ACM_CTRL.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->VP0_ACM_CTRL.u32) + u32Data * VP_OFFSET));
     VP0_ACM_CTRL.bits.acm_cbcrthr = u32AcmCbcrthr;
     VDP_RegWrite((HI_U32)(&(pVdpReg->VP0_ACM_CTRL.u32) + u32Data * VP_OFFSET), VP0_ACM_CTRL.u32); 
-
+#endif
     return ;
 }
 
 HI_VOID VDP_VP_SetAcmGainLum(HI_U32 u32Data, HI_U32 u32AcmGain0)
 {
+#if 1
+#warning TODO
+	printk("TODO\n");
+#else
     volatile U_VP0_ACM_ADJ  VP0_ACM_ADJ;
 
     if(u32Data>= VP_MAX)
@@ -9077,12 +9952,16 @@ HI_VOID VDP_VP_SetAcmGainLum(HI_U32 u32Data, HI_U32 u32AcmGain0)
     VP0_ACM_ADJ.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->VP0_ACM_ADJ.u32) + u32Data * VP_OFFSET));
     VP0_ACM_ADJ.bits.acm_gain0 = u32AcmGain0;
     VDP_RegWrite((HI_U32)(&(pVdpReg->VP0_ACM_ADJ.u32) + u32Data * VP_OFFSET), VP0_ACM_ADJ.u32); 
-
+#endif
     return ;
 }
 
 HI_VOID VDP_VP_SetAcmGainSat(HI_U32 u32Data, HI_U32 u32AcmGain2)
 {
+#if 1
+#warning TODO
+	printk("TODO\n");
+#else
     volatile U_VP0_ACM_ADJ  VP0_ACM_ADJ;
 
     if(u32Data>= VP_MAX)
@@ -9094,12 +9973,16 @@ HI_VOID VDP_VP_SetAcmGainSat(HI_U32 u32Data, HI_U32 u32AcmGain2)
     VP0_ACM_ADJ.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->VP0_ACM_ADJ.u32) + u32Data * VP_OFFSET));
     VP0_ACM_ADJ.bits.acm_gain2 = u32AcmGain2;
     VDP_RegWrite((HI_U32)(&(pVdpReg->VP0_ACM_ADJ.u32) + u32Data * VP_OFFSET), VP0_ACM_ADJ.u32); 
-
+#endif
     return ;
 }
 
 HI_VOID VDP_VP_SetAcmGainHue(HI_U32 u32Data, HI_U32 u32AcmGain1)
 {
+#if 1
+#warning TODO
+	printk("TODO\n");
+#else
     volatile U_VP0_ACM_ADJ  VP0_ACM_ADJ;
 
     if(u32Data>= VP_MAX)
@@ -9111,12 +9994,16 @@ HI_VOID VDP_VP_SetAcmGainHue(HI_U32 u32Data, HI_U32 u32AcmGain1)
     VP0_ACM_ADJ.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->VP0_ACM_ADJ.u32) + u32Data * VP_OFFSET));
     VP0_ACM_ADJ.bits.acm_gain1 = u32AcmGain1;
     VDP_RegWrite((HI_U32)(&(pVdpReg->VP0_ACM_ADJ.u32) + u32Data * VP_OFFSET), VP0_ACM_ADJ.u32); 
-
+#endif
     return ;
 }
 
 HI_VOID VDP_VP_SetAcmCoefAddr(HI_U32 u32Data, HI_U32 u32CoefAddr)
 {
+#if 1
+#warning TODO
+	printk("TODO\n");
+#else
     volatile U_VP0_ACM_CAD VP0_ACM_CAD;
 
     if(u32Data>= VP_MAX)
@@ -9128,7 +10015,7 @@ HI_VOID VDP_VP_SetAcmCoefAddr(HI_U32 u32Data, HI_U32 u32CoefAddr)
     VP0_ACM_CAD.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->VP0_ACM_CAD.u32) + u32Data * VP_OFFSET));
     VP0_ACM_CAD.bits.coef_addr = u32CoefAddr;
     VDP_RegWrite((HI_U32)(&(pVdpReg->VP0_ACM_CAD.u32) + u32Data * VP_OFFSET), VP0_ACM_CAD.u32); 
-
+#endif
     return ;
 }
 //-------------------------------------------------------------------
@@ -9832,6 +10719,10 @@ HI_VOID VDP_WBC_SetDhdLocate(HI_U32 u32Id, VDP_WBC_LOCATE_E   u32Data)
 
 HI_VOID VDP_WBC_SetDhdOflEn(HI_U32 u32Id, HI_U32  u32Data)
 {
+#if 1
+#warning TODO
+	printk("TODO\n");
+#else
     volatile U_WBC_OFL_EN  WBC_OFL_EN;
     if(u32Id>= CHN_MAX)
     {
@@ -9844,6 +10735,7 @@ HI_VOID VDP_WBC_SetDhdOflEn(HI_U32 u32Id, HI_U32  u32Data)
     WBC_OFL_EN.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->WBC_OFL_EN.u32)));
     WBC_OFL_EN.bits.wbc_ofl_en= u32Data;
     VDP_RegWrite((HI_U32)(&(pVdpReg->WBC_OFL_EN.u32)), WBC_OFL_EN.u32);
+#endif
 }
 
 HI_VOID VDP_SetCheckSumEnable(HI_U32  bEnable)
@@ -9875,14 +10767,17 @@ HI_VOID VDP_DHD_DEFAULT( )
 {
    volatile U_DHD0_CTRL DHD0_CTRL;
    volatile U_DHD0_SYNC_INV DHD0_SYNC_INV;
+   volatile U_DHD0_0xc02c Data_0xc02c;
 
     
     DHD0_SYNC_INV.u32 = 0x2000;
     DHD0_CTRL.u32 = 0x00008011;//0x8d0f8000;//0x8ad20011;
     
-    VDP_RegWrite((HI_U32)(&(pVdpReg->DHD0_SYNC_INV.u32)), DHD0_SYNC_INV.u32); 
-    VDP_RegWrite((HI_U32)(&(pVdpReg->DHD0_CTRL.u32)), DHD0_CTRL.u32); 
+    VDP_RegWrite1((HI_U32)(&(pVdpReg->DHD0_SYNC_INV.u32)), DHD0_SYNC_INV.u32);
+    VDP_RegWrite1((HI_U32)(&(pVdpReg->DHD0_CTRL.u32)), DHD0_CTRL.u32);
 
+    Data_0xc02c.u32 = 0;
+    VDP_RegWrite1((HI_U32)(&(pVdpReg->DHD0_0xc02c.u32)), Data_0xc02c.u32);
     
     
 }
@@ -9891,16 +10786,19 @@ HI_VOID VDP_DSD_DEFAULT( )
    volatile U_DHD0_CTRL DHD0_CTRL;
    volatile U_DHD0_SYNC_INV DHD0_SYNC_INV;
    volatile U_VO_MUX VO_MUX;
+   volatile U_DHD0_0xc02c Data_0xc02c;
     
     DHD0_SYNC_INV.u32 = 0x2000;
     DHD0_CTRL.u32 = 0x00008011;//0x8d0f8000;//0x8ad20011;
     VO_MUX.u32= 0x1;
     
-    VDP_RegWrite((HI_U32)(&(pVdpReg->DHD0_SYNC_INV.u32)+ 1*CHN_OFFSET), DHD0_SYNC_INV.u32); 
-    VDP_RegWrite((HI_U32)(&(pVdpReg->DHD0_CTRL.u32)+ 1*CHN_OFFSET), DHD0_CTRL.u32); 
+    VDP_RegWrite1((HI_U32)(&(pVdpReg->DHD0_SYNC_INV.u32)+ 1*CHN_OFFSET), DHD0_SYNC_INV.u32);
+    VDP_RegWrite1((HI_U32)(&(pVdpReg->DHD0_CTRL.u32)+ 1*CHN_OFFSET), DHD0_CTRL.u32);
 
-    VDP_RegWrite((HI_U32)(&(pVdpReg->VO_MUX.u32)), VO_MUX.u32); 
+    VDP_RegWrite1((HI_U32)(&(pVdpReg->VO_MUX.u32)), VO_MUX.u32);
 
+    Data_0xc02c.u32 = 0;
+    VDP_RegWrite1((HI_U32)(&(pVdpReg->DHD0_0xc02c.u32)+ 1*CHN_OFFSET), Data_0xc02c.u32);
 }
 HI_VOID VDP_DHD1_DEFAULT()
 {
@@ -9961,8 +10859,11 @@ HI_VOID VDP_SDATE_DEFAULT(VDP_DISP_DIGFMT_E enDigFmt)
     ClipData.u32ClipHigh_cb= 0x3c0;
     ClipData.u32ClipHigh_cr= 0x3c0;    
     
+#if 1
+#warning TODO
+#else
     VDP_DISP_SetClipCoef (VDP_CHN_DHD1, VDP_DISP_INTF_DATE, ClipData);
-
+#endif
 
 }
 
@@ -10022,9 +10923,15 @@ HI_VOID VDP_VGA_DEFAULT()
 
 HI_VOID VDP_VID_ZME_DEFAULT()
 {
+#if 1
+#warning TODO
+	printk("TODO\n");
+#else
+
    volatile U_V0_VSP V0_VSP;
     V0_VSP.u32 = 0xc0080000;
     VDP_RegWrite((HI_U32)(&(pVdpReg->V0_VSP.u32)), V0_VSP.u32); 
+#endif
 }
 
 HI_VOID VDP_DHD_DEBUG_DEFAULT(HI_U32 width)
@@ -10186,7 +11093,7 @@ HI_VOID vou_RegRTest(HI_U32 mask[], HI_U32 size, HI_U32 *testaddr, HI_U32 regdef
 HI_VOID VDP_MIXV_SetPrio(HI_U32 prioLayer)
 {
     U_MIXV0_MIX          MIXV0_MIX;
-    MIXV0_MIX.u32 = VDP_RegRead((HI_U32)&(pVdpReg->MIXV0_MIX.u32));
+    MIXV0_MIX.u32 = VDP_RegRead1((HI_U32)&(pVdpReg->MIXV0_MIX.u32));
     if(prioLayer == VDP_LAYER_VID0)
     {
         MIXV0_MIX.bits.mixer_prio0= 0x1;
@@ -10195,13 +11102,13 @@ HI_VOID VDP_MIXV_SetPrio(HI_U32 prioLayer)
     {
         MIXV0_MIX.bits.mixer_prio0= 0x2;
     }
-    VDP_RegWrite((HI_U32)(&(pVdpReg->MIXV0_MIX.u32)), MIXV0_MIX.u32); 
+    VDP_RegWrite1((HI_U32)(&(pVdpReg->MIXV0_MIX.u32)), MIXV0_MIX.u32);
 }
 
 HI_VOID VDP_MIXV_SetPrio1(HI_U32 prioLayer)
 {
     U_MIXV0_MIX          MIXV0_MIX;
-    MIXV0_MIX.u32 = VDP_RegRead((HI_U32)&(pVdpReg->MIXV0_MIX.u32));
+    MIXV0_MIX.u32 = VDP_RegRead1((HI_U32)&(pVdpReg->MIXV0_MIX.u32));
     if(prioLayer == VDP_LAYER_VID0)
     {
         MIXV0_MIX.bits.mixer_prio1= 0x1;
@@ -10210,7 +11117,7 @@ HI_VOID VDP_MIXV_SetPrio1(HI_U32 prioLayer)
     {
         MIXV0_MIX.bits.mixer_prio1= 0x2;
     }
-    VDP_RegWrite((HI_U32)(&(pVdpReg->MIXV0_MIX.u32)), MIXV0_MIX.u32); 
+    VDP_RegWrite1((HI_U32)(&(pVdpReg->MIXV0_MIX.u32)), MIXV0_MIX.u32);
 
 }
 
@@ -10231,6 +11138,11 @@ HI_U32 VDP_WBC_GetAlwaysProFlag(/*VDP_LAYER_WBC_E enLayer,*/ HI_BOOL *bAlwaysPro
 
 HI_VOID  VDP_VID_SetLayerBkgColor    (HI_U32 u32Data, HI_U32 stBkg)
 {
+#if 1
+#warning TODO
+	printk("TODO\n");
+#else
+
    volatile U_V0_BK    V0_BK;
     
     V0_BK.u32 = stBkg;
@@ -10261,6 +11173,7 @@ HI_VOID  VDP_VID_SetLayerBkgColor    (HI_U32 u32Data, HI_U32 stBkg)
             return;
     }
     return ;
+#endif
 }
 
 HI_U32 VDP_DISP_GetMaskIntSta(HI_U32 u32intmask)
@@ -10275,7 +11188,7 @@ HI_U32 VDP_DISP_GetMaskIntSta(HI_U32 u32intmask)
     else
     {
         /* read interrupt status */
-        VOMSKINTSTA.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->VOMSKINTSTA.u32)));;
+        VOMSKINTSTA.u32 = VDP_RegRead1((HI_U32)(&(pVdpReg->VOMSKINTSTA.u32)));;
     }
     
     return (VOMSKINTSTA.u32 & u32intmask);
@@ -10283,6 +11196,10 @@ HI_U32 VDP_DISP_GetMaskIntSta(HI_U32 u32intmask)
 
 HI_VOID  VDP_VID_SetInDataUVOrder(HI_U32 u32Data, HI_U32  VFirst)
 {
+#if 1
+#warning TODO
+	printk("TODO\n");
+#else
     U_V0_CTRL V0_CTRL;
 
     if(u32Data >= VID_MAX)
@@ -10294,13 +11211,13 @@ HI_VOID  VDP_VID_SetInDataUVOrder(HI_U32 u32Data, HI_U32  VFirst)
     V0_CTRL.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->V0_CTRL.u32) + u32Data * VID_OFFSET));
     V0_CTRL.bits.uv_order = VFirst;
     VDP_RegWrite((HI_U32)(&(pVdpReg->V0_CTRL.u32) + u32Data * VID_OFFSET), V0_CTRL.u32); 
-
+#endif
     return ;
 }
 
 HI_VOID VDP_SetWrOutStd(HI_U32 u32Data, HI_U32 u32BusId, HI_U32 u32OutStd)
 {
-    volatile U_VOAXICTRL VOAXICTRL;
+    /*volatile*/ U_VOAXICTRL VOAXICTRL;
 
     if(u32Data == VDP_MASTER0)
     {
@@ -10308,26 +11225,52 @@ HI_VOID VDP_SetWrOutStd(HI_U32 u32Data, HI_U32 u32BusId, HI_U32 u32OutStd)
         {
             VOAXICTRL.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->VOAXICTRL.u32)));
             VOAXICTRL.bits.m0_wr_ostd = u32OutStd;
-            VDP_RegWrite((HI_U32)(&(pVdpReg->VOAXICTRL.u32)), VOAXICTRL.u32); 
+            VDP_RegWrite((HI_U32)(&(pVdpReg->VOAXICTRL.u32)), VOAXICTRL.u32);
         }
         else
         {
             HI_PRINT("Error,VDP_SetWrOutStd() Select Wrong Bus Id,Wr Support one id!\n");
         }
     }
-    //else if(u32Data == VDP_MASTER1)
-    //{
-    //    if(u32BusId == 0)
-    //    {
-    //        VOAXICTRL.u32 = VDP_RegRead(&(pVdpReg->VOAXICTRL.u32));
-    //        VOAXICTRL.bits.m1_wr_ostd = u32OutStd;
-    //        VDP_RegWrite(&(pVdpReg->VOAXICTRL.u32), VOAXICTRL.u32); 
-    //    }
-    //    else
-    //    {
-    //        HI_PRINT("Error,VDP_SetWrOutStd() Select Wrong Bus Id,Wr Support one id!\n");
-    //    }
-    //}
+    else if(u32Data == VDP_MASTER1)
+    {
+        if(u32BusId == 0)
+        {
+            VOAXICTRL.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->VOAXICTRL.u32)));
+            VOAXICTRL.bits.m1_wr_ostd = u32OutStd;
+            VDP_RegWrite((HI_U32)(&(pVdpReg->VOAXICTRL.u32)), VOAXICTRL.u32);
+        }
+        else
+        {
+            HI_PRINT("Error,VDP_SetWrOutStd() Select Wrong Bus Id,Wr Support one id!\n");
+        }
+    }
+    else if(u32Data == VDP_MASTER2)
+    {
+        if(u32BusId == 0)
+        {
+            VOAXICTRL.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->VOAXICTRL1.u32)));
+            VOAXICTRL.bits.m0_wr_ostd = u32OutStd;
+            VDP_RegWrite((HI_U32)(&(pVdpReg->VOAXICTRL1.u32)), VOAXICTRL.u32);
+        }
+        else
+        {
+            HI_PRINT("Error,VDP_SetWrOutStd() Select Wrong Bus Id,Wr Support one id!\n");
+        }
+    }
+    else if(u32Data == VDP_MASTER3)
+    {
+        if(u32BusId == 0)
+        {
+            VOAXICTRL.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->VOAXICTRL1.u32)));
+            VOAXICTRL.bits.m1_wr_ostd = u32OutStd;
+            VDP_RegWrite((HI_U32)(&(pVdpReg->VOAXICTRL1.u32)), VOAXICTRL.u32);
+        }
+        else
+        {
+            HI_PRINT("Error,VDP_SetWrOutStd() Select Wrong Bus Id,Wr Support one id!\n");
+        }
+    }
     else
     {
         HI_PRINT("Error,VDP_SetWrOutStd() Select Wrong Master!\n");
@@ -10338,7 +11281,7 @@ HI_VOID VDP_SetWrOutStd(HI_U32 u32Data, HI_U32 u32BusId, HI_U32 u32OutStd)
 
 HI_VOID VDP_SetRdOutStd(HI_U32 u32Data, HI_U32 u32BusId, HI_U32 u32OutStd)
 {
-    volatile U_VOAXICTRL VOAXICTRL;
+    /*volatile*/ U_VOAXICTRL VOAXICTRL;
 
     if(u32Data == VDP_MASTER0)
     {
@@ -10346,38 +11289,76 @@ HI_VOID VDP_SetRdOutStd(HI_U32 u32Data, HI_U32 u32BusId, HI_U32 u32OutStd)
         {
             VOAXICTRL.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->VOAXICTRL.u32)));
             VOAXICTRL.bits.m0_outstd_rid0 = u32OutStd;
-            VDP_RegWrite((HI_U32)(&(pVdpReg->VOAXICTRL.u32)), VOAXICTRL.u32); 
+            VDP_RegWrite((HI_U32)(&(pVdpReg->VOAXICTRL.u32)), VOAXICTRL.u32);
         }
         else if(u32BusId == 1)
         {
             VOAXICTRL.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->VOAXICTRL.u32)));
             VOAXICTRL.bits.m0_outstd_rid1 = u32OutStd;
-            VDP_RegWrite((HI_U32)(&(pVdpReg->VOAXICTRL.u32)), VOAXICTRL.u32); 
+            VDP_RegWrite((HI_U32)(&(pVdpReg->VOAXICTRL.u32)), VOAXICTRL.u32);
         }
         else
         {
             HI_PRINT("Error,VDP_SetRdOutStd() Select Wrong Bus Id,Rd Support two id!\n");
         }
     }
-    //else if(u32Data == VDP_MASTER1)
-    //{
-    //    if(u32BusId == 0)
-    //    {
-    //        VOAXICTRL.u32 = VDP_RegRead(&(pVdpReg->VOAXICTRL.u32));
-    //        VOAXICTRL.bits.m1_outstd_rid0 = u32OutStd;
-    //        VDP_RegWrite(&(pVdpReg->VOAXICTRL.u32), VOAXICTRL.u32); 
-    //    }
-    //    else if(u32BusId == 1)
-    //    {
-    //        VOAXICTRL.u32 = VDP_RegRead(&(pVdpReg->VOAXICTRL.u32));
-    //        VOAXICTRL.bits.m1_outstd_rid1 = u32OutStd;
-    //        VDP_RegWrite(&(pVdpReg->VOAXICTRL.u32), VOAXICTRL.u32); 
-    //    }
-    //    else
-    //    {
-    //        HI_PRINT("Error,VDP_SetRdOutStd() Select Wrong Bus Id,Rd Support two id!\n");
-    //    }
-    //}
+    else if(u32Data == VDP_MASTER1)
+    {
+        if(u32BusId == 0)
+        {
+            VOAXICTRL.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->VOAXICTRL.u32)));
+            VOAXICTRL.bits.m1_outstd_rid0 = u32OutStd;
+            VDP_RegWrite((HI_U32)(&(pVdpReg->VOAXICTRL.u32)), VOAXICTRL.u32);
+        }
+        else if(u32BusId == 1)
+        {
+            VOAXICTRL.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->VOAXICTRL.u32)));
+            VOAXICTRL.bits.m1_outstd_rid1 = u32OutStd;
+            VDP_RegWrite((HI_U32)(&(pVdpReg->VOAXICTRL.u32)), VOAXICTRL.u32);
+        }
+        else
+        {
+            HI_PRINT("Error,VDP_SetRdOutStd() Select Wrong Bus Id,Rd Support two id!\n");
+        }
+    }
+    else if(u32Data == VDP_MASTER2)
+    {
+        if(u32BusId == 0)
+        {
+            VOAXICTRL.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->VOAXICTRL1.u32)));
+            VOAXICTRL.bits.m0_outstd_rid0 = u32OutStd;
+            VDP_RegWrite((HI_U32)(&(pVdpReg->VOAXICTRL1.u32)), VOAXICTRL.u32);
+        }
+        else if(u32BusId == 1)
+        {
+            VOAXICTRL.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->VOAXICTRL1.u32)));
+            VOAXICTRL.bits.m0_outstd_rid1 = u32OutStd;
+            VDP_RegWrite((HI_U32)(&(pVdpReg->VOAXICTRL1.u32)), VOAXICTRL.u32);
+        }
+        else
+        {
+            HI_PRINT("Error,VDP_SetRdOutStd() Select Wrong Bus Id,Rd Support two id!\n");
+        }
+    }
+    else if(u32Data == VDP_MASTER3)
+    {
+        if(u32BusId == 0)
+        {
+            VOAXICTRL.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->VOAXICTRL1.u32)));
+            VOAXICTRL.bits.m1_outstd_rid0 = u32OutStd;
+            VDP_RegWrite((HI_U32)(&(pVdpReg->VOAXICTRL1.u32)), VOAXICTRL.u32);
+        }
+        else if(u32BusId == 1)
+        {
+            VOAXICTRL.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->VOAXICTRL1.u32)));
+            VOAXICTRL.bits.m1_outstd_rid1 = u32OutStd;
+            VDP_RegWrite((HI_U32)(&(pVdpReg->VOAXICTRL1.u32)), VOAXICTRL.u32);
+        }
+        else
+        {
+            HI_PRINT("Error,VDP_SetRdOutStd() Select Wrong Bus Id,Rd Support two id!\n");
+        }
+    }
     else
     {
         HI_PRINT("Error,VDP_SetWrOutStd() Select Wrong Master!\n");
@@ -10403,8 +11384,9 @@ HI_VOID VDP_DATE_SetEnable(DISP_VENC_E eDate,HI_U32 enable)
     }
 }
 
-HI_VOID VDP_DATE_SetDACDET(DISP_VENC_E enDate,HI_DRV_DISP_FMT_E enFmt)
+HI_VOID VDP_DATE_SetDACDET(DISP_VENC_E enDate,HI_DRV_DISP_FMT_E enFmt, int c)
 {
+#if 0
     U_HDATE_DACDET1      HDATE_DACDET1 ;
     U_HDATE_DACDET2      HDATE_DACDET2;
     U_DATE_DACDET1       DATE_DACDET1;
@@ -10581,10 +11563,127 @@ HI_VOID VDP_DATE_SetDACDET(DISP_VENC_E enDate,HI_DRV_DISP_FMT_E enFmt)
     VDP_RegWrite((HI_U32)&(pVdpReg->HDATE_DACDET2.u32), HDATE_DACDET2.u32); 
     VDP_RegWrite((HI_U32)&(pVdpReg->DATE_DACDET1.u32), DATE_DACDET1.u32); 
     VDP_RegWrite((HI_U32)&(pVdpReg->DATE_DACDET2.u32), DATE_DACDET2.u32); 
+#endif
 }
+
+int bla1(HI_DRV_DISP_FMT_E enFmt)
+{
+    switch(enFmt)
+    {
+        case HI_DRV_DISP_FMT_1080P_60:
+        case HI_DRV_DISP_FMT_1080P_50:
+        case HI_DRV_DISP_FMT_1080P_30:
+         case HI_DRV_DISP_FMT_1080P_25:
+         case HI_DRV_DISP_FMT_1080P_24:
+        case HI_DRV_DISP_FMT_1080i_60:
+        case HI_DRV_DISP_FMT_1080i_50:
+        case HI_DRV_DISP_FMT_720P_60:
+        case HI_DRV_DISP_FMT_720P_50:
+        case HI_DRV_DISP_FMT_576P_50:
+        case HI_DRV_DISP_FMT_480P_60:
+        	return 18;
+        case HI_DRV_DISP_FMT_PAL:
+        case HI_DRV_DISP_FMT_PAL_B:
+        case HI_DRV_DISP_FMT_PAL_B1:
+        case HI_DRV_DISP_FMT_PAL_D:
+        case HI_DRV_DISP_FMT_PAL_D1:
+        case HI_DRV_DISP_FMT_PAL_G:
+        case HI_DRV_DISP_FMT_PAL_H:
+        case HI_DRV_DISP_FMT_PAL_K:
+        case HI_DRV_DISP_FMT_PAL_I:
+        case HI_DRV_DISP_FMT_PAL_N:
+        case HI_DRV_DISP_FMT_PAL_Nc:
+        case HI_DRV_DISP_FMT_PAL_M:
+        case HI_DRV_DISP_FMT_PAL_60:
+        case HI_DRV_DISP_FMT_NTSC:
+        case HI_DRV_DISP_FMT_NTSC_J:
+        case HI_DRV_DISP_FMT_NTSC_443:
+        case HI_DRV_DISP_FMT_SECAM_SIN:
+        case HI_DRV_DISP_FMT_SECAM_COS:
+        case HI_DRV_DISP_FMT_SECAM_L:
+        case HI_DRV_DISP_FMT_SECAM_B:
+        case HI_DRV_DISP_FMT_SECAM_G:
+        case HI_DRV_DISP_FMT_SECAM_D:
+        case HI_DRV_DISP_FMT_SECAM_K:
+        case HI_DRV_DISP_FMT_SECAM_H:
+        case HI_DRV_DISP_FMT_1440x576i_50:
+        case HI_DRV_DISP_FMT_1440x480i_60:
+			return 10;
+        default :
+        	return 0;
+    }
+}
+
+int bla2(HI_DRV_DISP_FMT_E enFmt)
+{
+    switch(enFmt)
+    {
+        case HI_DRV_DISP_FMT_1080P_60:
+        case HI_DRV_DISP_FMT_1080P_50:
+        case HI_DRV_DISP_FMT_1080P_30:
+         case HI_DRV_DISP_FMT_1080P_25:
+         case HI_DRV_DISP_FMT_1080P_24:
+        case HI_DRV_DISP_FMT_1080i_60:
+        case HI_DRV_DISP_FMT_1080i_50:
+        case HI_DRV_DISP_FMT_720P_60:
+        case HI_DRV_DISP_FMT_720P_50:
+        	return 1000;
+        case HI_DRV_DISP_FMT_576P_50:
+        case HI_DRV_DISP_FMT_480P_60:
+        	return 600;
+        case HI_DRV_DISP_FMT_PAL:
+        case HI_DRV_DISP_FMT_PAL_B:
+        case HI_DRV_DISP_FMT_PAL_B1:
+        case HI_DRV_DISP_FMT_PAL_D:
+        case HI_DRV_DISP_FMT_PAL_D1:
+        case HI_DRV_DISP_FMT_PAL_G:
+        case HI_DRV_DISP_FMT_PAL_H:
+        case HI_DRV_DISP_FMT_PAL_K:
+        case HI_DRV_DISP_FMT_PAL_I:
+        case HI_DRV_DISP_FMT_PAL_N:
+        case HI_DRV_DISP_FMT_PAL_Nc:
+        case HI_DRV_DISP_FMT_PAL_M:
+        case HI_DRV_DISP_FMT_PAL_60:
+        case HI_DRV_DISP_FMT_NTSC:
+        case HI_DRV_DISP_FMT_NTSC_J:
+        case HI_DRV_DISP_FMT_NTSC_443:
+        case HI_DRV_DISP_FMT_SECAM_SIN:
+        case HI_DRV_DISP_FMT_SECAM_COS:
+        case HI_DRV_DISP_FMT_SECAM_L:
+        case HI_DRV_DISP_FMT_SECAM_B:
+        case HI_DRV_DISP_FMT_SECAM_G:
+        case HI_DRV_DISP_FMT_SECAM_D:
+        case HI_DRV_DISP_FMT_SECAM_K:
+        case HI_DRV_DISP_FMT_SECAM_H:
+        case HI_DRV_DISP_FMT_1440x576i_50:
+        case HI_DRV_DISP_FMT_1440x480i_60:
+			return 280;
+        default :
+        	return 0;
+    }
+}
+
+HI_S32 VDP_SetDACDET(DISP_VENC_E enDate,HI_DRV_DISP_FMT_E enFmt)
+{
+	if (enDate >= DISP_VENC_MAX)
+	{
+    	DISP_INFO("enDate invalidation\n"); //1770
+    	return HI_FAILURE;
+	}
+
+	if (enFmt <= HI_DRV_DISP_FMT_720P_50_FP)
+	{
+#warning TODO: VDP_SetDACDET
+		VDP_DATE_SetDACDET(enDate, bla1(enFmt), bla2(enFmt));
+	}
+
+	return HI_SUCCESS;
+}
+
 
 HI_VOID VDP_DATE_SetDACDetEn(DISP_VENC_E enDate, HI_U32 enable)
 {
+#if 0
     U_HDATE_DACDET2      HDATE_DACDET2;
     U_DATE_DACDET2       DATE_DACDET2;
     
@@ -10605,6 +11704,7 @@ HI_VOID VDP_DATE_SetDACDetEn(DISP_VENC_E enDate, HI_U32 enable)
     }
     VDP_RegWrite((HI_U32)&(pVdpReg->HDATE_DACDET2.u32), HDATE_DACDET2.u32); 
     VDP_RegWrite((HI_U32)&(pVdpReg->DATE_DACDET2.u32), DATE_DACDET2.u32); 
+#endif
 }
 
 
@@ -10617,23 +11717,22 @@ HI_VOID VDP_VDAC_GetEnable(HI_U32 uVdac, HI_U32 *penable)
 
     switch (uVdac)
     {
+		case 3:
+			VO_DAC_C_CTRL.u32 = VDP_RegRead1((HI_U32)&(pVdpReg->VO_DAC_C_CTRL.u32)); //0x130
+			*penable = (VO_DAC_C_CTRL.bits.en_c & 1); //VO_DAC_C_CTRL.bits.en_buf_c);
+			break;
         case 0:
-            VO_DAC_C_CTRL.u32 = VDP_RegRead((HI_U32)&(pVdpReg->VO_DAC_C_CTRL.u32));
-            *penable = (VO_DAC_C_CTRL.bits.en_c & VO_DAC_C_CTRL.bits.en_buf_c);
+            VO_DAC_R_CTRL.u32 = VDP_RegRead1((HI_U32)&(pVdpReg->VO_DAC_R_CTRL.u32)); //0x134
+            *penable = (VO_DAC_R_CTRL.bits.en_r & 1); //VO_DAC_R_CTRL.bits.en_buf_r);
             break;
         case 1:
-        
-            VO_DAC_R_CTRL.u32 = VDP_RegRead((HI_U32)&(pVdpReg->VO_DAC_R_CTRL.u32));
-            *penable = (VO_DAC_R_CTRL.bits.en_r & VO_DAC_R_CTRL.bits.en_buf_r);
+            VO_DAC_G_CTRL.u32 = VDP_RegRead1((HI_U32)&(pVdpReg->VO_DAC_G_CTRL.u32)); //0x138
+            *penable = (VO_DAC_G_CTRL.bits.en_g & 1); //VO_DAC_G_CTRL.bits.en_buf_g);
             break;
-        case 2:
-            VO_DAC_G_CTRL.u32 = VDP_RegRead((HI_U32)&(pVdpReg->VO_DAC_G_CTRL.u32));
-            *penable = (VO_DAC_G_CTRL.bits.en_g & VO_DAC_G_CTRL.bits.en_buf_g);
-            break;
-        case 3:
-            VO_DAC_B_CTRL.u32 = VDP_RegRead((HI_U32)&(pVdpReg->VO_DAC_B_CTRL.u32));
-            *penable = (VO_DAC_B_CTRL.bits.en_b & VO_DAC_B_CTRL.bits.en_buf_b);
-            break;
+		case 2:
+			VO_DAC_B_CTRL.u32 = VDP_RegRead1((HI_U32)&(pVdpReg->VO_DAC_B_CTRL.u32)); //0x13C
+			*penable = (VO_DAC_B_CTRL.bits.en_b & 1); //VO_DAC_B_CTRL.bits.en_buf_b);
+			break;
         default :
             break;
     }
@@ -10652,6 +11751,7 @@ HI_VOID VDP_VDAC_GetEnable(HI_U32 uVdac, HI_U32 *penable)
 
 static HI_U32 u32aDATESrc13Coef[][18]=
 {
+#if 0
 {0x00000000, 0x07fb07fe, 0x00080000, 0x07f107ff, 0x00190001, 0x07d807ff, 0x00420000, 0x07870003,
  0x015207ee, 0x01520224, 0x078707ee, 0x00420003, 0x07d80000, 0x001907ff, 0x07f10001, 0x000807ff, 
  0x07fb0000, 0x000007fe
@@ -10672,20 +11772,52 @@ static HI_U32 u32aDATESrc13Coef[][18]=
  0x16407d8,  0x164024e,  0x76807d8,  0x5307ff ,  0x7d00009,  0x1b07f6 ,  0x7f20009,  0x607fa,
  0x7fe0004,  0x7fd,
 },
+#else
+{
+0x00000000,0x00000000,0x00010000,0x07fc0000,0x000c0000,
+0x07e30000,0x003f07ff,0x077c0007,0x015a07d6,0x015a0248,0x077c07d6,0x003f0007,0x07e307ff,
+0x000c0000,0x07fc0000,0x00010000,0x00000000,0x00000000,
+},
+{
+0x00000000,0x07fb07fe,0x00080000,0x07f107ff,0x00190001,0x07d807ff,0x00420000,
+0x07870003,0x015207ee,0x01520224,0x078707ee,0x00420003,0x07d80000,0x001907ff,0x07f10001,
+0x000807ff,0x07fb0000,0x000007fe,
+},
+{
+0x00000000,0x00000000,0x00010000,0x07fc0001,0x000c07fd,
+0x07e50005,0x003907f7,0x0787000f,0x015207d7,0x0152023f,0x078707d7,0x0039000f,0x07e507f7,
+0x000c0005,0x07fc07fd,0x00010001,0x00000000,0x00000000,
+},
+{
+0x00000000,0x00000000,0x000107ff,0x07fa0002,0x001007fc,0x07db0008,0x004d07f2,
+0x0764001e,0x016807a9,0x01680285,0x076407a9,0x004d001e,0x07db07f2,0x00100008,0x07fa07fc,
+0x00010002,0x000007ff,0x00000000,
+},
+#endif
 };
 
 
 /*
-Çë×éÖ¯»Ø¹éÑéÖ¤ÏÂ£¬Ð»Ð»¡£
+ï¿½ï¿½ï¿½ï¿½Ö¯ï¿½Ø¹ï¿½ï¿½ï¿½Ö¤ï¿½Â£ï¿½Ð»Ð»ï¿½ï¿½
 himm 0xf8ccf2c8 0x1f07e8
 himm 0xf8ccf2cc 0x1f01f2
 himm 0xf8ccf2d0 0x7e8
 */
 HI_U32 u32aSDDATEDefSrcCoef[]=
+#if 0
 { 0x1f07e8,  0x1f01f2,  0x7e8,   0x7b6000b,  0x13f013f,  0xb07b6};
+#else
+{0x078d0010,0x05c70145,0x00000357,0x001b07fa,0x075c0003,0x01630129,
+0x00000001,0x00808080,0x00808080,0x00000001};
+#endif
 
 HI_U32 u32aSDDATESrcCoef[]=
+#if 0
 {0x07FF07FF,  0x07FF0204,  0x000007FF,   0x07BF000C,  0x01350135,  0x000C07BF};
+#else
+{0x07ff07ff,0x07ff0204,0x000007ff,0x07bf000c,0x01350135,0x000c07bf,
+0x00000001,0x00808080,0x00808080,0x00010000};
+#endif
 
 
 
@@ -10693,35 +11825,40 @@ HI_VOID VDP_DATE_SetSrcCoef(DISP_VENC_E eDate, HI_U32 *pu32Src13)
 {
     HI_U32 *pu32Src13tmp = pu32Src13;
     
-    if (DISP_VENC_HDATE0 == eDate)
+    if (DISP_VENC_HDATE0 == eDate) //0
     {
-        VDP_RegWrite((HI_U32)&(pVdpReg->HDATE_SRC_13_COEF1.u32), *pu32Src13tmp++); 
-        VDP_RegWrite((HI_U32)&(pVdpReg->HDATE_SRC_13_COEF2.u32), *pu32Src13tmp++); 
-        VDP_RegWrite((HI_U32)&(pVdpReg->HDATE_SRC_13_COEF3.u32), *pu32Src13tmp++); 
-        VDP_RegWrite((HI_U32)&(pVdpReg->HDATE_SRC_13_COEF4.u32), *pu32Src13tmp++); 
-        VDP_RegWrite((HI_U32)&(pVdpReg->HDATE_SRC_13_COEF5.u32), *pu32Src13tmp++); 
-        VDP_RegWrite((HI_U32)&(pVdpReg->HDATE_SRC_13_COEF6.u32), *pu32Src13tmp++); 
-        VDP_RegWrite((HI_U32)&(pVdpReg->HDATE_SRC_13_COEF7.u32), *pu32Src13tmp++); 
-        VDP_RegWrite((HI_U32)&(pVdpReg->HDATE_SRC_13_COEF8.u32), *pu32Src13tmp++); 
-        VDP_RegWrite((HI_U32)&(pVdpReg->HDATE_SRC_13_COEF9.u32), *pu32Src13tmp++); 
-        VDP_RegWrite((HI_U32)&(pVdpReg->HDATE_SRC_13_COEF10.u32), *pu32Src13tmp++); 
-        VDP_RegWrite((HI_U32)&(pVdpReg->HDATE_SRC_13_COEF11.u32), *pu32Src13tmp++); 
-        VDP_RegWrite((HI_U32)&(pVdpReg->HDATE_SRC_13_COEF12.u32), *pu32Src13tmp++); 
-        VDP_RegWrite((HI_U32)&(pVdpReg->HDATE_SRC_13_COEF13.u32), *pu32Src13tmp++); 
-        VDP_RegWrite((HI_U32)&(pVdpReg->HDATE_SRC_13_COEF14.u32), *pu32Src13tmp++); 
-        VDP_RegWrite((HI_U32)&(pVdpReg->HDATE_SRC_13_COEF15.u32), *pu32Src13tmp++); 
-        VDP_RegWrite((HI_U32)&(pVdpReg->HDATE_SRC_13_COEF16.u32), *pu32Src13tmp++); 
-        VDP_RegWrite((HI_U32)&(pVdpReg->HDATE_SRC_13_COEF17.u32), *pu32Src13tmp++); 
-        VDP_RegWrite((HI_U32)&(pVdpReg->HDATE_SRC_13_COEF18.u32), *pu32Src13tmp++); 
+        VDP_RegWrite1((HI_U32)&(pVdpReg->HDATE_SRC_13_COEF1.u32), *pu32Src13tmp++);
+        VDP_RegWrite1((HI_U32)&(pVdpReg->HDATE_SRC_13_COEF2.u32), *pu32Src13tmp++);
+        VDP_RegWrite1((HI_U32)&(pVdpReg->HDATE_SRC_13_COEF3.u32), *pu32Src13tmp++);
+        VDP_RegWrite1((HI_U32)&(pVdpReg->HDATE_SRC_13_COEF4.u32), *pu32Src13tmp++);
+        VDP_RegWrite1((HI_U32)&(pVdpReg->HDATE_SRC_13_COEF5.u32), *pu32Src13tmp++);
+        VDP_RegWrite1((HI_U32)&(pVdpReg->HDATE_SRC_13_COEF6.u32), *pu32Src13tmp++);
+        VDP_RegWrite1((HI_U32)&(pVdpReg->HDATE_SRC_13_COEF7.u32), *pu32Src13tmp++);
+        VDP_RegWrite1((HI_U32)&(pVdpReg->HDATE_SRC_13_COEF8.u32), *pu32Src13tmp++);
+        VDP_RegWrite1((HI_U32)&(pVdpReg->HDATE_SRC_13_COEF9.u32), *pu32Src13tmp++);
+        VDP_RegWrite1((HI_U32)&(pVdpReg->HDATE_SRC_13_COEF10.u32), *pu32Src13tmp++);
+        VDP_RegWrite1((HI_U32)&(pVdpReg->HDATE_SRC_13_COEF11.u32), *pu32Src13tmp++);
+        VDP_RegWrite1((HI_U32)&(pVdpReg->HDATE_SRC_13_COEF12.u32), *pu32Src13tmp++);
+        VDP_RegWrite1((HI_U32)&(pVdpReg->HDATE_SRC_13_COEF13.u32), *pu32Src13tmp++);
+        VDP_RegWrite1((HI_U32)&(pVdpReg->HDATE_SRC_13_COEF14.u32), *pu32Src13tmp++);
+        VDP_RegWrite1((HI_U32)&(pVdpReg->HDATE_SRC_13_COEF15.u32), *pu32Src13tmp++);
+        VDP_RegWrite1((HI_U32)&(pVdpReg->HDATE_SRC_13_COEF16.u32), *pu32Src13tmp++);
+        VDP_RegWrite1((HI_U32)&(pVdpReg->HDATE_SRC_13_COEF17.u32), *pu32Src13tmp++);
+        VDP_RegWrite1((HI_U32)&(pVdpReg->HDATE_SRC_13_COEF18.u32), *pu32Src13tmp++);
     }
-    else if (DISP_VENC_SDATE0 == eDate)
+    else if (DISP_VENC_SDATE0 == eDate) //1
     {
-        VDP_RegWrite((HI_U32)&(pVdpReg->DATE_COEFF50.u32), *pu32Src13tmp++); 
-        VDP_RegWrite((HI_U32)&(pVdpReg->DATE_COEFF51.u32), *pu32Src13tmp++); 
-        VDP_RegWrite((HI_U32)&(pVdpReg->DATE_COEFF52.u32), *pu32Src13tmp++); 
-        VDP_RegWrite((HI_U32)&(pVdpReg->DATE_COEFF53.u32), *pu32Src13tmp++); 
-        VDP_RegWrite((HI_U32)&(pVdpReg->DATE_COEFF54.u32), *pu32Src13tmp++); 
-        VDP_RegWrite((HI_U32)&(pVdpReg->DATE_COEFF55.u32), *pu32Src13tmp++); 
+        VDP_RegWrite1((HI_U32)&(pVdpReg->DATE_COEFF50.u32), *pu32Src13tmp++);
+        VDP_RegWrite1((HI_U32)&(pVdpReg->DATE_COEFF51.u32), *pu32Src13tmp++);
+        VDP_RegWrite1((HI_U32)&(pVdpReg->DATE_COEFF52.u32), *pu32Src13tmp++);
+        VDP_RegWrite1((HI_U32)&(pVdpReg->DATE_COEFF53.u32), *pu32Src13tmp++);
+        VDP_RegWrite1((HI_U32)&(pVdpReg->DATE_COEFF54.u32), *pu32Src13tmp++);
+        VDP_RegWrite1((HI_U32)&(pVdpReg->DATE_COEFF55.u32), *pu32Src13tmp++);
+        VDP_RegWrite1((HI_U32)&(pVdpReg->DATE_0xcee0.u32), *pu32Src13tmp++);
+        VDP_RegWrite1((HI_U32)&(pVdpReg->DATE_0xcee4.u32), *pu32Src13tmp++);
+        VDP_RegWrite1((HI_U32)&(pVdpReg->DATE_0xcee8.u32), *pu32Src13tmp++);
+        VDP_RegWrite1((HI_U32)&(pVdpReg->DATE_0xceec.u32), *pu32Src13tmp++);
+
     }
 }
 
@@ -10774,63 +11911,69 @@ HI_BOOL  SDATE_Setc_gain(HI_U32 u32Data)
 {
     volatile U_DATE_COEFF1 DATE_COEFF1;
 
-    DATE_COEFF1.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->DATE_COEFF1.u32)));   
+    DATE_COEFF1.u32 = VDP_RegRead1((HI_U32)(&(pVdpReg->DATE_COEFF1.u32)));
     DATE_COEFF1.bits.c_gain = u32Data; 
-    VDP_RegWrite((HI_U32)(&(pVdpReg->DATE_COEFF1.u32)), DATE_COEFF1.u32); 
+    VDP_RegWrite1((HI_U32)(&(pVdpReg->DATE_COEFF1.u32)), DATE_COEFF1.u32);
 
     return HI_TRUE;
 }
 
 HI_VOID VDP_DATE_ResetFmt(DISP_VENC_E eDate, HI_DRV_DISP_FMT_E enFmt)
 {
-    if (DISP_VENC_HDATE0 == eDate)
+    if (DISP_VENC_HDATE0 == eDate) //0
     {
         U_HDATE_VIDEO_FORMAT HDATE_VIDEO_FORMAT;
         U_HDATE_OUT_CTRL     HDATE_OUT_CTRL;
 
         /* todo: fix it  */
-        VDP_RegWrite((HI_U32)(&(pVdpReg->HDATE_POLA_CTRL.u32)), 0x03ul); 
-        VDP_RegWrite((HI_U32)(&(pVdpReg->DHD0_SYNC_INV.u32)), 0x02000ul); 
+        VDP_RegWrite1((HI_U32)(&(pVdpReg->HDATE_POLA_CTRL.u32)), 0x03ul);
+        VDP_RegWrite1((HI_U32)(&(pVdpReg->DHD0_SYNC_INV.u32)), 0x02000ul);
         
         switch(enFmt)
         {
-            case HI_DRV_DISP_FMT_1080P_60:
-            case HI_DRV_DISP_FMT_1080P_50:
+            case HI_DRV_DISP_FMT_1080P_60: //0
+            case HI_DRV_DISP_FMT_1080P_50: //1
                 HDATE_VIDEO_FORMAT.u32 = 0x000000a3;                
-                VDP_DATE_SetSrcCoef(eDate, u32aDATESrc13Coef[DISP_DATE_SRC_COEF_INDEX_1080P]);
+                VDP_DATE_SetSrcCoef(eDate, u32aDATESrc13Coef[DISP_DATE_SRC_COEF_INDEX_1080P]); //3
                 break;
-            case HI_DRV_DISP_FMT_1080i_50:
+            case HI_DRV_DISP_FMT_1080i_50: //6
                 /* to resolve vsync for 1080i_50 */
-                VDP_RegWrite((HI_U32)(&(pVdpReg->HDATE_POLA_CTRL.u32)), 0x05ul); 
-            case HI_DRV_DISP_FMT_1080i_60:
+                VDP_RegWrite1((HI_U32)(&(pVdpReg->HDATE_POLA_CTRL.u32)), 0x05ul);
+            case HI_DRV_DISP_FMT_1080i_60: //5
                 HDATE_VIDEO_FORMAT.u32 = 0x000000a4;                
-                VDP_DATE_SetSrcCoef(eDate, u32aDATESrc13Coef[DISP_DATE_SRC_COEF_INDEX_1080I]);
+                VDP_DATE_SetSrcCoef(eDate, u32aDATESrc13Coef[DISP_DATE_SRC_COEF_INDEX_1080I]); //2
                 break;
-            case HI_DRV_DISP_FMT_720P_60:
-            case HI_DRV_DISP_FMT_720P_50:
+            case HI_DRV_DISP_FMT_720P_60: //7
+            case HI_DRV_DISP_FMT_720P_50: //8
                 HDATE_VIDEO_FORMAT.u32 = 0x000000a2;                
-                VDP_DATE_SetSrcCoef(eDate, u32aDATESrc13Coef[DISP_DATE_SRC_COEF_INDEX_720P]);
+                VDP_DATE_SetSrcCoef(eDate, u32aDATESrc13Coef[DISP_DATE_SRC_COEF_INDEX_720P]); //2
                 break;
-            case HI_DRV_DISP_FMT_576P_50:
+            case HI_DRV_DISP_FMT_576P_50: //9
                 HDATE_VIDEO_FORMAT.u32 = 0x000000a1;                
-                VDP_DATE_SetSrcCoef(eDate, u32aDATESrc13Coef[DISP_DATE_SRC_COEF_INDEX_576P]);
+                VDP_DATE_SetSrcCoef(eDate, u32aDATESrc13Coef[DISP_DATE_SRC_COEF_INDEX_576P]); //1
                 break;
-            case HI_DRV_DISP_FMT_480P_60:
+            case HI_DRV_DISP_FMT_480P_60: //10
                 HDATE_VIDEO_FORMAT.u32 = 0x000000a0;                
                 /* to resolve rwzb for 480p vsync */
-                VDP_RegWrite((HI_U32)(&(pVdpReg->DHD0_SYNC_INV.u32)), 0x06000ul); 
-                VDP_DATE_SetSrcCoef(eDate, u32aDATESrc13Coef[DISP_DATE_SRC_COEF_INDEX_480P]);
+                VDP_RegWrite1((HI_U32)(&(pVdpReg->DHD0_SYNC_INV.u32)), 0x06000ul);
+                VDP_DATE_SetSrcCoef(eDate, u32aDATESrc13Coef[DISP_DATE_SRC_COEF_INDEX_480P]); //1
                 break;
+            case HI_DRV_DISP_FMT_61: //61
+            case HI_DRV_DISP_FMT_62: //62
+            case HI_DRV_DISP_FMT_63: //63
+            case HI_DRV_DISP_FMT_64: //64
+                HDATE_VIDEO_FORMAT.u32 = 0x00000000;
+            	break;
             default :
                 HDATE_VIDEO_FORMAT.u32 = 0x000000a2;                
-                VDP_DATE_SetSrcCoef(eDate, u32aDATESrc13Coef[DISP_DATE_SRC_COEF_INDEX_DEFAULT]);
+                VDP_DATE_SetSrcCoef(eDate, u32aDATESrc13Coef[DISP_DATE_SRC_COEF_INDEX_DEFAULT]); //0
                 
                 break;
         }
-        VDP_RegWrite((HI_U32)(&(pVdpReg->HDATE_VIDEO_FORMAT.u32)), HDATE_VIDEO_FORMAT.u32); 
+        VDP_RegWrite1((HI_U32)(&(pVdpReg->HDATE_VIDEO_FORMAT.u32)), HDATE_VIDEO_FORMAT.u32);
 
 
-        HDATE_OUT_CTRL.u32 = VDP_RegRead((HI_U32)&(pVdpReg->HDATE_OUT_CTRL.u32));
+        HDATE_OUT_CTRL.u32 = VDP_RegRead1((HI_U32)&(pVdpReg->HDATE_OUT_CTRL.u32));
 
         HDATE_OUT_CTRL.bits.src_ctrl = 2;        
         HDATE_OUT_CTRL.bits.sync_lpf_en = 1;
@@ -10839,7 +11982,7 @@ HI_VOID VDP_DATE_ResetFmt(DISP_VENC_E eDate, HI_DRV_DISP_FMT_E enFmt)
         HDATE_OUT_CTRL.bits.video1_sel = 2;
         HDATE_OUT_CTRL.bits.video2_sel = 3;
         HDATE_OUT_CTRL.bits.video3_sel = 1;
-        VDP_RegWrite((HI_U32)(&(pVdpReg->HDATE_OUT_CTRL.u32)), HDATE_OUT_CTRL.u32);
+        VDP_RegWrite1((HI_U32)(&(pVdpReg->HDATE_OUT_CTRL.u32)), HDATE_OUT_CTRL.u32);
 
         
         // DTS2012080100525 : some sony46 TV can not accept 576P50 siganl correctly
@@ -10853,7 +11996,7 @@ HI_VOID VDP_DATE_ResetFmt(DISP_VENC_E eDate, HI_DRV_DISP_FMT_E enFmt)
             HDATE_CLIP.bits.clip_fb = 8;
             HDATE_CLIP.bits.clip_disable = 0;
             HDATE_CLIP.bits.clip_thdl = 251;
-            VDP_RegWrite((HI_U32)(&(pVdpReg->HDATE_CLIP.u32)), HDATE_CLIP.u32); 
+            VDP_RegWrite1((HI_U32)(&(pVdpReg->HDATE_CLIP.u32)), HDATE_CLIP.u32);
         }
     }
 
@@ -10877,11 +12020,11 @@ HI_VOID VDP_DATE_ResetFmt(DISP_VENC_E eDate, HI_DRV_DISP_FMT_E enFmt)
                 //DATE_COEFF0.u32  = 0x628412dc;
                 DATE_COEFF0.u32  = 0x6a8452dc;
                 break;
-            case HI_DRV_DISP_FMT_PAL_N:
+            case HI_DRV_DISP_FMT_PAL_N: //20
                 DATE_COEFF0.u32  = 0x6a8852dc;
                 break;
 
-            case HI_DRV_DISP_FMT_PAL_Nc:
+            case HI_DRV_DISP_FMT_PAL_Nc: //21
                 DATE_COEFF0.u32  = 0x6a9052dc;
                 break;
 
@@ -10924,21 +12067,21 @@ HI_VOID VDP_DATE_ResetFmt(DISP_VENC_E eDate, HI_DRV_DISP_FMT_E enFmt)
         // close pbpr low pass filter for standard test
         DATE_COEFF0.bits.pbpr_lpf_en = 0;
         
-        VDP_RegWrite((HI_U32)(&(pVdpReg->DATE_COEFF0.u32)), DATE_COEFF0.u32); 
+        VDP_RegWrite1((HI_U32)(&(pVdpReg->DATE_COEFF0.u32)), DATE_COEFF0.u32);
         SDATE_Setc_gain(1);
         
         // to get good SCH parameters, set video_phase_delta as 0x9A
-        VDP_RegWrite((HI_U32)(&(pVdpReg->DATE_COEFF22.u32)), 0x9a); 
+        VDP_RegWrite1((HI_U32)(&(pVdpReg->DATE_COEFF22.u32)), 0x9a);
 
         
-        DATE_COEFF21.u32 = VDP_RegRead((HI_U32)&(pVdpReg->DATE_COEFF21.u32));
+        DATE_COEFF21.u32 = VDP_RegRead1((HI_U32)&(pVdpReg->DATE_COEFF21.u32));
         DATE_COEFF21.bits.dac0_in_sel = 1;
         DATE_COEFF21.bits.dac1_in_sel = 2;
         DATE_COEFF21.bits.dac2_in_sel = 4;
         DATE_COEFF21.bits.dac3_in_sel = 3;
         DATE_COEFF21.bits.dac4_in_sel = 5;
         DATE_COEFF21.bits.dac5_in_sel = 6;
-        VDP_RegWrite((HI_U32)(&(pVdpReg->DATE_COEFF21.u32)), DATE_COEFF21.u32); 
+        VDP_RegWrite1((HI_U32)(&(pVdpReg->DATE_COEFF21.u32)), DATE_COEFF21.u32);
 
     }
 }
@@ -10948,24 +12091,24 @@ HI_VOID VDP_DATE_ResetFmt(DISP_VENC_E eDate, HI_DRV_DISP_FMT_E enFmt)
 HI_VOID VDP_DATE_SetSignal(HI_DRV_DISP_INTF_ID_E enIntfId,DISP_VENC_E eDate, HI_BOOL bRGBSync)
 {
     //TODO SELECT RGB or YPbPr   and sync mode
-    if (HI_DRV_DISP_INTF_YPBPR0 == enIntfId)
+    if (HI_DRV_DISP_INTF_YPBPR0 == enIntfId) //0
     {
-        if (DISP_VENC_HDATE0 ==  eDate )
+        if (DISP_VENC_HDATE0 ==  eDate ) //0
         {
             U_HDATE_VIDEO_FORMAT HDATE_VIDEO_FORMAT;
             /**/
-            HDATE_VIDEO_FORMAT.u32 = VDP_RegRead((HI_U32)&(pVdpReg->HDATE_VIDEO_FORMAT.u32));
+            HDATE_VIDEO_FORMAT.u32 = VDP_RegRead1((HI_U32)&(pVdpReg->HDATE_VIDEO_FORMAT.u32));
 
-            HDATE_VIDEO_FORMAT.bits.csc_ctrl = 0;/*YCbCr£­>YPbPr*/
+            HDATE_VIDEO_FORMAT.bits.csc_ctrl = 0;/*YCbCrï¿½ï¿½>YPbPr*/
             HDATE_VIDEO_FORMAT.bits.video_out_ctrl = 1;/*YPbPr insight sync*/
             HDATE_VIDEO_FORMAT.bits.sync_add_ctrl = 2; /*default : sync on G/Y */
-            VDP_RegWrite((HI_U32)(&(pVdpReg->HDATE_VIDEO_FORMAT.u32)), HDATE_VIDEO_FORMAT.u32);
+            VDP_RegWrite1((HI_U32)(&(pVdpReg->HDATE_VIDEO_FORMAT.u32)), HDATE_VIDEO_FORMAT.u32);
         }
-        else if (DISP_VENC_SDATE0 == eDate )
+        else if (DISP_VENC_SDATE0 == eDate ) //1
         {
             U_DATE_COEFF0 DATE_COEFF0;
 
-            DATE_COEFF0.u32 = VDP_RegRead((HI_U32)&(pVdpReg->DATE_COEFF0.u32));
+            DATE_COEFF0.u32 = VDP_RegRead1((HI_U32)&(pVdpReg->DATE_COEFF0.u32));
             /*0: yuv   1: rgb*/
             DATE_COEFF0.bits.rgb_en = 0;/* yuv*/
 
@@ -10974,7 +12117,7 @@ HI_VOID VDP_DATE_SetSignal(HI_DRV_DISP_INTF_ID_E enIntfId,DISP_VENC_E eDate, HI_
                 0:sync_mode_sel is 
             */
             DATE_COEFF0.bits.sync_mode_scart = 0;
-            VDP_RegWrite((HI_U32)(&(pVdpReg->DATE_COEFF0.u32)), DATE_COEFF0.u32);
+            VDP_RegWrite1((HI_U32)(&(pVdpReg->DATE_COEFF0.u32)), DATE_COEFF0.u32);
         }
         else
         {/*VGA do nothing
@@ -10982,39 +12125,41 @@ HI_VOID VDP_DATE_SetSignal(HI_DRV_DISP_INTF_ID_E enIntfId,DISP_VENC_E eDate, HI_
         }
 
     }
-    if (HI_DRV_DISP_INTF_RGB0 == enIntfId)
+    if (HI_DRV_DISP_INTF_RGB0 == enIntfId) //1
     {
         if (DISP_VENC_HDATE0 == eDate )
         {
             U_HDATE_VIDEO_FORMAT HDATE_VIDEO_FORMAT;
             /**/
-            HDATE_VIDEO_FORMAT.u32 = VDP_RegRead((HI_U32)&(pVdpReg->HDATE_VIDEO_FORMAT.u32));
-            HDATE_VIDEO_FORMAT.bits.csc_ctrl = 1;/*YCbCr¡ª>RGB ITU-R BT709*/
+            HDATE_VIDEO_FORMAT.u32 = VDP_RegRead1((HI_U32)&(pVdpReg->HDATE_VIDEO_FORMAT.u32));
+            HDATE_VIDEO_FORMAT.bits.csc_ctrl = 1;/*YCbCrï¿½ï¿½>RGB ITU-R BT709*/
             HDATE_VIDEO_FORMAT.bits.video_out_ctrl = 0;/*RGB sync in*/
             
             if (!bRGBSync)
                 HDATE_VIDEO_FORMAT.bits.sync_add_ctrl = 0; /*no sync*/
             else
                 HDATE_VIDEO_FORMAT.bits.sync_add_ctrl = 2; /*default : sync on G/Y */
-            VDP_RegWrite((HI_U32)(&(pVdpReg->HDATE_VIDEO_FORMAT.u32)), HDATE_VIDEO_FORMAT.u32);
+            VDP_RegWrite1((HI_U32)(&(pVdpReg->HDATE_VIDEO_FORMAT.u32)), HDATE_VIDEO_FORMAT.u32);
         }
         else if (DISP_VENC_SDATE0 == eDate )
         {
-            U_DATE_COEFF0 DATE_COEFF0;
-            /*0: yuv   1: rgb*/
-            DATE_COEFF0.bits.rgb_en = 1;
+             U_DATE_COEFF0 DATE_COEFF0;
+
+             DATE_COEFF0.u32 = VDP_RegRead1((HI_U32)&(pVdpReg->DATE_COEFF0.u32));
+             /*0: yuv   1: rgb*/
+             DATE_COEFF0.bits.rgb_en = 1;
 
              if (!bRGBSync)
-            {
-                DATE_COEFF0.bits.sync_mode_scart = 1;
-                DATE_COEFF0.bits.sync_mode_sel =   0;
-            }
-            else
-            {
-                DATE_COEFF0.bits.sync_mode_scart = 0;
-                DATE_COEFF0.bits.sync_mode_sel =   1;
-            }
-
+             {
+                 DATE_COEFF0.bits.sync_mode_scart = 1;
+                 DATE_COEFF0.bits.sync_mode_sel =   0;
+             }
+             else
+             {
+                 DATE_COEFF0.bits.sync_mode_scart = 0;
+                 DATE_COEFF0.bits.sync_mode_sel =   1;
+             }
+             VDP_RegWrite1((HI_U32)(&(pVdpReg->DATE_COEFF0.u32)), DATE_COEFF0.u32);
         }
     }
 }
@@ -11374,9 +12519,9 @@ HI_BOOL  SDATE_SetTtSeq(HI_U32 u32Data)
 
 HI_VOID VDP_VDAC_ResetCRG(HI_VOID)
 {
-    U_PERI_CRG71 PERI_CRG71TMP;
+    /*U_PERI_CRG71*/U_PERI_CRG0x1f8 PERI_CRG71TMP;
 
-    PERI_CRG71TMP.u32 = g_pstRegCrg->PERI_CRG71.u32;
+    PERI_CRG71TMP.u32 = g_pstRegCrg->/*PERI_CRG71*/PERI_CRG0x1f8.u32;
 
     //#define VDAC_SYSCTRL_RESET_VALUE 0x000010F3ul
     //g_pstRegCrg->PERI_CRG71.u32 = VDAC_SYSCTRL_RESET_VALUE;
@@ -11392,7 +12537,7 @@ HI_VOID VDP_VDAC_ResetCRG(HI_VOID)
     PERI_CRG71TMP.bits.vdac_g_clk_pctrl = 0;
     PERI_CRG71TMP.bits.vdac_b_clk_pctrl = 0;
 
-    g_pstRegCrg->PERI_CRG71.u32 = PERI_CRG71TMP.u32;
+    g_pstRegCrg->/*PERI_CRG71*/PERI_CRG0x1f8.u32 = PERI_CRG71TMP.u32;
 }
 
 
@@ -11406,8 +12551,9 @@ HI_VOID VDP_VDAC_Reset(HI_VOID)
     //g_pstRegCrg->PERI_CRG71.u32 = VDAC_SYSCTRL_RESET_VALUE;
     VDP_VDAC_ResetCRG();
 
+#if 0
     /*    
-    0xF8CC0120  0x00004000 //common block(29\14) iso¿ØÖÆ¼Ä´æÆ÷Ä¬ÈÏÎª0£»
+    0xF8CC0120  0x00004000 //common block(29\14) isoï¿½ï¿½ï¿½Æ¼Ä´ï¿½ï¿½ï¿½Ä¬ï¿½ï¿½Îª0ï¿½ï¿½
     //0xF8CC0130  0x10000000 //c channel (28)
     //0xF8CC0134  0x10000000 //r channel (28)
     //0xF8CC0138  0x10000000 //g channel (28)
@@ -11415,7 +12561,7 @@ HI_VOID VDP_VDAC_Reset(HI_VOID)
     */
     
     ctrlv = VDAC_CTRL_ISO_RCT_VALUE;
-    VDP_RegWrite((HI_U32)(&(pVdpReg->VO_DAC_CTRL.u32)), ctrlv); 
+    VDP_RegWrite1((HI_U32)(&(pVdpReg->VO_DAC_CTRL.u32)), ctrlv);
     
     /*
     0xF8CC0120   0xa0004000 // enable bg (31\29\14) 
@@ -11426,20 +12572,30 @@ HI_VOID VDP_VDAC_Reset(HI_VOID)
     
     /*zkun_confirm:*/
     ctrlv = VDAC_CTRL_ISO_RCT_VALUE | VDAC_CTRL_ENBG_AND_TRIM_RESET_VALUE1;
-    VDP_RegWrite((HI_U32)(&(pVdpReg->VO_DAC_CTRL.u32)), ctrlv); 
+#else
+    ctrlv = 0x80000000;
+#endif
+    VDP_RegWrite1((HI_U32)(&(pVdpReg->VO_DAC_CTRL.u32)), ctrlv);
 
+#if 0
     DISP_MSLEEP(10);
     
     ctrlv = VDAC_CTRL_ISO_RCT_VALUE | VDAC_CTRL_EN_RCT_VALUE | VDAC_CTRL_ENBG_AND_TRIM_RESET_VALUE1;
-    VDP_RegWrite((HI_U32)(&(pVdpReg->VO_DAC_CTRL.u32)), ctrlv); 
+    VDP_RegWrite1((HI_U32)(&(pVdpReg->VO_DAC_CTRL.u32)), ctrlv);
     
     ctrlv = VDAC_CTRL_EN_RCT_VALUE | VDAC_CTRL_ENBG_AND_TRIM_RESET_VALUE1;
-    VDP_RegWrite((HI_U32)(&(pVdpReg->VO_DAC_CTRL.u32)), ctrlv); 
+    VDP_RegWrite1((HI_U32)(&(pVdpReg->VO_DAC_CTRL.u32)), ctrlv);
+#endif
 
     DISP_MSLEEP(1);
 
-    VDP_RegWrite((HI_U32)(&(pVdpReg->VO_MUX_DAC.u32)), 0); 
+    VDP_RegWrite1((HI_U32)(&(pVdpReg->VO_MUX_DAC.u32)), 0);
+#if 0
     DISP_WARN("=========VDAC_DRIVER_Initial====\n");
+
+    DISP_MSEELP(1);
+#endif
+
 
     return;    
 }
@@ -11482,38 +12638,39 @@ HI_BOOL  SDATE_SetCcSeq(HI_U32 u32Data)
 
 HI_VOID VDP_VDAC_SetReset(HI_U32 uVdac, HI_BOOL bReset)
 {
-    U_PERI_CRG71 PERI_CRG71Tmp;
+    U_PERI_CRG0x1f8 PERI_CRG0x1f8Tmp;
 
-    PERI_CRG71Tmp.u32 = g_pstRegCrg->PERI_CRG71.u32;
+    PERI_CRG0x1f8Tmp.u32 = g_pstRegCrg->PERI_CRG0x1f8.u32;
     
     switch(uVdac)
     {
         case 0:
-            PERI_CRG71Tmp.bits.vdac_c_srst_req = (bReset == HI_TRUE) ? 1 : 0;
+            PERI_CRG0x1f8Tmp.bits.vdac_c_srst_req = (bReset == HI_TRUE) ? 1 : 0;
             break;
         case 1:
-            PERI_CRG71Tmp.bits.vdac_r_srst_req = (bReset == HI_TRUE) ? 1 : 0;
+            PERI_CRG0x1f8Tmp.bits.vdac_r_srst_req = (bReset == HI_TRUE) ? 1 : 0;
             break;
             
         case 2:            
-            PERI_CRG71Tmp.bits.vdac_g_srst_req = (bReset == HI_TRUE) ? 1 : 0;
+            PERI_CRG0x1f8Tmp.bits.vdac_g_srst_req = (bReset == HI_TRUE) ? 1 : 0;
             break;
         case 3:
-            PERI_CRG71Tmp.bits.vdac_b_srst_req = (bReset == HI_TRUE) ? 1 : 0;
+            PERI_CRG0x1f8Tmp.bits.vdac_b_srst_req = (bReset == HI_TRUE) ? 1 : 0;
             break;
         default:
             return;
     }
 
-    g_pstRegCrg->PERI_CRG71.u32 = PERI_CRG71Tmp.u32;
+    g_pstRegCrg->PERI_CRG0x1f8.u32 = PERI_CRG0x1f8Tmp.u32;
     return;
 }
 
 
-HI_VOID VDP_VDAC_ResetFmt(DISP_VENC_E enVenc ,HI_U32 uVdac, HI_DRV_DISP_FMT_E enFmt)
+HI_VOID VDP_VDAC_ResetFmt(DISP_VENC_E enVenc ,HI_U32 uVdac, HI_DRV_DISP_FMT_E enFmt, HI_U32 u32PixFreq)
 {
     HI_U32 vdacvalue = 0x0ul;
     
+#if 0
     /*1:
         VGA format               100MHz;
         1080p,                  100MHz;
@@ -11552,31 +12709,30 @@ HI_VOID VDP_VDAC_ResetFmt(DISP_VENC_E enVenc ,HI_U32 uVdac, HI_DRV_DISP_FMT_E en
     {   /*lcd format*/
          vdacvalue |= (VDECX_MODE_TV <<X5HD2_VDACX_MODE_C_OFFSET);
     }
+#endif
 
     // set vdac crg reset state
     VDP_VDAC_SetReset(uVdac, HI_TRUE);
         
     switch(uVdac)
     {
-        case 0:
+        case 3:
             //g_pstRegCrg->PERI_CRG71.u32 = g_pstRegCrg->PERI_CRG71.u32 | X5HD2_VDAC0_MASK_RESET;            
-            VDP_RegWrite((HI_U32)(&(pVdpReg->VO_DAC_C_CTRL.u32)), vdacvalue);             
+            VDP_RegWrite1((HI_U32)(&(pVdpReg->VO_DAC_C_CTRL.u32)), 0x801f8000); //vdacvalue); //0x130
             break;
 
-        case 1:
+        case 0:
             //g_pstRegCrg->PERI_CRG71.u32 = g_pstRegCrg->PERI_CRG71.u32 | X5HD2_VDAC1_MASK_RESET;
-            VDP_RegWrite((HI_U32)(&(pVdpReg->VO_DAC_R_CTRL.u32)), vdacvalue); 
+            VDP_RegWrite1((HI_U32)(&(pVdpReg->VO_DAC_R_CTRL.u32)), 0x801f8000); //vdacvalue); //0x134
             break;
             
-        case 2:            
+        case 1:
             //g_pstRegCrg->PERI_CRG71.u32 = g_pstRegCrg->PERI_CRG71.u32 | X5HD2_VDAC2_MASK_RESET;
-            VDP_RegWrite((HI_U32)(&(pVdpReg->VO_DAC_G_CTRL.u32)), vdacvalue); 
-            
+            VDP_RegWrite1((HI_U32)(&(pVdpReg->VO_DAC_G_CTRL.u32)), 0x801f8000); //vdacvalue); //0x138
             break;
-        case 3:
+        case 2:
             //g_pstRegCrg->PERI_CRG71.u32 = g_pstRegCrg->PERI_CRG71.u32 | X5HD2_VDAC3_MASK_RESET;
-            VDP_RegWrite((HI_U32)(&(pVdpReg->VO_DAC_B_CTRL.u32)), vdacvalue); 
-            
+            VDP_RegWrite1((HI_U32)(&(pVdpReg->VO_DAC_B_CTRL.u32)), 0x801f8000); //vdacvalue); //0x13C
             break;
         default:
             return;
@@ -11705,18 +12861,18 @@ HI_BOOL  SDATE_SetOutAgcAmp(HI_U32 u32Data)
 
 /*zkun_confirm:*/
 /*
-    DAC £¨ 0x0£©¡£
+    DAC ï¿½ï¿½ 0x0ï¿½ï¿½ï¿½ï¿½
 
-    0x0£º £¨SDATE£©£»
-    0x1£º Y/R £¨SDATE£©£»
-    0x2£º Cb/G £¨SDATE£©£»
-    0x3£º Cr/B £¨SDATE£©£»
-    0x4£º Y/R £¨HDATE£©£»
-    0x5£º Cb/G £¨HDATE£©£»
-    0x6£º Cr/B £¨HDATE£©£»
-    0x7£ºVGA   R£»
-    0x8£ºVGA   G£»
-    0x9£ºVGA   B¡£
+    0x0ï¿½ï¿½ ï¿½ï¿½SDATEï¿½ï¿½ï¿½ï¿½
+    0x1ï¿½ï¿½ Y/R ï¿½ï¿½SDATEï¿½ï¿½ï¿½ï¿½
+    0x2ï¿½ï¿½ Cb/G ï¿½ï¿½SDATEï¿½ï¿½ï¿½ï¿½
+    0x3ï¿½ï¿½ Cr/B ï¿½ï¿½SDATEï¿½ï¿½ï¿½ï¿½
+    0x4ï¿½ï¿½ Y/R ï¿½ï¿½HDATEï¿½ï¿½ï¿½ï¿½
+    0x5ï¿½ï¿½ Cb/G ï¿½ï¿½HDATEï¿½ï¿½ï¿½ï¿½
+    0x6ï¿½ï¿½ Cr/B ï¿½ï¿½HDATEï¿½ï¿½ï¿½ï¿½
+    0x7ï¿½ï¿½VGA   Rï¿½ï¿½
+    0x8ï¿½ï¿½VGA   Gï¿½ï¿½
+    0x9ï¿½ï¿½VGA   Bï¿½ï¿½
 */
 static HI_U32 s_VDACLink[3][HI_DRV_DISP_VDAC_SIGNAL_BUTT] = 
 {/*0  1  2  3  4     5  6  7  8  9    10*/
@@ -11735,7 +12891,7 @@ HI_VOID VDP_VDAC_SetLink(DISP_VENC_E eDate, HI_U32 uVdac, HI_DRV_DISP_VDAC_SIGNA
     // set vdac crg reset state
     VDP_VDAC_SetReset(uVdac, HI_TRUE);
 
-    VO_MUX_DAC.u32 = VDP_RegRead((HI_U32)&(pVdpReg->VO_MUX_DAC.u32));
+    VO_MUX_DAC.u32 = VDP_RegRead1((HI_U32)&(pVdpReg->VO_MUX_DAC.u32));
     switch (uVdac)
     {
         case 0:
@@ -11761,13 +12917,39 @@ HI_VOID VDP_VDAC_SetLink(DISP_VENC_E eDate, HI_U32 uVdac, HI_DRV_DISP_VDAC_SIGNA
             return;
     }
 
-    VDP_RegWrite((HI_U32)(&(pVdpReg->VO_MUX_DAC.u32)), VO_MUX_DAC.u32);
+    VDP_RegWrite1((HI_U32)(&(pVdpReg->VO_MUX_DAC.u32)), VO_MUX_DAC.u32);
 
     //TODO SELECT CLK
     return;
 }
 
-HI_VOID VDP_VDAC_SetEnable(HI_U32 uVdac, HI_U32 enable)
+HI_VOID VDP_VDAC_SetClockEnable(HI_U32 a, HI_BOOL bEnable)
+{
+    U_PERI_CRG54 PERI_CRG54Tmp;
+
+    PERI_CRG54Tmp.u32 = g_pstRegCrg->PERI_CRG54.u32;
+
+    switch (a)
+    {
+		case 0:
+			PERI_CRG54Tmp.bits.vdac_ch0_cken = (bEnable == 1)? 1: 0;
+			break;
+		case 1:
+			PERI_CRG54Tmp.bits.vdac_ch1_cken = (bEnable == 1)? 1: 0;
+			break;
+		case 2:
+			PERI_CRG54Tmp.bits.vdac_ch2_cken = (bEnable == 1)? 1: 0;
+			break;
+		case 3:
+			PERI_CRG54Tmp.bits.vdac_ch3_cken = (bEnable == 1)? 1: 0;
+			break;
+    }
+
+    g_pstRegCrg->PERI_CRG54.u32 = PERI_CRG54Tmp.u32;
+}
+
+
+HI_VOID VDP_VDAC_SetEnable(HI_U32 uVdac, HI_U32 enable, int c)
 {
     U_VO_DAC_C_CTRL VO_DAC_C_CTRL;
     U_VO_DAC_R_CTRL VO_DAC_R_CTRL;
@@ -11780,104 +12962,111 @@ HI_VOID VDP_VDAC_SetEnable(HI_U32 uVdac, HI_U32 enable)
 
     switch (uVdac)
     {
+		case 3:
+			//g_pstRegCrg->PERI_CRG71.u32 = g_pstRegCrg->PERI_CRG71.u32 | X5HD2_VDAC3_MASK_RESET;
+			if (enable)
+			{
+				VO_DAC_C_CTRL.u32 = VDP_RegRead1((HI_U32)&(pVdpReg->VO_DAC_C_CTRL.u32));
+				VO_DAC_C_CTRL.bits.en_c = 1;
+				VDP_RegWrite1((HI_U32)(&(pVdpReg->VO_DAC_C_CTRL.u32)), VO_DAC_C_CTRL.u32);
+
+	#if 0
+				VO_DAC_C_CTRL.u32 = VDP_RegRead1((HI_U32)&(pVdpReg->VO_DAC_C_CTRL.u32));
+				VO_DAC_C_CTRL.bits.en_buf_c = 1;
+				VDP_RegWrite1((HI_U32)(&(pVdpReg->VO_DAC_C_CTRL.u32)), VO_DAC_C_CTRL.u32);
+	#endif
+				//g_pstRegCrg->PERI_CRG71.u32 = g_pstRegCrg->PERI_CRG71.u32 & X5HD2_VDAC3_MASK_RESET_OVER;
+			}
+			else
+			{
+	#if 0
+				VO_DAC_C_CTRL.u32 = VDP_RegRead1((HI_U32)&(pVdpReg->VO_DAC_C_CTRL.u32));
+				VO_DAC_C_CTRL.bits.en_buf_c = 0;
+				VDP_RegWrite1((HI_U32)(&(pVdpReg->VO_DAC_C_CTRL.u32)), VO_DAC_C_CTRL.u32);
+	#endif
+				VO_DAC_C_CTRL.u32 = VDP_RegRead1((HI_U32)&(pVdpReg->VO_DAC_C_CTRL.u32));
+				VO_DAC_C_CTRL.bits.en_c = 0;
+				VDP_RegWrite1((HI_U32)(&(pVdpReg->VO_DAC_C_CTRL.u32)), VO_DAC_C_CTRL.u32);
+			}
+			break;
         case 0:
             //g_pstRegCrg->PERI_CRG71.u32 = g_pstRegCrg->PERI_CRG71.u32 | X5HD2_VDAC0_MASK_RESET;
             if (enable)
             {
-                VO_DAC_C_CTRL.u32 = VDP_RegRead((HI_U32)&(pVdpReg->VO_DAC_C_CTRL.u32));
-                VO_DAC_C_CTRL.bits.en_c = 1;
-                VDP_RegWrite((HI_U32)(&(pVdpReg->VO_DAC_C_CTRL.u32)), VO_DAC_C_CTRL.u32); 
-
-                VO_DAC_C_CTRL.u32 = VDP_RegRead((HI_U32)&(pVdpReg->VO_DAC_C_CTRL.u32));
-                VO_DAC_C_CTRL.bits.en_buf_c = 1;
-                VDP_RegWrite((HI_U32)(&(pVdpReg->VO_DAC_C_CTRL.u32)), VO_DAC_C_CTRL.u32); 
-
+                VO_DAC_R_CTRL.u32 = VDP_RegRead1((HI_U32)&(pVdpReg->VO_DAC_R_CTRL.u32));
+                VO_DAC_R_CTRL.bits.en_r = 1;
+                VDP_RegWrite1((HI_U32)(&(pVdpReg->VO_DAC_R_CTRL.u32)), VO_DAC_R_CTRL.u32);
+#if 0
+                VO_DAC_R_CTRL.u32 = VDP_RegRead1((HI_U32)&(pVdpReg->VO_DAC_R_CTRL.u32));
+                VO_DAC_R_CTRL.bits.en_buf_r = 1;
+                VDP_RegWrite1((HI_U32)(&(pVdpReg->VO_DAC_R_CTRL.u32)), VO_DAC_R_CTRL.u32);
+#endif
                 //g_pstRegCrg->PERI_CRG71.u32 = g_pstRegCrg->PERI_CRG71.u32 & X5HD2_VDAC0_MASK_RESET_OVER;
             }
             else
             {
-                VO_DAC_C_CTRL.u32 = VDP_RegRead((HI_U32)&(pVdpReg->VO_DAC_C_CTRL.u32));
-                VO_DAC_C_CTRL.bits.en_buf_c = 0;
-                VDP_RegWrite((HI_U32)(&(pVdpReg->VO_DAC_C_CTRL.u32)), VO_DAC_C_CTRL.u32); 
-
-                VO_DAC_C_CTRL.u32 = VDP_RegRead((HI_U32)&(pVdpReg->VO_DAC_C_CTRL.u32));
-                VO_DAC_C_CTRL.bits.en_c = 0;
-                VDP_RegWrite((HI_U32)(&(pVdpReg->VO_DAC_C_CTRL.u32)), VO_DAC_C_CTRL.u32); 
+#if 0
+                VO_DAC_R_CTRL.u32 = VDP_RegRead1((HI_U32)&(pVdpReg->VO_DAC_R_CTRL.u32));
+                VO_DAC_R_CTRL.bits.en_buf_r = 0;
+                VDP_RegWrite1((HI_U32)(&(pVdpReg->VO_DAC_R_CTRL.u32)), VO_DAC_R_CTRL.u32);
+#endif
+                VO_DAC_R_CTRL.u32 = VDP_RegRead1((HI_U32)&(pVdpReg->VO_DAC_R_CTRL.u32));
+                VO_DAC_R_CTRL.bits.en_r = 0;
+                VDP_RegWrite1((HI_U32)(&(pVdpReg->VO_DAC_R_CTRL.u32)), VO_DAC_R_CTRL.u32);
             }
             break;
         case 1:
             //g_pstRegCrg->PERI_CRG71.u32 = g_pstRegCrg->PERI_CRG71.u32 | X5HD2_VDAC1_MASK_RESET;
             if (enable)
             {
-                VO_DAC_R_CTRL.u32 = VDP_RegRead((HI_U32)&(pVdpReg->VO_DAC_R_CTRL.u32));
-                VO_DAC_R_CTRL.bits.en_r = 1;
-                VDP_RegWrite((HI_U32)(&(pVdpReg->VO_DAC_R_CTRL.u32)), VO_DAC_R_CTRL.u32); 
+                VO_DAC_G_CTRL.u32 = VDP_RegRead1((HI_U32)&(pVdpReg->VO_DAC_G_CTRL.u32));
+                VO_DAC_G_CTRL.bits.en_g = 1;
+                VDP_RegWrite1((HI_U32)(&(pVdpReg->VO_DAC_G_CTRL.u32)), VO_DAC_G_CTRL.u32);
 
-                VO_DAC_R_CTRL.u32 = VDP_RegRead((HI_U32)&(pVdpReg->VO_DAC_R_CTRL.u32));
-                VO_DAC_R_CTRL.bits.en_buf_r = 1;
-                VDP_RegWrite((HI_U32)(&(pVdpReg->VO_DAC_R_CTRL.u32)), VO_DAC_R_CTRL.u32); 
-
+#if 0
+                VO_DAC_G_CTRL.u32 = VDP_RegRead1((HI_U32)&(pVdpReg->VO_DAC_G_CTRL.u32));
+                VO_DAC_G_CTRL.bits.en_buf_g = 1;
+                VDP_RegWrite1((HI_U32)(&(pVdpReg->VO_DAC_G_CTRL.u32)), VO_DAC_G_CTRL.u32);
+#endif
                 //g_pstRegCrg->PERI_CRG71.u32 = g_pstRegCrg->PERI_CRG71.u32 & X5HD2_VDAC1_MASK_RESET_OVER;
             }
             else
             {
-                VO_DAC_R_CTRL.u32 = VDP_RegRead((HI_U32)&(pVdpReg->VO_DAC_R_CTRL.u32));
-                VO_DAC_R_CTRL.bits.en_buf_r = 0;
-                VDP_RegWrite((HI_U32)(&(pVdpReg->VO_DAC_R_CTRL.u32)), VO_DAC_R_CTRL.u32); 
-
-                VO_DAC_R_CTRL.u32 = VDP_RegRead((HI_U32)&(pVdpReg->VO_DAC_R_CTRL.u32));
-                VO_DAC_R_CTRL.bits.en_r = 0;
-                VDP_RegWrite((HI_U32)(&(pVdpReg->VO_DAC_R_CTRL.u32)), VO_DAC_R_CTRL.u32); 
+#if 0
+                VO_DAC_G_CTRL.u32 = VDP_RegRead1((HI_U32)&(pVdpReg->VO_DAC_G_CTRL.u32));
+                VO_DAC_G_CTRL.bits.en_buf_g = 0;
+                VDP_RegWrite1((HI_U32)(&(pVdpReg->VO_DAC_G_CTRL.u32)), VO_DAC_G_CTRL.u32);
+#endif
+                VO_DAC_G_CTRL.u32 = VDP_RegRead1((HI_U32)&(pVdpReg->VO_DAC_G_CTRL.u32));
+                VO_DAC_G_CTRL.bits.en_g = 0;
+                VDP_RegWrite1((HI_U32)(&(pVdpReg->VO_DAC_G_CTRL.u32)), VO_DAC_G_CTRL.u32);
             }
             break;
         case 2:
             //g_pstRegCrg->PERI_CRG71.u32 = g_pstRegCrg->PERI_CRG71.u32 | X5HD2_VDAC2_MASK_RESET;
             if (enable)
             {
-                VO_DAC_G_CTRL.u32 = VDP_RegRead((HI_U32)&(pVdpReg->VO_DAC_G_CTRL.u32));
-                VO_DAC_G_CTRL.bits.en_g = 1;
-                VDP_RegWrite((HI_U32)(&(pVdpReg->VO_DAC_G_CTRL.u32)), VO_DAC_G_CTRL.u32); 
+                VO_DAC_B_CTRL.u32 = VDP_RegRead1((HI_U32)&(pVdpReg->VO_DAC_B_CTRL.u32));
+                VO_DAC_B_CTRL.bits.en_b = 1;
+                VDP_RegWrite1((HI_U32)(&(pVdpReg->VO_DAC_B_CTRL.u32)), VO_DAC_B_CTRL.u32);
 
-                VO_DAC_G_CTRL.u32 = VDP_RegRead((HI_U32)&(pVdpReg->VO_DAC_G_CTRL.u32));
-                VO_DAC_G_CTRL.bits.en_buf_g = 1;
-                VDP_RegWrite((HI_U32)(&(pVdpReg->VO_DAC_G_CTRL.u32)), VO_DAC_G_CTRL.u32); 
-
+#if 0
+                VO_DAC_B_CTRL.u32 = VDP_RegRead1((HI_U32)&(pVdpReg->VO_DAC_B_CTRL.u32));
+                VO_DAC_B_CTRL.bits.en_buf_b = 1;
+                VDP_RegWrite1((HI_U32)(&(pVdpReg->VO_DAC_B_CTRL.u32)), VO_DAC_B_CTRL.u32);
+#endif
                 //g_pstRegCrg->PERI_CRG71.u32 = g_pstRegCrg->PERI_CRG71.u32 & X5HD2_VDAC2_MASK_RESET_OVER;
             }
             else
             {
-                VO_DAC_G_CTRL.u32 = VDP_RegRead((HI_U32)&(pVdpReg->VO_DAC_G_CTRL.u32));
-                VO_DAC_G_CTRL.bits.en_buf_g = 0;
-                VDP_RegWrite((HI_U32)(&(pVdpReg->VO_DAC_G_CTRL.u32)), VO_DAC_G_CTRL.u32); 
-
-                VO_DAC_G_CTRL.u32 = VDP_RegRead((HI_U32)&(pVdpReg->VO_DAC_G_CTRL.u32));
-                VO_DAC_G_CTRL.bits.en_g = 0;
-                VDP_RegWrite((HI_U32)(&(pVdpReg->VO_DAC_G_CTRL.u32)), VO_DAC_G_CTRL.u32); 
-            }
-            break;
-        case 3:
-            //g_pstRegCrg->PERI_CRG71.u32 = g_pstRegCrg->PERI_CRG71.u32 | X5HD2_VDAC3_MASK_RESET;
-            if (enable)
-            {
-                VO_DAC_B_CTRL.u32 = VDP_RegRead((HI_U32)&(pVdpReg->VO_DAC_B_CTRL.u32));
-                VO_DAC_B_CTRL.bits.en_b = 1;
-                VDP_RegWrite((HI_U32)(&(pVdpReg->VO_DAC_B_CTRL.u32)), VO_DAC_B_CTRL.u32); 
-
-                VO_DAC_B_CTRL.u32 = VDP_RegRead((HI_U32)&(pVdpReg->VO_DAC_B_CTRL.u32));
-                VO_DAC_B_CTRL.bits.en_buf_b = 1;
-                VDP_RegWrite((HI_U32)(&(pVdpReg->VO_DAC_B_CTRL.u32)), VO_DAC_B_CTRL.u32); 
-
-                //g_pstRegCrg->PERI_CRG71.u32 = g_pstRegCrg->PERI_CRG71.u32 & X5HD2_VDAC3_MASK_RESET_OVER;
-            }
-            else
-            {
-                VO_DAC_B_CTRL.u32 = VDP_RegRead((HI_U32)&(pVdpReg->VO_DAC_B_CTRL.u32));
+#if 0
+                VO_DAC_B_CTRL.u32 = VDP_RegRead1((HI_U32)&(pVdpReg->VO_DAC_B_CTRL.u32));
                 VO_DAC_B_CTRL.bits.en_buf_b = 0;
-                VDP_RegWrite((HI_U32)(&(pVdpReg->VO_DAC_B_CTRL.u32)), VO_DAC_B_CTRL.u32); 
-
-                VO_DAC_B_CTRL.u32 = VDP_RegRead((HI_U32)&(pVdpReg->VO_DAC_B_CTRL.u32));
+                VDP_RegWrite1((HI_U32)(&(pVdpReg->VO_DAC_B_CTRL.u32)), VO_DAC_B_CTRL.u32);
+#endif
+                VO_DAC_B_CTRL.u32 = VDP_RegRead1((HI_U32)&(pVdpReg->VO_DAC_B_CTRL.u32));
                 VO_DAC_B_CTRL.bits.en_b = 0;
-                VDP_RegWrite((HI_U32)(&(pVdpReg->VO_DAC_B_CTRL.u32)), VO_DAC_B_CTRL.u32); 
+                VDP_RegWrite1((HI_U32)(&(pVdpReg->VO_DAC_B_CTRL.u32)), VO_DAC_B_CTRL.u32);
             }
             break;
         default :
@@ -11899,6 +13088,10 @@ HI_VOID VDP_VDAC_SetEnable(HI_U32 uVdac, HI_U32 enable)
 // VIDEO LAYER CONFIG
 HI_VOID  VDP_VID_SetInReso2(HI_U32 u32Data, HI_RECT_S *pstRect, HI_RECT_S *pstRectOrigin)
 {
+#if 1
+#warning TODO: VDP_VID_SetInReso2
+	printk("VDP_VID_SetInReso2: TODO\n");
+#else
     U_V0_IRESO V0_IRESO;
 
     if(u32Data >= VID_MAX)
@@ -11915,12 +13108,16 @@ HI_VOID  VDP_VID_SetInReso2(HI_U32 u32Data, HI_RECT_S *pstRect, HI_RECT_S *pstRe
     V0_IRESO.bits.iw = pstRectOrigin->s32Width - 1;
     V0_IRESO.bits.ih = pstRect->s32Height - 1;
     VDP_RegWrite((HI_U32)(&(pVdpReg->V0_IRESO.u32) + u32Data * VID_OFFSET), V0_IRESO.u32); 
-
+#endif
     return ;
 }
 
 HI_VOID  VDP_VID_SetInCrop(HI_U32 u32Data, HI_U32 xstartposition, HI_U32 xstopposition)
 {
+#if 1
+#warning TODO: VDP_VID_SetInCrop
+	printk("VDP_VID_SetInCrop: TODO\n");
+#else
     U_V0_CPOS  V0_CPOS;
 
     if(u32Data >= VID_MAX)
@@ -11933,12 +13130,16 @@ HI_VOID  VDP_VID_SetInCrop(HI_U32 u32Data, HI_U32 xstartposition, HI_U32 xstoppo
     V0_CPOS.bits.src_xfpos = xstartposition;
     V0_CPOS.bits.src_xlpos = xstopposition - 1;
     VDP_RegWrite((HI_U32)(&(pVdpReg->V0_CPOS.u32) + u32Data * VID_OFFSET), V0_CPOS.u32);     
-
+#endif
     return ;
 }
  
 HI_VOID  VDP_VID_SetOutReso2(HI_U32 u32Data, HI_RECT_S *pstRect)
 {
+#if 1
+#warning TODO: VDP_VID_SetOutReso2
+	printk("VDP_VID_SetOutReso2: TODO\n");
+#else
     U_V0_ORESO V0_ORESO;
 
    if(u32Data >= VID_MAX)
@@ -11952,12 +13153,16 @@ HI_VOID  VDP_VID_SetOutReso2(HI_U32 u32Data, HI_RECT_S *pstRect)
    V0_ORESO.bits.ow = pstRect->s32Width - 1;
    V0_ORESO.bits.oh = pstRect->s32Height - 1;
    VDP_RegWrite((HI_U32)(&(pVdpReg->V0_ORESO.u32) + u32Data * VID_OFFSET), V0_ORESO.u32); 
-
+#endif
    return ;
 }   
     
 HI_VOID  VDP_VID_SetVideoPos2(HI_U32 u32Data, HI_RECT_S *pstRect)
 {
+#if 1
+#warning TODO: VDP_VID_SetVideoPos2
+	printk("VDP_VID_SetVideoPos2: TODO\n");
+#else
    U_V0_VFPOS V0_VFPOS;
    U_V0_VLPOS V0_VLPOS;
 
@@ -11976,12 +13181,17 @@ HI_VOID  VDP_VID_SetVideoPos2(HI_U32 u32Data, HI_RECT_S *pstRect)
    V0_VLPOS.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->V0_VLPOS.u32) + u32Data * VID_OFFSET));
    V0_VLPOS.bits.video_xlpos = pstRect->s32X + pstRect->s32Width - 1;
    V0_VLPOS.bits.video_ylpos = pstRect->s32Y + pstRect->s32Height - 1;
-   VDP_RegWrite((HI_U32)(&(pVdpReg->V0_VLPOS.u32) + u32Data * VID_OFFSET), V0_VLPOS.u32); 
+   VDP_RegWrite((HI_U32)(&(pVdpReg->V0_VLPOS.u32) + u32Data * VID_OFFSET), V0_VLPOS.u32);
+#endif
    return ;
 }   
     
 HI_VOID  VDP_VID_SetDispPos2(HI_U32 u32Data, HI_RECT_S *pstRect)
 {
+#if 1
+#warning TODO: VDP_VID_SetDispPos2
+	printk("VDP_VID_SetDispPos2: TODO\n");
+#else
    U_V0_DFPOS V0_DFPOS;
    U_V0_DLPOS V0_DLPOS;
 
@@ -12001,12 +13211,17 @@ HI_VOID  VDP_VID_SetDispPos2(HI_U32 u32Data, HI_RECT_S *pstRect)
    V0_DLPOS.bits.disp_xlpos = pstRect->s32X + pstRect->s32Width - 1;
    V0_DLPOS.bits.disp_ylpos = pstRect->s32Y + pstRect->s32Height - 1;
    VDP_RegWrite((HI_U32)(&(pVdpReg->V0_DLPOS.u32) + u32Data * VID_OFFSET), V0_DLPOS.u32); 
+#endif
    return ;
 } 
 
 
 HI_VOID  VDP_VID_SetZmeEnable2(HI_U32 u32Data, HI_U32 u32bEnable)
 {
+#if 1
+#warning TODO: VDP_VID_SetZmeEnable2
+	printk("VDP_VID_SetZmeEnable2: TODO\n");
+#else
     U_V0_HSP V0_HSP;
     U_V0_VSP V0_VSP;
     
@@ -12026,6 +13241,7 @@ HI_VOID  VDP_VID_SetZmeEnable2(HI_U32 u32Data, HI_U32 u32bEnable)
     V0_VSP.bits.vlmsc_en  = u32bEnable;
     V0_VSP.bits.vchmsc_en = u32bEnable;
     VDP_RegWrite((HI_U32)(&(pVdpReg->V0_VSP.u32) + u32Data * VID_OFFSET), V0_VSP.u32); 
+#endif
 
     return ;
 }
@@ -12033,6 +13249,10 @@ HI_VOID  VDP_VID_SetZmeEnable2(HI_U32 u32Data, HI_U32 u32bEnable)
 /* Vou set zoom inital phase */
 HI_VOID  VDP_VID_SetZmePhaseH(HI_U32 u32Data, HI_S32 s32PhaseL, HI_S32 s32PhaseC)
 {
+#if 1
+#warning TODO: VDP_VID_SetZmePhaseH
+	printk("VDP_VID_SetZmePhaseH: TODO\n");
+#else
     U_V0_HLOFFSET  V0_HLOFFSET;
     U_V0_HCOFFSET  V0_HCOFFSET;
     
@@ -12050,13 +13270,17 @@ HI_VOID  VDP_VID_SetZmePhaseH(HI_U32 u32Data, HI_S32 s32PhaseL, HI_S32 s32PhaseC
     V0_HCOFFSET.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->V0_HCOFFSET.u32) + u32Data * VID_OFFSET));
     V0_HCOFFSET.bits.hor_coffset = s32PhaseC;
     VDP_RegWrite((HI_U32)(&(pVdpReg->V0_HCOFFSET.u32) + u32Data * VID_OFFSET), V0_HCOFFSET.u32); 
-
+#endif
 
     return ;
 }
 
 HI_VOID  VDP_VID_SetZmePhaseV(HI_U32 u32Data, HI_S32 s32PhaseL, HI_S32 s32PhaseC)
 {
+#if 1
+#warning TODO: VDP_VID_SetZmePhaseV
+	printk("VDP_VID_SetZmePhaseV: TODO\n");
+#else
     U_V0_VOFFSET   V0_VOFFSET;
     
     if(u32Data >= VID_MAX)
@@ -12069,12 +13293,16 @@ HI_VOID  VDP_VID_SetZmePhaseV(HI_U32 u32Data, HI_S32 s32PhaseL, HI_S32 s32PhaseC
     V0_VOFFSET.bits.vluma_offset   = s32PhaseL;
     V0_VOFFSET.bits.vchroma_offset = s32PhaseC;
     VDP_RegWrite((HI_U32)(&(pVdpReg->V0_VOFFSET.u32) + u32Data * VID_OFFSET), V0_VOFFSET.u32); 
-
+#endif
     return ;
 }
 
 HI_VOID  VDP_VID_SetZmePhaseVB(HI_U32 u32Data, HI_S32 s32PhaseL, HI_S32 s32PhaseC)
 {
+#if 1
+#warning TODO: VDP_VID_SetZmePhaseVB
+	printk("VDP_VID_SetZmePhaseVB: TODO\n");
+#else
     U_V0_VBOFFSET  V0_VBOFFSET;
     
     if(u32Data >= VID_MAX)
@@ -12087,7 +13315,7 @@ HI_VOID  VDP_VID_SetZmePhaseVB(HI_U32 u32Data, HI_S32 s32PhaseL, HI_S32 s32Phase
     V0_VBOFFSET.bits.vbluma_offset   = s32PhaseL;
     V0_VBOFFSET.bits.vbchroma_offset = s32PhaseC;
     VDP_RegWrite((HI_U32)(&(pVdpReg->V0_VBOFFSET.u32) + u32Data * VID_OFFSET), V0_VBOFFSET.u32); 
-
+#endif
     return ;
 }
 
@@ -12097,6 +13325,10 @@ HI_VOID  VDP_VID_SetZmeFirEnable2(HI_U32 u32Data,
                                   HI_U32 u32bEnableVl,
                                   HI_U32 u32bEnableVc)
 {
+#if 1
+#warning TODO: VDP_VID_SetZmeFirEnable2
+	printk("VDP_VID_SetZmeFirEnable2: TODO\n");
+#else
     U_V0_HSP V0_HSP;
     U_V0_VSP V0_VSP;
     
@@ -12115,7 +13347,7 @@ HI_VOID  VDP_VID_SetZmeFirEnable2(HI_U32 u32Data,
      V0_VSP.bits.vlfir_en  = u32bEnableVl;
      V0_VSP.bits.vchfir_en = u32bEnableVc;
      VDP_RegWrite((HI_U32)(&(pVdpReg->V0_VSP.u32) + u32Data * VID_OFFSET), V0_VSP.u32); 
-
+#endif
     return ;
 }
 
@@ -12123,6 +13355,10 @@ HI_VOID  VDP_VID_SetZmeFirEnable2(HI_U32 u32Data,
     
 HI_VOID  VDP_VID_SetZmeMidEnable2(HI_U32 u32Data, HI_U32 u32bEnable)
 {
+#if 1
+#warning TODO: VDP_VID_SetZmeMidEnable2
+	printk("VDP_VID_SetZmeMidEnable2: TODO\n");
+#else
     U_V0_HSP V0_HSP;
     U_V0_VSP V0_VSP;
     
@@ -12142,7 +13378,7 @@ HI_VOID  VDP_VID_SetZmeMidEnable2(HI_U32 u32Data, HI_U32 u32bEnable)
     V0_VSP.bits.vlmid_en  = u32bEnable;
     V0_VSP.bits.vchmid_en = u32bEnable;
     VDP_RegWrite((HI_U32)(&(pVdpReg->V0_VSP.u32) + u32Data * VID_OFFSET), V0_VSP.u32); 
-
+#endif
     return ;
 }
 
@@ -12299,13 +13535,13 @@ HI_VOID VDP_CBM_SetMixerPrioQuick(VDP_CBM_MIX_E u32mixer_id,HI_U32 *pu32layer_id
     U_CBM_MIX1 CBM_MIX1;
     U_CBM_MIX2 CBM_MIX2;
     
-    if(u32mixer_id == VDP_CBM_MIXV0)
+    if(u32mixer_id == VDP_CBM_MIXV0) //0
     {
         MIXV0_MIX.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->MIXV0_MIX.u32)));
 
         MIXV0_MIX.bits.mixer_prio0 = 0;
         MIXV0_MIX.bits.mixer_prio1 = 0;
-        
+
         if (u32Number > 0)
         {
             if (pu32layer_id[0] < VDP_LAYER_VID2)
@@ -12331,37 +13567,6 @@ HI_VOID VDP_CBM_SetMixerPrioQuick(VDP_CBM_MIX_E u32mixer_id,HI_U32 *pu32layer_id
     }
     else if(u32mixer_id == VDP_CBM_MIXV1)
         ;
-    else if(u32mixer_id == VDP_CBM_MIX0)//DHD0
-    {
-        CBM_MIX1.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->CBM_MIX1.u32)));
-
-        CBM_MIX1.bits.mixer_prio0 = 0;
-        CBM_MIX1.bits.mixer_prio1 = 0;
-
-        if (u32Number > 0)
-        {
-            if (pu32layer_id[0] < VDP_CBM_VP1)
-            {
-                CBM_MIX1.bits.mixer_prio0 = pu32layer_id[0]+1;
-            }
-        }
-
-        if (u32Number > 1)
-        {
-            if (pu32layer_id[1] < VDP_CBM_VP1)
-            {
-                CBM_MIX1.bits.mixer_prio1 = pu32layer_id[1]+1;
-            }
-        }
-
-        if (u32Number > 2)
-        {
-            HI_PRINT("Error, Vou_SetCbmMixerPrioQuickly() Two many number\n");
-        }
-        
-        VDP_RegWrite((HI_U32)(&(pVdpReg->CBM_MIX1.u32)), CBM_MIX1.u32);
-
-    }
     else if(u32mixer_id == VDP_CBM_MIX1)//DHD1
     {
         CBM_MIX2.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->CBM_MIX2.u32)));
@@ -12397,6 +13602,10 @@ HI_VOID VDP_CBM_SetMixerPrioQuick(VDP_CBM_MIX_E u32mixer_id,HI_U32 *pu32layer_id
 
 HI_VOID  VDP_VID_SetZmeVchTap(HI_U32 u32Data, HI_U32 u32VscTap)
 {
+#if 1
+#warning TODO: VDP_VID_SetZmeVchTap
+	printk("VDP_VID_SetZmeVchTap: TODO\n");
+#else
     U_V0_VSP V0_VSP;
     
     if(u32Data >= VID_MAX)
@@ -12408,7 +13617,7 @@ HI_VOID  VDP_VID_SetZmeVchTap(HI_U32 u32Data, HI_U32 u32VscTap)
     V0_VSP.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->V0_VSP.u32) + u32Data * VID_OFFSET));
     V0_VSP.bits.vsc_chroma_tap  = u32VscTap;
     VDP_RegWrite((HI_U32)(&(pVdpReg->V0_VSP.u32) + u32Data * VID_OFFSET), V0_VSP.u32); 
-
+#endif
     return ;
 }
 
@@ -13397,13 +14606,13 @@ HI_VOID  VDP_DISP_SetTiming(HI_U32 u32hd_id,VDP_DISP_SYNCINFO_S *pstSyncInfo)
     
        
         //VOU VHD CHANNEL enable 
-        DHD0_CTRL.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->DHD0_CTRL.u32)+u32hd_id*CHN_OFFSET));
+        DHD0_CTRL.u32 = VDP_RegRead1((HI_U32)(&(pVdpReg->DHD0_CTRL.u32)+u32hd_id*CHN_OFFSET));
         DHD0_CTRL.bits.iop   = pstSyncInfo->bIop;// 
-        VDP_RegWrite((HI_U32)(&(pVdpReg->DHD0_CTRL.u32)+u32hd_id*CHN_OFFSET),DHD0_CTRL.u32);
+        VDP_RegWrite1((HI_U32)(&(pVdpReg->DHD0_CTRL.u32)+u32hd_id*CHN_OFFSET),DHD0_CTRL.u32);
 
         
-        DHD0_HSYNC1.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->DHD0_HSYNC1.u32)+u32hd_id*CHN_OFFSET));
-        DHD0_HSYNC2.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->DHD0_HSYNC2.u32)+u32hd_id*CHN_OFFSET));
+        DHD0_HSYNC1.u32 = VDP_RegRead1((HI_U32)(&(pVdpReg->DHD0_HSYNC1.u32)+u32hd_id*CHN_OFFSET));
+        DHD0_HSYNC2.u32 = VDP_RegRead1((HI_U32)(&(pVdpReg->DHD0_HSYNC2.u32)+u32hd_id*CHN_OFFSET));
 /*
         DHD0_HSYNC1.bits.hact = pstSyncInfo->u32Hact -1;
         DHD0_HSYNC1.bits.hbb  = pstSyncInfo->u32Hbb -1;
@@ -13425,28 +14634,28 @@ HI_VOID  VDP_DISP_SetTiming(HI_U32 u32hd_id,VDP_DISP_SYNCINFO_S *pstSyncInfo)
             DHD0_HSYNC2.bits.hmid = pstSyncInfo->u32Hmid * 2 -1;
         }
 #endif
-        VDP_RegWrite((HI_U32)(&(pVdpReg->DHD0_HSYNC1.u32)+u32hd_id*CHN_OFFSET), DHD0_HSYNC1.u32);
-        VDP_RegWrite((HI_U32)(&(pVdpReg->DHD0_HSYNC2.u32)+u32hd_id*CHN_OFFSET), DHD0_HSYNC2.u32);
+        VDP_RegWrite1((HI_U32)(&(pVdpReg->DHD0_HSYNC1.u32)+u32hd_id*CHN_OFFSET), DHD0_HSYNC1.u32);
+        VDP_RegWrite1((HI_U32)(&(pVdpReg->DHD0_HSYNC2.u32)+u32hd_id*CHN_OFFSET), DHD0_HSYNC2.u32);
 
         //Config VHD interface veritical timming
-        DHD0_VSYNC.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->DHD0_VSYNC.u32)+u32hd_id*CHN_OFFSET));
+        DHD0_VSYNC.u32 = VDP_RegRead1((HI_U32)(&(pVdpReg->DHD0_VSYNC.u32)+u32hd_id*CHN_OFFSET));
         DHD0_VSYNC.bits.vact = pstSyncInfo->u32Vact  -1;
         DHD0_VSYNC.bits.vbb = pstSyncInfo->u32Vbb - 1;
         DHD0_VSYNC.bits.vfb =  pstSyncInfo->u32Vfb - 1;
-        VDP_RegWrite((HI_U32)(&(pVdpReg->DHD0_VSYNC.u32)+u32hd_id*CHN_OFFSET), DHD0_VSYNC.u32);
+        VDP_RegWrite1((HI_U32)(&(pVdpReg->DHD0_VSYNC.u32)+u32hd_id*CHN_OFFSET), DHD0_VSYNC.u32);
         
         //Config VHD interface veritical bottom timming,no use in progressive mode
-        DHD0_VPLUS.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->DHD0_VPLUS.u32)+u32hd_id*CHN_OFFSET));
+        DHD0_VPLUS.u32 = VDP_RegRead1((HI_U32)(&(pVdpReg->DHD0_VPLUS.u32)+u32hd_id*CHN_OFFSET));
         DHD0_VPLUS.bits.bvact = pstSyncInfo->u32Bvact - 1;
         DHD0_VPLUS.bits.bvbb =  pstSyncInfo->u32Bvbb - 1;
         DHD0_VPLUS.bits.bvfb =  pstSyncInfo->u32Bvfb - 1;
-        VDP_RegWrite((HI_U32)(&(pVdpReg->DHD0_VPLUS.u32)+u32hd_id*CHN_OFFSET), DHD0_VPLUS.u32);
+        VDP_RegWrite1((HI_U32)(&(pVdpReg->DHD0_VPLUS.u32)+u32hd_id*CHN_OFFSET), DHD0_VPLUS.u32);
 
         //Config VHD interface veritical bottom timming, 
-        DHD0_PWR.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->DHD0_PWR.u32)+u32hd_id*CHN_OFFSET));        
+        DHD0_PWR.u32 = VDP_RegRead1((HI_U32)(&(pVdpReg->DHD0_PWR.u32)+u32hd_id*CHN_OFFSET));
         DHD0_PWR.bits.hpw = pstSyncInfo->u32Hpw - 1;
         DHD0_PWR.bits.vpw = pstSyncInfo->u32Vpw - 1;
-        VDP_RegWrite((HI_U32)(&(pVdpReg->DHD0_PWR.u32)+u32hd_id*CHN_OFFSET), DHD0_PWR.u32);
+        VDP_RegWrite1((HI_U32)(&(pVdpReg->DHD0_PWR.u32)+u32hd_id*CHN_OFFSET), DHD0_PWR.u32);
 }
 
 HI_VOID VDP_DISP_GetVactState(HI_U32 u32hd_id, HI_BOOL *pbBtm, HI_U32 *pu32Vcnt)
@@ -13460,7 +14669,7 @@ HI_VOID VDP_DISP_GetVactState(HI_U32 u32hd_id, HI_BOOL *pbBtm, HI_U32 *pu32Vcnt)
     }
     
     //Set Vou Dhd Channel Gamma Correct Enable
-    DHD0_STATE.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->DHD0_STATE.u32)+u32hd_id*CHN_OFFSET));
+    DHD0_STATE.u32 = VDP_RegRead1((HI_U32)(&(pVdpReg->DHD0_STATE.u32)+u32hd_id*CHN_OFFSET));
     *pbBtm   = DHD0_STATE.bits.bottom_field;
     *pu32Vcnt = DHD0_STATE.bits.vcnt;
 
@@ -13827,11 +15036,11 @@ HI_BOOL HDATE_SetOvsCoef(HI_S32 * psts32Data)
 
 HI_VOID VDP_SelectClk(HI_U32 u32VDPClkMode)
 {
-    U_PERI_CRG54 PERI_CRG54Tmp;
+    U_PERI_CRG0x1fc PERI_CRG0x1fcTmp;
 
-    PERI_CRG54Tmp.u32 = g_pstRegCrg->PERI_CRG54.u32;
-    PERI_CRG54Tmp.bits.vdp_clk_sel = u32VDPClkMode;
-    g_pstRegCrg->PERI_CRG54.u32 = PERI_CRG54Tmp.u32;
+    PERI_CRG0x1fcTmp.u32 = g_pstRegCrg->PERI_CRG0x1fc.u32;
+    PERI_CRG0x1fcTmp.bits.Bit4 = u32VDPClkMode;
+    g_pstRegCrg->PERI_CRG0x1fc.u32 = PERI_CRG0x1fcTmp.u32;
 }
 
 HI_S32 VDP_DISP_SelectChanClkDiv(HI_DRV_DISPLAY_E eChn, HI_U32 u32Div)
@@ -13877,9 +15086,9 @@ BIT[   22] = vdac_ch2_clk_sel  <= 0, sd; 1, hd
 BIT[   21] = vdac_ch1_clk_sel  <= 0, sd; 1, hd
 BIT[   20] = vdac_ch0_clk_sel  <= 0, sd; 1, hd
 BIT[19-18] = vo_hd_clk_div     <= 00, 1/2; 01, 1/4; 1X, 1
-BIT[17-16] = vo_hd_clk_sel     <= 00£ºsd_ini£»01£ºhd0_ini£»10£ºhd1_ini£»11£ºreserved
+BIT[17-16] = vo_hd_clk_sel     <= 00ï¿½ï¿½sd_iniï¿½ï¿½01ï¿½ï¿½hd0_iniï¿½ï¿½10ï¿½ï¿½hd1_iniï¿½ï¿½11ï¿½ï¿½reserved
 BIT[15-14] = vo_sd_clk_div     <= 00, 1/2; 01, 1/4; 1X, 1
-BIT[13-12] = vo_sd_clk_sel     <= 00£ºsd_ini£»01£ºhd0_ini£»10£ºhd1_ini£»11£ºreserved
+BIT[13-12] = vo_sd_clk_sel     <= 00ï¿½ï¿½sd_iniï¿½ï¿½01ï¿½ï¿½hd0_iniï¿½ï¿½10ï¿½ï¿½hd1_iniï¿½ï¿½11ï¿½ï¿½reserved
 BIT[   11] = reserved          <=
 BIT[   10] = vo_clkout_cken    <= 0,dis; 1, en;
 BIT[    9] = vdac_ch3_cken     <= 0,dis; 1, en;
@@ -13929,6 +15138,58 @@ BIT[    0] = vo_bus_cken       <= 0,dis; 1, en;
     return;
 }
 
+HI_VOID DISP_ResetCRG(HI_VOID)
+{
+    U_PERI_CRG54 unTmpValue; /* 0xd8 */
+    U_PERI_CRG0x1fc unCrg0x1fc; /* 0x1fc */
+
+    unCrg0x1fc.u32 = 0xF;
+    unCrg0x1fc.bits.Bit4 = 0;
+
+    g_pstRegCrg->PERI_CRG0x1fc.u32 = unCrg0x1fc.u32;
+
+    DISP_MSLEEP(5);
+
+    unTmpValue.u32 = g_pstRegCrg->PERI_CRG54.u32;
+
+    unTmpValue.bits.vo_bus_cken      = 1;
+//    unTmpValue.bits.vo_cken          = 1;
+    unTmpValue.bits.vo_sd_cken       = 1;
+    unTmpValue.bits.vo_sdate_cken    = 1;
+    unTmpValue.bits.vo_hd_cken       = 1;
+    unTmpValue.bits.vo_hdate_cken    = 1;
+    unTmpValue.bits.vdac_ch0_cken    = 1;
+    unTmpValue.bits.vdac_ch1_cken    = 1;
+    unTmpValue.bits.vdac_ch2_cken    = 1;
+    unTmpValue.bits.vdac_ch3_cken    = 1;
+    unTmpValue.bits.vo_clkout_cken   = 1;
+    unTmpValue.bits.vo_sd_clk_sel    = 0;
+    unTmpValue.bits.vo_sd_clk_div    = 2;
+    unTmpValue.bits.vo_hd_clk_sel    = 1;
+    unTmpValue.bits.vo_hd_clk_div    = 0;
+    unTmpValue.bits.vdac_ch0_clk_sel = 1;
+    unTmpValue.bits.vdac_ch1_clk_sel = 1;
+    unTmpValue.bits.vdac_ch2_clk_sel = 1;
+    unTmpValue.bits.vdac_ch3_clk_sel = 1;
+    unTmpValue.bits.vo_clkout_sel    = 1;
+    unTmpValue.bits.vo_clkout_pctrl  = 0;
+    unTmpValue.bits.hdmi_clk_sel     = 1;
+    unTmpValue.bits.vo_sd_hdmi_clk_sel = 0;
+    //unTmpValue.bits.vdp_clk_sel        = 0;
+    unTmpValue.bits.vo_hd_hdmi_clk_sel = 0;
+    unTmpValue.bits.vou_srst_req       = 1;
+
+    g_pstRegCrg->PERI_CRG54.u32 = unTmpValue.u32;
+
+    DISP_MSLEEP(5);
+
+    unTmpValue.bits.vou_srst_req       = 0;
+    g_pstRegCrg->PERI_CRG54.u32 = unTmpValue.u32;
+
+    DISP_MSLEEP(1);
+}
+
+
 HI_VOID VDP_RegSave(HI_U32 u32RegBackAddr)
 {
     S_VOU_CV200_REGS_TYPE  *pVdpBackReg;
@@ -13937,31 +15198,38 @@ HI_VOID VDP_RegSave(HI_U32 u32RegBackAddr)
     /* save Reg */
     memcpy((HI_VOID *)(&(pVdpBackReg->VOCTRL)), (HI_VOID *)(&(pVdpReg->VOCTRL)), 0x100*2);
     memcpy((HI_VOID *)(&(pVdpBackReg->WBC_DHD_LOCATE)), (HI_VOID *)(&(pVdpReg->WBC_DHD_LOCATE)), 0x100);
+#if 1
+#warning TODO: VDP_RegSave
+	printk("VDP_RegSave: TODO\n");
+#else
     memcpy((HI_VOID *)(&(pVdpBackReg->COEF_DATA)), (HI_VOID *)(&(pVdpReg->COEF_DATA)), 0x100);
   
     /*video layer */
     memcpy((HI_VOID *)(&(pVdpBackReg->V0_CTRL)), (HI_VOID *)(&(pVdpReg->V0_CTRL)), 0x800*5);
+#endif
 
     /*VP0 VP1*/
-    memcpy((HI_VOID *)(&(pVdpBackReg->VP0_UPD)), (HI_VOID *)(&(pVdpReg->VP0_UPD)), 0x800*2);
+    memcpy((HI_VOID *)(&(pVdpBackReg->/*VP0_UPD*/VP0_CTRL)), (HI_VOID *)(&(pVdpReg->/*VP0_UPD*/VP0_CTRL)), 0x800*2);
 
     /*DWBC0*/
     memcpy((HI_VOID *)(&(pVdpBackReg->WBC_DHD0_CTRL)), (HI_VOID *)(&(pVdpReg->WBC_DHD0_CTRL)), 0x400);
     
     /*MIXER*/
-    memcpy((HI_VOID *)(&(pVdpBackReg->MIXV0_BKG.u32)), (HI_VOID *)(&(pVdpReg->MIXV0_BKG.u32)), 0x500);
+    memcpy((HI_VOID *)(&(pVdpBackReg->MIXV0_BKG.u32)), (HI_VOID *)(&(pVdpReg->MIXV0_BKG.u32)), /*0x500*/0x700);
      
     /*DHDx*/
     memcpy((HI_VOID *)(&(pVdpBackReg->DHD0_CTRL)), (HI_VOID *)(&(pVdpReg->DHD0_CTRL)), 0x400*2);
 
     /*DATE*/
-    memcpy((HI_VOID *)(&(pVdpBackReg->HDATE_VERSION)), (HI_VOID *)(&(pVdpReg->HDATE_VERSION)), 0x2dc);  
-
+    memcpy((HI_VOID *)(&(pVdpBackReg->HDATE_VERSION)), (HI_VOID *)(&(pVdpReg->HDATE_VERSION)), /*0x2dc*/0x300);
 
 }
 HI_VOID VDP_RegReStore(HI_U32 u32RegBackAddr)
 {
-
+#if 1
+#warning TODO: VDP_RegReStore
+	printk("VDP_RegReStore: TODO\n");
+#else
     S_VOU_CV200_REGS_TYPE  *pVdpBackReg;
     
     pVdpBackReg = (S_VOU_CV200_REGS_TYPE *)u32RegBackAddr;
@@ -13987,7 +15255,7 @@ HI_VOID VDP_RegReStore(HI_U32 u32RegBackAddr)
 
     /*DATE*/
     memcpy((HI_VOID *)(&(pVdpReg->HDATE_VERSION)), (HI_VOID *)(&(pVdpBackReg->HDATE_VERSION)), 0x2dc);
-
+#endif
 }
 
 HI_VOID VDP_CloseClkResetModule(HI_VOID)
@@ -14030,6 +15298,107 @@ HI_VOID VDP_CloseClkResetModule(HI_VOID)
 
      return ;    
 }
+
+
+HI_S32 VDP_Disp_GetVdpVersion(HI_U32 *pu32VersionPartL, HI_U32 *pu32VersionPartH)
+{
+	*pu32VersionPartL = 0x76756f76; //vuov
+	*pu32VersionPartH = 0x30313134; //0114
+
+	return HI_SUCCESS;
+}
+
+HI_VOID VDP_SetM0AndM1Sel(int a, int b)
+{
+	U_VO_0x38 VO_0x38;
+	VO_0x38.u32 = VDP_RegRead((HI_U32)(&(pVdpReg->VO_0x38.u32)));
+
+	if (a == 0) VO_0x38.bits.bit0 = b;
+	else if (a == 1) VO_0x38.bits.bit1 = b;
+	else if (a == 2) VO_0x38.bits.bit2 = b;
+	else if (a == 3) VO_0x38.bits.bit3 = b;
+	else if (a == 4) VO_0x38.bits.bit4 = b;
+	else if (a == 5) VO_0x38.bits.bit5 = b;
+	else if (a == 6) VO_0x38.bits.bit6 = b;
+	else if (a == 7) VO_0x38.bits.bit4 = b;
+	else if (a == 8) VO_0x38.bits.bit8 = b;
+	else if (a == 9) VO_0x38.bits.bit9 = b;
+	else if (a == 14) VO_0x38.bits.bit14 = b;
+	else if (a == 15) VO_0x38.bits.bit15 = b;
+	else if (a == 16) VO_0x38.bits.bit16 = b;
+	else if (a == 17) VO_0x38.bits.bit17 = b;
+	else if (a == 18) VO_0x38.bits.bit18 = b;
+	else if (a == 19) VO_0x38.bits.bit19 = b;
+	else if (a == 20) VO_0x38.bits.bit20 = b;
+	else if (a == 21) VO_0x38.bits.bit21 = b;
+	else if (a == 22) VO_0x38.bits.bit22 = b;
+	else if (a == 23) VO_0x38.bits.bit23 = b;
+	else if (a == 24) VO_0x38.bits.bit24 = b;
+	else if (a == 25) VO_0x38.bits.bit25 = b;
+	else if (a == 26) VO_0x38.bits.bit26 = b;
+	else if (a == 27) VO_0x38.bits.bit27 = b;
+	else if (a == 28) VO_0x38.bits.bit28 = b;
+	else if (a == 29) VO_0x38.bits.bit29 = b;
+	else if (a == 30) VO_0x38.bits.bit30 = b;
+	else if (a == 31) VO_0x38.bits.bit31 = b;
+	else
+	{
+		HI_PRINT("Error,VDP_SetMasterSel() Select Wrong Master!\n");
+	}
+
+	VDP_RegWrite((HI_U32)(&(pVdpReg->VO_0x38.u32)), VO_0x38.u32);
+}
+
+HI_VOID VDP_WBC_SetConnection(int a, int b)
+{
+	U_WBC_DHD_LOCATE WBC_DHD_LOCATE;
+
+	if (a == 0)
+	{
+		WBC_DHD_LOCATE.u32 = VDP_RegRead1((HI_U32)(&(pVdpReg->WBC_DHD_LOCATE.u32)));
+		WBC_DHD_LOCATE.bits.wbc_dhd_locate = b;
+		VDP_RegWrite1((HI_U32)(&(pVdpReg->WBC_DHD_LOCATE.u32)), WBC_DHD_LOCATE.u32);
+	}
+	else
+	{
+		HI_PRINT("Error, VDP_WBC_SetConnection() select wrong dhd layer id\n");
+	}
+}
+
+HI_VOID VDP_SetG3Position(int a)
+{
+	U_VOCTRL VOCTRL;
+
+	VOCTRL.u32 = VDP_RegRead1((HI_U32)(&(pVdpReg->VOCTRL.u32)));
+	if (a)
+	{
+		VOCTRL.bits.g3_dhd1_sel = 1;
+	}
+	else
+	{
+		VOCTRL.bits.g3_dhd1_sel = 0;
+	}
+	VDP_RegWrite1((HI_U32)(&(pVdpReg->VOCTRL.u32)), VOCTRL.u32);
+}
+
+HI_VOID VDP_VP_SetVpSel(HI_U32 u32Data, HI_U32 bEnable)
+{
+	U_VP0_CTRL VP0_CTRL;
+
+	if(u32Data >= VP_MAX)
+	{
+		HI_PRINT("Error,VDP_VP_SetMuteEnable() Select Wrong VP Layer ID\n");
+		return ;
+	}
+
+	VP0_CTRL.u32 = VDP_RegRead1((HI_U32)(&(pVdpReg->VP0_CTRL.u32) + u32Data * VP_OFFSET));
+	VP0_CTRL.bits.Bit9 = bEnable;
+	VDP_RegWrite1((HI_U32)(&(pVdpReg->VP0_CTRL.u32) + u32Data * VP_OFFSET), VP0_CTRL.u32);
+}
+
+
+
+
 /***********************************HDATE END*******************************************/   
 
 

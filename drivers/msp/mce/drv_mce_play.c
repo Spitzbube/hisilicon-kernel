@@ -1635,7 +1635,7 @@ HI_S32 MCE_ModuleInit(HI_VOID)
 #if 1
 #warning TODO
 #else
-    Ret = HI_DRV_PQ_Init();
+    Ret = HI_DRV_PQ_Init(0);
     if(HI_SUCCESS != Ret)
     {
         HI_WARN_MCE("ERR: HI_DRV_PQ_Init!\n");        
@@ -1669,6 +1669,7 @@ HI_S32 MCE_ModuleInit(HI_VOID)
         HI_ERR_MCE("ERR: HI_DRV_HDMI_Init!\n");
         return Ret;    
     }
+#endif
 
     Ret = HI_DRV_DISP_Init();
     if(HI_SUCCESS != Ret)
@@ -1677,6 +1678,7 @@ HI_S32 MCE_ModuleInit(HI_VOID)
         return Ret;
     } 
 
+#if 0
     Ret = tde_init_module_k();
     if(HI_SUCCESS != Ret)
     {
