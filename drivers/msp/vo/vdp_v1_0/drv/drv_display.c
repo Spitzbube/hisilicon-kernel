@@ -2311,8 +2311,8 @@ HI_S32 DISP_SetFormat(HI_DRV_DISPLAY_E enDisp, HI_DRV_DISP_STEREO_MODE_E enStere
 #endif
 
     // s1 check input parameters
-    DispCheckDeviceState();
-    DispCheckID(enDisp);
+    DispCheckDeviceState(); //2352
+    DispCheckID(enDisp); //2353
     // s2 get pointer
     DispGetPointerByID(enDisp, pstDisp);
     enEncFmt2 = DispTransferFormat(enDisp, enEncFmt);
@@ -2328,7 +2328,7 @@ HI_S32 DISP_SetFormat(HI_DRV_DISPLAY_E enDisp, HI_DRV_DISP_STEREO_MODE_E enStere
         && ((enEncFmt2 > HI_DRV_DISP_FMT_SECAM_H) || (enEncFmt2 < HI_DRV_DISP_FMT_PAL))
        )
     {
-        DISP_ERROR("attach mode  disp0 not support fmt(%d)\n", enEncFmt2);
+        DISP_ERROR("attach mode  disp0 not support fmt(%d)\n", enEncFmt2); //2371
         return HI_ERR_DISP_INVALID_PARA;
     }
 
@@ -2336,13 +2336,13 @@ HI_S32 DISP_SetFormat(HI_DRV_DISPLAY_E enDisp, HI_DRV_DISP_STEREO_MODE_E enStere
          && (enStereo == pstDisp->stSetting.eDispMode)
          && (enEncFmt2 < HI_DRV_DISP_FMT_CUSTOM) )
     {
-        DISP_PRINT(" DISP Set same format and return!\n");
+        DISP_PRINT(" DISP Set same format and return!\n"); //2380
         return HI_SUCCESS;
     }
 
     if (!pstDisp->pstIntfOpt->PF_TestChnEncFmt(pstDisp->enDisp, enEncFmt2))
     {
-        DISP_ERROR("Display %d does not support fmt %d\n", (HI_S32)enDisp, (HI_S32)enEncFmt2);
+        DISP_ERROR("Display %d does not support fmt %d\n", (HI_S32)enDisp, (HI_S32)enEncFmt2); //2386
         return HI_ERR_DISP_INVALID_PARA;
     }
 
@@ -2386,7 +2386,9 @@ HI_S32 DISP_SetFormat(HI_DRV_DISPLAY_E enDisp, HI_DRV_DISP_STEREO_MODE_E enStere
         	2:HDMI Data tpye use RGB ;TV FMT use YUV!
         */
 
+#if 0
         DISP_ReviseIntfRGB_VGA(enDisp, pstDisp->stSetting.enFormat);
+#endif
 
 #ifdef DISP_DEBUG_TEST_SET_FORMAT_TIME
         HI_DRV_SYS_GetTimeStampMs(&t1);

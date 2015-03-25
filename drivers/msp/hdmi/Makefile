@@ -1,0 +1,54 @@
+
+ccflags-y += -DCHIP_TYPE_hi3798cv100
+ccflags-y += -DDVI_SUPPORT
+
+ccflags-y += -Idrivers/msp/include
+ccflags-y += -Idrivers/msp/hdmi
+ccflags-y += -Idrivers/msp/hdmi/hdmi_drv
+
+
+obj-y += hdmi_intf_k.o
+obj-y += hdmi_intf.o
+obj-y += drv_hdmi.o
+obj-y += drv_global.o
+obj-y += drv_reg_proc.o
+obj-y += drv_compatibility.o
+obj-y += hdmi_drv/si_hdmitx.o
+obj-y += hdmi_drv/drv_hlviic.o
+obj-y += hdmi_drv/si_phy.o
+obj-y += hdmi_drv/si_eeprom.o
+obj-y += hdmi_drv/si_timer.o
+obj-y += hdmi_drv/si_isr.o
+obj-y += hdmi_drv/si_infofrm.o
+obj-y += hdmi_drv/si_edid.o
+obj-y += hdmi_drv/si_de.o
+obj-y += hdmi_drv/si_crc16.o
+obj-y += hdmi_drv/si_video.o
+obj-y += hdmi_drv/si_timer.o
+obj-y += hdmi_drv/si_txvidp.o
+obj-y += hdmi_drv/si_vmtables.o
+obj-y += hdmi_drv/si_vmode.o
+obj-y += hdmi_drv/si_audio.o
+obj-y += hdmi_drv/si_mddc.o
+obj-y += hdmi_drv/si_delay.o
+obj-y += hdmi_drv/si_hdcp.o
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
