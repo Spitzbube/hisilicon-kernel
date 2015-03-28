@@ -107,10 +107,11 @@ static HI_BOOL  g_bProcDebug = HI_FALSE;
 
 /*mem size of layer.hifb will allocate mem:*/
 static char* video = "";
-/*static*/ char* Data_80fb410c = "off";
 //static char* video = "hifb:vram0_size:7200,vram1_size:3600,vram2_size:3600";
 module_param(video, charp, S_IRUGO);
-module_param(Data_80fb410c, charp, S_IRUGO);
+
+static char* tc_wbc = "off"; //80fb410c
+module_param(tc_wbc, charp, S_IRUGO);
 
 HIFB_DRV_OPS_S s_stDrvOps; //81143678 +212 = 8114374C
 HI_U32 Data_8114374c = 0; //8114374c
@@ -5812,7 +5813,7 @@ HI_S32 HIFB_DRV_ModInit(HI_VOID)
 		return HI_FAILURE;
 	}
 
-    if (strncmp("on", Data_80fb410c, 2) == 0)
+    if (!strncmp("on", tc_wbc, 2))
     {
     	s_stDrvOps.HIFB_DRV_SetTCFlag(1);
     }
