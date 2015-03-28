@@ -36,7 +36,7 @@ obj-y += vdp_v1_0/hal/common/drv_disp_da.o
 obj-y += vdp_v1_0/hal/common/drv_disp_hal.o
 obj-y += vdp_v1_0/hal/common/drv_disp_ua.o
 obj-y += vdp_v1_0/hal/common/drv_win_hal.o
-obj-y += vdp_v1_0/hal/cv200/vdp_driver.o
 obj-y += vdp_v1_0/hal/cv200/hal_specific_config.o
+obj-y += vdp_v1_0/hal/cv200/vdp_driver.o
 
 

@@ -1676,7 +1676,7 @@ HI_S32 MCE_ModuleInit(HI_VOID)
     {
         HI_ERR_MCE("ERR: HI_DRV_DISP_Init!\n");
         return Ret;
-    } 
+    }
 
 #if 0
     Ret = tde_init_module_k();

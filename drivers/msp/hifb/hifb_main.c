@@ -992,6 +992,9 @@ static HI_S32 hifb_check_fmt(struct fb_var_screeninfo *var, struct fb_info *info
 ******************************************************************************/
 static HI_S32 hifb_check_var(struct fb_var_screeninfo *var, struct fb_info *info)
 {
+#if 1
+	printk("hifb_check_var\n");
+#else
     HIFB_PAR_S *pstPar = (HIFB_PAR_S *)info->par;
     if (pstPar->stBaseInfo.u32LayerID == HIFB_LAYER_CURSOR)
     {
@@ -999,6 +1002,7 @@ static HI_S32 hifb_check_var(struct fb_var_screeninfo *var, struct fb_info *info
         return HI_FAILURE;
     }
     return hifb_check_fmt(var, info);
+#endif
 }
 
 
@@ -1984,6 +1988,9 @@ static HI_S32 hifb_allocstereobuf(struct fb_info *info, HI_U32 u32BufSize)
 ******************************************************************************/
 static HI_S32 hifb_set_par(struct fb_info *info)
 {
+#if 1
+	printk("hifb_set_par\n");
+#else
 	HI_S32 s32Ret;
 	HI_U32 u32Stride;
 	HI_U32 u32BufSize;
@@ -2139,6 +2146,7 @@ static HI_S32 hifb_set_par(struct fb_info *info)
 		}              
 #endif		
     }
+#endif
 
     return 0;
 }
@@ -2157,6 +2165,9 @@ static HI_S32 hifb_set_par(struct fb_info *info)
 ******************************************************************************/
 static HI_S32 hifb_pan_display(struct fb_var_screeninfo *var, struct fb_info *info)
 {
+#if 1
+	printk("hifb_pan_display\n");
+#else
     HIFB_PAR_S *par = (HIFB_PAR_S *)info->par;
     HI_U32 u32DisplayAddr = 0;
     HI_U32 u32StartAddr = info->fix.smem_start ;    
@@ -2305,6 +2316,7 @@ static HI_S32 hifb_pan_display(struct fb_var_screeninfo *var, struct fb_info *in
  	{
  		par->bPanFlag = HI_TRUE;
  	}
+#endif
     
     return HI_SUCCESS;
 }
@@ -3412,6 +3424,9 @@ static HI_S32 hifb_refreshall(struct fb_info *info)
 
 static HI_S32 hifb_ioctl(struct fb_info *info, HI_U32 cmd, unsigned long arg)
 {
+#if 1
+	printk("hifb_ioctl\n");
+#else
     HIFB_PAR_S *par = (HIFB_PAR_S *)info->par;
     HI_VOID __user *argp = (HI_VOID __user *)arg;
 
@@ -4165,6 +4180,7 @@ static HI_S32 hifb_ioctl(struct fb_info *info, HI_U32 cmd, unsigned long arg)
     }
 
     return s32Ret;
+#endif
 }
 
 static HI_VOID hifb_3DMode_callback(HI_VOID * pParaml,HI_VOID * pParamr)
@@ -4676,6 +4692,9 @@ static HI_S32 hifb_createwbcproc(HIFB_PAR_S * par)
 
 static HI_S32 hifb_open (struct fb_info *info, HI_S32 user)
 {     
+#if 1
+	printk("hifb_open\n");
+#else
     HI_S32 cnt; 
     HI_S32 s32Ret;
 	HIFB_PAR_S *par;
@@ -4791,6 +4810,7 @@ static HI_S32 hifb_open (struct fb_info *info, HI_S32 user)
     /* increase reference count */
     atomic_inc(&par->stBaseInfo.ref_count);
     par->stExtendInfo.bOpen = HI_TRUE;
+#endif
 
     return HI_SUCCESS;
 }
@@ -4807,6 +4827,9 @@ static HI_S32 hifb_open (struct fb_info *info, HI_S32 user)
 ******************************************************************************/
 static HI_S32 hifb_release (struct fb_info *info, HI_S32 user)
 {
+#if 1
+	printk("hifb_release\n");
+#else
     HIFB_PAR_S *par = (HIFB_PAR_S *)info->par;
     HI_U32 cnt = atomic_read(&par->stBaseInfo.ref_count);
 
@@ -4880,6 +4903,7 @@ static HI_S32 hifb_release (struct fb_info *info, HI_S32 user)
 
     /* decrease the reference count */
     atomic_dec(&par->stBaseInfo.ref_count);
+#endif
 
     return 0;
 }
@@ -4906,11 +4930,18 @@ static HI_S32 hifb_dosetcolreg(unsigned regno, unsigned red, unsigned green,
 static HI_S32 hifb_setcolreg(unsigned regno, unsigned red, unsigned green,
                           unsigned blue, unsigned transp, struct fb_info *info)
 {
+#if 1
+	printk("hifb_setcolreg\n");
+#else
     return hifb_dosetcolreg(regno, red, green, blue, transp, info, HI_TRUE);
+#endif
 }
 
 static HI_S32 hifb_setcmap(struct fb_cmap *cmap, struct fb_info *info)
 {
+#if 1
+	printk("hifb_setcmap\n");
+#else
     HI_S32 i, start;
     unsigned short *red, *green, *blue, *transp;
     unsigned short hred, hgreen, hblue, htransp = 0xffff;
@@ -4968,6 +4999,7 @@ static HI_S32 hifb_setcmap(struct fb_cmap *cmap, struct fb_info *info)
         }
 
     }
+#endif
 
     return 0;
 }
@@ -5216,13 +5248,42 @@ static HI_S32 __INIT__ hifb_overlay_probe(HI_U32 u32LayerId, HI_U32 u32VramSize)
         }
     }
 
+#if 0
+    printk("info->count = %d\n", info->count);
+    printk("info->node = %d\n", info->node);
+    printk("info->flags = %d\n", info->flags);
+    printk("info->var.xres = %d\n", info->var.xres);
+    printk("info->var.yres = %d\n", info->var.yres);
+    printk("info->var.xres_virtual = %d\n", info->var.xres_virtual);
+    printk("info->var.yres_virtual = %d\n", info->var.yres_virtual);
+    printk("info->var.xoffset = %d\n", info->var.xoffset);
+    printk("info->var.yoffset = %d\n", info->var.yoffset);
+    printk("info->var.bits_per_pixel = %d\n", info->var.bits_per_pixel);
+    printk("info->var.grayscale = %d\n", info->var.grayscale);
+
+    printk("info->fix.smem_start = %d\n", info->fix.smem_start);	/* Start of frame buffer mem */
+    printk("info->fix.smem_len = %d\n", info->fix.smem_len);			/* Length of frame buffer mem */
+    printk("info->fix.type = %d\n", info->fix.type);			/* see FB_TYPE_*		*/
+    printk("info->fix.type_aux = %d\n", info->fix.type_aux);			/* Interleave for interleaved Planes */
+    printk("info->fix.visual = %d\n", info->fix.visual);			/* see FB_VISUAL_*		*/
+    printk("info->fix.xpanstep = %d\n", info->fix.xpanstep);			/* zero if no hardware panning  */
+    printk("info->fix.ypanstep = %d\n", info->fix.ypanstep);			/* zero if no hardware panning  */
+    printk("info->fix.ywrapstep = %d\n", info->fix.ywrapstep);		/* zero if no hardware ywrap    */
+    printk("info->fix.line_length = %d\n", info->fix.line_length);		/* length of a line in bytes    */
+    printk("info->fix.mmio_start = %d\n", info->fix.mmio_start);	/* Start of Memory Mapped I/O   */
+    printk("info->fix.mmio_len = %d\n", info->fix.mmio_len);			/* Length of Memory Mapped I/O  */
+    printk("info->fix.accel = %d\n", info->fix.accel);			/* Indicate to driver which	*/
+
+    printk("info->screen_base = %d\n", info->screen_base);
+    printk("info->screen_size = %d\n", info->screen_size);
+#endif
+
     if ((s32Ret = register_framebuffer(info)) < 0)
     {
         HIFB_ERROR("failed to register_framebuffer!\n"); //5652
         s32Ret = -EINVAL;
         goto ERR;
     }
-
 
     HIFB_INFO("succeed in registering the fb%d: %s frame buffer device\n",
               info->node, info->fix.id); //5659

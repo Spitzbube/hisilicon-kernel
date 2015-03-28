@@ -54,7 +54,7 @@ extern "C" {
 /*media memory map structure*/
 typedef struct hiMMZ_BUFFER_S
 {
-    HI_U32 u32StartVirAddr;
+    HI_U32 u32StartVirAddr; //0
     HI_U32 u32StartPhyAddr;
     HI_U32 u32Size;
 }MMZ_BUFFER_S;

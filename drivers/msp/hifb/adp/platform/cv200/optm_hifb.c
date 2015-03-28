@@ -133,7 +133,7 @@ typedef struct tagOPTM_GFX_LAYER_S{
     HI_BOOL              bOpened; //0 (2560)
     HI_BOOL              bMaskFlag;		
 	HI_BOOL              bSharpEnable;
-	HI_BOOL              bExtractLine;
+	HI_BOOL              bExtractLine; //12
 	/*******backup hardware data of gfx*********/
 	HI_BOOL              bEnable; //16
 	HI_BOOL              b3DEnable;
@@ -240,19 +240,19 @@ typedef struct tagOPTM_GFX_WORK_S
 typedef struct tagOPTM_GFX_GP_S
 {
 	/*Frame format of Output: 0-field; 1-frame*/
-	HI_BOOL bOpen;     //the flag of gp initial
+	HI_BOOL bOpen; //0    //the flag of gp initial
 	HI_BOOL b3DEnable;   // 3D flag
-	HI_BOOL bMaskFlag;
+	HI_BOOL bMaskFlag; //8
 	HI_BOOL bBGRState; //12
 	HI_BOOL bInterface;
 	HI_BOOL bGpClose; //20
 	HI_BOOL bRecoveryInNextVT; //24
 	/*wether need to extract line or not*/
-	HI_BOOL bNeedExtractLine;
+	HI_BOOL bNeedExtractLine; //28
 	/*gp_in size setted by usr*/
-	HI_BOOL bGPInSetbyusr;
+	HI_BOOL bGPInSetbyusr; //32
 	/*gp_in size got initial by the first opened layer */
-	HI_BOOL bGPInInitial;
+	HI_BOOL bGPInInitial; //36
 	/*disp initial*/
 	HI_BOOL bDispInitial; //40
 
@@ -906,14 +906,21 @@ HIFB_STEREO_MODE_E OPTM_AdaptTriDimModeFromDisp(HI_DRV_DISP_STEREO_E enDispStere
 {
 	switch(enDispStereo)
 	{
-		case DISP_STEREO_NONE:
-			return HIFB_STEREO_MONO;
-		case DISP_STEREO_SBS_HALF:
+		case DISP_STEREO_NONE: //0
+			return HIFB_STEREO_MONO; //0
+#if 0
+		case DISP_STEREO_SBS_HALF: //2
 			return HIFB_STEREO_SIDEBYSIDE_HALF;
-		case DISP_STEREO_TAB:
+		case DISP_STEREO_TAB: //3
 			return HIFB_STEREO_TOPANDBOTTOM;
-		case DISP_STEREO_FPK:
-			return HIFB_STEREO_FRMPACKING;
+#else
+		case 4:
+			return 2;
+		case 5:
+			return 3;
+#endif
+		case DISP_STEREO_FPK: //1
+			return 1; //HIFB_STEREO_FRMPACKING;
 		default:
 			return HIFB_STEREO_BUTT;
 	}
@@ -1000,9 +1007,6 @@ HI_S32 OPTM_GfxInit(HI_VOID)
 
 HI_S32 OPTM_GfxDeInit(HI_VOID)
 {
-#if 1
-#warning TODO
-#else
     HI_S32 i;
 	
     PRINT_IN;
@@ -1030,11 +1034,11 @@ HI_S32 OPTM_GfxDeInit(HI_VOID)
 		g_stGfxWbc2.stFrameBuffer.u32StartPhyAddr = 0;
 	}	
 
+	Data_81143414 = 0;
     g_u32GFXInitFlag = OPTM_DISABLE;
 	ps_DispExportFuncs = HI_NULL;
     
     PRINT_OUT;
-#endif
 
     return HI_SUCCESS;
 }
@@ -1231,8 +1235,11 @@ static HI_S32 OPTM_GPClose(OPTM_GFX_GP_E enGPId)
 	{
 		return HI_SUCCESS;
 	}
-	
+
+	g_enOptmGfxWorkMode = HIFB_GFX_MODE_NORMAL;
+
 	OPTM_SetCallbackToDisp(enGPId, (IntCallBack)OPTM_DispCallBack, HI_DRV_DISP_C_INTPOS_90_PERCENT, HI_FALSE);
+	OPTM_SetCallbackToDisp(enGPId, (IntCallBack)OPTM_FrameEndCallBack, HI_DRV_DISP_C_GFX_WBC, HI_FALSE);
 #ifndef HI_BUILD_IN_BOOT
     if (g_stGfxGPDevice[enGPId].queue)
 	{
@@ -1248,7 +1255,7 @@ static HI_S32 OPTM_GPClose(OPTM_GFX_GP_E enGPId)
 	g_stGfxGPDevice[enGPId].bNeedExtractLine = HI_FALSE;
 	g_stGfxGPDevice[enGPId].bMaskFlag     = HI_FALSE;
 	
-	g_enOptmGfxWorkMode = HIFB_GFX_MODE_NORMAL;
+//	g_enOptmGfxWorkMode = HIFB_GFX_MODE_NORMAL;
 
 	PRINT_OUT;
 	return HI_SUCCESS;
@@ -2038,7 +2045,7 @@ static HI_S32 OPTM_CheckGpState(OPTM_GFX_GP_E enGPId)
 	else if (OPTM_GFX_GP_1 == enGPId)
 	{
 		u32LayerIdSta = HIFB_LAYER_SD_0;
-		u32LayerIdEnd = HIFB_LAYER_SD_1;
+		u32LayerIdEnd = HIFB_LAYER_SD_0; //HIFB_LAYER_SD_1;
 	}
 	else
 	{
@@ -2058,9 +2065,6 @@ static HI_S32 OPTM_CheckGpState(OPTM_GFX_GP_E enGPId)
 
 HI_S32 OPTM_GfxCloseLayer(HIFB_LAYER_ID_E enLayerId)
 {   
-#if 1
-#warning TODO
-#else
 	OPTM_GFX_GP_E enGPId;
 	
     PRINT_IN;
@@ -2072,6 +2076,7 @@ HI_S32 OPTM_GfxCloseLayer(HIFB_LAYER_ID_E enLayerId)
 
 	enGPId = g_stGfxDevice[enLayerId].enGPId;
 	
+#if 0
 	/*set layer decompression false*/
     if(g_stGfxDevice[enLayerId].bCampEnable)
     {
@@ -2083,11 +2088,14 @@ HI_S32 OPTM_GfxCloseLayer(HIFB_LAYER_ID_E enLayerId)
 		OPTM_VDP_OpenGFX3(HI_FALSE);
 		OPTM_VDP_SetLayerConnect(OPTM_VDP_CONNECT_G3_DHD0);
 	}
+#endif
 
     /* set layer disenable, confirm hardware close */
 	OPTM_GfxSetEnable(enLayerId, HI_FALSE);
 	OPTM_VDP_GFX_SetRegUp(g_stGfxDevice[enLayerId].enGfxHalId);
+#if 0
 	OPTM_GfxWaitVBlank(enLayerId);
+#endif
 	OPTM_GfxDeInitLayer(enLayerId);
 	
 	g_stGfxDevice[enLayerId].bExtractLine = HI_FALSE;
@@ -2106,7 +2114,6 @@ HI_S32 OPTM_GfxCloseLayer(HIFB_LAYER_ID_E enLayerId)
 	}
 
     PRINT_OUT;
-#endif
     
     return HI_SUCCESS;
 }
@@ -2127,9 +2134,6 @@ HI_S32 OPTM_JudgeWbcEnable(HI_VOID)
 
 HI_S32 OPTM_GfxSetEnable(HIFB_LAYER_ID_E enLayerId, HI_BOOL bEnable)
 {
-#if 1
-#warning TODO
-#else
 	OPTM_GFX_GP_E enGpId;
 	
     PRINT_IN;
@@ -2159,7 +2163,6 @@ HI_S32 OPTM_GfxSetEnable(HIFB_LAYER_ID_E enLayerId, HI_BOOL bEnable)
     }
 
     PRINT_OUT;
-#endif
     
     return HI_SUCCESS;
 }
@@ -2403,6 +2406,78 @@ OPTM_VDP_GFX_IFMT_E OPTM_PixerFmtTransferToHalFmt(HIFB_COLOR_FMT_E enDataFmt)
     }
 	
 	return VDP_GFX_IFMT_BUTT;
+}
+
+HI_U32 OPTM_GetBppFromPixelFmt(HI_U32 a)
+{
+    if (a >= 28)
+    {
+        return 0;
+    }
+
+	switch (a)
+	{
+		case 0:
+			return 16;
+		case 1:
+			return 24;
+		case 2:
+			return 16;
+		case 3:
+			return 16;
+		case 4:
+			return 32;
+		case 5:
+			return 16;
+		case 6:
+			return 16;
+		case 7:
+			return 32;
+		case 8:
+			return 24;
+		case 9:
+			return 16;
+		case 10:
+			return 16;
+		case 11:
+			return 24;
+		case 12:
+			return 32;
+		case 13:
+			return 16;
+		case 14:
+			return 24;
+		case 15:
+			return 16;
+		case 16:
+			return 16;
+		case 17:
+			return 32;
+		case 18:
+			return 24;
+		case 19:
+			return 16;
+		case 20:
+			return 16;
+		case 21:
+			return 32;
+		case 22:
+			return 1;
+		case 23:
+			return 2;
+		case 24:
+			return 4;
+		case 25:
+			return 8;
+		case 26:
+			return 8;
+		case 27:
+			return 16;
+		default:
+			return 0;
+	}
+
+	return 0;
 }
 
 HI_S32 OPTM_GfxSetLayerDataFmt(HIFB_LAYER_ID_E enLayerId, HIFB_COLOR_FMT_E enDataFmt)

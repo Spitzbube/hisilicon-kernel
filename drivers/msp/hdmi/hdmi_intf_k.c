@@ -73,7 +73,7 @@
 #include "drv_hdmi_ioctl.h"
 
 HI_DECLARE_MUTEX(g_hdmiMutex);
-HI_U32 g_VirHDMI_PHY_BASE_ADDR = 0;
+HI_U32 g_VirHDMI_PHY_BASE_ADDR = 0; //81130b04 +8
 
 HI_S32 HDMI_DRV_Init(HI_VOID);
 HI_VOID  HDMI_DRV_EXIT(HI_VOID);
@@ -142,7 +142,7 @@ static irqreturn_t HDMI_Isr(HI_S32 irq, HI_VOID *dev_id)
     DEBUG_PRINTK("Interrupt Control Register: 0x%x\n", IntReg[0]);
     
     //WriteByteHDMITXP0( 0x79, 0x00);
-    //s40 hdmi txµÄÖÐ¶ÏÎªµÍÓÐÐ§
+    //s40 hdmi txï¿½ï¿½ï¿½Ð¶ï¿½Îªï¿½ï¿½ï¿½ï¿½Ð§
     WriteByteHDMITXP0( INT_CNTRL_ADDR, 0x02);
     
     return 0;
@@ -464,7 +464,7 @@ static HI_S32 hdmi_ProcessCmd(unsigned int cmd, HI_VOID *arg, HI_BOOL bUser)
                 //HI_ERR_HDMI("\n ---hdmi read event over--- \n");
                 u32Ret = (pPollEvent->Event != 0)?HI_SUCCESS:HI_ERR_HDMI_FAILURE;
 
-                //ÏÈÆÁ±ÎÊÔÊÔ
+                //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 				//pPollEvent->u32CallbackAddr = g_u32CallbackAddr;
                 break;
             }
@@ -703,16 +703,16 @@ HI_S32 hdmi_Ioctl(struct inode *inode, struct file *file,
 
 
 
-//ÐÞ¸ÄÃüÃû¹æÔò
+//ï¿½Þ¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 //HI_S32  HDMI_ModeInit_0(HI_VOID)
 HI_S32 HDMI_DRV_Init(HI_VOID)
 {
-    g_VirHDMI_PHY_BASE_ADDR = (HI_U32)IO_ADDRESS(HDMI_TX_BASE_ADDR);
-    HI_INFO_HDMI("***HDMI_TX_PHY_BASE_ADDR:0x%x, g_VirHDMI_PHY_BASE_ADDR:0x%x\n", (HI_U32)HDMI_TX_BASE_ADDR, (HI_U32)g_VirHDMI_PHY_BASE_ADDR);
+    g_VirHDMI_PHY_BASE_ADDR = (HI_U32)IO_ADDRESS2(HDMI_TX_BASE_ADDR);
+    HI_INFO_HDMI("***HDMI_TX_PHY_BASE_ADDR:0x%x, g_VirHDMI_PHY_BASE_ADDR:0x%x\n", (HI_U32)HDMI_TX_BASE_ADDR, (HI_U32)g_VirHDMI_PHY_BASE_ADDR); //714
     return DRV_HDMI_Register();
 }
 
-//ÐÞ¸ÄÃüÃû¹æÔò
+//ï¿½Þ¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 //HI_VOID  HDMI_ModeExit_0(HI_VOID)
 HI_VOID  HDMI_DRV_EXIT(HI_VOID)
 {
@@ -811,7 +811,7 @@ void hdmi_MCE_ProcHotPlug(HI_HANDLE hHdmi)
         else
         {
             pstAppAttr->enVidOutMode = HI_UNF_HDMI_VIDEO_MODE_RGB444;
-            //¶ÁÈ¡µ½ÁËedid£¬²¢ÇÒ²»Ö§³ÖhdmiÔò½øÈëdviÄ£Ê½
+            //ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½edidï¿½ï¿½ï¿½ï¿½ï¿½Ò²ï¿½Ö§ï¿½ï¿½hdmiï¿½ï¿½ï¿½ï¿½ï¿½dviÄ£Ê½
             //read real edid ok && sink not support hdmi,then we run in dvi mode
             pstAppAttr->bEnableHdmi = HI_FALSE;
         }
@@ -1067,7 +1067,7 @@ void hdmi_MCE_ProcHotPlug(HI_HANDLE hHdmi)
 		    enAspectRate  = HI_UNF_HDMI_ASPECT_RATIO_4TO3;
 		    if (pstAVIInfoframe->enAspectRatio == HI_UNF_HDMI_ASPECT_RATIO_16TO9)
 		    {
-			    /*the ratio mustn't force to change when setting 576p_50 16:9 before hotplug *//*CNcomment:ÈÈ²å°ÎÒÔÇ°²ÉÓÃµÄÊÇ576p_50 16:9µÄÄ£Ê½£¬²»ÐèÒªÇ¿ÖÆ¸Ä±ä */
+			    /*the ratio mustn't force to change when setting 576p_50 16:9 before hotplug *//*CNcomment:ï¿½È²ï¿½ï¿½ï¿½ï¿½Ç°ï¿½ï¿½ï¿½Ãµï¿½ï¿½ï¿½576p_50 16:9ï¿½ï¿½Ä£Ê½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÒªÇ¿ï¿½Æ¸Ä±ï¿½ */
 			    enAspectRate = HI_UNF_HDMI_ASPECT_RATIO_16TO9;
 		    }
 		    pstAVIInfoframe->u32PixelRepetition      = HI_TRUE;
@@ -1459,8 +1459,22 @@ HI_S32 HI_DRV_HDMI_SetAttr(HI_UNF_HDMI_ID_E enHdmi, HDMI_APP_ATTR_S *pstAttr)
     return s32Ret;
 }
 
+HI_S32 HI_DRV_HDMI_Detach()
+{
+#warning TODO: HI_DRV_HDMI_Detach
+
+	printk("HI_DRV_HDMI_Detach: TODO\n");
+}
+
+HI_S32 HI_DRV_HDMI_Attach()
+{
+#warning TODO: HI_DRV_HDMI_Attach
+
+	printk("HI_DRV_HDMI_Attach: TODO\n");
+}
+
 #if 0 /*--NO MODIFY : COMMENT BY CODINGPARTNER--*/
-//ºóÐøÐèÒªºÍÄ£¿éÒ»Æð×¢²á
+//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Òªï¿½ï¿½Ä£ï¿½ï¿½Ò»ï¿½ï¿½×¢ï¿½ï¿½
 EXPORT_SYMBOL(HI_DRV_HDMI_Init);
 EXPORT_SYMBOL(HI_DRV_HDMI_Deinit);
 EXPORT_SYMBOL(HI_DRV_HDMI_Open);

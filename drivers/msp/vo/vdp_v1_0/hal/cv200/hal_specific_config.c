@@ -11,9 +11,8 @@
 #endif
 #include "hi_reg_common.h"
 
-#warning TODO: s_stDispFormatParam (41-44)
 
-static DISP_FMT_CFG_S s_stDispFormatParam[] =
+static DISP_FMT_CFG_S s_stDispFormatParam[] = //80bad7f4
 {
 /* |--INTFACE---||-----TOP-----||----HORIZON--------||----BOTTOM-----||-PULSE-||-INVERSE-| */
 /* Synm Iop  Itf  Vact Vbb Vfb   Hact  Hbb Hfb      Bvact Bvbb Bvfb  Hpw Vpw Hmid bIdv bIhs bIvs */
@@ -21,42 +20,42 @@ static DISP_FMT_CFG_S s_stDispFormatParam[] =
  { {1,   1,   2,  1080,  41,  4,  1920, 192, 88,      1,   1,  1,     44, 5, 1,  0,  0,  0}, /* 1080P@60Hz */
    //{0x14000000, 0x02002063}, // 1080P14460/50
    DISP_CLOCK_SOURCE_HD0, 
-   {0x12000000, 0x02002063}, // 1080P60/50
+   {0x22000000, 0x02002063}, // 1080P60/50
    {HI_DRV_DISP_FMT_1080P_60, DISP_STEREO_NONE, HI_FALSE, {0,0,1920,1080}, {0,0,1920,1080}, {16,9}, 6000, HI_DRV_CS_BT709_YUV_LIMITED}
  },
   // 1 HI_UNF_ENC_FMT_1080P_60,
  { {1,   1,   2,  1080,  41,  4,  1920, 192, 88,      1,   1,  1,     44, 5, 1,  0,  0,  0}, /* 1080P@60Hz */
    //{0x14000000, 0x02002063}, // 1080P60/50
    DISP_CLOCK_SOURCE_HD0, 
-   {0x12000000, 0x02002063}, // 1080P60/50
+   {0x22000000, 0x02002063}, // 1080P60/50
    {HI_DRV_DISP_FMT_1080P_60, DISP_STEREO_NONE, HI_FALSE, {0,0,1920,1080},{0,0,1920,1080},{16,9}, 6000, HI_DRV_CS_BT709_YUV_LIMITED}
  },
   // 2 HI_UNF_ENC_FMT_1080P_50,
  { {1,   1,   2,  1080,  41,  4,  1920, 192, 528,      1,   1,  1,     44, 5, 1, 0,  0,  0}, /* 1080P@50Hz */
    //{0x14000000, 0x02002063}, // 1080P60/50
    DISP_CLOCK_SOURCE_HD0, 
-   {0x12000000, 0x02002063}, // 1080P60/50
+   {0x22000000, 0x02002063}, // 1080P60/50
    {HI_DRV_DISP_FMT_1080P_50, DISP_STEREO_NONE, HI_FALSE, {0,0,1920,1080},{0,0,1920,1080},{16,9}, 5000, HI_DRV_CS_BT709_YUV_LIMITED}
  },
   // 3 HI_UNF_ENC_FMT_1080P_30
  { {1,   1,   2,  1080,  41,  4,  1920, 192, 88,       1,   1,  1,    44,  5, 1, 0,  0,  0}, /* 1080P@30Hz */
 //   {0x24000000, 0x02002063}, // 1080i50
    DISP_CLOCK_SOURCE_HD0, 
-   {0x14000000, 0x02002063}, // 1080P60/50
+   {0x24000000, 0x02002063}, // 1080P60/50
    {HI_DRV_DISP_FMT_1080P_30, DISP_STEREO_NONE, HI_FALSE, {0,0,1920,1080},{0,0,1920,1080},{16,9}, 3000, HI_DRV_CS_BT709_YUV_LIMITED}
  },
   // 4 HI_UNF_ENC_FMT_1080P_25,
  { {1,   1,   2,  1080,  41,  4,  1920, 192, 528,      1,   1,  1,    44, 5, 1,  0,  0,  0}, /* 1080P@25Hz */
 //   {0x24000000, 0x02002063}, // 1080i50
    DISP_CLOCK_SOURCE_HD0, 
-   {0x14000000, 0x02002063}, // 1080P60/50
+   {0x24000000, 0x02002063}, // 1080P60/50
    {HI_DRV_DISP_FMT_1080P_25, DISP_STEREO_NONE, HI_FALSE, {0,0,1920,1080},{0,0,1920,1080},{16,9}, 2500, HI_DRV_CS_BT709_YUV_LIMITED}
  },
   // 5 HI_UNF_ENC_FMT_1080P_24 @74.25MHz,
  { {1,   1,   2,  1080,  41,  4,  1920, 192, 638,       1,   1,  1,    44, 5, 1, 0,  0,  0}, /* 1080P@24Hz */
 //   {0x24000000, 0x02002063}, // 1080i50
    DISP_CLOCK_SOURCE_HD0, 
-   {0x14000000, 0x02002063}, // 1080P60/50
+   {0x24000000, 0x02002063}, // 1080P60/50
    {HI_DRV_DISP_FMT_1080P_24, DISP_STEREO_NONE, HI_FALSE, {0,0,1920,1080},{0,0,1920,1080},{16,9}, 2400, HI_DRV_CS_BT709_YUV_LIMITED}
  },
 
@@ -64,14 +63,14 @@ static DISP_FMT_CFG_S s_stDispFormatParam[] =
  { {1,   0,   2,   540,  20,  2,  1920, 192, 88,  540, 21,  2,    44,  5, 908,   0,  0,  0}, /* 1080I@60Hz */
 //   {0x24000000, 0x02002063}, // 1080i50
    DISP_CLOCK_SOURCE_HD0, 
-   {0x14000000, 0x02002063}, // 1080P60/50
+   {0x24000000, 0x02002063}, // 1080P60/50
    {HI_DRV_DISP_FMT_1080i_60, DISP_STEREO_NONE, HI_TRUE, {0,0,1920,1080},{0,0,1920,1080},{16,9}, 6000, HI_DRV_CS_BT709_YUV_LIMITED}
  },
   // 7 HI_UNF_ENC_FMT_1080i_50
  { {1,   0,   2,   540,  20,  2,  1920, 192,528,  540,  21,  2,   44, 5, 1128,  0,  0,  0}, /* 1080I@50Hz */
 //   {0x24000000, 0x02002063}, // 1080i50
    DISP_CLOCK_SOURCE_HD0, 
-   {0x14000000, 0x02002063}, // 1080P60/50
+   {0x24000000, 0x02002063}, // 1080P60/50
    {HI_DRV_DISP_FMT_1080i_50, DISP_STEREO_NONE, HI_TRUE, {0,0,1920,1080},{0,0,1920,1080},{16,9}, 5000, HI_DRV_CS_BT709_YUV_LIMITED}
  },
 
@@ -79,31 +78,31 @@ static DISP_FMT_CFG_S s_stDispFormatParam[] =
  { {1,   1,   2,   720,  25,  5,  1280, 260,110,      1,   1,  1,    40,  5,  1, 0,  0,  0}, /* 720P@60Hz */
 //   {0x24000000, 0x02002063}, // 1080i50
    DISP_CLOCK_SOURCE_HD0, 
-   {0x14000000, 0x02002063}, // 1080P60/50
+   {0x24000000, 0x02002063}, // 1080P60/50
    {HI_DRV_DISP_FMT_720P_60, DISP_STEREO_NONE, HI_FALSE, {0,0,1280,720}, {0,0,1280,720},{16,9}, 6000, HI_DRV_CS_BT709_YUV_LIMITED}
  },
   // 9 HI_UNF_ENC_FMT_720P_50
  { {1,   1,   2,   720,  25,  5,  1280, 260,440,     1,   1,  1,     40, 5,  1,  0,  0,  0},  /* 720P@50Hz */
 //   {0x24000000, 0x02002063}, // 1080i50
    DISP_CLOCK_SOURCE_HD0, 
-   {0x14000000, 0x02002063}, // 1080P60/50
+   {0x24000000, 0x02002063}, // 1080P60/50
    {HI_DRV_DISP_FMT_720P_50, DISP_STEREO_NONE, HI_FALSE, {0,0,1280,720}, {0,0,1280,720},{16,9}, 5000, HI_DRV_CS_BT709_YUV_LIMITED}
  },
 
 /* Synm Iop  Itf  Vact Vbb Vfb   Hact  Hbb Hfb      Bvact Bvbb Bvfb  Hpw Vpw Hmid bIdv bIhs bIvs */
   // 10 HI_UNF_ENC_FMT_576P_50,
- { {1,  1,   2,   576,   44,  5,   720, 132, 12,     1,   1,  1,     64, 5,  1,  0,  0,  0}, /* 576P@50Hz */
+ { {1,  1,   2,   576,   44,  5,   720, 132, 12,     1,   1,  1,     64, 5,  1,  0,  1,  1}, /* 576P@50Hz */
    DISP_CLOCK_SOURCE_SD0, 
-   {0x14000000, 0x02002063}, 
+   {0x24000000, 0x02002063},
    {HI_DRV_DISP_FMT_576P_50, DISP_STEREO_NONE, HI_FALSE, {0,0,720,576} , {0,0,720,576} ,{4,3},  5000, HI_DRV_CS_BT601_YUV_LIMITED}
  },
     /* |--INTFACE---||-----TOP-----||----HORIZON--------||----BOTTOM-----||-PULSE-||-INVERSE-| */
   /* Synm Iop  Itf  Vact Vbb Vfb   Hact  Hbb Hfb      Bvact Bvbb Bvfb  Hpw Vpw Hmid bIdv bIhs bIvs */
   // 11 HI_UNF_ENC_FMT_480P_60,
 #if 1
- { {1,  1,   2,   480,   36,  9,   720, 122, 16,     1,   1,  1,     62, 6,  1,  0,  0,  0}, /* 480P@60Hz */
+ { {1,  1,   2,   480,   36,  9,   720, 122, 16,     1,   1,  1,     62, 6,  1,  0,  1,  1}, /* 480P@60Hz */
    DISP_CLOCK_SOURCE_SD0, 
-   {0x14000000, 0x02002063}, // 1080i50
+   {0x24000000, 0x02002063}, // 1080i50
    {HI_DRV_DISP_FMT_480P_60, DISP_STEREO_NONE, HI_FALSE, {0,0,720,480} , {0,0,720,480} , {4,3},  6000, HI_DRV_CS_BT601_YUV_LIMITED}
  },
 #else
@@ -115,18 +114,18 @@ static DISP_FMT_CFG_S s_stDispFormatParam[] =
 #endif
 
   // 12 HI_UNF_ENC_FMT_PAL
- { {0,   0,   0,   288,  22,  2,  720, 132, 12,     288,  23,  2,    126, 3, 0, 0,  0,  0},/* 576I(PAL) */
+ { {0,   0,   0,   288,  22,  2,  720, 132, 12,     288,  23,  2,    63, 3, 300, 0,  1,  1},/* 576I(PAL) */
    DISP_CLOCK_SOURCE_SD0, 
-   {0x24000000, 0x02002063}, // 1080i50
+   {0x44000000, 0x02002063}, // 1080i50
    {HI_DRV_DISP_FMT_PAL,     DISP_STEREO_NONE, HI_TRUE,  {0,0,720,576} ,  {0,0,720,576} , {4,3},  5000, HI_DRV_CS_BT601_YUV_LIMITED}
  },
 #if 1
   //576I: HDMI���Ҫ��hmid=300, ��YPbPrҪ��hmid=0, 
   //����һ���û�����ʹ��HDMI���576I�����Բ�֧��HDMI_567I�����ѡ��hmid=0
   // 13 HI_UNF_ENC_FMT_NTSC
- { {0,   0,   0,   240,  18,  4,   720, 119, 19,     240,  19,  4,    124, 3,  0, 0, 0,  0},/* 480I(NTSC) */
+ { {0,   0,   0,   240,  18,  4,   720, 119, 19,     240,  19,  4,    62, 3,  310, 0, 1,  1},/* 480I(NTSC) */
    DISP_CLOCK_SOURCE_SD0, 
-   {0x24000000, 0x02002063}, // 1080i50
+   {0x44000000, 0x02002063}, // 1080i50
    {HI_DRV_DISP_FMT_NTSC,    DISP_STEREO_NONE, HI_TRUE,  {0,0,720,480} , {0,0,720,480} ,{4,3},  6000, HI_DRV_CS_BT601_YUV_LIMITED},
  },
 #else
@@ -143,144 +142,144 @@ static DISP_FMT_CFG_S s_stDispFormatParam[] =
     // TODO:
     // 14, LCD
 
-    {   {1,   1,   2,   480,  35,  10,  640, 144, 16,       1,   1,  1,      96, 2,  1, 0,  0,  0}, /* 640*480@60Hz */
+    {   {1,   1,   2,   480,  35,  10,  640, 144, 16,       1,   1,  1,      96, 2,  1, 0,  1,  1}, /* 640*480@60Hz */
         DISP_CLOCK_SOURCE_HD0,
-        {0x24000000, 0x20050a8}, // 1080i50
+        {0x44000000, 0x20050a8}, // 1080i50
         {HI_DRV_DISP_FMT_861D_640X480_60,    DISP_STEREO_NONE, HI_FALSE,  {0, 0, 640, 480} ,  {0, 0, 640, 480}, {16, 9},  6000, HI_DRV_CS_BT709_RGB_FULL}
     },
     // 15
     {   {1,   1,   2,   600,  27,  1,   800, 216, 40,       1,   1,  1,    128, 4, 1, 0,  0,  0}, /* 800*600@60Hz */
         DISP_CLOCK_SOURCE_HD0,
-        {0x25000000, 0x201967a}, /* 800*600@60Hz */
+        {0x45000000, 0x201967a}, /* 800*600@60Hz */
         {HI_DRV_DISP_FMT_VESA_800X600_60,    DISP_STEREO_NONE, HI_FALSE,  {0, 0, 800, 600} ,  {0, 0, 800, 600}, {16, 9},  6000, HI_DRV_CS_BT709_RGB_FULL}
     },
     // 16
     {   {1,   1,   2,   768,  35,  3,  1024, 296, 24,      1,   1,  1,    136, 6, 1,  0,  0,  0}, /* 1024x768@60Hz */
         DISP_CLOCK_SOURCE_HD0,
-        {0x15000000, 0x201954a}, /* 1024x768@60Hz */
+        {0x25000000, 0x201954a}, /* 1024x768@60Hz */
         {HI_DRV_DISP_FMT_VESA_1024X768_60,    DISP_STEREO_NONE, HI_FALSE,  {0, 0, 1024, 768} ,  {0, 0, 1024, 768}, {16, 9},  6000, HI_DRV_CS_BT709_RGB_FULL}
     },
     // 17
     {   {1,   1,   2,   720,  25,  5,  1280, 260, 110,  1,     1,   1,  40, 5,  1, 0,  0,  0}, /* 1280x720@60Hz */
         DISP_CLOCK_SOURCE_HD0,
-        {0x13000000, 0x2008129}, /* 1280x720@60Hz */
+        {0x23000000, 0x2008129}, /* 1280x720@60Hz */
         {HI_DRV_DISP_FMT_VESA_1280X720_60,    DISP_STEREO_NONE, HI_FALSE,  {0, 0, 1280, 720} ,  {0, 0, 1280, 720}, {16, 9},  6000, HI_DRV_CS_BT709_RGB_FULL}
     },
     // 18
     {   {1,   1,   2,   800,  28,  3,  1280, 328, 72,  1,     1,   1,      128, 6, 1, 0,  0,  0}, /* 1280x800@60Hz */
         DISP_CLOCK_SOURCE_HD0,
-        {0x13000000, 0x2019417}, /* 1280x800@60Hz */
+        {0x23000000, 0x2019417}, /* 1280x800@60Hz */
         {HI_DRV_DISP_FMT_VESA_1280X800_60,    DISP_STEREO_NONE, HI_FALSE,  {0, 0, 1280, 800} ,  {0, 0, 1280, 800}, {16, 9},  6000, HI_DRV_CS_BT709_RGB_FULL}
     },
     // 19
     {   {1,   1,   2,  1024,  41,  1,  1280, 360, 48,  1,     1,   1,     112, 3, 1,  0,  0,  0}, /* 1280x1024@60Hz */
         DISP_CLOCK_SOURCE_HD0,
-        {0x15000000, 0x20198c9}, /* 1280x1024@60Hz */
+        {0x25000000, 0x20198c9}, /* 1280x1024@60Hz */
         {HI_DRV_DISP_FMT_VESA_1280X1024_60,    DISP_STEREO_NONE, HI_FALSE,  {0, 0, 1280, 1024},  {0, 0, 1280, 1024} , {16, 9},  6000, HI_DRV_CS_BT709_RGB_FULL}
     },
     // 20
     {   {1,   1,   2,   768,  24,  3,  1360, 368, 64,  1,     1,   1,    112, 6,  1,  0,  0,  0}, /* 1360x768@60Hz */
         DISP_CLOCK_SOURCE_HD0,
-        {0x13000000, 0x2032859}, /* 1360x768@60Hz */
+        {0x23000000, 0x2032859}, /* 1360x768@60Hz */
         {HI_DRV_DISP_FMT_VESA_1360X768_60,    DISP_STEREO_NONE, HI_FALSE,  {0, 0, 1360, 768},  {0, 0, 1360, 768} , {16, 9},  6000, HI_DRV_CS_BT709_RGB_FULL}
     },
     // 21
     {   {1,   1,   2,   768,  27,  3,  1366, 356, 70,  1,     1,   1,      143, 3, 1, 0,  0,  0}, /* 1366x768@60Hz */
         DISP_CLOCK_SOURCE_HD0,
-        {0x13000000, 0x200a1ad}, /* 1366X768@60Hz */
+        {0x23000000, 0x200a1ad}, /* 1366X768@60Hz */
         {HI_DRV_DISP_FMT_VESA_1366X768_60,    DISP_STEREO_NONE, HI_FALSE,  {0, 0, 1366, 768},  {0, 0, 1366, 768} , {16, 9},  6000, HI_DRV_CS_BT709_RGB_FULL}
     },
     // 22
     {   {1,   1,   2,  1050,  36,  3,  1400, 376, 88,  1,     1,   1,    144, 4,  1,  0,  0,  0}, /* 1400x1050@60Hz */
         DISP_CLOCK_SOURCE_HD0,
-        {0x12000000, 0x20050cb}, /* 1400x1050@60Hz */
+        {0x22000000, 0x20050cb}, /* 1400x1050@60Hz */
         {HI_DRV_DISP_FMT_VESA_1400X1050_60,    DISP_STEREO_NONE, HI_FALSE,  {0, 0, 1400, 1050},  {0, 0, 1400, 1050} , {16, 9},  6000, HI_DRV_CS_BT709_RGB_FULL}
     },
 
     // 24
     {   {1,   1,   2,   900,  31,  3,  1440, 384, 80,    1,   1,  1,    152, 6,   1,  0,  0,  0}, /* 1440x900@60Hz_RB@106.5MHz */
         DISP_CLOCK_SOURCE_HD0,
-         {0x12000000, 0x201e42b},/* 1440x900@60Hz@106.5MHz */
+         {0x22000000, 0x201e42b},/* 1440x900@60Hz@106.5MHz */
         {HI_DRV_DISP_FMT_VESA_1440X900_60_RB,    DISP_STEREO_NONE, HI_FALSE,  {0, 0, 1440, 900} ,  {0, 0, 1440, 900}, {16, 9},  6000, HI_DRV_CS_BT709_RGB_FULL}
     },
         // 23
     {   {1,   1,   2,   900,  23,  3,  1440, 112, 48,     1,   1,  1,    32, 6,   1, 0,  0,  0}, /* 1440x900@60Hz@88.75MHz */
         DISP_CLOCK_SOURCE_HD0,
-        {0x14000000, 0x2006163}, /* 1440x900@60Hz_RB@88.75MHz */
+        {0x24000000, 0x2006163}, /* 1440x900@60Hz_RB@88.75MHz */
         {HI_DRV_DISP_FMT_VESA_1440X900_60,    DISP_STEREO_NONE, HI_FALSE,  {0, 0, 1440, 900} ,  {0, 0, 1440, 900}, {16, 9},  6000, HI_DRV_CS_BT709_RGB_FULL}
     },
         // 25
     {   {1,   1,   2,   900,  23,  3,  1600, 112, 48,    1,   1,  1,    32, 5,   1,  0,  0,  0}, /* 1600x900@60Hz_RB@97.750 MHz  */
             DISP_CLOCK_SOURCE_HD0,
-            {0x14000000, 0x2006187}, /* 1600x900@60Hz_RB@97.750 MHz  */
+            {0x24000000, 0x2006187}, /* 1600x900@60Hz_RB@97.750 MHz  */
             {HI_DRV_DISP_FMT_VESA_1600X900_60_RB,    DISP_STEREO_NONE, HI_FALSE,  {0, 0, 1600, 900} ,  {0, 0, 1600, 900}, {16, 9},  6000, HI_DRV_CS_BT709_RGB_FULL}
     },
 
     // 26
     {   {1,   1,   2,   1200, 49,  1, 1600, 496, 64,       1,   1,  1,     192, 3, 1, 0,  0,  0}, /* 1600*12000@60Hz@162.000 MHz  */
         DISP_CLOCK_SOURCE_HD0,
-        {0x12000000, 0x2001036}, /* 1600*12000@60Hz@162.000 MHz  */
+        {0x22000000, 0x2001036}, /* 1600*12000@60Hz@162.000 MHz  */
         {HI_DRV_DISP_FMT_VESA_1600X1200_60,    DISP_STEREO_NONE, HI_FALSE,  {0, 0, 1600, 1200} ,  {0, 0, 1600, 1200}, {16, 9},  6000, HI_DRV_CS_BT709_RGB_FULL}
     },
     // 27
     {   {1,   1,   2,  1050,  36,  3,  1680, 456, 104,  1,     1,   1,   176, 6,   1,  0,  0,  0}, /* 1680x1050@60Hz@119.000 MHz  */
         DISP_CLOCK_SOURCE_HD0,
-        {0x12000000, 0x2018493}, /* 1680x1050@60Hz@119.000 MHz  */
+        {0x22000000, 0x2018493}, /* 1680x1050@60Hz@119.000 MHz  */
         {HI_DRV_DISP_FMT_VESA_1680X1050_60,    DISP_STEREO_NONE, HI_FALSE,  {0, 0, 1680, 1050} ,  {0, 0, 1680, 1050}, {16, 9},  6000, HI_DRV_CS_BT709_RGB_FULL}
     },
         // 28
     {   {1,   1,   2,  1050,  36,  3,  1680, 456, 104,  1,     1,   1,   176, 6,   1,  0,  0,  0}, /* 1680x1050@60Hz@119.000 MHz  */
         DISP_CLOCK_SOURCE_HD0,
-        {0x12000000, 0x2018493}, /* 1680x1050@60Hz@119.000 MHz  */
+        {0x22000000, 0x2018493}, /* 1680x1050@60Hz@119.000 MHz  */
         {HI_DRV_DISP_FMT_VESA_1680X1050_60_RB,    DISP_STEREO_NONE, HI_FALSE,  {0, 0, 1680, 1050} ,  {0, 0, 1680, 1050}, {16, 9},  6000, HI_DRV_CS_BT709_RGB_FULL}
     },
     // 29
     {   {1,   1,   2,  1080,  41,  4,  1920, 192, 88,  1,     1,   1,       44, 5, 1, 0,  0,  0}, /* 1920x1080@60Hz@148.500 MHz  */
         DISP_CLOCK_SOURCE_HD0,
-        {0x12000000, 0x2002063}, /* 1920x1080@60Hz@148.500 MHz  */
+        {0x22000000, 0x2002063}, /* 1920x1080@60Hz@148.500 MHz  */
         {HI_DRV_DISP_FMT_VESA_1920X1080_60,    DISP_STEREO_NONE, HI_FALSE,  {0, 0, 1920, 1080} ,  {0, 0, 1920, 1080}, {16, 9},  6000, HI_DRV_CS_BT709_RGB_FULL}
     },
     // 30
     {   {1,   1,   2,  1200,  32,  3,  1920, 112, 48,  1,     1,   1,      32, 6, 1,  0,  0,  0}, /* 1920x1200@60Hz@154.000 MHz */
         DISP_CLOCK_SOURCE_HD0,
-        {0x12000000, 0x200309a}, /* 1920x1200@60Hz@154.000 MHz */
+        {0x22000000, 0x200309a}, /* 1920x1200@60Hz@154.000 MHz */
         {HI_DRV_DISP_FMT_VESA_1920X1200_60,    DISP_STEREO_NONE, HI_FALSE,  {0, 0, 1920, 1200} ,  {0, 0, 1920, 1200}, {16, 9},  6000, HI_DRV_CS_BT709_RGB_FULL}
     },
     
     // 31       
-      {   {1,     1,         2,  1440,  59,      1,  1920,       552, 	   128,        1,             1,         1,        1,    208,           3,    0,     0,  0}, /*  1920x1440@60Hz 234MHz */
+      {   {1,     1,         2,  1440,  59,      1,  1920,       552, 	   128,        1,             1,         1,        208,           3,    1,     0,  0, 0}, /*  1920x1440@60Hz 234MHz */
           DISP_CLOCK_SOURCE_HD0,
-          {0x11000000, 0x2001027}, /*  1920x1440@60Hz 234MHz */
+          {0x21000000, 0x2001027}, /*  1920x1440@60Hz 234MHz */
           {HI_DRV_DISP_FMT_VESA_1920X1440_60,    DISP_STEREO_NONE, HI_FALSE,  {0, 0, 1920, 1440} ,  {0, 0, 1920, 1440}, {16, 9},  6000, HI_DRV_CS_BT709_RGB_FULL}
       },
       
     // 32
     {   {1,   1,   2,  1152,  30,  3,  2048, 112, 48,  1,     1,   1,     32, 5,  1,  0,  0,  0}, /* 2048X1152@60Hz@156.750 MHz  */
         DISP_CLOCK_SOURCE_HD0,
-        {0x12000000, 0x200309d}, /* 2048X1152@60Hz@156.750 MHz  */
+        {0x22000000, 0x200309d}, /* 2048X1152@60Hz@156.750 MHz  */
         {HI_DRV_DISP_FMT_VESA_2048X1152_60,    DISP_STEREO_NONE, HI_FALSE,  {0, 0, 2048, 1152} ,  {0, 0, 2048, 1152}, {16, 9},  6000, HI_DRV_CS_BT709_RGB_FULL}
     },
     
     // 33       /*not support*/
     {    
-        {1,     1,         2,  1440,  39,      2,  2560,       112, 	   48,          1,             1,         1,        1,    32,           5,    0,     0,  0}, /*  2560x1440@60Hz@241.5MHz RB */
+        {1,     1,         2,  1440,  39,      2,  2560,       112, 	   48,          1,             1,         1,        32,           5,    1,     0,  0, 0}, /*  2560x1440@60Hz@241.5MHz RB */
         DISP_CLOCK_SOURCE_HD0,
-        {0x12000000, 0x20020a1}, /*  2560x1440@60Hz@241.5MHz RB */
+        {0x22000000, 0x20020a1}, /*  2560x1440@60Hz@241.5MHz RB */
         {HI_DRV_DISP_FMT_VESA_2560X1440_60_RB,    DISP_STEREO_NONE, HI_FALSE,  {0, 0, 2560, 1440} ,  {0, 0, 2560, 1440}, {16, 9},  6000, HI_DRV_CS_BT709_RGB_FULL}
     },
 
     // 34       /*not support*/
-    {    {1,     1,         2,  1600,  43,      3,  2560,       112,       48,          1,             1,         1,        1,    32,            6,    0,     0,  0}, /*  2560x1600@60Hz@268.5MHz RB */
+    {    {1,     1,         2,  1600,  43,      3,  2560,       112,       48,          1,             1,         1,        32,            6,    1,     0,  0, 0}, /*  2560x1600@60Hz@268.5MHz RB */
         
         DISP_CLOCK_SOURCE_HD0,
-        {0x12000000, 0x20020b3}, /*  2560x1600@60Hz@268.5MHz RB */
+        {0x22000000, 0x20020b3}, /*  2560x1600@60Hz@268.5MHz RB */
         {HI_DRV_DISP_FMT_VESA_2560X1600_60_RB,    DISP_STEREO_NONE, HI_FALSE,  {0, 0, 2560, 1600} ,  {0, 0, 2560, 1600}, {16, 9},  6000, HI_DRV_CS_BT709_RGB_FULL}
     },
 
       //22 HI_UNF_ENC_FMT_PAL_TEST
      { {0,   0,   2,   288,  22,  2,  1440, 132, 12,    288,  23,  2,    126, 3,  0, 0,  0,  0},/* 576I(PAL) */
        DISP_CLOCK_SOURCE_HD0, 
-       {0x24000000, 0x02002063}, // 1080i50
+       {0x44000000, 0x02002063}, // 1080i50
        {HI_DRV_DISP_FMT_NTSC,    DISP_STEREO_NONE, HI_TRUE,  {0,0,720,480} , {0,0,720,480} ,{4,3},  6000, HI_DRV_CS_BT601_YUV_LIMITED}
      },
 
@@ -288,63 +287,63 @@ static DISP_FMT_CFG_S s_stDispFormatParam[] =
       // 23 HI_UNF_ENC_FMT_1080P_24_FP @74.25MHz,
      { {1,   1,   2,  1080,  41,  4,  1920, 192, 638,   1080,  41,  4,   44, 5,   1, 0,  0,  0}, /* 1080P@24Hz */
        DISP_CLOCK_SOURCE_HD0, 
-       {0x12000000, 0x02002063}, // 1080P60/50
+       {0x22000000, 0x02002063}, // 1080P60/50
        {HI_DRV_DISP_FMT_1080P_24_FP, DISP_STEREO_FPK, HI_FALSE, {0,0,1920,1080},{0,0,1920,1080},{16,9}, 2400, HI_DRV_CS_BT709_YUV_LIMITED}
      },
 
   // 24 HI_UNF_ENC_FMT_720P_60_FP
  { {1,   1,   2,   720,  25,  5,  1280, 260,110,    720,  25,  5,    40,  5,  1,  0,  0,  0}, /* 720P@60Hz */
    DISP_CLOCK_SOURCE_HD0, 
-   {0x12000000, 0x02002063}, // 1080P60/50
+   {0x22000000, 0x02002063}, // 1080P60/50
    {HI_DRV_DISP_FMT_720P_60_FP, DISP_STEREO_FPK, HI_FALSE, {0,0,1280,720},  {0,0,1280,720},{16,9}, 6000, HI_DRV_CS_BT709_YUV_LIMITED}
  },
   // 25 HI_UNF_ENC_FMT_720P_50_FP
  /* Synm Iop  Itf  Vact Vbb Vfb   Hact  Hbb Hfb      Bvact Bvbb Bvfb  Hpw Vpw Hmid bIdv bIhs bIvs */
  { {1,   1,   2,   720,  25,  5,  1280, 260,440,    720,  25,   5,   40,  5,  1, 0,  0,  0},  /* 720P@50Hz */
    DISP_CLOCK_SOURCE_HD0, 
-   {0x12000000, 0x02002063}, // 1080P60/50
+   {0x22000000, 0x02002063}, // 1080P60/50
    {HI_DRV_DISP_FMT_720P_50_FP, DISP_STEREO_FPK, HI_FALSE, {0,0,1280,720},  {0,0,1280,720},{16,9}, 5000, HI_DRV_CS_BT709_YUV_LIMITED}
  },
  
   // 12 HI_UNF_ENC_FMT_PAL
- { {0,   0,   0,   288,  22,  2,  720, 132, 12,     288,  23,  2,    126, 3, 0, 0,  0,  0},/* 576I(PAL) */
+ { {0,   0,   0,   288,  22,  2,  720, 132, 12,     288,  23,  2,    63, 3, 300, 0,  1,  1},/* 576I(PAL) */
    DISP_CLOCK_SOURCE_SD0, 
-   {0x24000000, 0x02002063}, // 1080i50
+   {0x44000000, 0x02002063}, // 1080i50
    {HI_DRV_DISP_FMT_PAL,     DISP_STEREO_NONE, HI_TRUE,  {0,0,720,576} ,  {0,0,720,576} , {4,3},  5000, HI_DRV_CS_BT601_YUV_LIMITED}
  },
  
   //576I: HDMI���Ҫ��hmid=300, ��YPbPrҪ��hmid=0, 
   //����һ���û�����ʹ��HDMI���576I�����Բ�֧��HDMI_567I�����ѡ��hmid=0
   // 13 HI_UNF_ENC_FMT_NTSC
- { {0,   0,   0,   240,  18,  4,   720, 119, 19,     240,  19,  4,    124, 3,  0, 0, 0,  0},/* 480I(NTSC) */
+ { {0,   0,   0,   240,  18,  4,   720, 119, 19,     240,  19,  4,    62, 3,  310, 0, 1,  1},/* 480I(NTSC) */
    DISP_CLOCK_SOURCE_SD0, 
-   {0x24000000, 0x02002063}, // 1080i50
+   {0x44000000, 0x02002063}, // 1080i50
    {HI_DRV_DISP_FMT_NTSC,    DISP_STEREO_NONE, HI_TRUE,  {0,0,720,480} , {0,0,720,480} ,{4,3},  6000, HI_DRV_CS_BT601_YUV_LIMITED},
  },
 
  //41
- { {0,   0,   0,   240,  18,  4,   720, 119, 19,     240,  19,  4,    124, 3,  0, 0, 0,  0},/* 480I(NTSC) */
-   DISP_CLOCK_SOURCE_SD0,
-   {0x24000000, 0x02002063}, // 1080i50
-   {HI_DRV_DISP_FMT_NTSC,    DISP_STEREO_NONE, HI_TRUE,  {0,0,720,480} , {0,0,720,480} ,{4,3},  6000, HI_DRV_CS_BT601_YUV_LIMITED},
+ { {1,   1,   2,   2160,  82,  8,   3840, 384, 1276,     1,  1,  1,    88, 10,  1, 0, 0,  0},/* 480I(NTSC) */
+   DISP_CLOCK_SOURCE_HD0,
+   {0x12000000, 0x02002063}, // 1080i50
+   {HI_DRV_DISP_FMT_61,    DISP_STEREO_NONE, HI_FALSE,  {0,0,3840,2160} , {0,0,3840,2160} ,{16,9},  2400, HI_DRV_CS_BT709_YUV_LIMITED},
  },
  //42
- { {0,   0,   0,   240,  18,  4,   720, 119, 19,     240,  19,  4,    124, 3,  0, 0, 0,  0},/* 480I(NTSC) */
-   DISP_CLOCK_SOURCE_SD0,
-   {0x24000000, 0x02002063}, // 1080i50
-   {HI_DRV_DISP_FMT_NTSC,    DISP_STEREO_NONE, HI_TRUE,  {0,0,720,480} , {0,0,720,480} ,{4,3},  6000, HI_DRV_CS_BT601_YUV_LIMITED},
+ { {1,   1,   2,   2160,  82,  8,   3840, 384, 1056,     1,  1,  1,    88, 10,  1, 0, 0,  0},/* 480I(NTSC) */
+   DISP_CLOCK_SOURCE_HD0,
+   {0x12000000, 0x02002063}, // 1080i50
+   {HI_DRV_DISP_FMT_62,    DISP_STEREO_NONE, HI_FALSE,  {0,0,3840,2160} , {0,0,3840,2160} ,{16,9},  2500, HI_DRV_CS_BT709_YUV_LIMITED},
  },
  //43
- { {0,   0,   0,   240,  18,  4,   720, 119, 19,     240,  19,  4,    124, 3,  0, 0, 0,  0},/* 480I(NTSC) */
-   DISP_CLOCK_SOURCE_SD0,
-   {0x24000000, 0x02002063}, // 1080i50
-   {HI_DRV_DISP_FMT_NTSC,    DISP_STEREO_NONE, HI_TRUE,  {0,0,720,480} , {0,0,720,480} ,{4,3},  6000, HI_DRV_CS_BT601_YUV_LIMITED},
+ { {1,   1,   2,   2160,  82,  8,   3840, 384, 176,     1,  1,  1,    88, 10,  1, 0, 0,  0},/* 480I(NTSC) */
+   DISP_CLOCK_SOURCE_HD0,
+   {0x12000000, 0x02002063}, // 1080i50
+   {HI_DRV_DISP_FMT_63,    DISP_STEREO_NONE, HI_FALSE,  {0,0,3840,2160} , {0,0,3840,2160} ,{16,9},  3000, HI_DRV_CS_BT709_YUV_LIMITED},
  },
  //44
- { {0,   0,   0,   240,  18,  4,   720, 119, 19,     240,  19,  4,    124, 3,  0, 0, 0,  0},/* 480I(NTSC) */
-   DISP_CLOCK_SOURCE_SD0,
-   {0x24000000, 0x02002063}, // 1080i50
-   {HI_DRV_DISP_FMT_NTSC,    DISP_STEREO_NONE, HI_TRUE,  {0,0,720,480} , {0,0,720,480} ,{4,3},  6000, HI_DRV_CS_BT601_YUV_LIMITED},
+ { {1,   1,   2,   2160,  82,  8,   4096, 384, 1020,     1,  1,  1,    88, 10,  1, 0, 0,  0},/* 480I(NTSC) */
+   DISP_CLOCK_SOURCE_HD0,
+   {0x12000000, 0x02002063}, // 1080i50
+   {HI_DRV_DISP_FMT_64,    DISP_STEREO_NONE, HI_FALSE,  {0,0,3840,2160} , {0,0,3840,2160} ,{16,9},  2400, HI_DRV_CS_BT709_YUV_LIMITED},
  },
 };
 

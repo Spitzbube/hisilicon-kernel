@@ -5,6 +5,7 @@ config MACH_S40
     select CPU_V7
     select ARM_GIC
     select ARM_TIMER_SP804
+    select FB_DEFERRED_IO
     help
       Include support for the hisilion S40 platform.
       S40 support ARM CORTEX-A9 processer,

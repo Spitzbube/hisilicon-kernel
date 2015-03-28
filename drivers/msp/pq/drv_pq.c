@@ -110,8 +110,10 @@ HI_S32 DRV_PQ_SetSharpness(HI_U32 a)
 
 HI_S32 DRV_PQ_UpdateVdpPQ(int a, DRV_PQ_UpdateVdpPQ_Struct* b, int c)
 {
+#if 1
 #warning TODO: DRV_PQ_UpdateVdpPQ
-
+	printk("DRV_PQ_UpdateVdpPQ: TODO\n");
+#else
 	HI_S32 ret;
 
 	PQ_HAL_UpdateVdpReg(c);
@@ -187,13 +189,17 @@ HI_S32 DRV_PQ_UpdateVdpPQ(int a, DRV_PQ_UpdateVdpPQ_Struct* b, int c)
 		PQ_HAL_UpdatACMCoef(0);
 		PQ_HAL_UpdateSharpCofe(0);
 	}
-
+#endif
 	return HI_SUCCESS;
 }
 
 
 HI_S32 DRV_PQ_GetHDPictureSetting(DRV_PQ_GetPictureSettingStruct* a)
 {
+#if 1
+#warning TODO: DRV_PQ_GetHDPictureSetting
+//	printk("DRV_PQ_GetHDPictureSetting: TODO\n");
+#else
 	PQ_MNG_GetPictureSettingStruct1 fp36;
 	PQ_MNG_GetPictureSettingStruct2 fp48;
 
@@ -218,6 +224,7 @@ HI_S32 DRV_PQ_GetHDPictureSetting(DRV_PQ_GetPictureSettingStruct* a)
 	a->wData_14 = ((fp48.wData_6 * r2) + 127) / 255;
 	a->wData_16 = ((fp48.wData_8 * r2) + 127) / 255;
 	a->wData_18 = ((fp48.wData_10 * r2) + 127) / 255;
+#endif
 
 	return HI_SUCCESS;
 }
@@ -227,6 +234,11 @@ HI_S32 DRV_PQ_GetHDPictureSetting(DRV_PQ_GetPictureSettingStruct* a)
 
 HI_S32 DRV_PQ_GetSDPictureSetting(DRV_PQ_GetPictureSettingStruct* a)
 {
+#if 1
+#warning TODO: DRV_PQ_GetSDPictureSetting
+//	printk("DRV_PQ_GetSDPictureSetting: TODO\n");
+#else
+
 	PQ_MNG_GetPictureSettingStruct1 fp36;
 	PQ_MNG_GetPictureSettingStruct2 fp48;
 
@@ -251,6 +263,7 @@ HI_S32 DRV_PQ_GetSDPictureSetting(DRV_PQ_GetPictureSettingStruct* a)
 	a->wData_14 = ((fp48.wData_6 * r2) + 127) / 255;
 	a->wData_16 = ((fp48.wData_8 * r2) + 127) / 255;
 	a->wData_18 = ((fp48.wData_10 * r2) + 127) / 255;
+#endif
 
 	return HI_SUCCESS;
 }

@@ -183,7 +183,7 @@ typedef enum
     HIFB_LAYER_HD_2,
     HIFB_LAYER_HD_3,
     HIFB_LAYER_SD_0, //4
-    HIFB_LAYER_SD_1,    
+    HIFB_LAYER_SD_1, //5
     HIFB_LAYER_SD_2,     
     HIFB_LAYER_SD_3, 
     HIFB_LAYER_AD_0,  
@@ -383,10 +383,10 @@ typedef struct
 typedef enum
 {
     HIFB_STEREO_MONO   = 0x0,             /**< Normal output to non-stereoscopic (3D) TV. No L/R content provided to TV*/
-    HIFB_STEREO_SIDEBYSIDE_HALF,          /**< L/R frames are downscaled horizontally by 2 andpacked side-by-side into a single frame, left on lefthalf of frame*/
-    HIFB_STEREO_TOPANDBOTTOM,             /**< L/R frames are downscaled vertically by 2 andpacked into a single frame, left on top*/
-    HIFB_STEREO_FRMPACKING,               /**< one frames are copyed */    
-    HIFB_STEREO_BUTT
+    HIFB_STEREO_SIDEBYSIDE_HALF, //1         /**< L/R frames are downscaled horizontally by 2 andpacked side-by-side into a single frame, left on lefthalf of frame*/
+    HIFB_STEREO_TOPANDBOTTOM, //2            /**< L/R frames are downscaled vertically by 2 andpacked into a single frame, left on top*/
+    HIFB_STEREO_FRMPACKING, //3              /**< one frames are copyed */
+    HIFB_STEREO_BUTT //4
 }HIFB_STEREO_MODE_E;
 
 /** 3D stereo mode*/

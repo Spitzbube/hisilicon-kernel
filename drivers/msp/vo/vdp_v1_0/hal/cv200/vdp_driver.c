@@ -229,7 +229,7 @@ HI_VOID  VDAC_DRIVER_Initial()
 HI_U32 VDP_RegRead1(HI_U32 a)
 {
    //msleep(5);
-   HI_PRINT("\nread---addr = 0x%x,date = 0x%x",a, (*((HI_U32 *)a)));
+//   HI_PRINT("\nread---addr = 0x%x,date = 0x%x",a, (*((HI_U32 *)a)));
 #if 0
    return (*((HI_U32 *)a));
 #else
@@ -246,7 +246,7 @@ HI_U32 VDP_RegRead(HI_U32 a)
 HI_VOID VDP_RegWrite1(HI_U32 a, HI_U32 b)
 {
     //msleep(5);
-    HI_PRINT("\nwrite---addr = 0x%x,date = 0x%x",a,b);
+//    HI_PRINT("\nwrite---addr = 0x%x,date = 0x%x",a,b);
 #if 0
     *(HI_U32 *)a = b;       // ENV cfg
 #else

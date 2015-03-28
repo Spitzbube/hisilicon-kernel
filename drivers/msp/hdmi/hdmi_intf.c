@@ -34,7 +34,7 @@
 #include <linux/vmalloc.h>
 #include <linux/slab.h>
 
-//#include "common_dev.h" Í·ÎÄ¼þ¸ÄÃû
+//#include "common_dev.h" Í·ï¿½Ä¼ï¿½ï¿½ï¿½ï¿½ï¿½
 #include "hi_drv_dev.h"
 //#include "common_proc.h"
 #include "hi_drv_proc.h"
@@ -898,7 +898,7 @@ HI_S32 hdmi_GetProcArg(HI_CHAR*  chCmd,HI_CHAR*  chArg,HI_U32 u32ArgIdx)
     HI_CHAR chArg2[DEF_FILE_NAMELENGTH] = {0};
     u32CmdCount = 0;
 
-    /*Çå³ýÇ°ÃæµÄ¿Õ¸ñ*/
+    /*ï¿½ï¿½ï¿½Ç°ï¿½ï¿½Ä¿Õ¸ï¿½*/
     u32Count = 0;
     u32CmdCount = 0;
     u32LogCount = 1;
@@ -962,7 +962,7 @@ extern HI_S32 hdmi_Ioctl(struct inode *inode, struct file *file,
 extern HI_S32 hdmi_Suspend(PM_BASEDEV_S *pdev, pm_message_t state);
 extern HI_S32 hdmi_Resume(PM_BASEDEV_S *pdev);
 
-static HDMI_EXPORT_FUNC_S s_stHdmiExportFuncs = {
+static HDMI_EXPORT_FUNC_S s_stHdmiExportFuncs = { //80fac664
     .pfnHdmiInit = HI_DRV_HDMI_Init,
     .pfnHdmiDeinit = HI_DRV_HDMI_Deinit,
     .pfnHdmiOpen  = HI_DRV_HDMI_Open,
@@ -974,6 +974,8 @@ static HDMI_EXPORT_FUNC_S s_stHdmiExportFuncs = {
     .pfnHdmiAudioChange = HI_DRV_HDMI_AudioChange,
     .pfnHdmiPreFormat = HI_DRV_HDMI_PreFormat,
     .pfnHdmiSetFormat = HI_DRV_HDMI_SetFormat,
+    .pfnHdmiDetach = HI_DRV_HDMI_Detach,
+    .pfnHdmiAttach = HI_DRV_HDMI_Attach,
 //  .pfnHdmiSet3DMode = HI_DRV_HDMI_Set3DMode,
 };
 
@@ -2291,7 +2293,7 @@ HI_S32 hdmi_ProcWrite(struct file * file,
             }
 
                      
-            // term_en && cap_ctl  // term_en ÏÈ¹Øµô
+            // term_en && cap_ctl  // term_en ï¿½È¹Øµï¿½
             SI_TX_PHY_ReadRegister(0x0e,&u32Reg);
             if(u32Reg & 0x01)
             {
@@ -2474,18 +2476,19 @@ HI_S32 DRV_HDMI_Register(HI_VOID)
 	ret = HI_DRV_MODULE_Register((HI_U32)HI_ID_HDMI,HDMI_NAME,(HI_VOID *)&s_stHdmiExportFuncs);
     if (HI_SUCCESS != ret)
     {
-        HI_FATAL_HDMI("HI_DRV_MODULE_Register failed\n");
+        HI_FATAL_HDMI("HI_DRV_MODULE_Register failed\n"); //2171
         return ret;
     }
 	return HI_SUCCESS;
 }
+
 HI_S32 DRV_HDMI_UnRegister(HI_VOID)
 {
 	HI_S32 ret;
 	ret = HI_DRV_MODULE_UnRegister((HI_U32)HI_ID_HDMI);
     if (HI_SUCCESS != ret)
     {        
-        HI_FATAL_HDMI("HI_DRV_MODULE_UnRegister failed\n");
+        HI_FATAL_HDMI("HI_DRV_MODULE_UnRegister failed\n"); //2183
         return ret;
     }
 	return HI_SUCCESS;
@@ -2505,7 +2508,7 @@ int HDMI_DRV_ModInit(void)
     //ret = DRV_HDMI_Register();
     
 #ifdef ANDROID_SUPPORT
-    //android ÌØÓÐ
+    //android ï¿½ï¿½ï¿½ï¿½
 	if (switch_dev_register(&hdmi_tx_sdev))
     {
 		HI_WARN_HDMI("\n Warning:! registering HDMI switch device Failed \n");		
@@ -2544,7 +2547,7 @@ void HDMI_DRV_ModExit(void)
         //HI_DRV_HDMI_Close(HI_UNF_HDMI_ID_0);
     //}
 #ifdef ANDROID_SUPPORT
-    //android ÌØÓÐ
+    //android ï¿½ï¿½ï¿½ï¿½
     if(g_switchOk == HI_TRUE)
     {
     	switch_dev_unregister(&hdmi_tx_sdev);
