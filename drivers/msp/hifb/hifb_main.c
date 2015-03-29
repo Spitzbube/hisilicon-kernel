@@ -100,9 +100,39 @@
 #define IS_2BUF_MODE(par)  ((par->stExtendInfo.enBufMode == HIFB_LAYER_BUF_DOUBLE || par->stExtendInfo.enBufMode == HIFB_LAYER_BUF_DOUBLE_IMMEDIATE))
 #define IS_1BUF_MODE(par)  ((par->stExtendInfo.enBufMode == HIFB_LAYER_BUF_ONE))
 
+typedef enum tagHIFB_LOGO_CHANNEL_E
+{
+    HIFB_LOGO_CHN_HD = 0,
+    HIFB_LOGO_CHN_SD = 1,
+    HIFB_LOGO_CHN_BUTT,
+}HIFB_LOGO_CHANNEL_E;
+
+typedef struct
+{
+	HI_BOOL bShow; //0
+	HI_BOOL bTransitted; //0
+	HIFB_LAYER_ID_E enLogoID; //HI_U32 u32LayerId; //0
+	//struct work_struct freeLogoMemWork;
+	//12
+} HIFB_LOGO_INFO_S;
+
+typedef struct tagHIFB_LOGO_S
+{
+    HI_U32           u32LogoNum; //0 = 8114374c
+    HIFB_LOGO_INFO_S stLogoInfo[HIFB_LOGO_CHN_BUTT]; //4 = 81143750
+}HIFB_LOGO_S;
+
+static HIFB_LOGO_S g_sLogo = {0}; //8114374c
+#define HIFB_HD_LOGO_LAYER_ID HIFB_LAYER_HD_2 //HIFB_LAYER_HD_1
+#if defined(CHIP_TYPE_hi3798mv100) || defined(CHIP_TYPE_hi3796mv100) || defined(CHIP_TYPE_hi3796cv100) || defined(CHIP_TYPE_hi3798cv100)
+#define HIFB_SD_LOGO_LAYER_ID HIFB_LAYER_SD_0
+#else
+#define HIFB_SD_LOGO_LAYER_ID HIFB_LAYER_SD_1
+#endif
+
 #define HIFB_LOGO_LAYER_ID HIFB_LAYER_HD_2
 static HI_BOOL  g_bLogoShow = HI_FALSE;
-static struct work_struct s_FreeLogoMemWork;
+//static struct work_struct s_FreeLogoMemWork;
 static HI_BOOL  g_bProcDebug = HI_FALSE;
 
 /*mem size of layer.hifb will allocate mem:*/
@@ -114,16 +144,6 @@ static char* tc_wbc = "off"; //80fb410c
 module_param(tc_wbc, charp, S_IRUGO);
 
 HIFB_DRV_OPS_S s_stDrvOps; //81143678 +212 = 8114374C
-HI_U32 Data_8114374c = 0; //8114374c
-typedef struct
-{
-	HI_BOOL bLogoShow; //0
-	int Data_4; //0
-	HI_U32 u32LayerId; //0
-	//12
-} Struct_81143750;
-
-Struct_81143750 Data_81143750[2]; //81143750
 HIFB_DRV_TDEOPS_S s_stDrvTdeOps; //8114376c
 
 /* to save layer id and layer size */
@@ -646,7 +666,7 @@ static HI_VOID hifb_freelogomem_work(struct work_struct *work, HI_BOOL i)
 		HIFB_INFO("<<<<<<<<freen mem %s>>>>>>>>>\n", DISPLAY_BUFFER_SD); //657
 	}
 
-	if (Data_8114374c == 0)
+	if (g_sLogo.u32LogoNum == 0)
 	{
 		ps_PdmExportFuncs->pfnPDM_ReleaseReserveMem(HIFB_ZME_COEF_BUFFER);
 		HIFB_INFO("<<<<<<<<freen mem %s>>>>>>>>>\n", HIFB_ZME_COEF_BUFFER); //663
@@ -657,32 +677,32 @@ static HI_VOID hifb_freelogomem_work(struct work_struct *work, HI_BOOL i)
 static HI_S32 hifb_logo_init(HI_VOID)
 {
     HI_S32 s32Ret;
+    HIFB_LOGO_CHANNEL_E enLogoChn;
     HIFB_OSD_DATA_S pstLogoLayerData; 
-    HI_S32 i;
     
-    Data_8114374c = 0;
+    g_sLogo.u32LogoNum = 0;
 
-    for (i = 0; i < 2; i++)
+    for (enLogoChn = 0; enLogoChn < HIFB_LOGO_CHN_BUTT; enLogoChn++)
     {
-		Data_81143750[i].Data_4 = 0;
-		Data_81143750[i].u32LayerId = 2 + i*2; //HIFB_LOGO_LAYER_ID;
+    	g_sLogo.stLogoInfo[enLogoChn].bTransitted = HI_FALSE;
+    	g_sLogo.stLogoInfo[enLogoChn].enLogoID = (HIFB_LOGO_CHN_HD == enLogoChn) ? HIFB_HD_LOGO_LAYER_ID : HIFB_SD_LOGO_LAYER_ID;
 
 		/* judge whether has logo */
-		s32Ret = s_stDrvOps.HIFB_DRV_GetOSDData(Data_81143750[i].u32LayerId, &pstLogoLayerData);
+		s32Ret = s_stDrvOps.HIFB_DRV_GetOSDData(g_sLogo.stLogoInfo[enLogoChn].enLogoID, &pstLogoLayerData);
 		if (s32Ret != HI_SUCCESS)
 		{
-			HIFB_ERROR("failed to Get OSDData%d !\n", Data_81143750[i].u32LayerId); //685
+			HIFB_ERROR("failed to Get OSDData%d !\n", g_sLogo.stLogoInfo[enLogoChn].enLogoID); //685
 			return s32Ret;
 		}
 
 		if (pstLogoLayerData.eState == HIFB_LAYER_STATE_ENABLE)
 		{
-			Data_8114374c++;
-			Data_81143750[i].bLogoShow = HI_TRUE;
+			g_sLogo.u32LogoNum++;
+			g_sLogo.stLogoInfo[enLogoChn].bShow = HI_TRUE;
 
-			s_stDrvOps.HIFB_DRV_SetLayerMaskFlag(Data_81143750[i].u32LayerId, HI_TRUE);
+			s_stDrvOps.HIFB_DRV_SetLayerMaskFlag(g_sLogo.stLogoInfo[enLogoChn].enLogoID, HI_TRUE);
 
-			HIFB_INFO("<<<<<<<<<<<<<start with boot logo, ID:%d>>>>>>>>>>>>>>>\n", Data_81143750[i].u32LayerId); //696
+			HIFB_INFO("<<<<<<<<<<<<<start with boot logo, ID:%d>>>>>>>>>>>>>>>\n", g_sLogo.stLogoInfo[enLogoChn].enLogoID); //696
 		}
     }
 
@@ -693,18 +713,18 @@ static HI_VOID hifb_clear_logo(HI_U32 layerId)
 {        
 	HI_BOOL i = (layerId > 3); //? 0: 1;
 
-	if (Data_81143750[i].bLogoShow == HI_FALSE)
+	if (g_sLogo.stLogoInfo[i].bShow == HI_FALSE)
 	{
 		return;
 	}
 
-	layerId = Data_81143750[i].u32LayerId;
+	layerId = g_sLogo.stLogoInfo[i].enLogoID;
 
     s_stDrvOps.HIFB_DRV_SetLayerMaskFlag(layerId, HI_FALSE);
     s_stDrvOps.HIFB_DRV_ClearLogo(layerId);
     s_stDrvOps.HIFB_DRV_UpdataLayerReg(layerId);
 
-    Data_8114374c--;
+    g_sLogo.u32LogoNum--;
 
 #if 0
 	if (in_interrupt())
@@ -718,8 +738,8 @@ static HI_VOID hifb_clear_logo(HI_U32 layerId)
 		hifb_freelogomem_work(HI_NULL, i);
 	}
     
-    Data_81143750[i].bLogoShow = HI_FALSE;
-    Data_81143750[i].Data_4 = 1;
+	g_sLogo.stLogoInfo[i].bShow = HI_FALSE;
+	g_sLogo.stLogoInfo[i].bTransitted = 1;
 	
     HIFB_INFO("<<<<<<<<<<<<<hifb_clear_logo>>>>>>>>>>>>>>>\n"); //736
 }
