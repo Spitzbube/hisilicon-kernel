@@ -115,8 +115,6 @@ obj-y += i2c/gpio_i2c/drv_gpioi2c_intf.o
 obj-y += i2c/gpio_i2c/drv_gpio_i2c.o
 
 obj-y += hifb/hifb_main_k.o
-ccflags-y += -DCFG_HI_HD0_FB_VRAM_SIZE=16200
-obj-y += hifb/hifb_main.o
 obj-y += hifb/hifb_comm.o
 obj-y += hifb/hifb_snapshot.o
 obj-y += hifb/adp/hifb_drv_adpt.o
@@ -135,6 +133,7 @@ obj-y += pdm/drv_pdm.o
 obj-y += pdm/db/hi_db.o
 
 obj-y += hdmi/
+obj-y += hifb/
 obj-y += pq/
 obj-y += vo/
 

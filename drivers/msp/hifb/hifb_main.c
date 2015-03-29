@@ -75,14 +75,21 @@
 #include "hifb_scrolltext.h"
 #endif
 
+static HI_U32 HI_SYS_GET_STRIDE(HI_U32 a)
+{
+	if (!(a & 0xFF)) return a;
+
+	a >>= 8;
+	if (!(a & 1)) a += 1;
+	else a += 2;
+	a <<= 8;
+
+	return a;
+}
 
 /*************************** Macro Definition ****************************/
 /** \addtogroup           HIFB_MAIN   */
 /** @{ */  /** <!-- [HIFB_MAIN] */
-
-#ifdef CFG_HIFB_STEREO3D_HW_SUPPORT
-#define CFG_HIFB_3D_ENABLE   
-#endif
 
 #define CFG_HIFB_LOGO_SUPPORT
 #define CFG_HIFB_VIRTUAL_COORDINATE_SUPPORT
@@ -100,6 +107,7 @@
 #define IS_2BUF_MODE(par)  ((par->stExtendInfo.enBufMode == HIFB_LAYER_BUF_DOUBLE || par->stExtendInfo.enBufMode == HIFB_LAYER_BUF_DOUBLE_IMMEDIATE))
 #define IS_1BUF_MODE(par)  ((par->stExtendInfo.enBufMode == HIFB_LAYER_BUF_ONE))
 
+#ifdef CFG_HIFB_LOGO_SUPPORT
 typedef enum tagHIFB_LOGO_CHANNEL_E
 {
     HIFB_LOGO_CHN_HD = 0,
@@ -128,6 +136,7 @@ static HIFB_LOGO_S g_sLogo = {0}; //8114374c
 #define HIFB_SD_LOGO_LAYER_ID HIFB_LAYER_SD_0
 #else
 #define HIFB_SD_LOGO_LAYER_ID HIFB_LAYER_SD_1
+#endif
 #endif
 
 #define HIFB_LOGO_LAYER_ID HIFB_LAYER_HD_2
@@ -615,7 +624,7 @@ static HI_VOID hifb_select_antiflicker_mode(HIFB_PAR_S *pstPar);
 static HI_S32 hifb_refreshall(struct fb_info *info);
 static HI_S32 hifb_tde_callback(HI_VOID *pParaml, HI_VOID *pParamr);
 static HI_S32 hifb_alloccanbuf(struct fb_info *info, HIFB_LAYER_INFO_S * pLayerInfo);
-#ifdef CFG_HIFB_3D_ENABLE
+#ifdef CFG_HIFB_STEREO3D_HW_SUPPORT
 static HI_S32 hifb_clearallstereobuf(struct fb_info *info);
 static HI_S32 hifb_checkandalloc_3dmem(HIFB_LAYER_ID_E enLayerId, HI_U32 u32BufferSize);
 #endif
@@ -630,7 +639,7 @@ static HI_S32 hifb_frame_end_callback(HI_VOID *pParaml, HI_VOID *pParamr);
 /** @} */  /** <!-- ==== API declaration end ==== */
 
 #ifdef CFG_HIFB_LOGO_SUPPORT
-static HI_VOID hifb_freelogomem_work(struct work_struct *work, HI_BOOL i)
+static HI_VOID hifb_freelogomem_work(HIFB_LOGO_CHANNEL_E enLogoChn)
 {
     PDM_EXPORT_FUNC_S *ps_PdmExportFuncs = HI_NULL;
 
@@ -644,16 +653,7 @@ static HI_VOID hifb_freelogomem_work(struct work_struct *work, HI_BOOL i)
         return;
     }
     
-#if 0
-    /*msleep 40ms to asure wbc closed*/
-    msleep(40);
-
-    ps_PdmExportFuncs->pfnPDM_ReleaseReserveMem(DISPLAY_BUFFER);
-    ps_PdmExportFuncs->pfnPDM_ReleaseReserveMem(OPTM_GFX_WBC2_BUFFER);
-    ps_PdmExportFuncs->pfnPDM_ReleaseReserveMem(HIFB_ZME_COEF_BUFFER);
-#endif
-
-	if (i == HI_FALSE)
+	if (HIFB_LOGO_CHN_HD == enLogoChn)
 	{
 		ps_PdmExportFuncs->pfnPDM_ReleaseReserveMem(DISPLAY_BUFFER_HD);
 		ps_PdmExportFuncs->pfnPDM_ReleaseReserveMem(OPTM_GFX_WBC2_BUFFER);
@@ -666,13 +666,36 @@ static HI_VOID hifb_freelogomem_work(struct work_struct *work, HI_BOOL i)
 		HIFB_INFO("<<<<<<<<freen mem %s>>>>>>>>>\n", DISPLAY_BUFFER_SD); //657
 	}
 
-	if (g_sLogo.u32LogoNum == 0)
+	if (0 == g_sLogo.u32LogoNum)
 	{
 		ps_PdmExportFuncs->pfnPDM_ReleaseReserveMem(HIFB_ZME_COEF_BUFFER);
 		HIFB_INFO("<<<<<<<<freen mem %s>>>>>>>>>\n", HIFB_ZME_COEF_BUFFER); //663
 	}
     return;
 }
+
+#if 0
+static HI_VOID hifb_freelogomem_work(struct work_struct *work)
+{
+	HIFB_LOGO_INFO_S *pstLogoInfo = NULL;
+	HIFB_LOGO_CHANNEL_E enLogoChn;
+
+	pstLogoInfo = (HIFB_LOGO_INFO_S *)container_of(work, HIFB_LOGO_INFO_S, freeLogoMemWork);
+
+	if (IS_HD_LAYER(pstLogoInfo->enLogoID) || IS_MINOR_HD_LAYER(pstLogoInfo->enLogoID))
+	{
+		enLogoChn = HIFB_LOGO_CHN_HD;
+	}
+	else
+	{
+		enLogoChn = HIFB_LOGO_CHN_SD;
+	}
+
+	hifb_freelogomem(enLogoChn);
+
+    return;
+}
+#endif
 
 static HI_S32 hifb_logo_init(HI_VOID)
 {
@@ -709,37 +732,48 @@ static HI_S32 hifb_logo_init(HI_VOID)
     return HI_SUCCESS;
 }
 
-static HI_VOID hifb_clear_logo(HI_U32 layerId)
+static HI_VOID hifb_clear_logo(HI_U32 u32LayerID)
 {        
-	HI_BOOL i = (layerId > 3); //? 0: 1;
+	HIFB_LAYER_ID_E enLogoLayerId;
+	HIFB_LOGO_CHANNEL_E enLogoChn;
+	if ((u32LayerID > 3)/*IS_HD_LAYER(u32LayerID) || IS_MINOR_HD_LAYER(u32LayerID)*/)
+	{
+		enLogoChn = HIFB_LOGO_CHN_HD;
+	}
+	else
+	{
+		enLogoChn = HIFB_LOGO_CHN_SD;
+	}
 
-	if (g_sLogo.stLogoInfo[i].bShow == HI_FALSE)
+	if (!g_sLogo.stLogoInfo[enLogoChn].bShow)
 	{
 		return;
 	}
 
-	layerId = g_sLogo.stLogoInfo[i].enLogoID;
+	enLogoLayerId = g_sLogo.stLogoInfo[enLogoChn].enLogoID;
 
-    s_stDrvOps.HIFB_DRV_SetLayerMaskFlag(layerId, HI_FALSE);
-    s_stDrvOps.HIFB_DRV_ClearLogo(layerId);
-    s_stDrvOps.HIFB_DRV_UpdataLayerReg(layerId);
+    s_stDrvOps.HIFB_DRV_SetLayerMaskFlag(enLogoLayerId, HI_FALSE);
+    s_stDrvOps.HIFB_DRV_ClearLogo(enLogoLayerId);
+    s_stDrvOps.HIFB_DRV_UpdataLayerReg(enLogoLayerId);
 
     g_sLogo.u32LogoNum--;
 
-#if 0
-	if (in_interrupt())
+#if 1
+	hifb_freelogomem_work(enLogoChn);
+#else
+    if (bModExit)
 	{
-		INIT_WORK(&s_FreeLogoMemWork, hifb_freelogomem_work);
-    	schedule_work(&s_FreeLogoMemWork);    
+		hifb_freelogomem(enLogoChn);
 	}
 	else
-#endif
 	{
-		hifb_freelogomem_work(HI_NULL, i);
+		INIT_WORK(&(g_sLogo.stLogoInfo[enLogoChn].freeLogoMemWork), hifb_freelogomem_work);
+    	schedule_work(&(g_sLogo.stLogoInfo[enLogoChn].freeLogoMemWork));
 	}
+#endif
     
-	g_sLogo.stLogoInfo[i].bShow = HI_FALSE;
-	g_sLogo.stLogoInfo[i].bTransitted = 1;
+	g_sLogo.stLogoInfo[enLogoChn].bShow = HI_FALSE;
+	g_sLogo.stLogoInfo[enLogoChn].bTransitted = HI_TRUE;
 	
     HIFB_INFO("<<<<<<<<<<<<<hifb_clear_logo>>>>>>>>>>>>>>>\n"); //736
 }
@@ -766,6 +800,7 @@ static HI_VOID hifb_clear_logo(HI_U32 layerId)
 static HIFB_COLOR_FMT_E hifb_getfmtbyargb(struct fb_bitfield *red, struct fb_bitfield *green,
                                           struct fb_bitfield *blue, struct fb_bitfield *transp, HI_U32 u32ColorDepth)
 {
+#warning TODO: hifb_getfmtbyargb
     HI_U32 i = 0;
     HI_U32 u32Bpp;
 
@@ -845,7 +880,7 @@ HI_S32 hifb_realloc_layermem(struct fb_info *info,HI_U32 u32BufSize)
         if (info->fix.smem_start != 0)
         {
             hifb_buf_freemem(info->fix.smem_start);
-			HIFB_INFO("free the video memory, phyaddr: 0x%lx!\n", info->fix.smem_start);
+			HIFB_INFO("free the video memory, phyaddr: 0x%lx!\n", info->fix.smem_start); //840
         }
 	
     /*Modify 16 to 32, preventing out of bound.*/  
@@ -855,7 +890,7 @@ HI_S32 hifb_realloc_layermem(struct fb_info *info,HI_U32 u32BufSize)
     info->fix.smem_start = hifb_buf_allocmem(name, u32BufSize);
     if (0 == info->fix.smem_start)
     {
-        HIFB_ERROR("%s:failed to malloc the video memory, size: %d KBtyes!\n", name, u32BufSize/1024);
+        HIFB_ERROR("%s:failed to malloc the video memory, size: %d KBtyes!\n", name, u32BufSize/1024); //850
         return HI_FAILURE;
     }
     else
@@ -868,14 +903,14 @@ HI_S32 hifb_realloc_layermem(struct fb_info *info,HI_U32 u32BufSize)
         {
             HIFB_WARNING("Failed to call map video memory, "
                      "size:%d KBytes, start: 0x%lx\n",
-                     info->fix.smem_len/1024, info->fix.smem_start);
+                     info->fix.smem_len/1024, info->fix.smem_start); //863
         }
         else
         {
             memset(info->screen_base, 0x00, info->fix.smem_len);
         }
 		
-		HIFB_INFO("%s:success to malloc the video memory, size: %d KBtyes!\n", name, u32BufSize/1024);
+		HIFB_INFO("%s:success to malloc the video memory, size: %d KBtyes!\n", name, u32BufSize/1024); //870
     }
 
 	return HI_SUCCESS;
@@ -913,7 +948,7 @@ HI_S32 hifb_checkmem_enough(struct fb_info *info,HI_U32 u32Pitch,HI_U32 u32Heigh
         return HI_SUCCESS;
     }
 
-	HIFB_ERROR("memory is not enough!  now is %d u32Pitch %d u32Height %d expect %d\n",info->fix.smem_len,u32Pitch, u32Height,u32Buffersize);
+	HIFB_ERROR("memory is not enough!  now is %d u32Pitch %d u32Height %d expect %d\n",info->fix.smem_len,u32Pitch, u32Height,u32Buffersize); //908
     
     return HI_FAILURE;
 }
@@ -937,7 +972,7 @@ static HI_S32 hifb_check_fmt(struct fb_var_screeninfo *var, struct fb_info *info
             var->green.offset, var->green.length, var->green.msb_right,
             var->blue.offset, var->blue.length, var->blue.msb_right,
             var->transp.offset, var->transp.length, var->transp.msb_right,
-            var->bits_per_pixel);
+            var->bits_per_pixel); //932
         return -EINVAL;
     }
 
@@ -945,7 +980,7 @@ static HI_S32 hifb_check_fmt(struct fb_var_screeninfo *var, struct fb_info *info
         || (!s_stDrvTdeOps.HIFB_DRV_TdeSupportFmt(enFmt) &&
         	par->stExtendInfo.enBufMode != HIFB_LAYER_BUF_STANDARD))
     {
-        HIFB_ERROR("Unsupported PIXEL FORMAT!\n");
+        HIFB_ERROR("Unsupported PIXEL FORMAT!\n"); //940
         return -EINVAL;
     }
 
@@ -983,7 +1018,7 @@ static HI_S32 hifb_check_fmt(struct fb_var_screeninfo *var, struct fb_info *info
     }
 
     HIFB_INFO("xres:%d, yres:%d, xres_virtual:%d, yres_virtual:%d\n",
-        var->xres, var->yres, var->xres_virtual, var->yres_virtual);
+        var->xres, var->yres, var->xres_virtual, var->yres_virtual); //978
 
     /*check if the offset is valid*/
     if ((var->xoffset > var->xres_virtual)
@@ -991,7 +1026,7 @@ static HI_S32 hifb_check_fmt(struct fb_var_screeninfo *var, struct fb_info *info
         || (var->xoffset + var->xres > var->xres_virtual)
         || (var->yoffset + var->yres > var->yres_virtual))
     {
-        HIFB_ERROR("offset is invalid!xoffset:%d, yoffset:%d\n", var->xoffset, var->yoffset);
+        HIFB_ERROR("offset is invalid!xoffset:%d, yoffset:%d\n", var->xoffset, var->yoffset); //986
         return -EINVAL;
     }
 	
@@ -1013,17 +1048,13 @@ static HI_S32 hifb_check_fmt(struct fb_var_screeninfo *var, struct fb_info *info
 ******************************************************************************/
 static HI_S32 hifb_check_var(struct fb_var_screeninfo *var, struct fb_info *info)
 {
-#if 1
-	printk("hifb_check_var\n");
-#else
     HIFB_PAR_S *pstPar = (HIFB_PAR_S *)info->par;
     if (pstPar->stBaseInfo.u32LayerID == HIFB_LAYER_CURSOR)
     {
-        HIFB_ERROR("cursor layer doesn't support this operation!\n");
+        HIFB_ERROR("cursor layer doesn't support this operation!\n"); //1011
         return HI_FAILURE;
     }
     return hifb_check_fmt(var, info);
-#endif
 }
 
 
@@ -1037,7 +1068,7 @@ static HI_S32 hifb_check_var(struct fb_var_screeninfo *var, struct fb_info *info
  Return               : return 0
  Others               : 0
 ******************************************************************************/
-#ifdef CFG_HIFB_3D_ENABLE
+#ifdef CFG_HIFB_STEREO3D_HW_SUPPORT
 static HI_S32 hifb_3DData_Config(HIFB_LAYER_ID_E enLayerId, HIFB_BUFFER_S *pstBuffer, HIFB_BLIT_OPT_S *pstBlitOpt)
 {
 	HIFB_PAR_S *pstPar;
@@ -1101,7 +1132,7 @@ static HI_S32 hifb_3DData_Config(HIFB_LAYER_ID_E enLayerId, HIFB_BUFFER_S *pstBu
 	s32Ret = s_stDrvTdeOps.HIFB_DRV_Blit(pstBuffer, &st3DBuf, pstBlitOpt, HI_TRUE);
 	if (s32Ret < 0)
 	{
-	    HIFB_ERROR("tde blit error!\n");
+	    HIFB_ERROR("tde blit error!\n"); //1093
 	    return HI_FAILURE;
 	} 
 
@@ -1121,7 +1152,7 @@ static HI_VOID hifb_assign_dispbuf(HI_U32 u32LayerId)
     HIFB_PAR_S *pstPar = (HIFB_PAR_S *)(info->par);
     HI_U32 u32BufSize = 0;
 
-#ifdef CFG_HIFB_3D_ENABLE
+#ifdef CFG_HIFB_STEREO3D_HW_SUPPORT
     //if ((IS_STEREO_SBS(pstPar) || IS_STEREO_TAB(pstPar)))
     if (pstPar->bSetStereoMode)
     {       
@@ -1130,7 +1161,11 @@ static HI_VOID hifb_assign_dispbuf(HI_U32 u32LayerId)
         
         /* there's a limit from hardware that screen buf shoule be 16 bytes aligned,maybe it's proper
                   to get this info from drv adapter*/
+#if defined(CHIP_TYPE_hi3796cv100) || defined(CHIP_TYPE_hi3798cv100)
+        u32Stride  = HI_SYS_GET_STRIDE((info->var.xres * info->var.bits_per_pixel >> 3));
+#else
         u32Stride  = ((info->var.xres * info->var.bits_per_pixel >> 3) + 0xf) & 0xfffffff0;
+#endif
         u32BufSize = ((u32Stride * info->var.yres)+0xf)&0xfffffff0;
 
 		/****in 2buf and 1buf refresh mode, we can use N3D buffer to save 3D data*******/
@@ -1256,7 +1291,7 @@ static HI_S32 hifb_refresh_1buf(HI_U32 u32LayerId, HIFB_BUFFER_S *pstCanvasBuf)
     return HI_SUCCESS;
 }
 
-#ifdef CFG_HIFB_3D_ENABLE
+#ifdef CFG_HIFB_STEREO3D_HW_SUPPORT
 static HI_S32 hifb_refresh_1buf_3D(HI_U32 u32LayerId, HIFB_BUFFER_S *pstCanvasBuf)
 {
 	HIFB_PAR_S *pstPar; 			 
@@ -1517,7 +1552,7 @@ RET:
     return HI_SUCCESS;
 }
 
-#ifdef CFG_HIFB_3D_ENABLE
+#ifdef CFG_HIFB_STEREO3D_HW_SUPPORT
 static HI_S32 hifb_refresh_2buf_3D(HI_U32 u32LayerId, HIFB_BUFFER_S *pstCanvasBuf)
 {
 	HI_S32 s32Ret;
@@ -1712,7 +1747,7 @@ RET:
 
 /*In this function we should wait the new contain has been show on the screen before return, 
 and the operations such as address configuration no needed do in interrupt handle*/
-#ifdef CFG_HIFB_3D_ENABLE
+#ifdef CFG_HIFB_STEREO3D_HW_SUPPORT
 static HI_S32 hifb_refresh_2buf_immediate_display_3D(HI_U32 u32LayerId, HIFB_BUFFER_S *pstCanvasBuf)
 {
 	HI_S32 s32Ret;
@@ -1913,7 +1948,7 @@ HI_S32 hifb_freeccanbuf(HIFB_PAR_S *par)
     return HI_SUCCESS;
 }
 
-#ifdef CFG_HIFB_3D_ENABLE
+#ifdef CFG_HIFB_STEREO3D_HW_SUPPORT
 HI_S32 hifb_freestereobuf(HIFB_PAR_S *par)
 {
     if (HI_NULL != par->st3DInfo.st3DMemInfo.u32StereoMemStart)
@@ -1929,7 +1964,7 @@ HI_S32 hifb_freestereobuf(HIFB_PAR_S *par)
 }
 #endif
 
-#ifdef CFG_HIFB_3D_ENABLE
+#ifdef CFG_HIFB_STEREO3D_HW_SUPPORT
 static HI_VOID hifb_clearstereobuf(struct fb_info *info)
 {
     HIFB_PAR_S *par = (HIFB_PAR_S *)info->par;
@@ -1947,7 +1982,7 @@ static HI_VOID hifb_clearstereobuf(struct fb_info *info)
 }
 #endif
 
-#ifdef CFG_HIFB_3D_ENABLE
+#ifdef CFG_HIFB_STEREO3D_HW_SUPPORT
 static HI_S32 hifb_allocstereobuf(struct fb_info *info, HI_U32 u32BufSize)
 {
     HIFB_PAR_S *par = (HIFB_PAR_S *)info->par;
@@ -2009,7 +2044,7 @@ static HI_S32 hifb_allocstereobuf(struct fb_info *info, HI_U32 u32BufSize)
 ******************************************************************************/
 static HI_S32 hifb_set_par(struct fb_info *info)
 {
-#if 1
+#if 0
 	printk("hifb_set_par\n");
 #else
 	HI_S32 s32Ret;
@@ -2055,7 +2090,7 @@ static HI_S32 hifb_set_par(struct fb_info *info)
 
 	pstPar->stExtendInfo.enBufMode = HIFB_LAYER_BUF_STANDARD;
 	
-#ifdef CFG_HIFB_3D_ENABLE
+#ifdef CFG_HIFB_STEREO3D_HW_SUPPORT
     if (//(IS_STEREO_SBS(pstPar)|| IS_STEREO_TAB(pstPar))
     	pstPar->bSetStereoMode
             && (HIFB_LAYER_BUF_STANDARD == pstPar->stExtendInfo.enBufMode))
@@ -2186,7 +2221,7 @@ static HI_S32 hifb_set_par(struct fb_info *info)
 ******************************************************************************/
 static HI_S32 hifb_pan_display(struct fb_var_screeninfo *var, struct fb_info *info)
 {
-#if 1
+#if 0
 	printk("hifb_pan_display\n");
 #else
     HIFB_PAR_S *par = (HIFB_PAR_S *)info->par;
@@ -2199,7 +2234,7 @@ static HI_S32 hifb_pan_display(struct fb_var_screeninfo *var, struct fb_info *in
 	}
 
     /*stereo 3d  mode*/
-#ifdef CFG_HIFB_3D_ENABLE
+#ifdef CFG_HIFB_STEREO3D_HW_SUPPORT
     if (//(IS_STEREO_SBS(par) || IS_STEREO_TAB(par)) 
     	par->bSetStereoMode
            && par->stExtendInfo.enBufMode == HIFB_LAYER_BUF_STANDARD)
@@ -2353,7 +2388,7 @@ static HI_S32 hifb_pan_display(struct fb_var_screeninfo *var, struct fb_info *in
  Return               : return 0
  Others               : 0
 ******************************************************************************/
-#ifdef CFG_HIFB_3D_ENABLE
+#ifdef CFG_HIFB_STEREO3D_HW_SUPPORT
 static HI_S32 hifb_checkandalloc_3dmem(HIFB_LAYER_ID_E enLayerId, HI_U32 u32BufferSize)
 {
 	HI_S32 s32Ret;
@@ -2647,7 +2682,7 @@ static HI_S32 hifb_vo_callback(HI_VOID *pParaml, HI_VOID *pParamr)
 
 	        if (pstPar->stRunInfo.u32ParamModifyMask & HIFB_LAYER_PARAMODIFY_STRIDE)
 	        {
-#ifdef CFG_HIFB_3D_ENABLE	        
+#ifdef CFG_HIFB_STEREO3D_HW_SUPPORT
 	        	if (//(IS_STEREO_SBS(pstPar) || IS_STEREO_TAB(pstPar)))
 	        		pstPar->bSetStereoMode)
 	        	{	        					
@@ -2694,7 +2729,7 @@ static HI_S32 hifb_vo_callback(HI_VOID *pParaml, HI_VOID *pParamr)
 		hifb_flip_screenaddr(*pu32LayerId);
     } 
 
-#ifdef CFG_HIFB_3D_ENABLE
+#ifdef CFG_HIFB_STEREO3D_HW_SUPPORT
     if ((pstPar->stExtendInfo.enBufMode == HIFB_LAYER_BUF_STANDARD)
         	&& pstPar->st3DInfo.st3DMemInfo.u32StereoMemStart
         	&& pstPar->bSetStereoMode//(IS_STEREO_SBS(pstPar) || IS_STEREO_TAB(pstPar))
@@ -2754,7 +2789,7 @@ static HI_S32 hifb_refresh_0buf(HI_U32 u32LayerId, HIFB_BUFFER_S *pstCanvasBuf)
     return HI_SUCCESS;
 }
 
-#ifdef CFG_HIFB_3D_ENABLE
+#ifdef CFG_HIFB_STEREO3D_HW_SUPPORT
 static HI_S32 hifb_refresh_0buf_3D(HI_U32 u32LayerId, HIFB_BUFFER_S *pstCanvasBuf)
 {
 	HI_S32 s32Ret;
@@ -2822,7 +2857,7 @@ static HI_S32 hifb_refresh_0buf_3D(HI_U32 u32LayerId, HIFB_BUFFER_S *pstCanvasBu
 }
 #endif
 
-#ifdef CFG_HIFB_3D_ENABLE
+#ifdef CFG_HIFB_STEREO3D_HW_SUPPORT
 static HI_S32 hifb_refresh_panbuf(HI_U32 u32LayerId, HIFB_BUFFER_S *pstCanvasBuf)
 {
     HI_S32 s32Ret;
@@ -2951,7 +2986,7 @@ static HI_S32 hifb_refresh(HI_U32 u32LayerId, HIFB_BUFFER_S *pstCanvasBuf, HIFB_
 	info   = s_stLayer[u32LayerId].pstInfo;
 	par    = (HIFB_PAR_S *)(info->par);
 	
-#ifdef CFG_HIFB_3D_ENABLE
+#ifdef CFG_HIFB_STEREO3D_HW_SUPPORT
 	if (par->bSetStereoMode)//(IS_STEREO_SBS(par) || IS_STEREO_TAB(par)))
 	{
 		switch (enBufMode)
@@ -3110,7 +3145,7 @@ static HI_S32 hifb_onrefresh(HIFB_PAR_S* par, HI_VOID __user *argp)
     
     /*when user data  update in 3d mode , 
     	    blit pan buffer to 3D buffer to config 3d data*/  
-#ifdef CFG_HIFB_3D_ENABLE
+#ifdef CFG_HIFB_STEREO3D_HW_SUPPORT
     if ((par->stExtendInfo.enBufMode == HIFB_LAYER_BUF_STANDARD) 
             &&  (((par->st3DInfo.st3DMemInfo.u32StereoMemStart != 0) && par->bSetStereoMode/*(IS_STEREO_SBS(par) || IS_STEREO_TAB(par))*/) ))
     {
@@ -3226,7 +3261,7 @@ static HI_S32 hifb_onputlayerinfo(struct fb_info *info, HIFB_PAR_S* par, HI_VOID
        }
     }
 
-#ifdef CFG_HIFB_3D_ENABLE
+#ifdef CFG_HIFB_STEREO3D_HW_SUPPORT
      if ( ((stLayerInfo.u32Mask & HIFB_LAYERMASK_DISPSIZE) 
 	 		&& par->bSetStereoMode))
      {
@@ -3330,7 +3365,7 @@ static HI_S32 hifb_onputlayerinfo(struct fb_info *info, HIFB_PAR_S* par, HI_VOID
     return s32Ret;	
 }
 
-#ifdef CFG_HIFB_3D_ENABLE
+#ifdef CFG_HIFB_STEREO3D_HW_SUPPORT
 static HI_S32 hifb_clearallstereobuf(struct fb_info *info)
 {
 #if 1
@@ -3402,7 +3437,7 @@ static HI_S32 hifb_refreshall(struct fb_info *info)
 {
     HIFB_PAR_S *par = (HIFB_PAR_S *)info->par;
 	
-#ifdef CFG_HIFB_3D_ENABLE
+#ifdef CFG_HIFB_STEREO3D_HW_SUPPORT
     if (par->bSetStereoMode)//(IS_STEREO_SBS(par) || IS_STEREO_TAB(par))
     {      
     	if (HIFB_LAYER_BUF_STANDARD == par->stExtendInfo.enBufMode)
@@ -3505,7 +3540,7 @@ static HI_S32 hifb_ioctl(struct fb_info *info, HI_U32 cmd, unsigned long arg)
 
             return copy_to_user(argp, &stLayerInfo, sizeof(HIFB_LAYER_INFO_S));
     	} 
-#ifdef CFG_HIFB_3D_ENABLE
+#ifdef CFG_HIFB_STEREO3D_HW_SUPPORT
         case FBIOGET_ENCODER_PICTURE_FRAMING:
         {	
 #ifdef HIFB_FOR_TEST				
@@ -4154,7 +4189,7 @@ static HI_S32 hifb_ioctl(struct fb_info *info, HI_U32 cmd, unsigned long arg)
             break;
         }
 #endif		
-#ifdef CFG_HIFB_3D_ENABLE
+#ifdef CFG_HIFB_STEREO3D_HW_SUPPORT
 	    case FBIOPUT_STEREO_DEPTH:
         {
 			HI_S32 s32StereoDepth;
@@ -4206,7 +4241,7 @@ static HI_S32 hifb_ioctl(struct fb_info *info, HI_U32 cmd, unsigned long arg)
 
 static HI_VOID hifb_3DMode_callback(HI_VOID * pParaml,HI_VOID * pParamr)
 {
-#ifdef CFG_HIFB_3D_ENABLE
+#ifdef CFG_HIFB_STEREO3D_HW_SUPPORT
 	HI_U32 *pu32LayerId;
 	HIFB_STEREO_MODE_E *penStereoMode;
 	struct fb_info *info;
@@ -4713,7 +4748,7 @@ static HI_S32 hifb_createwbcproc(HIFB_PAR_S * par)
 
 static HI_S32 hifb_open (struct fb_info *info, HI_S32 user)
 {     
-#if 1
+#if 0
 	printk("hifb_open\n");
 #else
     HI_S32 cnt; 
@@ -4898,7 +4933,7 @@ static HI_S32 hifb_release (struct fb_info *info, HI_S32 user)
 			}
 #endif
 			
-#ifdef CFG_HIFB_3D_ENABLE
+#ifdef CFG_HIFB_STEREO3D_HW_SUPPORT
             hifb_freestereobuf(par);
 #endif
             par->st3DInfo.enInStereoMode  = HIFB_STEREO_MONO;
@@ -5076,11 +5111,8 @@ static struct fb_ops s_sthifbops =
  Return          : static
  Others          : 0
 ******************************************************************************/
-#ifdef MODULE
-static __EXIT__ HI_VOID hifb_overlay_cleanup(HI_U32 u32LayerId, HI_BOOL bUnregister)
-#else
+
 static HI_VOID hifb_overlay_cleanup(HI_U32 u32LayerId, HI_BOOL bUnregister)
-#endif
 {
     struct fb_info* info = NULL;
     struct fb_cmap* cmap = NULL;
@@ -5147,7 +5179,7 @@ static HI_VOID hifb_overlay_cleanup(HI_U32 u32LayerId, HI_BOOL bUnregister)
  Return          : 0 if success; otherwise return error code
  Others          : 0
 ******************************************************************************/
-static HI_S32 __INIT__ hifb_overlay_probe(HI_U32 u32LayerId, HI_U32 u32VramSize)
+static HI_S32 hifb_overlay_probe(HI_U32 u32LayerId, HI_U32 u32VramSize)
 {
     HI_S32 s32Ret = 0;
     struct fb_info * info = NULL;
@@ -5805,8 +5837,9 @@ extern HI_S32 hifb_init_module_k(HI_VOID);
 HI_S32 HIFB_DRV_ModInit(HI_VOID)
 {
     HI_U32 i = 0;    
+#ifdef CFG_HIFB_LOGO_SUPPORT
     HI_S32 s32Ret;
-
+#endif
     memset(&s_stLayer, 0x00, sizeof(s_stLayer));
 
 	HIFB_DRV_GetDevOps(&s_stDrvOps);
@@ -5835,7 +5868,7 @@ HI_S32 HIFB_DRV_ModInit(HI_VOID)
 
     if (!strncmp("on", tc_wbc, 2))
     {
-    	s_stDrvOps.HIFB_DRV_SetTCFlag(1);
+    	s_stDrvOps.HIFB_DRV_SetTCFlag(HI_TRUE);
     }
 
     /* parse the \arg video string */
@@ -5849,7 +5882,8 @@ HI_S32 HIFB_DRV_ModInit(HI_VOID)
     }
 
     /*inital fb file according the config*/
-    for(i = 0; i <= 5/*HIFB_MAX_LAYER_ID*/; i++)
+    //for(i = 0; i <= HIFB_MAX_LAYER_ID; i++)
+    for(i = 0; i <= HIFB_LAYER_SD_1; i++)
     {
         /*if hw not support, we modify memory to 0, so in the path of /dev/ there is only one device name */
         if (i== HIFB_LAYER_CURSOR/* || 
@@ -5869,21 +5903,7 @@ HI_S32 HIFB_DRV_ModInit(HI_VOID)
 		}
         
         /* register the layer */
-        if (hifb_overlay_probe(i, s_stLayer[i].u32LayerSize) == HI_SUCCESS)
-        {
-#ifdef CFG_HIFB_PROC_SUPPORT 
-			HI_CHAR entry_name[16];
-            GFX_PROC_ITEM_S item;
-
-            /* create a proc entry in 'hifb' for the layer */
-            snprintf(entry_name, sizeof(entry_name), "hifb%d", i);
-			item.fnRead = hifb_read_proc;
-			item.fnWrite= hifb_write_proc;
-			item.fnIoctl= HI_NULL;
-            HI_GFX_PROC_AddModule(entry_name, &item, (HI_VOID *)s_stLayer[i].pstInfo);
-#endif			
-        }
-        else
+        if (hifb_overlay_probe(i, s_stLayer[i].u32LayerSize) != HI_SUCCESS)
         {
         	return HI_FAILURE;
         }
@@ -5913,7 +5933,8 @@ HI_S32 HIFB_DRV_ModInit(HI_VOID)
     
 ERR:
     
-    for (i = 0; i < 6/*HIFB_LAYER_ID_BUTT*/; i++)
+    //for (i = 0; i < HIFB_LAYER_ID_BUTT; i++)
+    for(i = 0; i <= HIFB_LAYER_SD_1; i++)
     {
         hifb_overlay_cleanup(i, HI_TRUE);
     }
@@ -5940,34 +5961,16 @@ HI_VOID HIFB_DRV_ModExit(HI_VOID)
 
     s_stDrvTdeOps.HIFB_DRV_SetTdeCallBack(NULL);
 
-#if 0
-#ifdef CFG_HIFB_LOGO_SUPPORT
-    if (g_bLogoShow)
-    {
-        hifb_clear_logo();
-    }
-#endif
-#endif
-
     s_stDrvOps.HIFB_DRV_GfxDeInit();
 
-    for (i = 0; i < 6/*HIFB_LAYER_ID_BUTT*/; i++)
+    //for (i = 0; i < HIFB_LAYER_ID_BUTT; i++)
+    for (i = 0; i <= HIFB_LAYER_SD_1; i++)
     {
-#ifdef CFG_HIFB_PROC_SUPPORT
-        HI_CHAR entry_name[16];
-        /* create a proc entry in 'hifb' for the layer */
-        snprintf(entry_name, sizeof(entry_name), "hifb%d", i);            
-        HI_GFX_PROC_RemoveModule(entry_name);
-#endif
-
 #ifdef CFG_HIFB_LOGO_SUPPORT
         hifb_clear_logo(i);
 #endif
 
         hifb_overlay_cleanup(i, HI_TRUE);
-#ifdef CFG_HIFB_COMPRESSION_SUPPORT
-        s_stDrvOps.HIFB_DRV_EnableCompression(i, HI_FALSE);
-#endif
     }
 
 	s_stDrvTdeOps.HIFB_DRV_TdeClose();
