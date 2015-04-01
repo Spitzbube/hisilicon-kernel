@@ -52,7 +52,7 @@
 
 #include <linux/interrupt.h>
 
-#include <staging/android/sw_sync.h>
+#include <sw_sync.h>
 
 #include "hi_module.h"
 #include "hi_drv_module.h"
