@@ -115,9 +115,7 @@ obj-y += i2c/gpio_i2c/drv_gpioi2c_intf.o
 obj-y += i2c/gpio_i2c/drv_gpio_i2c.o
 
 obj-y += hifb/hifb_main_k.o
-obj-y += hifb/hifb_comm.o
 obj-y += hifb/hifb_snapshot.o
-obj-y += hifb/adp/hifb_drv_adpt.o
 obj-y += hifb/adp/hifb_blit.o
 obj-y += hifb/adp/platform/alg/optm_alg_gzme.o
 obj-y += hifb/adp/platform/alg/optm_alg_zme_coef.o

@@ -24,7 +24,7 @@
 #include "optm_hifb.h"
 #include "hifb_drv.h"
 
-static OPTM_GFX_OPS_S g_stGfxOps;
+static OPTM_GFX_OPS_S g_stGfxOps; //8114354c
 
 OPTM_GFX_GP_E OPTM_GetGfxGpId(HIFB_LAYER_ID_E enLayerId)
 {
