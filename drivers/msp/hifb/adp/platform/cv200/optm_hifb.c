@@ -2902,7 +2902,7 @@ HI_S32 OPTM_GfxGetDispFMTSize(OPTM_GFX_GP_E enGpId, HIFB_RECT *pstOutRect)
 	return HI_SUCCESS;
 }
 
-HI_S32 OPTM_GFX_GetSlvLayerInfo(HIFB_SLV_LAYER_INFO_S* a)
+HI_S32 OPTM_GFX_GetSlvLayerInfo(HIFB_SLVLAYER_DATA_S* a)
 {
 	printk("OPTM_GFX_GetSlvLayerInfo: TODO\n");
 }

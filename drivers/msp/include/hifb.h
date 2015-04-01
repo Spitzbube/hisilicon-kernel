@@ -157,6 +157,8 @@ cursor can be attached to only one layer at any time*/
 /**free logo*/
 #define FBIO_FREE_LOGO          _IO(IOC_TYPE_HIFB, 143)
 
+#define FBIO_HWC_REFRESH        _IOR(IOC_TYPE_HIFB, 146, void/*HIFB_HWC_LAYERINFO_S*/*)
+
 /** @} */  /** <!-- ==== Macro Definition end ==== */
 
 
@@ -179,13 +181,13 @@ typedef struct
 typedef enum 
 {
     HIFB_LAYER_HD_0 = 0x0,
-    HIFB_LAYER_HD_1,
-    HIFB_LAYER_HD_2,
-    HIFB_LAYER_HD_3,
+    HIFB_LAYER_HD_1, //1
+    HIFB_LAYER_HD_2, //2
+    HIFB_LAYER_HD_3, //3
     HIFB_LAYER_SD_0, //4
     HIFB_LAYER_SD_1, //5
     HIFB_LAYER_SD_2, //6
-    HIFB_LAYER_SD_3, 
+    HIFB_LAYER_SD_3, //7
     HIFB_LAYER_AD_0,  
     HIFB_LAYER_AD_1,
     HIFB_LAYER_AD_2,
@@ -307,13 +309,13 @@ typedef enum
     HIFB_FMT_KBGR555,       /**< BGR555 16bpp */
     HIFB_FMT_KBGR888,       /**< BGR888 32bpp */
 
-    HIFB_FMT_1BPP,          /**<  clut1 */
+    HIFB_FMT_1BPP, //22         /**<  clut1 */
     HIFB_FMT_2BPP,          /**<  clut2 */    
     HIFB_FMT_4BPP,          /**<  clut4 */ 
     HIFB_FMT_8BPP,          /**< clut8 */
     HIFB_FMT_ACLUT44,       /**< AClUT44*/
     HIFB_FMT_ACLUT88,         /**< ACLUT88 */
-    HIFB_FMT_PUYVY,         /**< UYVY */
+    HIFB_FMT_PUYVY, //28        /**< UYVY */
     HIFB_FMT_PYUYV,         /**< YUYV */
     HIFB_FMT_PYVYU,         /**< YVYU */
     HIFB_FMT_YUV888,        /**< YUV888 */
@@ -480,9 +482,21 @@ typedef enum
 
 typedef struct
 {
-	int fill_0[25]; //0
-	HI_U32 u32LayerId; //100
-} HIFB_SLV_LAYER_INFO_S;
+	HI_BOOL bShow; //0
+	int fill_4; //4
+	int fill_8; //8
+	HI_U32 u32Stride; //12
+	HI_U32 u32WbcBufNum; //16
+	HI_U32 u32WbcBufSize; //20
+	int fill_24; //24
+	HIFB_RECT stSrcBufRect; //28
+	HIFB_RECT stCurWBCBufRect; //44
+	HIFB_RECT stMaxWbcBufRect; //60
+	HIFB_RECT stScreenRect; //76
+	HI_U32 eFmt; //92
+	int fill_96; //96
+	HI_U32 enLayerID; //100
+} HIFB_SLVLAYER_DATA_S;
 
 
 

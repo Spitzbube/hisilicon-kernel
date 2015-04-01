@@ -436,7 +436,7 @@ HI_S32 HIFB_DRV_SetGpDeflicker(int a, int b)
 	return g_stGfxOps.OPTM_GFX_SetGpDeflicker(!a, b);
 }
 
-HI_S32 HIFB_DRV_GetSlvLayerInfo(HIFB_SLV_LAYER_INFO_S* a)
+HI_S32 HIFB_DRV_GetSlvLayerInfo(HIFB_SLVLAYER_DATA_S* a)
 {
 	return g_stGfxOps.OPTM_GFX_GetSlvLayerInfo(a);
 }

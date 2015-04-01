@@ -97,7 +97,7 @@ typedef enum
     /*CNcomment:�Ĵ�����������ж�*/
     HIFB_CALLBACK_TYPE_REGUP = 0x4,
 
-    HIFB_CALLBACK_TYPE_0x10 = 0x10,
+    HIFB_CALLBACK_TYPE_FRAME_END = 0x10,
     
     HIFB_CALLBACK_TYPE_BUTT,
 }HIFB_CALLBACK_TPYE_E;

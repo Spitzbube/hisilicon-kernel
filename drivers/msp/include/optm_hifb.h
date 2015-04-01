@@ -245,7 +245,7 @@ typedef struct
 	HI_S32 (*OPTM_GFX_SetCmpMode)(HIFB_LAYER_ID_E enLayerId, int b); //172
 	HI_S32 (*OPTM_GFX_GetCmpMode)(HIFB_LAYER_ID_E enLayerId); //176
 	HI_S32 (*OPTM_GFX_SetCmpDDROpen)(HIFB_LAYER_ID_E enLayerId, int b); //180
-	HI_S32 (*OPTM_GFX_GetSlvLayerInfo)(HIFB_SLV_LAYER_INFO_S*); //184
+	HI_S32 (*OPTM_GFX_GetSlvLayerInfo)(HIFB_SLVLAYER_DATA_S*); //184
 	HI_S32 (*OPTM_GFX_SetTCFlag)(HI_U32 a); //188
 	HI_S32 (*OPTM_GFX_SetGpDeflicker)(int, int); //192
 }OPTM_GFX_OPS_S;

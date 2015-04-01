@@ -157,10 +157,10 @@ typedef struct
 {   	
 	HI_BOOL             bSetStereoMode; //0
 	HI_BOOL             bPanFlag; //4
-	int Data_8; //8
-	int Data_12; //12
-	int Data_16; //16
-	int fill_20; //20
+	HI_BOOL             bSetVar; //8
+	HI_BOOL             bPanReady; //12
+	HI_BOOL             bVblank; //16
+	HI_BOOL             bHwcRefresh; //20
     HIFB_BASE_INFO_S    stBaseInfo; //24
 #if 0
     typedef struct
@@ -265,11 +265,23 @@ typedef struct
 		HI_S32    s32RefreshHandle;/* job handle of tde blit*/
 	}HIFB_RTIME_INFO_S;
 #endif
-	int fill2[3]; //????
-	int Data_380; //380
-	int Data_384; //384
-	int Data_388; //388
-	int Data_392; //392
+
+	struct
+	{
+        HI_U32 u32RefreshFrame; //368
+        HI_S32 u32StartTimeMs; //372
+        HI_U32 u32Fps; //376
+
+	} stFrameInfo; //368
+
+	struct
+	{
+		HI_BOOL bWbcProc; //380
+		HI_BOOL bCreatedProc; //384
+		HI_U32 u32MasterLayerNum; //388
+		int enWbcLayerID; //392
+	} stProcInfo; //380
+
 	int Data_396[256]; //396
 	//1420
 }HIFB_PAR_S;

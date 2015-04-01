@@ -276,7 +276,7 @@ typedef struct
 	HI_S32 (*HIFB_DRV_GetCmpMode)(HIFB_LAYER_ID_E enLayerId); //196
 	HI_S32 (*HIFB_DRV_SetCmpDDROpen)(HIFB_LAYER_ID_E enLayerId); //200
 	HI_S32 (*HIFB_DRV_SetGpDeflicker)(HIFB_LAYER_ID_E enLayerId); //204
-	HI_S32 (*HIFB_DRV_GetSlvLayerInfo)(HIFB_SLV_LAYER_INFO_S*); //208
+	HI_S32 (*HIFB_DRV_GetSlvLayerInfo)(HIFB_SLVLAYER_DATA_S*); //208
 	//212?
 }HIFB_DRV_OPS_S;
 
