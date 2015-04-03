@@ -175,7 +175,7 @@ HI_S32 HIFB_DRV_GetLayerOutRect(HIFB_LAYER_ID_E enLayerId, HIFB_RECT *pstOutputR
 
 	if (HI_NULL != pstOutputRect)
 	{
-		s32Ret |= g_stGfxOps.OPTM_GfxGetOutRect(/*OPTM_GetGfxGpId*/(enLayerId), pstOutputRect);
+		s32Ret |= g_stGfxOps.OPTM_GfxGetOutRect(enLayerId, pstOutputRect);
 	}	
 
 	return s32Ret;

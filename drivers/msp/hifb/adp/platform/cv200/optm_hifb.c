@@ -49,6 +49,9 @@
 #else
 #include "drv_display.h"
 #include "hifb_debug.h"
+#ifndef HI_PQ_V1_0
+#include "hi_drv_pq.h"
+#endif
 #endif
 #include "optm_hal.h"
 #include "optm_hifb.h"
@@ -62,9 +65,8 @@
 ******************************************************************/
 #ifndef HI_BUILD_IN_BOOT
 static DISP_EXPORT_FUNC_S *ps_DispExportFuncs = HI_NULL; //81143418
-#else
-static HI_U32             *ps_DispExportFuncs = HI_NULL;
 #endif
+
 
 #define CFG_HIFB_S40V2_PALNTSC_BUG
 
@@ -75,12 +77,13 @@ static HI_U32             *ps_DispExportFuncs = HI_NULL;
 #define HIFB_FATAL   printf
 #endif
 
+#ifndef HI_BUILD_IN_BOOT
 /* wait v blanking */
 #define OPTM_HIFB_WVM_ENABLE 1
 
 /*  call-back after registers' update */
 #define OPTM_HIFB_GFXRR_ENABLE 1
-
+#endif
 
 #define OPTM_MAX_LOGIC_HIFB_LAYER ((HI_U32)HIFB_LAYER_ID_BUTT) //13
 
@@ -104,6 +107,11 @@ OPTM_ALG_GZME_MEM_S  GfxZmeModule; //81143454
 #define OPTM_SLAVER_LAYERID HIFB_LAYER_SD_0
 #define OPTM_CURSOR_LAYERID HIFB_LAYER_SD_1 //HIFB_LAYER_HD_3????
 
+#ifndef HI_BUILD_IN_BOOT
+#define OPTM_WBCBUFFER_NUM 2
+#else
+#define OPTM_WBCBUFFER_NUM 1
+#endif
 
 
 /******************************************************************
@@ -128,7 +136,59 @@ typedef union _OPTM_GFX_UP_FLAG_U
     unsigned int    u32;
 }OPTM_GFX_UP_FLAG_U;
 
+#ifdef CFG_HIFB_COMPRESSION_SUPPORT
+typedef enum tagOPTM_CMP_STATUS_E
+{
+    OPTM_CMP_STATUS_STANDBY = 0x0 ,  /** hardware was ready to work*/
+    OPTM_CMP_STATUS_PARALYSED     ,  /** hardware unable to work*/
+    OPTM_CMP_STATUS_COMPRESSIONABLE   ,  /** hardware can be setted to compress*/
+    OPTM_CMP_STATUS_COMPRESSING   ,  /** hardware was compressing*/
+    OPTM_CMP_STATUS_COMPRESSFINISHED   ,  /** hardware has finished compression*/
+    OPTM_CMP_STATUS_DECOMPRESSIONABLE ,  /** hardware can be setted to decompress*/
+    OPTM_CMP_STATUS_DECOMPRESSING ,  /** hardware was decompressing*/
+    OPTM_CMP_STATUS_BUTT          ,
+}OPTM_CMP_STATUS_E;
 
+typedef struct tagOPTM_CMP_DATA_INFO_S
+{
+    HI_U32 u32ARCmpAddr;
+    HI_U32 u32GBCmpAddr;
+    HI_U32 u32Width;
+    HI_U32 u32Height;
+    HI_U32 u32CmpStride;
+    HI_U32 u32HeadStride;
+    HI_U32 u32HeadSize;
+    HI_U32 u32CMPBufSize;
+    HIFB_RECT stUpdateRect;
+    HIFB_RECT stCmpRect;
+    MMZ_BUFFER_S stCMPBuffer;
+}OPTM_CMP_DATA_INFO_S;
+
+typedef struct tagOPTM_GFX_CMP_WORK_S
+{
+    HI_U32                   u32Data;
+    struct work_struct       work;
+    struct workqueue_struct  *queue;
+}OPTM_GFX_CMP_WORK_S;
+
+
+typedef struct tagOPTM_GFX_CMP_S
+{
+    //HI_BOOL bModifying;
+    HI_U32  u32CmpIndex;
+    HI_BOOL bLayerRefreshed;
+    HI_BOOL bLayerResChgFlag;
+    HI_BOOL bCMPQueueWorkStart;
+    HI_BOOL bDDRDetectOpen;
+    HI_BOOL bDDRDetectReady;
+    HIFB_CMP_MODE_E enCMPMode;
+    OPTM_VDP_LAYER_WBC_E enCmpHalID;
+    OPTM_VDP_INTMSK_E enIntMsk;
+    OPTM_CMP_STATUS_E enStatus;
+    OPTM_CMP_DATA_INFO_S stDataInfo;
+    OPTM_GFX_CMP_WORK_S  stCMPWork;
+}OPTM_GFX_CMP_S;
+#endif
 typedef struct tagOPTM_GFX_LAYER_S{
     HI_BOOL              bOpened; //0 (2560)
     HI_BOOL              bMaskFlag;		
@@ -137,19 +197,19 @@ typedef struct tagOPTM_GFX_LAYER_S{
 	/*******backup hardware data of gfx*********/
 	HI_BOOL              bEnable; //16
 	HI_BOOL              b3DEnable;
+    HI_S32               s32Depth;
 	HI_BOOL              bPreMute;
-    int fill1[1]; //????
 	HI_U32               u32ZOrder; //32
-	HI_BOOL              bCampEnable; //36
+	HI_BOOL              bCmpOpened; //36
     HI_BOOL              bBufferChged;    
     HI_U32               s32BufferChgCount;        
     HI_U32               NoCmpBufAddr;
 	HI_U32               u32TriDimAddr;
-    int fill2[1]; //????
+    HI_U32				 u32Data_56; //56
     HI_U16               Stride; //60         /* no compression mode stride*/
     HI_U16               CmpStride;       /* compression mode stride     */
 	HIFB_COLOR_FMT_E     enDataFmt;
-	HIFB_RECT            stInRect;        /*Inres of gfx*/
+	HIFB_RECT            stInRect; //68       /*Inres of gfx*/
     HIFB_ALPHA_S         stAlpha;
 	HIFB_COLORKEYEX_S    stColorkey;
 	HIFB_STEREO_MODE_E   enTriDimMode;
@@ -167,13 +227,16 @@ typedef struct tagOPTM_GFX_LAYER_S{
 	volatile HI_U32      vblflag;
 	wait_queue_head_t    vblEvent; //176
     MMZ_BUFFER_S         stCluptTable; //188
+#ifdef CFG_HIFB_COMPRESSION_SUPPORT
+    OPTM_GFX_CMP_S       stCmpInfo;
+#endif
     //200
 }OPTM_GFX_LAYER_S;
 
 typedef enum tagOPTM_WBC_MODE_E{
 	OPTM_WBC_MODE_MONO      = 0x0,
-	OPTM_WBC_MODE_LFET_EYE  = 0x10,
-	OPTM_WBC_MODE_RIGHT_EYE = 0x11,
+	OPTM_WBC_MODE_LFET_EYE  = 0x2, //0x10,
+	OPTM_WBC_MODE_RIGHT_EYE = 0x3, //0x11,
 	OPTM_WBC_MODE_BUTT,
 }OPTM_WBC_MODE_E;
 
@@ -185,7 +248,10 @@ typedef enum tagOPTM_VDP_CONNECT_E
     OPTM_VDP_CONNECT_BUTT       ,
 }OPTM_VDP_CONNECT_E;
 
-
+typedef enum tagOPTM_WBC_BUFFER_STATUS_E{
+    OPTM_WBC_BUFFER_RELEASED = 0,
+    OPTM_WBC_BUFFER_ACQUIRED
+}OPTM_WBC_BUFFER_STATUS_E;
 
 typedef struct tagOPTM_GFX_WBC_S{
     HI_BOOL                bOpened; //0
@@ -196,28 +262,29 @@ typedef struct tagOPTM_GFX_WBC_S{
     HI_S32                 s32BufferWidth; //12
     HI_S32                 s32BufferHeight; //16
     HI_U32                 u32BufferStride; //20
-    int 				   Data_24; //24
-    int					   Data_28; //28
-    int 				   Data_32; //32
-    int					   Data_36; //36
-    int 				   Data_40; //40
+    HI_U32 				   u32BufIndex; //24
+    //HI_S32                 s32WbcCnt;
+    HI_U32                 u32WBCBuffer[OPTM_WBCBUFFER_NUM];
+    //OPTM_WBC_BUFFER_STATUS_E enWBCBufferStatus[OPTM_WBCBUFFER_NUM];
+    HI_U32				   u32WriteBufAddr; //36
+    HI_U32 				   u32ReadBufAddr; //40
     MMZ_BUFFER_S           stFrameBuffer; //44
 
     HI_U32                 u32DataPoint; //56 /* 0, feeder; others, reserve */
 
     HIFB_COLOR_FMT_E       enDataFmt; //60
 
-    HIFB_RECT              stInRect; //64???
-    HI_BOOL                bInProgressive; //80???
-    HIFB_RECT              stOutRect; //84???
-    HI_BOOL                bOutProgressive; //100???
-    HI_U32                 u32BtmOffset; //104???
-    HI_BOOL                bHdDispProgressive; //108???
+    HIFB_RECT              stInRect; //64
+    HI_BOOL                bInProgressive; //80
+    HIFB_RECT              stOutRect; //84
+    HI_BOOL                bOutProgressive; //100
+    HI_U32                 u32BtmOffset; //104
+    HI_BOOL                bHdDispProgressive; //108
 	OPTM_VDP_DITHER_E      enDitherMode; //112
 	OPTM_VDP_WBC_OFMT_E    stWBCFmt; //116
 	OPTM_VDP_DATA_RMODE_E  enReadMode; //120
 	OPTM_WBC_MODE_E        enWbcMode; //124
-	HI_U32 Data_128; //128
+    OPTM_VDP_INTMSK_E      enWbcInt; //128
 	//132
 }OPTM_GFX_WBC_S;
 
@@ -259,9 +326,9 @@ typedef struct tagOPTM_GFX_GP_S
 	HI_RECT_S stInRect;
 	HI_RECT_S stOutRect;
 
-	HIFB_STEREO_MODE_E        enTriDimMode;
+	HIFB_STEREO_MODE_E        enTriDimMode; //76
 
-	int fill; //???
+	HI_U32                    u32ZmeDeflicker; //80
 	/*  about color  */
 	OPTM_COLOR_SPACE_E        enInputCsc; //84
 	OPTM_COLOR_SPACE_E        enOutputCsc; //88
@@ -300,20 +367,21 @@ typedef struct tagOPTM_GFX_CALLBACK_S
 	0---HIFB_CALLBACK_TYPE_VO
 	1---HIFB_CALLBACK_TYPE_3DMode_CHG
 	2---HIFB_CALLBACK_TYPE_REGUP
+    3---HIFB_CALLBACK_TYPE_FRAME_START
+    4---HIFB_CALLBACK_TYPE_FRAME_END
 	*/
-	HI_U32  u32CTypeFlag; 
+	HI_U32  u32CTypeFlag; //0
 	OPTM_GFX_IRQ_S stGfxIrq[HIFB_CALLBACK_TYPE_BUTT];
 }OPTM_GFX_CALLBACK_S;
 
 
-#define OPTM_GP_MAXGFXCOUNT 3
+#define OPTM_GP_MAXGFXCOUNT 5
 typedef struct tagOPTM_GP_IRQ_S
 {
 	/*Gp only need to register callback func to disp once*/
-    HI_BOOL bRegistered[111]/*[HI_DRV_DISP_C_TYPE_BUTT]*/; //0
+    HI_BOOL bRegistered[HI_DRV_DISP_C_TYPE_BUTT]; //0
 	
-	OPTM_GFX_CALLBACK_S stGfxCallBack[OPTM_GP_MAXGFXCOUNT];
-//	int fill[110]; //?????
+	OPTM_GFX_CALLBACK_S stGfxCallBack[OPTM_GP_MAXGFXCOUNT]; //28
 	//1068
 }OPTM_GP_IRQ_S;
 
@@ -642,6 +710,7 @@ static HI_U32 g_u32GFXInitFlag      = 0; //81143540
 static HI_U32 g_u32SlvLayerInitFlag = 0; //8114341c
 //static HI_U32 g_u32DispInitFlag[OPTM_GFX_GP_BUTT];
 
+static HI_BOOL g_bTcWBCFlag = HI_FALSE; //81143414
 
 /* WORKMODE */
 static HIFB_GFX_MODE_EN g_enOptmGfxWorkMode = HIFB_GFX_MODE_NORMAL; //8114338c
@@ -657,14 +726,22 @@ static OPTM_GFX_GP_S g_stGfxGPDevice[OPTM_GFX_GP_BUTT]; //81141f64
 static OPTM_GP_IRQ_S g_stGfxGPIrq[OPTM_GFX_GP_BUTT]; //8114210c
 static OPTM_GFX_WBC_S  g_stGfxWbc2; //81143390
 //static OPTM_GFX_WBC_S  g_stGfxWbc3;
-
-/*static*/ HI_BOOL Data_81143414; //81143414
-
+#if !(defined(CHIP_TYPE_hi3798mv100) || defined(CHIP_TYPE_hi3796mv100))
+#if defined(CHIP_TYPE_hi3798cv100)
+#define OPTM_GP0_GFX_COUNT 4
+#define OPTM_GP1_GFX_COUNT 1
+#else
 #define OPTM_GP0_GFX_COUNT 3
 #define OPTM_GP1_GFX_COUNT 2
+#endif
+#else
+#define OPTM_GP0_GFX_COUNT 2
+#define OPTM_GP1_GFX_COUNT 1
+#endif
 
-#define OPTM_GFX_WBC_WIDTH  720
-#define OPTM_GFX_WBC_HEIGHT 576
+
+#define OPTM_GFX_WBC_WIDTH  (g_bTcWBCFlag?1920:720)
+#define OPTM_GFX_WBC_HEIGHT (g_bTcWBCFlag?1200:576)
 
 #define OPTM_GFXCLUT_LENGTH 256
 #define OPTM_GFXDATA_DEFAULTBYTES 4
@@ -720,18 +797,21 @@ HI_S32 OPTM_GFX_CloseWbc2(OPTM_GFX_WBC_S *pstWbc2);
 
 /*  in WBC mode, call-back function of switching for SD display system */
 HI_VOID OPTM_DispInfoCallbackUnderWbc(HI_U32 u32Param0, HI_U32 u32Param1);
+#ifndef HI_BUILD_IN_BOOT
 HI_S32 OPTM_SetCallbackToDisp(OPTM_GFX_GP_E enGPId, IntCallBack pCallBack, HI_DRV_DISP_CALLBACK_TYPE_E eType, HI_BOOL bFlag);
 HI_VOID OPTM_DispCallBack(HI_VOID* u32Param0, HI_VOID* u32Param1);
-HI_VOID OPTM_FrameEndCallBack(HI_VOID* u32Param0, HI_VOID* u32Param1);
+HI_S32 OPTM_GFX_SetStereoDepth(HIFB_LAYER_ID_E enLayerId, HI_S32 s32Depth);
 HI_S32 OPTM_Distribute_Callback(HI_VOID* u32Param0, HI_VOID* u32Param1);
+HI_VOID OPTM_FrameEndCallBack(HI_VOID* u32Param0, HI_VOID* u32Param1);
+HI_VOID OPTM_SlaverProcess(HI_VOID* u32Param0, HI_VOID* u32Param1);
+#endif
+
 HI_S32 OPTM_GfxSetSrcFromWbc2(HI_BOOL bFromWbc2);
-HI_S32 OPTM_GfxChgCmp2Ncmp(HIFB_LAYER_ID_E enLayerId);
 HI_S32 OPTM_GPMask(OPTM_VDP_LAYER_GP_E enGPId, HI_BOOL bFlag);
 
 HI_S32 OPTM_GPRecovery(OPTM_VDP_LAYER_GP_E enGPId);
 HI_S32 OPTM_GfxCloseLayer(HIFB_LAYER_ID_E enLayerId);
 HI_S32 OPTM_GfxSetDispFMTSize(OPTM_GFX_GP_E enGpId, const HI_RECT_S *pstOutRect);
-HI_S32 OPTM_GfxSetLayerDeCmpEnable(HIFB_LAYER_ID_E enLayerId, HI_BOOL bEnable);
 HI_S32 OPTM_GfxSetEnable(HIFB_LAYER_ID_E enLayerId, HI_BOOL bEnable);
 HI_S32 OPTM_GfxSetGpRect(OPTM_GFX_GP_E enGpId, const HIFB_RECT * pstInputRect);
 OPTM_VDP_GFX_IFMT_E OPTM_PixerFmtTransferToHalFmt(HIFB_COLOR_FMT_E enDataFmt);
@@ -746,21 +826,16 @@ HI_S32 OPTM_GfxSetWbcAddr(OPTM_VDP_LAYER_WBC_E enWbcHalId, HI_U32 u32Addr, HI_U3
 HI_S32 OPTM_GfxSetLayerStride(HIFB_LAYER_ID_E enLayerId, HI_U32 u32Stride);
 OPTM_COLOR_SPACE_E OPTM_AdaptCscTypeFromDisp(HI_DRV_COLOR_SPACE_E enHiDrvCsc);
 HI_S32 OPTM_JudgeWbcEnable(HI_VOID);
-/*static*/ HI_S32 OPTM_GfxCloseSlvLayer(HIFB_LAYER_ID_E enLayerId);
+static HI_S32 OPTM_GfxCloseSlvLayer(HIFB_LAYER_ID_E enLayerId);
+#ifdef CFG_HIFB_COMPRESSION_SUPPORT
+HI_VOID OPTM_GFX_CMP_Clean(HIFB_LAYER_ID_E enLayerId);
+HI_S32 OPTM_GFX_CMP_Open(HIFB_LAYER_ID_E enLayerId);
+HI_S32 OPTM_GFX_CMP_Close(HIFB_LAYER_ID_E enLayerId);
+HI_VOID OPTM_GFX_CMP_Process(HI_VOID* u32Param0);
+HI_VOID OPTM_GFX_CMP_ProcessNOCMP(HIFB_LAYER_ID_E enLayerId);
+#endif
+
 HI_S32 OPTM_GfxWaitVBlank(HIFB_LAYER_ID_E enLayerId);
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 /******************************************************************
@@ -872,13 +947,13 @@ OPTM_VDP_LAYER_GFX_E OPTM_GetGfxHalId(HIFB_LAYER_ID_E enLayerId)
 		return OPTM_VDP_LAYER_GFX_BUTT;
 	}
 #else
-	if (enLayerId < 5)
+	if (HIFB_LAYER_SD_1 > enLayerId)
 	{
 		return (OPTM_VDP_LAYER_GFX_E)enLayerId;
 	}
 	else
 	{
-		return 6;
+		return OPTM_VDP_LAYER_GFX_BUTT;
 	}
 #endif
 }
@@ -901,33 +976,26 @@ OPTM_COLOR_SPACE_E OPTM_AdaptCscTypeFromDisp(HI_DRV_COLOR_SPACE_E enHiDrvCsc)
 			return OPTM_CS_BUTT;
 	}
 }
-
-HIFB_STEREO_MODE_E OPTM_AdaptTriDimModeFromDisp(HI_DRV_DISP_STEREO_E enDispStereo)
+#ifndef HI_BUILD_IN_BOOT
+HIFB_STEREO_MODE_E OPTM_AdaptTriDimModeFromDisp(OPTM_VDP_DISP_MODE_E enDispStereo)
 {
 	switch(enDispStereo)
 	{
-		case DISP_STEREO_NONE: //0
-			return HIFB_STEREO_MONO; //0
-#if 0
-		case DISP_STEREO_SBS_HALF: //2
+		case VDP_DISP_MODE_2D:
+			return HIFB_STEREO_MONO;
+		case VDP_DISP_MODE_SBS:
 			return HIFB_STEREO_SIDEBYSIDE_HALF;
-		case DISP_STEREO_TAB: //3
+		case VDP_DISP_MODE_TAB:
 			return HIFB_STEREO_TOPANDBOTTOM;
-#else
-		case 4:
-			return 2;
-		case 5:
-			return 3;
-#endif
-		case DISP_STEREO_FPK: //1
-			return 1; //HIFB_STEREO_FRMPACKING;
+		case VDP_DISP_MODE_FP:
+			return HIFB_STEREO_FRMPACKING;
 		default:
 			return HIFB_STEREO_BUTT;
 	}
 
 	return HIFB_STEREO_BUTT;
 }
-
+#endif
 
 HI_VOID OPTM_GPDATA_Init(HI_VOID)
 {
@@ -940,9 +1008,9 @@ HI_VOID OPTM_GPDATA_Init(HI_VOID)
 /* physical base address of VOU registers' list */
 #define OPTM_REGS_BASE_ADDR   0xfa120000
 
+#ifndef HI_BUILD_IN_BOOT
 HI_S32 OPTM_Aapt_Module_GetFunction(HI_U32 u32ModuleID, HI_VOID** ppFunc)
 {
-#ifndef HI_BUILD_IN_BOOT
 	if (HI_NULL == ppFunc)
 	{
 		return HI_FAILURE;
@@ -961,11 +1029,8 @@ HI_S32 OPTM_Aapt_Module_GetFunction(HI_U32 u32ModuleID, HI_VOID** ppFunc)
 	{
 		return HI_SUCCESS;
 	}
-#else
-	return HI_SUCCESS;
-#endif
 }
-
+#endif
 
 HI_S32 OPTM_GfxInit(HI_VOID)
 {
@@ -987,7 +1052,17 @@ HI_S32 OPTM_GfxInit(HI_VOID)
 	}
 	
     OPTM_VDP_DRIVER_Initial(u32Phyaddr);
-	
+
+#ifdef CFG_HIFB_COMPRESSION_SUPPORT
+    u32Phyaddr = (HI_U32)IO_ADDRESS(MDDRC_BASE_ADDR);
+    if (0 == u32Phyaddr)
+    {
+        HIFB_ERROR("fail to init hal register!\n");
+        return HI_FAILURE;
+    }
+
+    OPTM_MDDRC_DRIVER_Initial(u32Phyaddr);
+#endif
 	OPTM_GPDATA_Init();
     
     /* TODO: load Gfx zoom coefficients */
@@ -1007,6 +1082,7 @@ HI_S32 OPTM_GfxInit(HI_VOID)
 
 HI_S32 OPTM_GfxDeInit(HI_VOID)
 {
+#ifndef HI_BUILD_IN_BOOT
     HI_S32 i;
 	
     PRINT_IN;
@@ -1022,6 +1098,9 @@ HI_S32 OPTM_GfxDeInit(HI_VOID)
         {
             OPTM_GfxCloseLayer(i);
         }        
+#ifdef CFG_HIFB_COMPRESSION_SUPPORT
+        OPTM_GFX_CMP_Clean(i);
+#endif
     }
     
     /* TODO: load Gfx zoom coefficients */
@@ -1034,12 +1113,12 @@ HI_S32 OPTM_GfxDeInit(HI_VOID)
 		g_stGfxWbc2.stFrameBuffer.u32StartPhyAddr = 0;
 	}	
 
-	Data_81143414 = 0;
     g_u32GFXInitFlag = OPTM_DISABLE;
 	ps_DispExportFuncs = HI_NULL;
+	g_bTcWBCFlag = HI_FALSE;
     
     PRINT_OUT;
-
+#endif
     return HI_SUCCESS;
 }
 
@@ -1052,12 +1131,6 @@ static HI_VOID OPTM_WorkQueueToOpenWbc(struct work_struct *data)
 	//printk("get data from slv work %d.\n",u32LayerID);
 	OPTM_GfxOpenSlvLayer(u32LayerID);
 }
-/*
-#else
-static HI_VOID OPTM_WorkQueueToOpenWbc(HI_VOID)
-{
-	return;
-}*/
 #endif
 
 #ifndef HI_BUILD_IN_BOOT
@@ -1069,7 +1142,18 @@ static HI_VOID OPTM_3DMode_Callback(struct work_struct *data)
 	OPTM_GFX_GP_E 		        enGpHalId;
 	OPTM_GFX_WORK_S             *pst3DModeWork;
 
+    if (HI_NULL == data)
+    {
+        return;
+    }
+
 	pst3DModeWork = container_of(data, OPTM_GFX_WORK_S, work);
+
+    if (HI_NULL == pst3DModeWork)
+    {
+        return;
+    }
+
 	enGpHalId	  = (OPTM_GFX_GP_E)(pst3DModeWork->u32Data);
 
 	if (enGpHalId >= OPTM_GFX_GP_BUTT)
@@ -1078,7 +1162,7 @@ static HI_VOID OPTM_3DMode_Callback(struct work_struct *data)
 	}
 
 	u32LayerCount = (OPTM_VDP_LAYER_GP0 == enGpHalId) ? OPTM_GP0_GFX_COUNT : OPTM_GP1_GFX_COUNT;
-	
+    //printk("##3d queue work start##\n");
 	for (i = 0; i < u32LayerCount;i++)
 	{
 		u32CTypeFlag = g_stGfxGPIrq[enGpHalId].stGfxCallBack[i].u32CTypeFlag;
@@ -1091,9 +1175,12 @@ static HI_VOID OPTM_3DMode_Callback(struct work_struct *data)
 		if (u32CTypeFlag & HIFB_CALLBACK_TYPE_3DMode_CHG)
 		{
 			/*callback function*/
-			g_stGfxGPIrq[enGpHalId].stGfxCallBack[i].stGfxIrq[HIFB_CALLBACK_TYPE_3DMode_CHG].pFunc(
-				(HI_VOID*)g_stGfxGPIrq[enGpHalId].stGfxCallBack[i].stGfxIrq[HIFB_CALLBACK_TYPE_3DMode_CHG].u32Param0, 
-				(HI_VOID*)&g_stGfxGPDevice[enGpHalId].enTriDimMode);			
+            if (g_stGfxGPIrq[enGpHalId].stGfxCallBack[i].stGfxIrq[HIFB_CALLBACK_TYPE_3DMode_CHG].pFunc)
+            {
+				g_stGfxGPIrq[enGpHalId].stGfxCallBack[i].stGfxIrq[HIFB_CALLBACK_TYPE_3DMode_CHG].pFunc(
+					(HI_VOID*)g_stGfxGPIrq[enGpHalId].stGfxCallBack[i].stGfxIrq[HIFB_CALLBACK_TYPE_3DMode_CHG].u32Param0,
+					(HI_VOID*)&g_stGfxGPDevice[enGpHalId].enTriDimMode);
+            }
 		}
 	}
 }
@@ -1126,12 +1213,20 @@ HI_VOID OPTM_ALG_Init(OPTM_GFX_GP_E enGPId)
 	OPTM_VDP_GP_SetTiGainCoef(enGPId, VDP_TI_MODE_LUM, (HI_U32 *)stDtiRtlPara.u32LTICompsatMuti);
 }
 
-/*static*/ HI_S32 OPTM_GPOpen(OPTM_GFX_GP_E enGPId)
+static HI_S32 OPTM_GPOpen(OPTM_GFX_GP_E enGPId)
 {
 	HI_U32 i;
 	OPTM_VDP_BKG_S     stBkg;
 	HI_U32 u32InitLayerID;
 	HI_U32 u32MaxLayerCount;
+#ifndef HI_BUILD_IN_BOOT
+#ifdef HI_PQ_V1_0
+
+    HI_S32 s32Ret = HI_FAILURE;
+    PQ_EXPORT_FUNC_S*   pstPqFuncs = HI_NULL;
+    PQ_PARAM_S*         pstPqParam = HI_NULL;
+#endif
+#endif
 
 	PRINT_IN;
 
@@ -1139,17 +1234,16 @@ HI_VOID OPTM_ALG_Init(OPTM_GFX_GP_E enGPId)
 	{
 		return HI_SUCCESS;
 	}
-
+#ifndef HI_BUILD_IN_BOOT
 	if (HI_NULL == ps_DispExportFuncs)
 	{
-#warning module HI_ID_DISP not yet implemented!
 		if(HI_SUCCESS != OPTM_Aapt_Module_GetFunction(HI_ID_DISP, (HI_VOID**)&ps_DispExportFuncs))
 	    {
 	        HIFB_ERROR("Fail to get disp export functions!\n"); //1241
 	        return HI_FAILURE;
 	    }
 	}
-
+#endif
 	memset(&g_stGfxGPIrq[enGPId], 0, sizeof(OPTM_GP_IRQ_S));
 	if (OPTM_GFX_GP_0 == enGPId)
 	{
@@ -1163,7 +1257,36 @@ HI_VOID OPTM_ALG_Init(OPTM_GFX_GP_E enGPId)
 		}
     #endif    
 	}	
-	
+
+#ifndef HI_BUILD_IN_BOOT
+#ifdef HI_PQ_V1_0
+
+    g_stGfxGPDevice[enGPId].u32ZmeDeflicker = 0;
+
+    /*Get Pq param*/
+    if (HI_SUCCESS != HI_DRV_MODULE_GetFunction(HI_ID_PQ, (HI_VOID**)&pstPqFuncs))
+    {
+        HIFB_WARNING("Get PQ_EXPORT_FUNC_S failed\r\n");
+    }
+    else
+    {
+        if (NULL == pstPqFuncs)
+        {
+            HIFB_WARNING("Get PQ_EXPORT_FUNC_S failed\r\n");
+        }
+        else
+        {
+            s32Ret = pstPqFuncs->pfnPQ_GetPqParam(&pstPqParam);
+            if (HI_SUCCESS == s32Ret)
+            {
+                g_stGfxGPDevice[enGPId].u32ZmeDeflicker = (OPTM_GFX_GP_0 == enGPId)?
+                                pstPqParam ->stPQCoef.stGfxCoef.u32HdCtrlEn : pstPqParam ->stPQCoef.stGfxCoef.u32SdCtrlEn;
+            }
+        }
+    }
+#endif
+#endif
+
 	memset(&stBkg,0,sizeof(OPTM_VDP_BKG_S));
 	stBkg.u32BkgA = 0x0;
 
@@ -1227,7 +1350,6 @@ HI_VOID OPTM_ALG_Init(OPTM_GFX_GP_E enGPId)
 
 	return HI_SUCCESS;
 }
-
 static HI_S32 OPTM_GPClose(OPTM_GFX_GP_E enGPId)
 {
 	PRINT_IN;
@@ -1238,9 +1360,10 @@ static HI_S32 OPTM_GPClose(OPTM_GFX_GP_E enGPId)
 
 	g_enOptmGfxWorkMode = HIFB_GFX_MODE_NORMAL;
 
-	OPTM_SetCallbackToDisp(enGPId, (IntCallBack)OPTM_DispCallBack, HI_DRV_DISP_C_INTPOS_90_PERCENT, HI_FALSE);
-	OPTM_SetCallbackToDisp(enGPId, (IntCallBack)OPTM_FrameEndCallBack, HI_DRV_DISP_C_GFX_WBC, HI_FALSE);
 #ifndef HI_BUILD_IN_BOOT
+	OPTM_SetCallbackToDisp(enGPId, (IntCallBack)OPTM_DispCallBack, HI_DRV_DISP_C_INTPOS_90_PERCENT, HI_FALSE);
+
+	OPTM_SetCallbackToDisp(enGPId, (IntCallBack)OPTM_FrameEndCallBack, HI_DRV_DISP_C_GFX_WBC, HI_FALSE);
     if (g_stGfxGPDevice[enGPId].queue)
 	{
 		destroy_workqueue(g_stGfxGPDevice[enGPId].queue);
@@ -1254,14 +1377,13 @@ static HI_S32 OPTM_GPClose(OPTM_GFX_GP_E enGPId)
 	g_stGfxGPDevice[enGPId].bDispInitial  = HI_FALSE;
 	g_stGfxGPDevice[enGPId].bNeedExtractLine = HI_FALSE;
 	g_stGfxGPDevice[enGPId].bMaskFlag     = HI_FALSE;
-	
 //	g_enOptmGfxWorkMode = HIFB_GFX_MODE_NORMAL;
 
 	PRINT_OUT;
 	return HI_SUCCESS;
 }
 
-/*static*/ HI_S32 OPTM_GfxSetLayerReadMode(HIFB_LAYER_ID_E enLayerId, OPTM_VDP_DATA_RMODE_E enReadMode)
+static HI_S32 OPTM_GfxSetLayerReadMode(HIFB_LAYER_ID_E enLayerId, OPTM_VDP_DATA_RMODE_E enReadMode)
 {
 	OPTM_GFX_GP_E        enGPId;
 
@@ -1273,7 +1395,7 @@ static HI_S32 OPTM_GPClose(OPTM_GFX_GP_E enGPId)
 	return HI_SUCCESS;
 }
 
-/*static*/ HI_S32 OPTM_GfxInitLayer(HIFB_LAYER_ID_E enLayerId)
+static HI_S32 OPTM_GfxInitLayer(HIFB_LAYER_ID_E enLayerId)
 {
 	OPTM_VDP_BKG_S stBkg;
 		
@@ -1282,11 +1404,7 @@ static HI_S32 OPTM_GPClose(OPTM_GFX_GP_E enGPId)
 	init_waitqueue_head(&(g_stGfxDevice[enLayerId].vblEvent));	
 
 	g_stGfxDevice[enLayerId].enGfxHalId = OPTM_GetGfxHalId(enLayerId);
-#if 0
-	g_stGfxDevice[enLayerId].enGPId     = (g_stGfxDevice[enLayerId].enGfxHalId > OPTM_VDP_LAYER_GFX2) ? OPTM_GFX_GP_1 : OPTM_GFX_GP_0;
-#else
-	g_stGfxDevice[enLayerId].enGPId     = (g_stGfxDevice[enLayerId].enGfxHalId > OPTM_VDP_LAYER_GFX3) ? OPTM_GFX_GP_1: OPTM_GFX_GP_0;
-#endif
+	g_stGfxDevice[enLayerId].enGPId     = (g_stGfxDevice[enLayerId].enGfxHalId > /*OPTM_VDP_LAYER_GFX2*/OPTM_VDP_LAYER_GFX3) ? OPTM_GFX_GP_1 : OPTM_GFX_GP_0;
 	g_stGfxDevice[enLayerId].CscState   = OPTM_CSC_SET_PARA_RGB;
 
 	memset(&stBkg, 0, sizeof(stBkg));
@@ -1296,7 +1414,7 @@ static HI_S32 OPTM_GPClose(OPTM_GFX_GP_E enGPId)
 	g_stGfxDevice[enLayerId].enReadMode  = VDP_RMODE_PROGRESSIVE;
 	g_stGfxDevice[enLayerId].enUpDateMode= VDP_RMODE_PROGRESSIVE;
 
-	OPTM_VDP_GFX_SetNoSecFlag(g_stGfxDevice[enLayerId].enGfxHalId, HI_TRUE); //HI_FALSE);
+	OPTM_VDP_GFX_SetNoSecFlag(g_stGfxDevice[enLayerId].enGfxHalId, HI_TRUE);
 	OPTM_VDP_GFX_SetDcmpEnable(g_stGfxDevice[enLayerId].enGfxHalId, HI_FALSE);
 	
 	OPTM_VDP_GFX_SetLayerBkg(g_stGfxDevice[enLayerId].enGfxHalId, g_stGfxDevice[enLayerId].stBkg);
@@ -1323,6 +1441,7 @@ static HI_S32 OPTM_GPClose(OPTM_GFX_GP_E enGPId)
 
 static HI_S32 OPTM_GfxDeInitLayer(HIFB_LAYER_ID_E enLayerId)
 {
+#ifndef HI_BUILD_IN_BOOT
 	PRINT_IN;	
     if (g_stGfxCap[enLayerId].bHasCmapReg != HI_FALSE)
     {
@@ -1336,20 +1455,114 @@ static HI_S32 OPTM_GfxDeInitLayer(HIFB_LAYER_ID_E enLayerId)
     }
 
 	PRINT_OUT;
-	
+#endif
     return HI_SUCCESS;
 }
 
+#if 1
+typedef struct hiPQ_PICTURE_SETTING_S
+{
+    HI_U16 u16Brightness;
+    HI_U16 u16Contrast;
+    HI_U16 u16Hue;
+    HI_U16 u16Saturation;
+
+    /*É«ÎÂÉè¶¨*/
+    HI_S16 s16RedGain;
+    HI_S16 s16GreenGain;
+    HI_S16 s16BlueGain;
+    HI_S16 s16RedOffset;
+    HI_S16 s16GreenOffset;
+    HI_S16 s16BlueOffset;
+} HI_PQ_PICTURE_SETTING_S;
+
+extern HI_S32 DRV_PQ_GetHDPictureSetting(HI_PQ_PICTURE_SETTING_S* pstPictureSetting);
+extern HI_S32 DRV_PQ_GetSDPictureSetting(HI_PQ_PICTURE_SETTING_S* pstPictureSetting);
+#endif
+
 HI_S32 OPTM_GfxSetCsc(OPTM_GFX_GP_E enGfxGpId, OPTM_GFX_CSC_PARA_S *pstCscPara, HI_BOOL bIsBGRIn)
 { 
-#if 1
-#warning TODO
-#else
 	OPTM_ALG_CSC_DRV_PARA_S stCscDrvPara;
 	OPTM_ALG_CSC_RTL_PARA_S stCscRtlPara;
 	OPTM_VDP_CSC_COEF_S     stVDPCscCoef;
 	OPTM_VDP_CSC_DC_COEF_S  stVDPCscDcCoef;
 	
+#ifndef HI_PQ_V1_0
+
+#ifndef HI_BUILD_IN_BOOT
+    HI_PQ_PICTURE_SETTING_S stPictureSetting; // = {50, 50, 50, 50, 50, 50, 50, 50, 50, 50};
+#else
+    HI_U32 enChan;
+    HI_U32 u32Bright = 50;
+    HI_U32 u32Contrst = 50;
+    HI_U32 u32Hue = 50;
+    HI_U32 u32Satur = 50;
+#endif
+
+#ifndef HI_BUILD_IN_BOOT
+    OPTM_GFX_CSC_PARA_S stCscPara;
+    if (enGfxGpId == OPTM_GFX_GP_0)
+    {
+        DRV_PQ_GetHDPictureSetting(&stPictureSetting);
+    }
+    else
+    {
+        DRV_PQ_GetSDPictureSetting(&stPictureSetting);
+    }
+
+    stCscPara.u32Bright     = stCscDrvPara.u32Bright  = stPictureSetting.u16Brightness;
+    stCscPara.u32Contrast   = stCscDrvPara.u32Contrst = stPictureSetting.u16Contrast;
+    stCscPara.u32Hue        = stCscDrvPara.u32Hue     = stPictureSetting.u16Hue;
+    stCscPara.u32Saturation = stCscDrvPara.u32Satur   = stPictureSetting.u16Saturation;
+
+    stCscPara.u32Kb = stCscDrvPara.u32Kb = 50;
+    stCscPara.u32Kg = stCscDrvPara.u32Kg = 50;
+    stCscPara.u32Kr = stCscDrvPara.u32Kr = 50;
+
+#if 0
+    if (memcmp(&g_stGfxGPDevice[enGfxGpId].stCscPara, &stCscPara, sizeof(OPTM_GFX_CSC_PARA_S)) != 0)
+    {
+        g_stGfxGPDevice[enGfxGpId].stCscPara.u32Bright     = stCscDrvPara.u32Bright;
+        g_stGfxGPDevice[enGfxGpId].stCscPara.u32Contrast   = stCscDrvPara.u32Contrst;
+        g_stGfxGPDevice[enGfxGpId].stCscPara.u32Hue        = stCscDrvPara.u32Hue;
+        g_stGfxGPDevice[enGfxGpId].stCscPara.u32Kb         = stCscDrvPara.u32Kb;
+        g_stGfxGPDevice[enGfxGpId].stCscPara.u32Kg         = stCscDrvPara.u32Kg;
+        g_stGfxGPDevice[enGfxGpId].stCscPara.u32Kr         = stCscDrvPara.u32Kr;
+        g_stGfxGPDevice[enGfxGpId].stCscPara.u32Saturation = stCscDrvPara.u32Satur;
+        g_stGfxGPDevice[OPTM_VDP_LAYER_GP1].unUpFlag.bits.RegUp = 1;
+        OPTM_VDP_GP_SetRegUp(enGfxGpId);
+    }
+#endif
+
+#else
+
+    if (enGfxGpId == OPTM_GFX_GP_0)
+    {
+        enChan = HI_UNF_DISPLAY1;
+    }
+    else
+    {
+        enChan = HI_UNF_DISPLAY0;
+    }
+
+    HI_PQ_GetBrightness(enChan, &u32Bright);
+    HI_PQ_GetContrast(enChan, &u32Contrst);
+    HI_PQ_GetHue(enChan, &u32Hue);
+    HI_PQ_GetSaturation(enChan, &u32Satur);
+
+    stCscDrvPara.u32Bright  = u32Bright;
+    stCscDrvPara.u32Contrst = u32Contrst;
+    stCscDrvPara.u32Hue     = u32Hue;
+    stCscDrvPara.u32Satur   = u32Satur;
+
+    stCscDrvPara.u32Kb      = 50;
+    stCscDrvPara.u32Kg      = 50;
+    stCscDrvPara.u32Kr      = 50;
+
+#endif
+
+#endif //HI_PQ_V2_0  HI_PQ_V3_0
+
     PRINT_IN;
 
 	g_stGfxGPDevice[enGfxGpId].enInputCsc  = OPTM_CS_BT709_RGB_FULL;
@@ -1360,6 +1573,7 @@ HI_S32 OPTM_GfxSetCsc(OPTM_GFX_GP_E enGfxGpId, OPTM_GFX_CSC_PARA_S *pstCscPara, 
 	stCscDrvPara.eOutputCS  = g_stGfxGPDevice[enGfxGpId].enOutputCsc;
 	stCscDrvPara.bIsBGRIn   = bIsBGRIn;
 	
+#ifdef HI_PQ_V1_0
 	stCscDrvPara.u32Bright  = pstCscPara->u32Bright;
 	stCscDrvPara.u32Contrst = pstCscPara->u32Contrast;
 	stCscDrvPara.u32Hue     = pstCscPara->u32Hue;
@@ -1371,6 +1585,8 @@ HI_S32 OPTM_GfxSetCsc(OPTM_GFX_GP_E enGfxGpId, OPTM_GFX_CSC_PARA_S *pstCscPara, 
 	HIFB_INFO("<<<<<gpid %d csc in %d, out%d, BGR %d.\n",enGfxGpId,stCscDrvPara.eInputCS,stCscDrvPara.eOutputCS,stCscDrvPara.bIsBGRIn);
 	HIFB_INFO("parameter %d,%d,%d,%d,%d,%d,%d\n>>>",pstCscPara->u32Bright,pstCscPara->u32Contrast,pstCscPara->u32Hue,
 				pstCscPara->u32Kb,pstCscPara->u32Kg,pstCscPara->u32Kr,pstCscPara->u32Saturation);
+#endif //HI_PQ_V1_0
+
 	OPTM_ALG_CscCoefSet(&stCscDrvPara, &stCscRtlPara);
 
 	stVDPCscCoef.csc_coef00 = stCscRtlPara.s32CscCoef_00;
@@ -1399,19 +1615,15 @@ HI_S32 OPTM_GfxSetCsc(OPTM_GFX_GP_E enGfxGpId, OPTM_GFX_CSC_PARA_S *pstCscPara, 
     //g_stGfxDevice[enLayerId].CscState = OPTM_CSC_SET_PARA_RGB;
 	
     PRINT_OUT;
-#endif
  
     return HI_SUCCESS;
 }
 
 #ifndef HI_BUILD_IN_BOOT
 static HIFB_LAYER_ID_E CallBackLayerId[HIFB_LAYER_ID_BUTT];
-#endif
+
 HI_S32 OPTM_GfxSetCallback(HIFB_LAYER_ID_E enLayerId, IntCallBack pCallBack, HIFB_CALLBACK_TPYE_E eCallbackType)
-
 {
-#ifndef HI_BUILD_IN_BOOT
-
 	HI_U32                      u32GfxIndex;
 	OPTM_GFX_GP_E               enGPId;
 
@@ -1419,7 +1631,7 @@ HI_S32 OPTM_GfxSetCallback(HIFB_LAYER_ID_E enLayerId, IntCallBack pCallBack, HIF
     
     if (eCallbackType >= HIFB_CALLBACK_TYPE_BUTT)
     {
-    	HIFB_ERROR("Fail to set callback func!\n");
+    	HIFB_ERROR("Fail to set callback func!\n"); //1586
         return HI_FAILURE;
     }    
 
@@ -1431,15 +1643,15 @@ HI_S32 OPTM_GfxSetCallback(HIFB_LAYER_ID_E enLayerId, IntCallBack pCallBack, HIF
 
 	if (u32GfxIndex >= OPTM_GP_MAXGFXCOUNT)
 	{
-		HIFB_ERROR("Fail to set callback func!\n");
+		HIFB_ERROR("Fail to set callback func!\n"); //1598
 		return HI_FAILURE;
 	}
 
 	if (HI_NULL != pCallBack)
 	{
-		g_stGfxGPIrq[enGPId].stGfxCallBack[u32GfxIndex].u32CTypeFlag |= eCallbackType;
 		g_stGfxGPIrq[enGPId].stGfxCallBack[u32GfxIndex].stGfxIrq[eCallbackType].pFunc     = pCallBack;
 		g_stGfxGPIrq[enGPId].stGfxCallBack[u32GfxIndex].stGfxIrq[eCallbackType].u32Param0 = (HI_U32)&CallBackLayerId[enLayerId];	    
+		g_stGfxGPIrq[enGPId].stGfxCallBack[u32GfxIndex].u32CTypeFlag |= eCallbackType;
 	}
 	else
 	{
@@ -1450,9 +1662,34 @@ HI_S32 OPTM_GfxSetCallback(HIFB_LAYER_ID_E enLayerId, IntCallBack pCallBack, HIF
     PRINT_OUT;
 
     return HI_SUCCESS;
-#else
-	return HI_SUCCESS;
+}
+HI_S32 OPTM_CheckGfxCallbackReg(OPTM_GFX_GP_E enGPId, HIFB_CALLBACK_TPYE_E eCallbackType)
+{
+    HI_U32 u32LayerCount = (enGPId == OPTM_GFX_GP_0) ? OPTM_GP0_GFX_COUNT : OPTM_GP1_GFX_COUNT;
+    HI_U32 u32LayerId = 0;
+
+    for(; u32LayerId < u32LayerCount; u32LayerId++)
+    {
+        if (g_stGfxGPIrq[enGPId].stGfxCallBack[u32LayerId].u32CTypeFlag & eCallbackType)
+        {
+            if (g_stGfxGPIrq[enGPId].stGfxCallBack[u32LayerId].stGfxIrq[eCallbackType].pFunc)
+            {
+                return HI_SUCCESS;
+            }
+        }
+    }
+
+    return HI_FAILURE;
+}
 #endif
+
+HI_S32 OPTM_GfxSetWbcAddr(OPTM_VDP_LAYER_WBC_E enWbcHalId, HI_U32 u32Addr, HI_U32 u32Stride)
+{
+    OPTM_CheckGPMask_BYLayerID(OPTM_SLAVER_LAYERID);
+
+	OPTM_VDP_WBC_SetLayerAddr(enWbcHalId, u32Addr,
+			0x0, u32Stride, 0x0);
+    return HI_SUCCESS;
 }
 
 /*Open  sd0 layer when working int wbc mode*/
@@ -1504,15 +1741,15 @@ HI_S32 OPTM_GfxOpenSlvLayer(HIFB_LAYER_ID_E enLayerId)
 	OPTM_VDP_GFX_SetPreMultEnable(g_stGfxDevice[enLayerId].enGfxHalId, HI_TRUE);
 	OPTM_VDP_GFX_SetRegUp      (g_stGfxDevice[enLayerId].enGfxHalId);	
 
-	g_stGfxDevice[enLayerId].bCampEnable = HI_FALSE;	
-	 
+	g_stGfxDevice[enLayerId].bCmpOpened = HI_FALSE;
+#ifndef HI_BUILD_IN_BOOT
 	s32Ret = OPTM_SetCallbackToDisp(enGPId, (IntCallBack)OPTM_DispCallBack, HI_DRV_DISP_C_INTPOS_90_PERCENT, HI_TRUE);
 	if (HI_SUCCESS != s32Ret)
 	{
 		HIFB_ERROR("unable to register to disp for slv layer!\n"); //1701
 		goto ERR;
 	}
-
+#endif
 
 	if (g_stGfxCap[enLayerId].bHasCmapReg != HI_FALSE)
     {
@@ -1528,8 +1765,11 @@ HI_S32 OPTM_GfxOpenSlvLayer(HIFB_LAYER_ID_E enLayerId)
         OPTM_VDP_GFX_SetLutAddr(g_stGfxDevice[enLayerId].enGfxHalId, g_stGfxDevice[enLayerId].stCluptTable.u32StartPhyAddr);
     }	
 
+	OPTM_GfxSetWbcAddr(g_stGfxWbc2.enWbcHalId, g_stGfxWbc2.u32WriteBufAddr,
+			g_stGfxWbc2.u32BufferStride);
 	//OPTM_GfxSetLayerAddr  (enLayerId, g_stGfxWbc2.stFrameBuffer.u32StartPhyAddr);
-	OPTM_GfxSetWbcAddr(g_stGfxWbc2.enWbcHalId, g_stGfxWbc2.Data_36, g_stGfxWbc2.u32BufferStride);
+    //OPTM_VDP_WBC_SetLayerAddr(g_stGfxWbc2.enWbcHalId, g_stGfxWbc2.u32WBCBuffer[g_stGfxWbc2.u32BufIndex],
+    //                              0x0, g_stGfxWbc2.u32BufferStride, 0x0);
 	OPTM_GfxSetLayerStride(enLayerId, g_stGfxWbc2.u32BufferStride);
 
 	g_stGfxDevice[enLayerId].bEnable = OPTM_JudgeWbcEnable();
@@ -1556,7 +1796,7 @@ ERR:
 }
 
 /*Close  sd0 layer when working int wbc mode*/
-/*static*/ HI_S32 OPTM_GfxCloseSlvLayer(HIFB_LAYER_ID_E enLayerId)
+static HI_S32 OPTM_GfxCloseSlvLayer(HIFB_LAYER_ID_E enLayerId)
 {
 	HI_S32        s32Ret;
 	OPTM_GFX_GP_E enGPId;
@@ -1584,10 +1824,10 @@ ERR:
 	OPTM_GfxWaitVBlank(enLayerId);
 #endif
 	
-//#ifndef HI_BUILD_IN_BOOT    
+#ifndef HI_BUILD_IN_BOOT
 	//s32Ret |= OPTM_GfxSetCallback(enLayerId,HI_NULL,HIFB_CALLBACK_TYPE_VO);
 	s32Ret |= OPTM_SetCallbackToDisp(enGPId, (IntCallBack)OPTM_DispCallBack, HI_DRV_DISP_C_INTPOS_90_PERCENT, HI_FALSE);
-//#endif
+#endif
 	/*close wbc2*/
 	s32Ret |= OPTM_GFX_CloseWbc2(&g_stGfxWbc2);
 
@@ -1604,7 +1844,7 @@ ERR:
 	return s32Ret;
 }
 
-
+#if 0
 /*this func is for both graphics and video  virtual screen deal, it's a common function.*/
 HI_S32 OPTM_ReviseOutRect(const HI_RECT_S *tmp_virtscreen, 
                          const OPTM_GFX_OFFSET_S *stOffsetInfo,
@@ -1649,7 +1889,8 @@ HI_S32 OPTM_ReviseOutRect(const HI_RECT_S *tmp_virtscreen,
 
     return HI_SUCCESS;
 }
-
+#endif
+#ifndef HI_BUILD_IN_BOOT
 HI_S32 OPTM_GetScreenRectFromDispInfo(const HI_RECT_S *tmp_virtscreen, 
                          const OPTM_GFX_OFFSET_S *stOffsetInfo,
                          const HI_RECT_S *stFmtResolution,
@@ -1684,10 +1925,199 @@ HI_S32 OPTM_GetScreenRectFromDispInfo(const HI_RECT_S *tmp_virtscreen,
 
     return HI_SUCCESS;
 }
+#endif
+
+HI_VOID OPTM_SlaverProcess(HI_VOID* u32Param0, HI_VOID* u32Param1)
+{
+    HIFB_LAYER_ID_E enLayerId;
+    OPTM_GFX_GP_E   enGfxGpId;
+    OPTM_GFX_GP_S   *pGfxGp;
+    OPTM_GFX_WBC_S   *pstWbc2;
+
+    pstWbc2     = &g_stGfxWbc2;
+    enGfxGpId   = *((OPTM_GFX_GP_E*)u32Param0);
+    enLayerId   = HIFB_LAYER_SD_0;
+    pGfxGp      = &g_stGfxGPDevice[enGfxGpId];
+    if (!g_stGfxGPDevice[enGfxGpId].bMaskFlag)
+    {
+        if (pGfxGp->unUpFlag.bits.Enable)
+        {
+            OPTM_VDP_GFX_SetLayerEnable(g_stGfxDevice[enLayerId].enGfxHalId, g_stGfxDevice[enLayerId].bEnable);
+            OPTM_VDP_WBC_SetEnable     (pstWbc2->enWbcHalId,                 g_stGfxDevice[enLayerId].bEnable);
+            //OPTM_VDP_GFX_SetLayerAddrEX(g_stGfxDevice[enLayerId].enGfxHalId, g_stGfxWbc2.stFrameBuffer.u32StartPhyAddr);
+            pGfxGp->unUpFlag.bits.Enable = 0;
+        }
+
+        if (pGfxGp->unUpFlag.bits.InRect)
+        {
+            OPTM_GfxConfigSlvLayer(enLayerId, &pGfxGp->stOutRect);
+            pGfxGp->unUpFlag.bits.InRect = 0;
+        }
+
+        if (pGfxGp->unUpFlag.bits.Alpha)
+        {
+            HIFB_ALPHA_S *pstAlpha;
+            pstAlpha = &g_stGfxDevice[enLayerId].stAlpha;
+            OPTM_VDP_GFX_SetPalpha(g_stGfxDevice[enLayerId].enGfxHalId,pstAlpha->bAlphaEnable,HI_TRUE,pstAlpha->u8Alpha0,pstAlpha->u8Alpha1);
+            OPTM_VDP_GFX_SetLayerGalpha(g_stGfxDevice[enLayerId].enGfxHalId, pstAlpha->u8GlobalAlpha);
+            pGfxGp->unUpFlag.bits.Alpha = 0;
+        }
+
+        if (pGfxGp->unUpFlag.bits.PreMute)
+        {
+            OPTM_VDP_GFX_SetPreMultEnable(g_stGfxDevice[enLayerId].enGfxHalId, g_stGfxDevice[enLayerId].bPreMute);
+            pGfxGp->unUpFlag.bits.PreMute = 0;
+        }
+        OPTM_VDP_GFX_SetRegUp(g_stGfxDevice[enLayerId].enGfxHalId);
+        OPTM_VDP_GP_SetRegUp (enGfxGpId);
+
+    }
+
+}
+
+HI_U32 OPTM_VDP_DISP_GetIntSignal(int a);
+void OPTM_ClearIntSignal(int a);
+HI_S32 OPTM_GfxSetLayerRect(HIFB_LAYER_ID_E enLayerId, const HIFB_RECT *pstRect);
+
+HI_VOID OPTM_Wbc2Process(HI_VOID* u32Param0, HI_VOID* u32Param1)
+{
+    HIFB_LAYER_ID_E enLayerId;
+    OPTM_GFX_GP_E   enGfxGpId;
+    OPTM_GFX_GP_S   *pGfxGp;
+    OPTM_GFX_WBC_S   *pstWbc2;
+
+    pstWbc2     = &g_stGfxWbc2;
+    enGfxGpId   = *((OPTM_GFX_GP_E*)u32Param0);
+    enLayerId   = HIFB_LAYER_SD_0;
+    pGfxGp      = &g_stGfxGPDevice[OPTM_SLAVER_GPID];
+
+    if (!g_stGfxGPDevice[enGfxGpId].bMaskFlag)
+    {
+        if (pGfxGp->unUpFlag.bits.WbcMode)
+        {
+            OPTM_VDP_WBC_SetThreeMd(pstWbc2->enWbcHalId, (HI_U32)pstWbc2->enWbcMode);
+            pGfxGp->unUpFlag.bits.WbcMode = 0;
+        }
+
+        OPTM_VDP_WBC_SetRegUp(pstWbc2->enWbcHalId);
+    }
+
+#ifndef HI_BUILD_IN_BOOT
+    if (OPTM_VDP_DISP_GetIntSignal(pstWbc2->enWbcInt) && !g_stGfxGPDevice[OPTM_SLAVER_GPID].bMaskFlag)
+#endif
+    {
+        //HIFB_RECT stRect = {0};
+ #ifndef HI_BUILD_IN_BOOT
+        //OPTM_ClearIntSignal(pstWbc2->enWbcInt);
+ #endif
+        OPTM_VDP_GFX_SetLayerAddrEX(g_stGfxDevice[enLayerId].enGfxHalId, pstWbc2->u32WBCBuffer[pstWbc2->u32BufIndex]);
+        pstWbc2->u32ReadBufAddr = pstWbc2->u32WBCBuffer[pstWbc2->u32BufIndex];
+        //g_stGfxWbc2.enWBCBufferStatus[pstWbc2->u32BufIndex] = OPTM_WBC_BUFFER_RELEASED;
+        pstWbc2->u32BufIndex++;
+        pstWbc2->u32BufIndex = pstWbc2->u32BufIndex%OPTM_WBCBUFFER_NUM;
+        OPTM_VDP_WBC_SetLayerAddr(pstWbc2->enWbcHalId, pstWbc2->u32WBCBuffer[pstWbc2->u32BufIndex],
+                                    0x0, pstWbc2->u32BufferStride, 0x0);
+        pstWbc2->u32WriteBufAddr = pstWbc2->u32WBCBuffer[pstWbc2->u32BufIndex];
+
+        OPTM_ClearIntSignal(pstWbc2->enWbcInt);
+
+    //#if 1
+        //stRect.w = g_stGfxGPDevice[OPTM_SLAVER_GPID].stOutRect.s32Width;
+        //stRect.h = g_stGfxGPDevice[OPTM_SLAVER_GPID].stOutRect.s32Height;
+        //OPTM_GfxSetLayerRect(enLayerId, &stRect);
+        //OPTM_GfxSetGpRect(OPTM_SLAVER_GPID, &stRect);
+    //#endif
+
+//        OPTM_VDP_GFX_SetRegUp(g_stGfxDevice[enLayerId].enGfxHalId);
+//        OPTM_VDP_GP_SetRegUp (enGfxGpId);
+       // printk("f%d\n",wbc_int);
+    }
+
+#if 0
+    if (pGfxGp->unUpFlag.bits.RegUp && !g_stGfxGPDevice[enGfxGpId].bMaskFlag
+		&& g_stGfxDevice[enLayerId].bEnable)
+    {
+        //OPTM_VDP_WBC_SetEnable(pstWbc2->enWbcHalId, g_stGfxDevice[enLayerId].bEnable);
+#ifndef HI_BUILD_IN_BOOT
+        if (pGfxGp->unUpFlag.bits.WbcMode)
+        {
+            OPTM_VDP_WBC_SetThreeMd(pstWbc2->enWbcHalId, (HI_U32)pstWbc2->enWbcMode);
+            pGfxGp->unUpFlag.bits.WbcMode = 0;
+        }
+#endif
+
+#if 0
+        if (g_stGfxWbc2.s32WbcCnt > 0)
+        {
+            g_stGfxWbc2.s32WbcCnt--;
+			//g_stGfxWbc2.enWBCBufferStatus[pstWbc2->u32BufIndex] = OPTM_WBC_BUFFER_RELEASED;
+        }
+        else
+        {
+        	if (g_stGfxWbc2.enWBCBufferStatus[pstWbc2->u32BufIndex] == OPTM_WBC_BUFFER_RELEASED)
+            {
+                 pGfxGp->unUpFlag.bits.RegUp = 0;
+                 OPTM_VDP_WBC_SetRegUp(pstWbc2->enWbcHalId);
+				 g_stGfxWbc2.enWBCBufferStatus[pstWbc2->u32BufIndex] = OPTM_WBC_BUFFER_ACQUIRED;
+
+            }
+        }
+#endif
+
+    }
+
+#endif
+
+}
+
+HI_VOID OPTM_FrameEndCallBack(HI_VOID* u32Param0, HI_VOID* u32Param1)
+{
+
+    HI_U32 u32CTypeFlag;
+    OPTM_VDP_LAYER_GP_E         *pEnGpHalId;
+    HI_DRV_DISP_CALLBACK_INFO_S *pstDispInfo;
+    pEnGpHalId  = (OPTM_VDP_LAYER_GP_E *)u32Param0;
+    pstDispInfo = (HI_DRV_DISP_CALLBACK_INFO_S *)u32Param1;
+
+    if (HI_NULL == pEnGpHalId || HI_NULL == pstDispInfo)
+    {
+        HIFB_WARNING("unable to handle null point in dispcallback\n"); //1884
+        return;
+    }
+
+    if (!g_stGfxGPDevice[*pEnGpHalId].bOpen)
+    {
+        return;
+    }
+
+    if (*pEnGpHalId == OPTM_VDP_LAYER_GP0)
+    {
+
+        if (pstDispInfo->stDispInfo.bInterlace &&
+            !pstDispInfo->stDispInfo.bIsBottomField)
+        {
+            return;
+        }
+        OPTM_Wbc2Process(u32Param0,u32Param1);
+
+        u32CTypeFlag = g_stGfxGPIrq[*pEnGpHalId].stGfxCallBack[HIFB_LAYER_HD_0].u32CTypeFlag;
+        if (u32CTypeFlag & HIFB_CALLBACK_TYPE_FRAME_END){
+            g_stGfxGPIrq[*pEnGpHalId].stGfxCallBack[HIFB_LAYER_HD_0].stGfxIrq[HIFB_CALLBACK_TYPE_FRAME_END].pFunc(
+                (HI_VOID*)g_stGfxGPIrq[*pEnGpHalId].stGfxCallBack[HIFB_LAYER_HD_0].stGfxIrq[HIFB_CALLBACK_TYPE_FRAME_END].u32Param0,
+                HI_NULL);
+        }
+    }
+    else if (*pEnGpHalId == OPTM_VDP_LAYER_GP1)
+    {
+        //printk("==========frame end==========\n");
+        //OPTM_SlaverProcess(u32Param0, u32Param1);
+    }
+
+    return;
+}
 
 HI_VOID OPTM_DispCallBack(HI_VOID* u32Param0, HI_VOID* u32Param1)
 {
-#ifndef HI_BUILD_IN_BOOT
 	OPTM_COLOR_SPACE_E          enGpCsc;
 	OPTM_VDP_LAYER_GP_E         *pEnGpHalId;
 	HI_DRV_DISP_CALLBACK_INFO_S *pstDispInfo;
@@ -1697,10 +2127,15 @@ HI_VOID OPTM_DispCallBack(HI_VOID* u32Param0, HI_VOID* u32Param1)
 
 	if (HI_NULL == pEnGpHalId || HI_NULL == pstDispInfo)
 	{
-		HIFB_WARNING("unable to handle null point in dispcallback\n");
+		HIFB_WARNING("unable to handle null point in dispcallback\n"); //1929
 		return;
 	}
 	
+    if (!g_stGfxGPDevice[*pEnGpHalId].bOpen)
+    {
+        return;
+    }
+
 	if (g_enOptmGfxWorkMode == HIFB_GFX_MODE_NORMAL
 		&& pstDispInfo->stDispInfo.bIsMaster
 		&& OPTM_VDP_LAYER_GP0 == *pEnGpHalId)
@@ -1712,8 +2147,7 @@ HI_VOID OPTM_DispCallBack(HI_VOID* u32Param0, HI_VOID* u32Param1)
 			g_stGfxGPDevice[*pEnGpHalId].stOpenSlvWork.u32Data = HIFB_LAYER_SD_0;
 			queue_work(g_stGfxGPDevice[*pEnGpHalId].queue, &g_stGfxGPDevice[*pEnGpHalId].stOpenSlvWork.work);
 		}
-		
-		HIFB_INFO("set gfx work mode wbc!\n");
+		//HIFB_INFO("set gfx work mode wbc!\n");
 	}
 
 	if (HI_DRV_DISP_C_PREPARE_TO_PEND == pstDispInfo->eEventType
@@ -1728,7 +2162,7 @@ HI_VOID OPTM_DispCallBack(HI_VOID* u32Param0, HI_VOID* u32Param1)
 		
 		g_stGfxGPDevice[*pEnGpHalId].bGpClose = HI_TRUE;
         OPTM_GPMask(*pEnGpHalId, HI_TRUE);
-		HIFB_INFO("======disp%d close======\n",*pEnGpHalId);
+		HIFB_INFO("======disp%d close======\n",*pEnGpHalId); //1963
 		return;
 	}
 	else if (HI_DRV_DISP_C_RESUME == pstDispInfo->eEventType
@@ -1748,11 +2182,12 @@ HI_VOID OPTM_DispCallBack(HI_VOID* u32Param0, HI_VOID* u32Param1)
 		}
 		
 		OPTM_GPMask(*pEnGpHalId, HI_FALSE);
-		HIFB_INFO("======disp%d open======\n",*pEnGpHalId);
+		HIFB_INFO("======disp%d open======\n",*pEnGpHalId); //1983
 		return;
 	}
 	else if (HI_DRV_DISP_C_DISPLAY_SETTING_CHANGE == pstDispInfo->eEventType)
 	{
+#if 0
 		g_stGfxGPDevice[*pEnGpHalId].stCscPara.u32Bright     = pstDispInfo->stDispInfo.u32Bright;
 		g_stGfxGPDevice[*pEnGpHalId].stCscPara.u32Contrast   = pstDispInfo->stDispInfo.u32Contrst;
 		g_stGfxGPDevice[*pEnGpHalId].stCscPara.u32Hue        = pstDispInfo->stDispInfo.u32Hue;
@@ -1765,7 +2200,7 @@ HI_VOID OPTM_DispCallBack(HI_VOID* u32Param0, HI_VOID* u32Param1)
 				,pstDispInfo->stDispInfo.u32Bright,pstDispInfo->stDispInfo.u32Contrst,pstDispInfo->stDispInfo.u32Hue
 				,pstDispInfo->stDispInfo.u32Kb,pstDispInfo->stDispInfo.u32Kg,pstDispInfo->stDispInfo.u32Kr
 				,pstDispInfo->stDispInfo.u32Satur);
-			
+#endif
 		
 		OPTM_GfxSetCsc(*pEnGpHalId, &g_stGfxGPDevice[*pEnGpHalId].stCscPara, 
 						g_stGfxGPDevice[*pEnGpHalId].bBGRState);
@@ -1790,7 +2225,20 @@ HI_VOID OPTM_DispCallBack(HI_VOID* u32Param0, HI_VOID* u32Param1)
 				g_stGfxGPDevice[*pEnGpHalId].stOutRect.s32Width,g_stGfxGPDevice[*pEnGpHalId].stOutRect.s32Height);
 #endif
 		OPTM_GPRecovery(*pEnGpHalId);
-
+#if 0
+        if (OPTM_DispInfoProcess(*pEnGpHalId, pstDispInfo))
+        {
+            OPTM_DispInfoUpdate(*pEnGpHalId);
+         #if 1
+            if (*pEnGpHalId == OPTM_VDP_LAYER_GP1)
+            {
+                g_stGfxGPDevice[OPTM_VDP_LAYER_GP1].unUpFlag.bits.RegUp = 1;
+                g_stGfxGPDevice[OPTM_VDP_LAYER_GP1].unUpFlag.bits.InRect = 1;
+                g_stGfxWbc2.s32WbcCnt = 2;
+            }
+         #endif
+        }
+#endif
 		//printk("====DISP_SETTING_EVENT_END====\n");
 		return;
 	}
@@ -1812,7 +2260,7 @@ HI_VOID OPTM_DispCallBack(HI_VOID* u32Param0, HI_VOID* u32Param1)
 		if (HI_TRUE == g_stGfxGPDevice[*pEnGpHalId].bRecoveryInNextVT)
 		{		
 			g_stGfxGPDevice[*pEnGpHalId].bInterface = pstDispInfo->stDispInfo.bInterlace;
-			HIFB_INFO("disp call back bInterface %d.\n", g_stGfxGPDevice[*pEnGpHalId].bInterface);
+			HIFB_INFO("disp call back bInterface %d.\n", g_stGfxGPDevice[*pEnGpHalId].bInterface); //2049
 			
 			memcpy(&g_stGfxGPDevice[*pEnGpHalId].stInRect, &pstDispInfo->stDispInfo.stVirtaulScreen, sizeof(HI_RECT_S));
 			
@@ -1843,7 +2291,9 @@ HI_VOID OPTM_DispCallBack(HI_VOID* u32Param0, HI_VOID* u32Param1)
 			g_stGfxGPDevice[*pEnGpHalId].bDispInitial      = HI_TRUE;
 		}
 
-		enGpCsc = OPTM_AdaptCscTypeFromDisp(pstDispInfo->stDispInfo.eColorSpace);		
+		enGpCsc = OPTM_AdaptCscTypeFromDisp(pstDispInfo->stDispInfo.eColorSpace);
+
+#ifdef HI_PQ_V1_0
 		if (g_stGfxGPDevice[*pEnGpHalId].enOutputCsc != enGpCsc)
 		{
 			g_stGfxGPDevice[*pEnGpHalId].enOutputCsc = enGpCsc;
@@ -1857,29 +2307,28 @@ HI_VOID OPTM_DispCallBack(HI_VOID* u32Param0, HI_VOID* u32Param1)
 			OPTM_GfxSetCsc(*pEnGpHalId, &g_stGfxGPDevice[*pEnGpHalId].stCscPara, 
 							g_stGfxGPDevice[*pEnGpHalId].bBGRState);
 		}		
+#else
+        g_stGfxGPDevice[*pEnGpHalId].enOutputCsc = enGpCsc;
+        OPTM_GfxSetCsc(*pEnGpHalId, &g_stGfxGPDevice[*pEnGpHalId].stCscPara,
+                       g_stGfxGPDevice[*pEnGpHalId].bBGRState);
+#endif
 
 		if (IS_SLAVER_GP(*pEnGpHalId))
 		{
-			OPTM_Wbc2Isr(u32Param0, u32Param1);
+            //OPTM_Wbc2Isr(u32Param0, u32Param1);
+             OPTM_SlaverProcess(u32Param0, u32Param1);
 		}
 		else
 		{
 			OPTM_Distribute_Callback(u32Param0, u32Param1);
 		}		
-
+#ifdef CFG_HIFB_COMPRESSION_SUPPORT
+        OPTM_GFX_CMP_Process(u32Param0);
+#endif
 		return;
 	}
 
 	return;
-#else
-	return;
-#endif
-}
-
-HI_VOID OPTM_FrameEndCallBack(HI_VOID* u32Param0, HI_VOID* u32Param1)
-{
-#warning TODO: OPTM_FrameEndCallBack
-	printk("OPTM_FrameEndCallBack: TODO\n");
 }
 
 HI_DRV_DISPLAY_E OPTM_GfxChn2DispChn(OPTM_DISPCHANNEL_E enDispCh)
@@ -1898,9 +2347,9 @@ HI_DRV_DISPLAY_E OPTM_GfxChn2DispChn(OPTM_DISPCHANNEL_E enDispCh)
 	}
 }
 
+#ifndef HI_BUILD_IN_BOOT
 HI_S32 OPTM_SetCallbackToDisp(OPTM_GFX_GP_E enGPId, IntCallBack pCallBack, HI_DRV_DISP_CALLBACK_TYPE_E eType, HI_BOOL bFlag)
 {
-#ifndef HI_BUILD_IN_BOOT	
 	HI_S32 s32Ret;
 	HI_DRV_DISPLAY_E            enDisp;
 	HI_DRV_DISP_CALLBACK_S      stCallback;
@@ -1918,18 +2367,23 @@ HI_S32 OPTM_SetCallbackToDisp(OPTM_GFX_GP_E enGPId, IntCallBack pCallBack, HI_DR
         return HI_FAILURE;
     }    
 
+//    if (bFlag == g_stGfxGPIrq[enGPId].bRegistered[eType])
+//    {
+//        return HI_SUCCESS;
+//    }
+
 	if (HI_NULL == pCallBack)
 	{
 		HIFB_ERROR("Unable to handle the null func point!\n"); //2155
 		return HI_FAILURE;
 	}
 	
-	s32Ret = HI_FAILURE;
 	enDisp = OPTM_GfxChn2DispChn(g_stGfxGPDevice[enGPId].enDispCh);
 	
 	stCallback.hDst            = (HI_HANDLE)(&g_stGfxGPDevice[enGPId].enGpHalId);
 	stCallback.pfDISP_Callback = (HI_VOID*)pCallBack;
 
+	//printk("[%s:%d]flag:%d\n", __FUNCTION__, __LINE__, bFlag);
 	if (bFlag)
 	{
 		s32Ret = ps_DispExportFuncs->pfnDispRegCallback(enDisp,eType,&stCallback);
@@ -1938,6 +2392,7 @@ HI_S32 OPTM_SetCallbackToDisp(OPTM_GFX_GP_E enGPId, IntCallBack pCallBack, HI_DR
 	{
 		s32Ret = ps_DispExportFuncs->pfnDispUnRegCallback(enDisp,eType,&stCallback);
 	}
+	//printk("[%s:%d]flag:%d\n", __FUNCTION__, __LINE__, bFlag);
 
 	if (HI_SUCCESS == s32Ret)
 	{
@@ -1947,10 +2402,8 @@ HI_S32 OPTM_SetCallbackToDisp(OPTM_GFX_GP_E enGPId, IntCallBack pCallBack, HI_DR
     PRINT_OUT;
 
     return s32Ret;
-#else	
-	return HI_SUCCESS;
-#endif
 }
+#endif
 
 HI_S32 OPTM_GfxOpenLayer(HIFB_LAYER_ID_E enLayerId)
 {
@@ -1992,23 +2445,20 @@ HI_S32 OPTM_GfxOpenLayer(HIFB_LAYER_ID_E enLayerId)
 	{
 		return HI_FAILURE;
 	}
-	
+#ifndef HI_BUILD_IN_BOOT
 	s32Ret = OPTM_SetCallbackToDisp(enGPId, (IntCallBack)OPTM_DispCallBack, HI_DRV_DISP_C_INTPOS_90_PERCENT, HI_TRUE);
 	if (HI_SUCCESS != s32Ret)
 	{
 		HIFB_ERROR("Disp was not ready, open gfx%d failure!\n", enLayerId); //2228
 		return HI_FAILURE;
 	}
-
-
 	s32Ret = OPTM_SetCallbackToDisp(enGPId, (IntCallBack)OPTM_FrameEndCallBack, HI_DRV_DISP_C_GFX_WBC, HI_TRUE);
 	if (HI_SUCCESS != s32Ret)
 	{
-		HIFB_ERROR("fail to register FrameEndCallBack\n", enLayerId); //2236
+		HIFB_ERROR("fail to register FrameEndCallBack\n"); //2236
 		return HI_FAILURE;
 	}
-
-
+#endif
 
 	if (g_stGfxCap[enLayerId].bHasCmapReg != HI_FALSE)
     {
@@ -2075,27 +2525,17 @@ HI_S32 OPTM_GfxCloseLayer(HIFB_LAYER_ID_E enLayerId)
     }
 
 	enGPId = g_stGfxDevice[enLayerId].enGPId;
-	
 #if 0
-	/*set layer decompression false*/
-    if(g_stGfxDevice[enLayerId].bCampEnable)
-    {
-        OPTM_GfxSetLayerDeCmpEnable(enLayerId, HI_FALSE);
-    }
-
 	if (OPTM_VDP_LAYER_GFX3 == g_stGfxDevice[enLayerId].enGfxHalId)
 	{
 		OPTM_VDP_OpenGFX3(HI_FALSE);
 		OPTM_VDP_SetLayerConnect(OPTM_VDP_CONNECT_G3_DHD0);
 	}
 #endif
-
     /* set layer disenable, confirm hardware close */
 	OPTM_GfxSetEnable(enLayerId, HI_FALSE);
+    //OPTM_VDP_GFX_SetNoSecFlag(g_stGfxDevice[enLayerId].enGfxHalId, HI_TRUE);
 	OPTM_VDP_GFX_SetRegUp(g_stGfxDevice[enLayerId].enGfxHalId);
-#if 0
-	OPTM_GfxWaitVBlank(enLayerId);
-#endif
 	OPTM_GfxDeInitLayer(enLayerId);
 	
 	g_stGfxDevice[enLayerId].bExtractLine = HI_FALSE;
@@ -2112,7 +2552,9 @@ HI_S32 OPTM_GfxCloseLayer(HIFB_LAYER_ID_E enLayerId)
 
 		OPTM_GPClose(enGPId);
 	}
-
+#ifdef CFG_HIFB_COMPRESSION_SUPPORT
+    OPTM_GFX_CMP_Close(enLayerId);
+#endif
     PRINT_OUT;
     
     return HI_SUCCESS;
@@ -2169,16 +2611,21 @@ HI_S32 OPTM_GfxSetEnable(HIFB_LAYER_ID_E enLayerId, HI_BOOL bEnable)
 
 HI_S32 OPTM_GfxSetLayerAddr(HIFB_LAYER_ID_E enLayerId, HI_U32 u32Addr)
 {
-#if 1
-#warning TODO
-#else
 	PRINT_IN;
     g_stGfxDevice[enLayerId].NoCmpBufAddr = u32Addr;
 
 	OPTM_CheckGPMask_BYLayerID(enLayerId);
 
+	if (enLayerId == HIFB_LAYER_HD_3)
+	{
+		u32Addr += g_stGfxDevice[enLayerId].u32Data_56;
+	}
     OPTM_VDP_GFX_SetLayerAddrEX(g_stGfxDevice[enLayerId].enGfxHalId, u32Addr);
 
+#ifdef CFG_HIFB_COMPRESSION_SUPPORT
+    g_stGfxDevice[enLayerId].stCmpInfo.bDDRDetectReady = HI_FALSE;
+#endif
+/*
 	if (IS_SLAVER_GP(g_stGfxDevice[enLayerId].enGPId))
 	{	
 		OPTM_GFX_WBC_S   *pstWbc2;
@@ -2188,20 +2635,9 @@ HI_S32 OPTM_GfxSetLayerAddr(HIFB_LAYER_ID_E enLayerId, HI_U32 u32Addr)
 		OPTM_VDP_WBC_SetLayerAddr(pstWbc2->enWbcHalId, u32Addr,
         							0x0, pstWbc2->u32BufferStride, 0x0);
 	}
-	
+*/
     PRINT_OUT;
-#endif
 	
-    return HI_SUCCESS;
-}
-
-HI_S32 OPTM_GfxSetWbcAddr(OPTM_VDP_LAYER_WBC_E enWbcHalId, HI_U32 u32Addr, HI_U32 u32BufferStride)
-{
-	if (g_stGfxGPDevice[g_stGfxDevice[HIFB_LAYER_SD_0/*4*/].enGPId].bMaskFlag == HI_FALSE)
-	{
-		OPTM_VDP_WBC_SetLayerAddr(enWbcHalId, u32Addr, 0x0, u32BufferStride, 0x0);
-	}
-
     return HI_SUCCESS;
 }
 
@@ -2229,12 +2665,14 @@ HI_S32 OPTM_GfxSetLayerStride(HIFB_LAYER_ID_E enLayerId, HI_U32 u32Stride)
     /* when set G0 stride we should change current mode from cmp mode to no cmp mode*/ 
     u16StridePre = g_stGfxDevice[enLayerId].Stride;
     g_stGfxDevice[enLayerId].Stride = (HI_U16)u32Stride;
+#ifdef CFG_HIFB_COMPRESSION_SUPPORT
+    g_stGfxDevice[enLayerId].stCmpInfo.stDataInfo.u32CmpStride = u32Stride/2;
+#endif
 #if 0
 	/* cmp mode, stride is" width*2 + head size" algin with 16 bytes*/
     g_stGfxDevice[enLayerId].CmpStride = ((HI_U16)u32Stride/2 + (u32Stride/2/128/8 +1)  +0xf)&0xfffffff0;
-#endif
 
-    if(g_stGfxDevice[enLayerId].bCampEnable)
+    if(g_stGfxDevice[enLayerId].bCmpOpened)
     {
 		if(enLayerId == HIFB_LAYER_HD_0)
 		{ 
@@ -2248,12 +2686,12 @@ HI_S32 OPTM_GfxSetLayerStride(HIFB_LAYER_ID_E enLayerId, HI_U32 u32Stride)
     {
 	    //OPTM_VDP_GFX_SetLayerStride(g_stGfxDevice[enLayerId].enGfxHalId, u32Stride);
     }
-
+#endif
 	PRINT_OUT;
 	
     return HI_SUCCESS;
 }
-
+#ifndef HI_BUILD_IN_BOOT
 HIFB_COLOR_FMT_E OPTM_HalFmtTransferToPixerFmt(OPTM_VDP_GFX_IFMT_E enDataFmt)
 {
     if (enDataFmt >= VDP_GFX_IFMT_BUTT)
@@ -2320,7 +2758,7 @@ HIFB_COLOR_FMT_E OPTM_HalFmtTransferToPixerFmt(OPTM_VDP_GFX_IFMT_E enDataFmt)
 	
 	return VDP_GFX_IFMT_BUTT;
 }
-
+#endif
 
 OPTM_VDP_GFX_IFMT_E OPTM_PixerFmtTransferToHalFmt(HIFB_COLOR_FMT_E enDataFmt)
 {
@@ -2408,83 +2846,66 @@ OPTM_VDP_GFX_IFMT_E OPTM_PixerFmtTransferToHalFmt(HIFB_COLOR_FMT_E enDataFmt)
 	return VDP_GFX_IFMT_BUTT;
 }
 
-HI_U32 OPTM_GetBppFromPixelFmt(HI_U32 a)
+HI_U32 OPTM_GetBppFromPixelFmt(HIFB_COLOR_FMT_E enDataFmt)
 {
-    if (a >= 28)
+    switch(enDataFmt)
     {
-        return 0;
+        case HIFB_FMT_RGB565:
+        case HIFB_FMT_KRGB444:
+        case HIFB_FMT_KRGB555:
+        case HIFB_FMT_ARGB4444:
+        case HIFB_FMT_ARGB1555:
+        case HIFB_FMT_RGBA4444:
+        case HIFB_FMT_RGBA5551:
+        case HIFB_FMT_ACLUT88:
+        case HIFB_FMT_BGR565:
+        case HIFB_FMT_ABGR1555:
+        case HIFB_FMT_ABGR4444:
+        case HIFB_FMT_KBGR444:
+        case HIFB_FMT_KBGR555:
+        {
+            return 16;
+        }
+        case HIFB_FMT_RGB888:
+        case HIFB_FMT_ARGB8565:
+        case HIFB_FMT_RGBA5658:
+        case HIFB_FMT_ABGR8565:
+        case HIFB_FMT_BGR888:
+        {
+            return 24;
+        }
+        case HIFB_FMT_KRGB888:
+        case HIFB_FMT_ARGB8888:
+        case HIFB_FMT_RGBA8888:
+        case HIFB_FMT_ABGR8888:
+        case HIFB_FMT_KBGR888:
+        {
+            return 32;
+        }
+        case HIFB_FMT_1BPP:
+        {
+            return 1;
+        }
+        case HIFB_FMT_2BPP:
+        {
+            return 2;
+        }
+        case HIFB_FMT_4BPP:
+        {
+            return 4;
+        }
+        case HIFB_FMT_8BPP:
+        case HIFB_FMT_ACLUT44:
+        {
+            return 8;
+        }
+        default:
+            return 0;
     }
-
-	switch (a)
-	{
-		case 0:
-			return 16;
-		case 1:
-			return 24;
-		case 2:
-			return 16;
-		case 3:
-			return 16;
-		case 4:
-			return 32;
-		case 5:
-			return 16;
-		case 6:
-			return 16;
-		case 7:
-			return 32;
-		case 8:
-			return 24;
-		case 9:
-			return 16;
-		case 10:
-			return 16;
-		case 11:
-			return 24;
-		case 12:
-			return 32;
-		case 13:
-			return 16;
-		case 14:
-			return 24;
-		case 15:
-			return 16;
-		case 16:
-			return 16;
-		case 17:
-			return 32;
-		case 18:
-			return 24;
-		case 19:
-			return 16;
-		case 20:
-			return 16;
-		case 21:
-			return 32;
-		case 22:
-			return 1;
-		case 23:
-			return 2;
-		case 24:
-			return 4;
-		case 25:
-			return 8;
-		case 26:
-			return 8;
-		case 27:
-			return 16;
-		default:
-			return 0;
-	}
-
-	return 0;
 }
 
 HI_S32 OPTM_GfxSetLayerDataFmt(HIFB_LAYER_ID_E enLayerId, HIFB_COLOR_FMT_E enDataFmt)
 {
-#if 1
-#warning TODO
-#else
 	HI_U32 i;
 	HI_U32 u32LayerCount;
 	OPTM_GFX_GP_E enGPId;
@@ -2492,7 +2913,7 @@ HI_S32 OPTM_GfxSetLayerDataFmt(HIFB_LAYER_ID_E enLayerId, HIFB_COLOR_FMT_E enDat
 
 	if (!g_stGfxCap[enLayerId].bColFmt[enDataFmt])
 	{
-		HIFB_ERROR("unSupport color format.\n");
+		HIFB_ERROR("unSupport color format.\n"); //2695
 		return HI_FAILURE;
 	}
 	
@@ -2513,7 +2934,7 @@ HI_S32 OPTM_GfxSetLayerDataFmt(HIFB_LAYER_ID_E enLayerId, HIFB_COLOR_FMT_E enDat
 				&&(g_stGfxDevice[i].CscState != OPTM_CSC_SET_PARA_BGR))
 			{
 				//printk("enLayerId %d, enable %d.\n",enLayerId,g_stGfxDevice[enLayerId].bEnable);
-				HIFB_ERROR("fail to set color format.\n");
+				HIFB_ERROR("fail to set color format.\n"); //2716
 				return HI_FAILURE;
 			}
 		}
@@ -2535,7 +2956,7 @@ HI_S32 OPTM_GfxSetLayerDataFmt(HIFB_LAYER_ID_E enLayerId, HIFB_COLOR_FMT_E enDat
 			if ((i != enLayerId) && g_stGfxDevice[i].bEnable
 				&&(g_stGfxDevice[i].CscState != OPTM_CSC_SET_PARA_RGB))
 			{
-				HIFB_ERROR("fail to set color format.\n");
+				HIFB_ERROR("fail to set color format.\n"); //2738
 				return HI_FAILURE;
 			}
 		}
@@ -2550,23 +2971,27 @@ HI_S32 OPTM_GfxSetLayerDataFmt(HIFB_LAYER_ID_E enLayerId, HIFB_COLOR_FMT_E enDat
     }
 
 	OPTM_VDP_GFX_SetInDataFmt(g_stGfxDevice[enLayerId].enGfxHalId,OPTM_PixerFmtTransferToHalFmt(enDataFmt));
-
-	PRINT_OUT;
+#ifdef CFG_HIFB_COMPRESSION_SUPPORT
+    if (g_stGfxDevice[enLayerId].bCmpOpened)
+    {
+        if (HIFB_FMT_ARGB8888 != enDataFmt)
+        {
+            g_stGfxDevice[enLayerId].stCmpInfo.enStatus = OPTM_CMP_STATUS_PARALYSED;
+        }
+    }
 #endif
+	PRINT_OUT;
     return HI_SUCCESS;
 }
 
 HI_S32 OPTM_GfxSetColorReg(HIFB_LAYER_ID_E enLayerId, HI_U32 u32OffSet, HI_U32 u32Color, HI_S32 UpFlag)
 {
-#if 1
-#warning TODO
-#else
 	HI_U32 *pCTab;
 
 	pCTab = (HI_U32 *)(g_stGfxDevice[enLayerId].stCluptTable.u32StartVirAddr);
 	if (HI_NULL == pCTab)
 	{
-		HIFB_ERROR("Unable to handle null virtual address!\n");
+		HIFB_ERROR("Unable to handle null virtual address!\n"); //2773
 		return HI_FAILURE;
 	}
 	
@@ -2575,7 +3000,6 @@ HI_S32 OPTM_GfxSetColorReg(HIFB_LAYER_ID_E enLayerId, HI_U32 u32OffSet, HI_U32 u
     {
         OPTM_VDP_GFX_SetParaUpd(g_stGfxDevice[enLayerId].enGfxHalId,VDP_DISP_COEFMODE_LUT);
     }
-#endif
 	
     return HI_SUCCESS;
 }
@@ -2597,7 +3021,7 @@ HI_S32 OPTM_GfxWaitVBlank(HIFB_LAYER_ID_E enLayerId)
 
 	PRINT_IN;
 	
-    D_OPTM_HIFB_CheckGfxOpen(enLayerId);
+    D_OPTM_HIFB_CheckGfxOpen(enLayerId); //2803
 
     u32TimeOutMs = (200 * HZ)/1000;
 
@@ -2618,7 +3042,6 @@ HI_S32 OPTM_GfxWaitVBlank(HIFB_LAYER_ID_E enLayerId)
 }
 #endif
 
-
 HI_S32 OPTM_GfxSetLayerDeFlicker(HIFB_LAYER_ID_E enLayerId, HIFB_DEFLICKER_S *pstDeFlicker)
 {
     return HI_SUCCESS;
@@ -2626,9 +3049,6 @@ HI_S32 OPTM_GfxSetLayerDeFlicker(HIFB_LAYER_ID_E enLayerId, HIFB_DEFLICKER_S *ps
 
 HI_S32 OPTM_GfxSetLayerAlpha(HIFB_LAYER_ID_E enLayerId, HIFB_ALPHA_S *pstAlpha)
 {
-#if 1
-#warning TODO
-#else
 	OPTM_GFX_GP_E enGpId;
 	
     PRINT_IN;
@@ -2653,7 +3073,6 @@ HI_S32 OPTM_GfxSetLayerAlpha(HIFB_LAYER_ID_E enLayerId, HIFB_ALPHA_S *pstAlpha)
 #endif    
 
 	PRINT_OUT;
-#endif
 	 
     return HI_SUCCESS;
 }
@@ -2671,13 +3090,13 @@ HI_S32 OPTM_GfxGetLayerRect(HIFB_LAYER_ID_E enLayerId, HIFB_RECT *pstRect)
 
 HI_S32 OPTM_GfxConfigCursorRect(HIFB_LAYER_ID_E enLayerId, const HIFB_RECT *pstRect)
 {
-#if 1
-#warning TODO
-#else
+//#ifndef HI_BUILD_IN_BOOT
 	OPTM_GFX_GP_E enGpId;
 	OPTM_VDP_DISP_RECT_S stGfxRect;
-	
-	if (OPTM_CURSOR_LAYERID != enLayerId)
+	HI_U32 r1 = 0;
+	HI_U32 r3 = 0;
+
+	if (/*OPTM_CURSOR_LAYERID*/HIFB_LAYER_HD_3 != enLayerId)
 	{
 		return HI_FAILURE;
 	}
@@ -2685,57 +3104,93 @@ HI_S32 OPTM_GfxConfigCursorRect(HIFB_LAYER_ID_E enLayerId, const HIFB_RECT *pstR
 	enGpId = g_stGfxDevice[enLayerId].enGPId;
 	memset(&stGfxRect, 0, sizeof(OPTM_VDP_DISP_RECT_S));
 
-	stGfxRect.u32DXS = g_stGfxGPDevice[enGpId].stOutRect.s32X & 0xfffffffe; 
-	stGfxRect.u32DYS = g_stGfxGPDevice[enGpId].stOutRect.s32Y & 0xfffffffc;
-	stGfxRect.u32DXL = g_stGfxGPDevice[enGpId].stOutRect.s32Width & 0xfffffffe;
-    stGfxRect.u32DYL = g_stGfxGPDevice[enGpId].stOutRect.s32Height & 0xfffffffc;
-	
-	stGfxRect.u32VX  = g_stGfxDevice[enLayerId].stInRect.x & 0xfffffffe;	
-	stGfxRect.u32VY  = g_stGfxDevice[enLayerId].stInRect.y & 0xfffffffc;	
-	stGfxRect.u32IWth= g_stGfxDevice[enLayerId].stInRect.w & 0xfffffffe;
-    stGfxRect.u32IHgt= g_stGfxDevice[enLayerId].stInRect.h & 0xfffffffc;
+    stGfxRect.u32VX  = g_stGfxDevice[enLayerId].stInRect.x;
+    stGfxRect.u32VY  = g_stGfxDevice[enLayerId].stInRect.y;
+    stGfxRect.u32IWth= g_stGfxDevice[enLayerId].stInRect.w;
+    stGfxRect.u32IHgt= g_stGfxDevice[enLayerId].stInRect.h;
 
-	if (stGfxRect.u32VX > stGfxRect.u32DXL)
-	{
-		stGfxRect.u32VX = stGfxRect.u32DXL;
-	}
+    stGfxRect.u32VXL = stGfxRect.u32VX + stGfxRect.u32IWth;
+    stGfxRect.u32VYL = stGfxRect.u32VY + stGfxRect.u32IHgt;
 
-	if (stGfxRect.u32VY > stGfxRect.u32DYL)
-	{
-		stGfxRect.u32VY = stGfxRect.u32DYL;
-	}
+    if (g_stGfxDevice[enLayerId].stInRect.x < 0)
+    {
+    	r1 = -g_stGfxDevice[enLayerId].stInRect.x;
 
-	if ((stGfxRect.u32VX + stGfxRect.u32IWth) > stGfxRect.u32DXL)
-	{
-		stGfxRect.u32IWth = stGfxRect.u32DXL - stGfxRect.u32VX;
-	}
+    	stGfxRect.u32VX = 0;
 
-	if ((stGfxRect.u32VY + stGfxRect.u32IHgt) > stGfxRect.u32DYL)
-	{
-		stGfxRect.u32IHgt = stGfxRect.u32DYL - stGfxRect.u32VY;
-	}
+    	if (r1 >= stGfxRect.u32IWth)
+    	{
+    		r1 = stGfxRect.u32IWth;
+    	}
+		stGfxRect.u32IWth = stGfxRect.u32IWth - r1;
+    }
+
+    if (g_stGfxDevice[enLayerId].stInRect.y < 0)
+    {
+    	r3 = -g_stGfxDevice[enLayerId].stInRect.y;
+
+    	stGfxRect.u32VY = 0;
+
+    	if (r3 >= stGfxRect.u32IHgt)
+    	{
+    		r3 = stGfxRect.u32IHgt;
+    	}
+    	stGfxRect.u32IHgt = stGfxRect.u32IHgt - r3;
+    }
+
+    if ( g_stGfxDevice[enLayerId].stInRect.w != 0)
+    {
+    	g_stGfxDevice[enLayerId].u32Data_56 =
+    	(r1 * (OPTM_GetBppFromPixelFmt(g_stGfxDevice[enLayerId].enDataFmt) / 8)) + g_stGfxDevice[enLayerId].Stride * r3;
+
+    	OPTM_GfxSetLayerAddr(3, g_stGfxDevice[enLayerId].NoCmpBufAddr);
+    }
+
+#warning TODO: OPTM_GfxConfigCursorRect
+    if (stGfxRect.u32VX > g_stGfxGPDevice[g_stGfxDevice[enLayerId].enGPId].stInRect.s32Width)
+    {
+    	stGfxRect.u32VX = g_stGfxGPDevice[g_stGfxDevice[enLayerId].enGPId].stInRect.s32Width;
+    }
+
+    if (stGfxRect.u32VY > g_stGfxGPDevice[g_stGfxDevice[enLayerId].enGPId].stInRect.s32Height)
+    {
+    	stGfxRect.u32VY = g_stGfxGPDevice[g_stGfxDevice[enLayerId].enGPId].stInRect.s32Height;
+    }
+
+	stGfxRect.u32DXS = stGfxRect.u32VX;
+	stGfxRect.u32DYS = stGfxRect.u32VY;
+
+    if (g_stGfxGPDevice[g_stGfxDevice[enLayerId].enGPId].stInRect.s32Width < (stGfxRect.u32DXS + stGfxRect.u32IWth))
+    {
+    	stGfxRect.u32IWth = g_stGfxGPDevice[g_stGfxDevice[enLayerId].enGPId].stInRect.s32Width - stGfxRect.u32DXS;
+    }
+
+    if (g_stGfxGPDevice[g_stGfxDevice[enLayerId].enGPId].stInRect.s32Height < (stGfxRect.u32DYS + stGfxRect.u32IHgt))
+    {
+    	stGfxRect.u32IHgt = g_stGfxGPDevice[g_stGfxDevice[enLayerId].enGPId].stInRect.s32Height - stGfxRect.u32DYS;
+    }
+
+    stGfxRect.u32DXL = stGfxRect.u32DXS + stGfxRect.u32IWth;
+    stGfxRect.u32DYL = stGfxRect.u32DYS + stGfxRect.u32IHgt;
 
 	stGfxRect.u32OWth= stGfxRect.u32IWth;
     stGfxRect.u32OHgt= stGfxRect.u32IHgt;
-	
+
 	OPTM_VDP_GFX_SetLayerReso(g_stGfxDevice[enLayerId].enGfxHalId, stGfxRect);
     OPTM_VDP_GFX_SetRegUp    (g_stGfxDevice[enLayerId].enGfxHalId);
-#endif
 
-	
+//#endif
 	return HI_SUCCESS;
 }
 
 HI_S32 OPTM_GfxSetLayerRect(HIFB_LAYER_ID_E enLayerId, const HIFB_RECT *pstRect)
 {
-#if 1
-#warning TODO
-#else
 	OPTM_GFX_GP_E enGpId;
 	OPTM_VDP_DISP_RECT_S stGfxRect;	
 
 	PRINT_IN;
 
+#warning TODO: OPTM_GfxSetLayerRect
     g_stGfxDevice[enLayerId].stInRect.x = pstRect->x;
 	g_stGfxDevice[enLayerId].stInRect.y = pstRect->y;
 	g_stGfxDevice[enLayerId].stInRect.w = pstRect->w;
@@ -2862,13 +3317,17 @@ HI_S32 OPTM_GfxSetLayerRect(HIFB_LAYER_ID_E enLayerId, const HIFB_RECT *pstRect)
 
 	OPTM_VDP_GFX_SetLayerReso(g_stGfxDevice[enLayerId].enGfxHalId, stGfxRect);
     OPTM_VDP_GFX_SetRegUp    (g_stGfxDevice[enLayerId].enGfxHalId);
-
-	PRINT_OUT;
+#ifdef CFG_HIFB_COMPRESSION_SUPPORT
+    if (g_stGfxDevice[enLayerId].bCmpOpened)
+    {
+        g_stGfxDevice[enLayerId].stCmpInfo.bLayerResChgFlag = HI_TRUE;
+    }
 #endif
+	PRINT_OUT;
 		
     return HI_SUCCESS;
 }
-
+#ifndef HI_BUILD_IN_BOOT
 HI_S32 OPTM_GfxSetGpInPutSize(OPTM_GFX_GP_E enGpId, HI_U32 u32Width, HI_U32 u32Height)
 {
 	g_stGfxGPDevice[enGpId].stInRect.s32Width  = u32Width;
@@ -2901,33 +3360,25 @@ HI_S32 OPTM_GfxGetDispFMTSize(OPTM_GFX_GP_E enGpId, HIFB_RECT *pstOutRect)
 
 	return HI_SUCCESS;
 }
-
-HI_S32 OPTM_GFX_GetSlvLayerInfo(HIFB_SLVLAYER_DATA_S* a)
-{
-	printk("OPTM_GFX_GetSlvLayerInfo: TODO\n");
-}
-
-HI_S32 OPTM_GFX_SetTCFlag(HI_U32 a)
-{
-//	printk("OPTM_GFX_SetTCFlag: TODO\n");
-	Data_81143414 = a;
-
-	return HI_SUCCESS;
-}
-
-HI_S32 OPTM_GfxSetGpDeflicker(int a, int b)
-{
-	printk("OPTM_GfxSetGpDeflicker: TODO\n");
-}
-
+#endif
 
 
 HI_S32 OPTM_GfxSetDispFMTSize(OPTM_GFX_GP_E enGpId, const HI_RECT_S *pstOutRect)
 {
-	HI_U32    u32Ratio;
+	//HI_U32    u32Ratio;
 	HIFB_RECT     stInputRect;
 
 	PRINT_IN;	
+
+	if (pstOutRect->s32X < 0 || pstOutRect->s32Y < 0)
+	{
+		return HI_FAILURE;
+	}
+
+	if (pstOutRect->s32Width <= 0 || pstOutRect->s32Height <= 0)
+	{
+		return HI_FAILURE;
+	}
 
 	g_stGfxGPDevice[enGpId].stOutRect.s32X = pstOutRect->s32X; 
 	g_stGfxGPDevice[enGpId].stOutRect.s32Y = pstOutRect->s32Y;
@@ -2943,7 +3394,7 @@ HI_S32 OPTM_GfxSetDispFMTSize(OPTM_GFX_GP_E enGpId, const HI_RECT_S *pstOutRect)
 	stInputRect.y = g_stGfxGPDevice[enGpId].stInRect.s32Y;
 	stInputRect.w = g_stGfxGPDevice[enGpId].stInRect.s32Width;
 	stInputRect.h = g_stGfxGPDevice[enGpId].stInRect.s32Height;
-
+#if 0
 	/*judge wether need to extract line for layer or not*/
 	u32Ratio =  g_stGfxGPDevice[enGpId].stInRect.s32Height*2;
 	u32Ratio /= g_stGfxGPDevice[enGpId].stOutRect.s32Height;
@@ -2961,7 +3412,7 @@ HI_S32 OPTM_GfxSetDispFMTSize(OPTM_GFX_GP_E enGpId, const HI_RECT_S *pstOutRect)
 	{
 		g_stGfxGPDevice[enGpId].bNeedExtractLine = HI_FALSE;
 	}
-
+#endif
 	if (stInputRect.w && stInputRect.h)
 	{
 		OPTM_GfxSetGpRect(enGpId, &stInputRect);
@@ -2973,12 +3424,9 @@ HI_S32 OPTM_GfxSetDispFMTSize(OPTM_GFX_GP_E enGpId, const HI_RECT_S *pstOutRect)
 	
 }
 #define SHARPEN_RATIO 3
-#define SHARPEN_MAX_WIDTH 1920
+#define SHARPEN_MAX_WIDTH 3840
 HI_S32 OPTM_GfxSetGpRect(OPTM_GFX_GP_E enGpId, const HIFB_RECT * pstInputRect)
 {
-#if 1
-#warning TODO
-#else
 	HI_U32          i;
 	HI_U32          u32LayerCount;
 	HIFB_LAYER_ID_E enLayerId;
@@ -2996,6 +3444,7 @@ HI_S32 OPTM_GfxSetGpRect(OPTM_GFX_GP_E enGpId, const HIFB_RECT * pstInputRect)
 
 	PRINT_IN;
 	bSlvGp     = HI_FALSE;
+	bGfxSharpen= HI_FALSE;
 	enGpHalId  = g_stGfxGPDevice[enGpId].enGpHalId;
 
 	g_stGfxGPDevice[enGpId].stInRect.s32Width  = pstInputRect->w;
@@ -3008,19 +3457,19 @@ HI_S32 OPTM_GfxSetGpRect(OPTM_GFX_GP_E enGpId, const HIFB_RECT * pstInputRect)
 	memset(&stDtiDrvPara, 0, sizeof(stDtiDrvPara));
 	memset(&stDtiRtlPara, 0, sizeof(stDtiRtlPara));
 
-	HIFB_INFO("set gp%d in rect %d,%d.\n",enGpId,g_stGfxGPDevice[enGpId].stInRect.s32Width,g_stGfxGPDevice[enGpId].stInRect.s32Height);
+	HIFB_INFO("set gp%d in rect %d,%d.\n",enGpId,g_stGfxGPDevice[enGpId].stInRect.s32Width,g_stGfxGPDevice[enGpId].stInRect.s32Height); //3244
 	
     memset(&stGfxRect, 0, sizeof(OPTM_VDP_DISP_RECT_S));
 
     stGfxRect.u32IWth = g_stGfxGPDevice[enGpId].stInRect.s32Width & 0xfffffffe;
-    stGfxRect.u32IHgt = g_stGfxGPDevice[enGpId].stInRect.s32Height & 0xfffffffc;
+    stGfxRect.u32IHgt = g_stGfxGPDevice[enGpId].stInRect.s32Height & 0xfffffffe;
     stGfxRect.u32OWth = g_stGfxGPDevice[enGpId].stOutRect.s32Width & 0xfffffffe;
-    stGfxRect.u32OHgt = g_stGfxGPDevice[enGpId].stOutRect.s32Height & 0xfffffffc;
+    stGfxRect.u32OHgt = g_stGfxGPDevice[enGpId].stOutRect.s32Height & 0xfffffffe;
 
 	//printk("GP %d %d %d %d \n",stGfxRect.u32IWth,stGfxRect.u32IHgt,stGfxRect.u32OWth,stGfxRect.u32OHgt);
 
 	stGfxRect.u32DXS  = g_stGfxGPDevice[enGpId].stOutRect.s32X & 0xfffffffe;
-	stGfxRect.u32DYS  = g_stGfxGPDevice[enGpId].stOutRect.s32Y & 0xfffffffc;
+	stGfxRect.u32DYS  = g_stGfxGPDevice[enGpId].stOutRect.s32Y & 0xfffffffe;
 	stGfxRect.u32DXL  = stGfxRect.u32OWth + stGfxRect.u32DXS;
 	stGfxRect.u32DYL  = stGfxRect.u32OHgt + stGfxRect.u32DYS;
 	stGfxRect.u32VX   = stGfxRect.u32DXS;
@@ -3053,7 +3502,7 @@ HI_S32 OPTM_GfxSetGpRect(OPTM_GFX_GP_E enGpId, const HIFB_RECT * pstInputRect)
 	{	
 		OPTM_VDP_DISP_RECT_S stWbcRect;
 		stGfxRect.u32IWth  = g_stGfxWbc2.stInRect.w & 0xfffffffe;
-		stGfxRect.u32IHgt  = g_stGfxWbc2.stInRect.h & 0xfffffffc;
+		stGfxRect.u32IHgt  = g_stGfxWbc2.stInRect.h & 0xfffffffe;
 
 		if (stGfxRect.u32IWth == 0 ||
 			stGfxRect.u32IHgt == 0)
@@ -3107,10 +3556,12 @@ HI_S32 OPTM_GfxSetGpRect(OPTM_GFX_GP_E enGpId, const HIFB_RECT * pstInputRect)
 	if (OPTM_DISPCHANNEL_1 == g_stGfxGPDevice[enGpId].enDispCh)
 	{
 		//printf("====OPTM_ALG_GZmeHDSet====");
+        stZmeDrvPara.u32ZmeHdDeflicker = g_stGfxGPDevice[enGpId].u32ZmeDeflicker;
 		OPTM_ALG_GZmeHDSet(&GfxZmeModule, &stZmeDrvPara, &stZmeRtlPara);
 	}
 	else if (OPTM_DISPCHANNEL_0 == g_stGfxGPDevice[enGpId].enDispCh)
 	{
+        stZmeDrvPara.u32ZmeSdDeflicker = g_stGfxGPDevice[enGpId].u32ZmeDeflicker;
 		OPTM_ALG_GZmeSDSet(&GfxZmeModule, &stZmeDrvPara, &stZmeRtlPara);
 	}
 	else
@@ -3140,21 +3591,23 @@ HI_S32 OPTM_GfxSetGpRect(OPTM_GFX_GP_E enGpId, const HIFB_RECT * pstInputRect)
 		bSlvGp     = HI_TRUE;
 		//printf("==bSlvGp HI_TRUE==");
 	}
-
+#if 0
 	bGfxSharpen = HI_TRUE;
-	
+#endif
+#if 0
 	if (stDtiDrvPara.u32ZmeFrmWIn*2/stDtiDrvPara.u32ZmeFrmWOut > SHARPEN_RATIO
 		|| stDtiDrvPara.u32ZmeFrmHIn*2/stDtiDrvPara.u32ZmeFrmHOut > SHARPEN_RATIO)
 	{
 		bGfxSharpen = HI_FALSE;
 	}
+#endif
 
 	if (stZmeRtlPara.bZmeEnH || stZmeRtlPara.bZmeEnV)
 	{
 		//printf("==stZmeRtlPara.bZmeEnH || stZmeRtlPara.bZmeEnV==");
-		OPTM_VDP_GP_SetIpOrder(enGpHalId, bSlvGp, VDP_GP_ORDER_CSC_ZME);
+		OPTM_VDP_GP_SetIpOrder(enGpHalId, bSlvGp, VDP_GP_ORDER_ZME_CSC);
 		/*GP0 sharpen is forced to open,  set hfir_order V_H */
-		OPTM_VDP_GP_SetZmeHfirOrder(enGpHalId, VDP_ZME_ORDER_HV);
+		OPTM_VDP_GP_SetZmeHfirOrder(enGpHalId, VDP_ZME_ORDER_VH); //VDP_ZME_ORDER_HV);
 
 		OPTM_VDP_GP_SetZmeCoefAddr (enGpId, VDP_GP_PARA_ZME_HOR, stZmeRtlPara.u32ZmeCoefAddrHL);
 		/*set zme mode of horizontal luma and chroma*/
@@ -3222,6 +3675,8 @@ HI_S32 OPTM_GfxSetGpRect(OPTM_GFX_GP_E enGpId, const HIFB_RECT * pstInputRect)
 	}
 	else
 	{
+		OPTM_VDP_GP_SetTiEnable(enGpId, VDP_TI_MODE_CHM, HI_FALSE);
+		OPTM_VDP_GP_SetTiEnable(enGpId, VDP_TI_MODE_LUM, HI_FALSE);
 		OPTM_VDP_GP_SetIpOrder(enGpHalId, bSlvGp, VDP_GP_ORDER_CSC);
 	}	
 	/************************/
@@ -3232,15 +3687,7 @@ HI_S32 OPTM_GfxSetGpRect(OPTM_GFX_GP_E enGpId, const HIFB_RECT * pstInputRect)
 
 	/**************************************/
 	u32LayerCount = (OPTM_GFX_GP_0 == enGpId) ? OPTM_GP0_GFX_COUNT : OPTM_GP1_GFX_COUNT;
-	
-	if (OPTM_GFX_GP_0 == enGpId)
-	{
-		enInitLayerId     = HIFB_LAYER_HD_0;
-	}
-	else
-	{
-		enInitLayerId    = HIFB_LAYER_SD_0;
-	}
+    enInitLayerId = (OPTM_GFX_GP_0 == enGpId) ? HIFB_LAYER_HD_0 : HIFB_LAYER_SD_0;
 
 	/****when gp_inrect changed, reset all gfx's inrect******/
 	for (i = 0; i < u32LayerCount;i++)
@@ -3267,17 +3714,35 @@ HI_S32 OPTM_GfxSetGpRect(OPTM_GFX_GP_E enGpId, const HIFB_RECT * pstInputRect)
 	}
 	
 	PRINT_OUT;
-#endif
 
 	return HI_SUCCESS;
 }
 
-HI_S32 OPTM_GfxGetOutRect(OPTM_GFX_GP_E enGpId, HIFB_RECT * pstOutputRect)
+HI_S32 OPTM_GfxSetGpDeflicker(OPTM_GFX_GP_E enGpId, HI_BOOL bDeflicker)
 {
+    HIFB_RECT stInputRect;
+
+    stInputRect.x = g_stGfxGPDevice[enGpId].stInRect.s32X;
+    stInputRect.y = g_stGfxGPDevice[enGpId].stInRect.s32Y;
+    stInputRect.w = g_stGfxGPDevice[enGpId].stInRect.s32Width;
+    stInputRect.h = g_stGfxGPDevice[enGpId].stInRect.s32Height;
+
+    g_stGfxGPDevice[enGpId].u32ZmeDeflicker = (HI_U32)bDeflicker;
+
+    OPTM_GfxSetGpRect(enGpId, &stInputRect);
+
+    return HI_SUCCESS;
+}
+
+HI_S32 OPTM_GfxGetOutRect(HIFB_LAYER_ID_E enLayerId, HIFB_RECT * pstOutputRect)
+{
+#warning TODO: OPTM_GfxGetOutRect
+    OPTM_GFX_GP_E enGpId;
 	PRINT_IN;
 
 	pstOutputRect->x = 0;
 	pstOutputRect->y = 0;
+    enGpId = g_stGfxDevice[enLayerId].enGPId;
 	pstOutputRect->w = g_stGfxGPDevice[enGpId].stInRect.s32Width;
 	pstOutputRect->h = g_stGfxGPDevice[enGpId].stInRect.s32Height;
 	
@@ -3288,15 +3753,12 @@ HI_S32 OPTM_GfxGetOutRect(OPTM_GFX_GP_E enGpId, HIFB_RECT * pstOutputRect)
 
 HI_S32 OPTM_GfxSetLayKeyMask(HIFB_LAYER_ID_E enLayerId, const HIFB_COLORKEYEX_S *pstColorkey)
 {
-#if 1
-#warning TODO
-#else
     OPTM_VDP_GFX_CKEY_S ckey_info;
     OPTM_VDP_GFX_MASK_S ckey_mask;  
 
     PRINT_IN;
 
-	D_OPTM_HIFB_CheckGfxOpen(enLayerId);
+	D_OPTM_HIFB_CheckGfxOpen(enLayerId); //3559
 
 	memset(&ckey_info, 0, sizeof(ckey_info));
 	memset(&ckey_mask, 0, sizeof(ckey_mask));
@@ -3342,7 +3804,6 @@ HI_S32 OPTM_GfxSetLayKeyMask(HIFB_LAYER_ID_E enLayerId, const HIFB_COLORKEYEX_S 
 	OPTM_VDP_GFX_SetRegUp(g_stGfxDevice[enLayerId].enGfxHalId);
 
 	PRINT_OUT;
-#endif
 
 	return HI_SUCCESS;
 }
@@ -3350,9 +3811,6 @@ HI_S32 OPTM_GfxSetLayKeyMask(HIFB_LAYER_ID_E enLayerId, const HIFB_COLORKEYEX_S 
 /*  superposition */
 HI_S32 OPTM_GfxSetLayerPreMult(HIFB_LAYER_ID_E enLayerId, HI_BOOL bEnable)
 {	
-#if 1
-#warning TODO
-#else
 	OPTM_GFX_GP_E enGpId;
     PRINT_IN;
 	
@@ -3373,16 +3831,12 @@ HI_S32 OPTM_GfxSetLayerPreMult(HIFB_LAYER_ID_E enLayerId, HI_BOOL bEnable)
 	}
 #endif
 	PRINT_OUT;
-#endif
 	
     return HI_SUCCESS;
 }
 
 HI_S32  OPTM_GfxSetClutAddr(HIFB_LAYER_ID_E enLayerId, HI_U32 u32PhyAddr)
 {
-#if 1
-#warning TODO
-#else
 	PRINT_IN;
 
     if (HI_NULL == u32PhyAddr)
@@ -3394,16 +3848,55 @@ HI_S32  OPTM_GfxSetClutAddr(HIFB_LAYER_ID_E enLayerId, HI_U32 u32PhyAddr)
     OPTM_VDP_GFX_SetParaUpd(g_stGfxDevice[enLayerId].enGfxHalId,VDP_DISP_COEFMODE_LUT);
 
 	PRINT_OUT;
-#endif
 	
     return HI_SUCCESS;
 }
 
+#ifndef HI_BUILD_IN_BOOT
+HI_S32 OPTM_GFX_GetSlvLayerInfo(HIFB_SLVLAYER_DATA_S *pstLayerInfo)
+{
+    pstLayerInfo->enLayerID = OPTM_SLAVER_LAYERID;
+
+    if (HIFB_GFX_MODE_HD_WBC != g_enOptmGfxWorkMode)
+    {
+        return HI_FAILURE;
+    }
+
+	pstLayerInfo->bOpen = g_stGfxDevice[OPTM_SLAVER_LAYERID].bOpened;
+	pstLayerInfo->bShow = g_stGfxDevice[OPTM_SLAVER_LAYERID].bEnable;
+	pstLayerInfo->eFmt         = g_stGfxWbc2.enDataFmt;
+	pstLayerInfo->eGfxWorkMode = g_enOptmGfxWorkMode;
+	pstLayerInfo->eScanMode    = g_stGfxGPDevice[OPTM_SLAVER_GPID].bInterface ? HIFB_SCANMODE_I : HIFB_SCANMODE_P;
+	pstLayerInfo->u32Stride    = g_stGfxWbc2.u32BufferStride;
+	pstLayerInfo->u32WbcBufNum = OPTM_WBCBUFFER_NUM;
+	pstLayerInfo->u32WbcBufSize=  g_stGfxWbc2.stFrameBuffer.u32Size;
+	pstLayerInfo->u32ReadBufAddr = g_stGfxWbc2.u32ReadBufAddr;
+
+	pstLayerInfo->stCurWBCBufRect.x = 0;
+	pstLayerInfo->stCurWBCBufRect.y = 0;
+	pstLayerInfo->stCurWBCBufRect.w = g_stGfxWbc2.stOutRect.w;
+	pstLayerInfo->stCurWBCBufRect.h = g_stGfxWbc2.stOutRect.h;
+
+	pstLayerInfo->stSrcBufRect.x = 0;
+	pstLayerInfo->stSrcBufRect.y = 0;
+	pstLayerInfo->stSrcBufRect.w = g_stGfxWbc2.stInRect.w;
+	pstLayerInfo->stSrcBufRect.h = g_stGfxWbc2.stInRect.h;
+
+	pstLayerInfo->stMaxWbcBufRect.x = 0;
+	pstLayerInfo->stMaxWbcBufRect.y = 0;
+	pstLayerInfo->stMaxWbcBufRect.w = g_stGfxWbc2.s32BufferWidth;
+	pstLayerInfo->stMaxWbcBufRect.h = g_stGfxWbc2.s32BufferHeight;
+
+	pstLayerInfo->stScreenRect.x = g_stGfxWbc2.stOutRect.x;
+	pstLayerInfo->stScreenRect.y = g_stGfxWbc2.stOutRect.y;
+	pstLayerInfo->stScreenRect.w = g_stGfxWbc2.stOutRect.w;
+	pstLayerInfo->stScreenRect.h = g_stGfxWbc2.stOutRect.h;
+
+	return HI_SUCCESS;
+}
+
 HI_S32 OPTM_GfxGetOSDData(HIFB_LAYER_ID_E enLayerId, HIFB_OSD_DATA_S *pstLayerData)
 {
-#if 1
-#warning TODO
-#else
 	HI_U32 u32Enable;
 	HI_U32 u32KeyEnable;
 	HI_U32 alpharange;
@@ -3426,7 +3919,7 @@ HI_S32 OPTM_GfxGetOSDData(HIFB_LAYER_ID_E enLayerId, HIFB_OSD_DATA_S *pstLayerDa
 		enGPId = OPTM_GFX_GP_0;
 	}
 	
-	OPTM_VDP_GFX_GetLayerEnable(enLayerId, &u32Enable);
+	OPTM_VDP_GFX_GetLayerEnable(OPTM_GetGfxHalId(enLayerId), &u32Enable);
 
 	if (u32Enable)
 	{
@@ -3439,9 +3932,14 @@ HI_S32 OPTM_GfxGetOSDData(HIFB_LAYER_ID_E enLayerId, HIFB_OSD_DATA_S *pstLayerDa
 	
 	pstLayerData->u32BufferPhyAddr = g_stGfxDevice[enLayerId].NoCmpBufAddr;
 
-	OPTM_VDP_GFX_GetLayerAddr(enLayerId, &pstLayerData->u32RegPhyAddr);
-	
-	OPTM_VDP_GFX_GetLayerStride(enLayerId, &pstLayerData->u32Stride);
+	OPTM_VDP_GFX_GetLayerAddr(OPTM_GetGfxHalId(enLayerId), &pstLayerData->u32RegPhyAddr);
+#ifdef CFG_HIFB_COMPRESSION_SUPPORT
+    if (g_stGfxDevice[enLayerId].bCmpOpened)
+    {
+        pstLayerData->u32RegPhyAddr = g_stGfxDevice[enLayerId].NoCmpBufAddr;
+    }
+#endif
+	OPTM_VDP_GFX_GetLayerStride(OPTM_GetGfxHalId(enLayerId), &pstLayerData->u32Stride);
 
     OPTM_VDP_GFX_GetLayerInRect(OPTM_GetGfxHalId(enLayerId), &stInRect);
     pstLayerData->stInRect.x = stInRect.u32DXS; 
@@ -3464,18 +3962,20 @@ HI_S32 OPTM_GfxGetOSDData(HIFB_LAYER_ID_E enLayerId, HIFB_OSD_DATA_S *pstLayerDa
 	if (u32Enable)
 	{
 		pstLayerData->eGfxWorkMode = HIFB_GFX_MODE_HD_WBC;
+		pstLayerData->enSlaveryLayerID = OPTM_SLAVER_LAYERID;
 	}
 	else
 	{
 		pstLayerData->eGfxWorkMode = HIFB_GFX_MODE_NORMAL;
+		pstLayerData->enSlaveryLayerID = HIFB_LAYER_ID_BUTT;
 	}
 	
-	OPTM_VDP_GFX_GetPalpha(enLayerId, &pstLayerData->stAlpha.bAlphaEnable, 
+	OPTM_VDP_GFX_GetPalpha(OPTM_GetGfxHalId(enLayerId), &pstLayerData->stAlpha.bAlphaEnable,
 							&alpharange,&pstLayerData->stAlpha.u8Alpha0,&pstLayerData->stAlpha.u8Alpha1);
-	OPTM_VDP_GFX_GetLayerGalpha(enLayerId, &pstLayerData->stAlpha.u8GlobalAlpha);
+	OPTM_VDP_GFX_GetLayerGalpha(OPTM_GetGfxHalId(enLayerId), &pstLayerData->stAlpha.u8GlobalAlpha);
 
-	OPTM_VDP_GFX_GetKeyMask (enLayerId, &stckey_mask);
-	OPTM_VDP_GFX_GetColorKey(enLayerId, &u32KeyEnable,&stKey);
+	OPTM_VDP_GFX_GetKeyMask (OPTM_GetGfxHalId(enLayerId), &stckey_mask);
+	OPTM_VDP_GFX_GetColorKey(OPTM_GetGfxHalId(enLayerId), &u32KeyEnable,&stKey);
 	
 	pstLayerData->stColorKey.u8RedMask   = stckey_mask .u32Mask_r;
 	pstLayerData->stColorKey.u8GreenMask = stckey_mask .u32Mask_g;
@@ -3493,22 +3993,19 @@ HI_S32 OPTM_GfxGetOSDData(HIFB_LAYER_ID_E enLayerId, HIFB_OSD_DATA_S *pstLayerDa
 	pstLayerData->stColorKey.u8GreenMin = stKey.u32Key_g_min;
 	pstLayerData->stColorKey.u8BlueMin  = stKey.u32Key_b_min;
 
-	OPTM_VDP_GFX_GetPreMultEnable(enLayerId, &pstLayerData->bPreMul);
+	OPTM_VDP_GFX_GetPreMultEnable(OPTM_GetGfxHalId(enLayerId), &pstLayerData->bPreMul);
 
-	OPTM_VDP_GFX_GetInDataFmt(enLayerId, &enDataFmt);
+	OPTM_VDP_GFX_GetInDataFmt(OPTM_GetGfxHalId(enLayerId), &enDataFmt);
 
 	pstLayerData->eFmt = OPTM_HalFmtTransferToPixerFmt(enDataFmt);
 	
 	PRINT_OUT;
-#endif
     return HI_SUCCESS;
 }
+#endif
 
 HI_S32 OPTM_GfxUpLayerReg(HIFB_LAYER_ID_E enLayerId)
 {	
-#if 1
-#warning TODO
-#else
 	OPTM_GFX_GP_E enGpId;
 	
 	enGpId = g_stGfxDevice[enLayerId].enGPId;
@@ -3521,14 +4018,12 @@ HI_S32 OPTM_GfxUpLayerReg(HIFB_LAYER_ID_E enLayerId)
     {
         g_stGfxGPDevice[OPTM_SLAVER_GPID].unUpFlag.bits.RegUp = 1;
     }
-#endif
 	
     return HI_SUCCESS;
 }
 
 HI_S32 OPTM_GFX_OpenWbc2(OPTM_GFX_WBC_S *pstWbc2)
 {
-#warning TODO: OPTM_GFX_OpenWbc2
 	OPTM_VDP_DISP_RECT_S stWbcGpRect;
 	
 	PRINT_IN;
@@ -3538,46 +4033,15 @@ HI_S32 OPTM_GFX_OpenWbc2(OPTM_GFX_WBC_S *pstWbc2)
 	    return HI_SUCCESS;
     }
 
-#if 0
-    if (Data_81143414 == 0)
-    {
-    	//->805e1ea0
-        pstWbc2->s32BufferWidth  = OPTM_GFX_WBC_WIDTH;
-        pstWbc2->s32BufferHeight = OPTM_GFX_WBC_HEIGHT;
-        pstWbc2->u32BufferStride = pstWbc2->s32BufferWidth * OPTM_GFXDATA_DEFAULTBYTES;
-    }
-    else
-    {
-		/* apply clut table buffer */
-		pstWbc2->s32BufferWidth  = 1920; //OPTM_GFX_WBC_WIDTH;
-		pstWbc2->s32BufferHeight = 1200; //OPTM_GFX_WBC_HEIGHT;
-		pstWbc2->u32BufferStride = pstWbc2->s32BufferWidth * OPTM_GFXDATA_DEFAULTBYTES;
-    }
-#else
-    switch (Data_81143414)
-    {
-    case 0:
-        pstWbc2->s32BufferWidth  = OPTM_GFX_WBC_WIDTH;
-        pstWbc2->s32BufferHeight = OPTM_GFX_WBC_HEIGHT;
-        pstWbc2->u32BufferStride = pstWbc2->s32BufferWidth * OPTM_GFXDATA_DEFAULTBYTES;
-    	break;
-    default:
-		pstWbc2->s32BufferWidth  = 1920; //OPTM_GFX_WBC_WIDTH;
-		pstWbc2->s32BufferHeight = 1200; //OPTM_GFX_WBC_HEIGHT;
-		pstWbc2->u32BufferStride = pstWbc2->s32BufferWidth * OPTM_GFXDATA_DEFAULTBYTES;
-    	break;
-    }
-#endif
+    /* apply clut table buffer */
+    pstWbc2->s32BufferWidth  = OPTM_GFX_WBC_WIDTH;
+    pstWbc2->s32BufferHeight = OPTM_GFX_WBC_HEIGHT;
+    pstWbc2->u32BufferStride = pstWbc2->s32BufferWidth * OPTM_GFXDATA_DEFAULTBYTES;
 
-#if 0
-	if (pstWbc2->stFrameBuffer.u32StartVirAddr == 0 &&
-		pstWbc2->stFrameBuffer.u32StartPhyAddr == 0)
-#else
 	if (pstWbc2->stFrameBuffer.u32StartVirAddr == 0)
-#endif
 	{
 		if (OPTM_AllocAndMap(OPTM_GFX_WBC2_BUFFER, HI_NULL, 
-		    pstWbc2->u32BufferStride * pstWbc2->s32BufferHeight * 2,
+		    pstWbc2->u32BufferStride * pstWbc2->s32BufferHeight*OPTM_WBCBUFFER_NUM,
 		    0, &(pstWbc2->stFrameBuffer)) != 0)
 		{
 		    HIFB_ERROR("GFX Get wbc2 buffer failed!\n"); //3845
@@ -3585,11 +4049,33 @@ HI_S32 OPTM_GFX_OpenWbc2(OPTM_GFX_WBC_S *pstWbc2)
 		}
 	}
 
-	pstWbc2->Data_24 = 0;
-	pstWbc2->Data_28 = pstWbc2->Data_36 = pstWbc2->stFrameBuffer.u32StartPhyAddr;
-	pstWbc2->Data_32 = pstWbc2->Data_40 = pstWbc2->stFrameBuffer.u32StartPhyAddr + pstWbc2->u32BufferStride * pstWbc2->s32BufferHeight;
+    pstWbc2->u32BufIndex = 0;
 
-	memset((HI_U8 *)(pstWbc2->stFrameBuffer.u32StartVirAddr), 0, pstWbc2->u32BufferStride * pstWbc2->s32BufferHeight * 2);
+    if (1 == OPTM_WBCBUFFER_NUM)
+    {
+        pstWbc2->u32WBCBuffer[0] = pstWbc2->stFrameBuffer.u32StartPhyAddr;
+        pstWbc2->u32WriteBufAddr = pstWbc2->u32WBCBuffer[0];
+        pstWbc2->u32ReadBufAddr  = pstWbc2->u32WBCBuffer[0];
+		//pstWbc2->enWBCBufferStatus[0] = OPTM_WBC_BUFFER_RELEASED;
+    }
+    else if (2 == OPTM_WBCBUFFER_NUM)
+    {
+        pstWbc2->u32WBCBuffer[0] = pstWbc2->stFrameBuffer.u32StartPhyAddr;
+        pstWbc2->u32WBCBuffer[1] = pstWbc2->u32WBCBuffer[0] + pstWbc2->u32BufferStride * pstWbc2->s32BufferHeight;
+        pstWbc2->u32WriteBufAddr = pstWbc2->u32WBCBuffer[0];
+        pstWbc2->u32ReadBufAddr  = pstWbc2->u32WBCBuffer[1];
+		//pstWbc2->enWBCBufferStatus[0] = OPTM_WBC_BUFFER_RELEASED;
+		//pstWbc2->enWBCBufferStatus[1] = OPTM_WBC_BUFFER_RELEASED;
+    }
+    else
+    {
+        HIFB_ERROR("Allocate wbc buffer failure!\n");
+        return HI_FAILURE;
+    }
+
+#ifndef HI_BUILD_IN_BOOT
+	memset((HI_U8 *)(pstWbc2->stFrameBuffer.u32StartVirAddr), 0, pstWbc2->u32BufferStride * pstWbc2->s32BufferHeight*OPTM_WBCBUFFER_NUM);
+#endif
 
     pstWbc2->bEnable = HI_FALSE;
     pstWbc2->enWbcHalId = OPTM_VDP_LAYER_WBC_GP0;
@@ -3600,40 +4086,19 @@ HI_S32 OPTM_GFX_OpenWbc2(OPTM_GFX_WBC_S *pstWbc2)
     
 	memset(&stWbcGpRect, 0, sizeof(stWbcGpRect));
 
-	if (Data_81143414 == 0)
-	{
-#if 0
-		stWbcGpRect.u32IWth= OPTM_GFX_WBC_WIDTH;
-		stWbcGpRect.u32IHgt= OPTM_GFX_WBC_HEIGHT;
-		stWbcGpRect.u32OWth= OPTM_GFX_WBC_WIDTH;
-		stWbcGpRect.u32OHgt= OPTM_GFX_WBC_HEIGHT;
-#else
-		printk("help\n");
-		stWbcGpRect.u32DXL = OPTM_GFX_WBC_WIDTH;
-		stWbcGpRect.u32DYL = OPTM_GFX_WBC_HEIGHT;
+    stWbcGpRect.u32DXL = OPTM_GFX_WBC_WIDTH;
+    stWbcGpRect.u32DYL = OPTM_GFX_WBC_HEIGHT;
 
-		stWbcGpRect.u32IWth= OPTM_GFX_WBC_WIDTH;
-		stWbcGpRect.u32IHgt= OPTM_GFX_WBC_HEIGHT;
-		stWbcGpRect.u32OWth= stWbcGpRect.u32DXL;
-#endif
-	}
-	else
-	{
-		stWbcGpRect.u32DXL = 1920;
-		stWbcGpRect.u32DYL = 1200;
-
-		stWbcGpRect.u32IWth= 1920;
-		stWbcGpRect.u32IHgt= 1200;
-		stWbcGpRect.u32OWth= stWbcGpRect.u32DXL;
-	}
-	stWbcGpRect.u32OHgt= stWbcGpRect.u32DYL;
+	stWbcGpRect.u32IWth= OPTM_GFX_WBC_WIDTH;
+	stWbcGpRect.u32IHgt= OPTM_GFX_WBC_HEIGHT;
+	stWbcGpRect.u32OWth= OPTM_GFX_WBC_WIDTH;
+	stWbcGpRect.u32OHgt= OPTM_GFX_WBC_HEIGHT;
 
     pstWbc2->enDitherMode = VDP_DITHER_TMP_SPA_8;
 	pstWbc2->stWBCFmt     = VDP_WBC_OFMT_ARGB8888;
 	pstWbc2->enReadMode   = VDP_RMODE_PROGRESSIVE;
 	pstWbc2->enWbcMode    = OPTM_WBC_MODE_MONO;
-
-	pstWbc2->Data_128 = 256;
+    pstWbc2->enWbcInt     = OPTM_VDP_INTMSK_WBC_GP0_INT;
 
 	OPTM_VDP_WBC_SetThreeMd   (pstWbc2->enWbcHalId, pstWbc2->enWbcMode);
     OPTM_VDP_WBC_SetDitherMode(pstWbc2->enWbcHalId, pstWbc2->enDitherMode);
@@ -3650,9 +4115,7 @@ HI_S32 OPTM_GFX_OpenWbc2(OPTM_GFX_WBC_S *pstWbc2)
 
 HI_S32 OPTM_GFX_CloseWbc2(OPTM_GFX_WBC_S *pstWbc2)
 {
-#if 0
-#warning TODO
-#else
+
 	PRINT_IN;
 	
     if (pstWbc2->bOpened == HI_FALSE)
@@ -3674,7 +4137,6 @@ HI_S32 OPTM_GFX_CloseWbc2(OPTM_GFX_WBC_S *pstWbc2)
 	}
 #endif	
 	PRINT_OUT;
-#endif
 	
     return HI_SUCCESS;
 }
@@ -3682,9 +4144,6 @@ HI_S32 OPTM_GFX_CloseWbc2(OPTM_GFX_WBC_S *pstWbc2)
 HI_S32 OPTM_GfxConfigSlvLayer(HIFB_LAYER_ID_E enLayerId,
                                         HI_RECT_S *pstRect)
 {
-#if 1
-#warning TODO
-#else
 	HIFB_RECT        stRect;
 	OPTM_GFX_GP_E    enGfxGpId;
 	OPTM_GFX_GP_E    enMstGfxGpId;			
@@ -3705,7 +4164,7 @@ HI_S32 OPTM_GfxConfigSlvLayer(HIFB_LAYER_ID_E enLayerId,
 	enMstGfxGpId = OPTM_MASTER_GPID;
 
 	HIFB_INFO("enMstGfxGpId %d, in_w %d, in_h %d \n",enMstGfxGpId,g_stGfxGPDevice[enMstGfxGpId].stInRect.s32Width,
-				g_stGfxGPDevice[enMstGfxGpId].stInRect.s32Height);
+				g_stGfxGPDevice[enMstGfxGpId].stInRect.s32Height); //3963
 	/*when layer work in wbc mode, wbc_inRect=MstGP_inRect*/
 	pstWbc2->stInRect.x = 0;
 	pstWbc2->stInRect.y = 0;
@@ -3726,39 +4185,41 @@ HI_S32 OPTM_GfxConfigSlvLayer(HIFB_LAYER_ID_E enLayerId,
 	memset(&stLayerRect, 0, sizeof(stLayerRect));
 
     stLayerRect.u32IWth= pstWbc2->stInRect.w & 0xfffffffe;
-    stLayerRect.u32IHgt= pstWbc2->stInRect.h & 0xfffffffc;
+    stLayerRect.u32IHgt= pstWbc2->stInRect.h & 0xfffffffe;
 	/*crop for source of gp0 data*/
     stLayerRect.u32DXL = stLayerRect.u32DXS + stLayerRect.u32IWth;
     stLayerRect.u32DYL = stLayerRect.u32DXS + stLayerRect.u32IHgt;
 
     stLayerRect.u32OWth= pstRect->s32Width & 0xfffffffe;
-    stLayerRect.u32OHgt= pstRect->s32Height & 0xfffffffc;
+    stLayerRect.u32OHgt= pstRect->s32Height & 0xfffffffe;
 	
 	OPTM_CheckGPMask_BYGPID(enGfxGpId);
 
 	OPTM_VDP_WBC_SetLayerReso(pstWbc2->enWbcHalId, stLayerRect);   
     OPTM_VDP_WBC_SetCropReso (pstWbc2->enWbcHalId, stLayerRect);	
-
-	OPTM_GfxSetLayerRect(enLayerId, &stRect);
-	
-	//OPTM_GfxSetGpRect(enGfxGpId, &pstWbc2->stInRect);
-	OPTM_GfxSetGpRect(enGfxGpId, &stRect);
-	
+#ifndef HI_BUILD_IN_BOOT
+//    if (g_stGfxGPDevice[enGfxGpId].unUpFlag.bits.WbcMode || g_stGfxGPDevice[OPTM_MASTER_GPID].bNeedExtractLine == HI_TRUE)
+    {
+        OPTM_GfxSetLayerRect(enLayerId, &stRect);
+        //OPTM_GfxSetGpRect(enGfxGpId, &pstWbc2->stInRect);
+        OPTM_GfxSetGpRect(enGfxGpId, &stRect);
+    }
+#else
+        OPTM_GfxSetLayerRect(enLayerId, &stRect);
+        //OPTM_GfxSetGpRect(enGfxGpId, &pstWbc2->stInRect);
+        OPTM_GfxSetGpRect(enGfxGpId, &stRect);
+#endif
 	OPTM_VDP_GFX_SetRegUp(g_stGfxDevice[enLayerId].enGfxHalId);
 	OPTM_VDP_GP_SetRegUp (enGfxGpId);
 	OPTM_VDP_WBC_SetRegUp(pstWbc2->enWbcHalId);
 
 	PRINT_OUT;
-#endif
 	
     return HI_SUCCESS;
 }
 
 HI_VOID OPTM_Wbc2Isr(HI_VOID* u32Param0, HI_VOID* u32Param1)
 {    
-#if 1
-#warning TODO
-#else
 	HIFB_LAYER_ID_E enLayerId;
 	OPTM_GFX_GP_E   enGfxGpId;
 	OPTM_GFX_GP_S   *pGfxGp;
@@ -3769,7 +4230,7 @@ HI_VOID OPTM_Wbc2Isr(HI_VOID* u32Param0, HI_VOID* u32Param1)
 	enLayerId   = HIFB_LAYER_SD_0;
 	pGfxGp      = &g_stGfxGPDevice[enGfxGpId];
 
-	if (pGfxGp->unUpFlag.bits.RegUp && !g_stGfxGPDevice[enGfxGpId].bMaskFlag)
+	if (/*pGfxGp->unUpFlag.bits.RegUp &&*/ !g_stGfxGPDevice[enGfxGpId].bMaskFlag)
 	{
         if (pGfxGp->unUpFlag.bits.Enable)
         {
@@ -3799,31 +4260,41 @@ HI_VOID OPTM_Wbc2Isr(HI_VOID* u32Param0, HI_VOID* u32Param1)
 			OPTM_VDP_GFX_SetPreMultEnable(g_stGfxDevice[enLayerId].enGfxHalId, g_stGfxDevice[enLayerId].bPreMute);
 			pGfxGp->unUpFlag.bits.PreMute = 0;
         }
-
+#ifndef HI_BUILD_IN_BOOT
 		if (pGfxGp->unUpFlag.bits.WbcMode)
         {
 			OPTM_VDP_WBC_SetThreeMd(pstWbc2->enWbcHalId, (HI_U32)pstWbc2->enWbcMode);
 			pGfxGp->unUpFlag.bits.WbcMode = 0;
         }
-
+#endif
 		OPTM_VDP_GFX_SetRegUp(g_stGfxDevice[enLayerId].enGfxHalId);
 		OPTM_VDP_GP_SetRegUp (enGfxGpId);
 		OPTM_VDP_WBC_SetRegUp(pstWbc2->enWbcHalId);
 		
-		pGfxGp->unUpFlag.bits.RegUp = 0;
+		//pGfxGp->unUpFlag.bits.RegUp = 0;
 	}
-
-	OPTM_GfxWVBCallBack(enLayerId, HI_NULL);
+#ifndef HI_BUILD_IN_BOOT
+    if (OPTM_VDP_DISP_GetIntSignal(pstWbc2->enWbcInt) && !g_stGfxGPDevice[enGfxGpId].bMaskFlag)
 #endif
+    {
+        OPTM_VDP_GFX_SetLayerAddrEX(g_stGfxDevice[enLayerId].enGfxHalId, pstWbc2->u32WBCBuffer[pstWbc2->u32BufIndex]);
+        pstWbc2->u32ReadBufAddr = pstWbc2->u32WBCBuffer[pstWbc2->u32BufIndex];
+        pstWbc2->u32BufIndex++;
+        pstWbc2->u32BufIndex = pstWbc2->u32BufIndex%OPTM_WBCBUFFER_NUM;
+        OPTM_VDP_WBC_SetLayerAddr(pstWbc2->enWbcHalId, pstWbc2->u32WBCBuffer[pstWbc2->u32BufIndex],
+                                    0x0, pstWbc2->u32BufferStride, 0x0);
+        pstWbc2->u32WriteBufAddr = pstWbc2->u32WBCBuffer[pstWbc2->u32BufIndex];
+#ifndef HI_BUILD_IN_BOOT
+        OPTM_ClearIntSignal(pstWbc2->enWbcInt);
+#endif
+    }
 	
 	return;
 }
 
+#ifdef CFG_HIFB_STEREO3D_HW_SUPPORT
 HI_S32 OPTM_GfxSetTriDimEnable(HIFB_LAYER_ID_E enLayerId, HI_U32 bEnable)
 {
-#if 1
-#warning TODO
-#else
 	PRINT_IN;
 
 	g_stGfxDevice[enLayerId].b3DEnable = bEnable;
@@ -3833,7 +4304,6 @@ HI_S32 OPTM_GfxSetTriDimEnable(HIFB_LAYER_ID_E enLayerId, HI_U32 bEnable)
 	OPTM_VDP_GFX_SetThreeDimEnable(enLayerId, bEnable);
 		
 	PRINT_OUT;
-#endif
 	
     return HI_SUCCESS;
 }
@@ -3859,9 +4329,6 @@ OPTM_VDP_DISP_MODE_E OPTM_GfxGetHalTriDimMode(HIFB_STEREO_MODE_E enMode)
 
 HI_S32 OPTM_GfxSetTriDimMode(HIFB_LAYER_ID_E enLayerId, HIFB_STEREO_MODE_E enMode)
 {	
-#if 1
-#warning TODO
-#else
 	HI_U32 u32GpId;
     PRINT_IN;
 
@@ -3876,26 +4343,19 @@ HI_S32 OPTM_GfxSetTriDimMode(HIFB_LAYER_ID_E enLayerId, HIFB_STEREO_MODE_E enMod
 
 	OPTM_CheckGPMask_BYGPID(u32GpId);
 
-	OPTM_VDP_GFX_SetDispMode(enLayerId, OPTM_GfxGetHalTriDimMode(enMode));
-	
 	/*for test*/
 
 	g_stGfxGPDevice[u32GpId].enTriDimMode = enMode;
 	
-	OPTM_VDP_GP_SetDispMode(g_stGfxDevice[enLayerId].enGPId, OPTM_GfxGetHalTriDimMode(enMode));
 	OPTM_VDP_GP_SetRegUp   (g_stGfxDevice[enLayerId].enGPId);
 		
 	PRINT_OUT;
-#endif
 	
     return HI_SUCCESS;
 }
 
 HI_S32 OPTM_GfxSetTriDimAddr(HIFB_LAYER_ID_E enLayerId, HI_U32 u32TriDimAddr)
 {	
-#if 1
-#warning TODO
-#else
     PRINT_IN;
 
 	g_stGfxDevice[enLayerId].u32TriDimAddr= u32TriDimAddr;
@@ -3905,56 +4365,16 @@ HI_S32 OPTM_GfxSetTriDimAddr(HIFB_LAYER_ID_E enLayerId, HI_U32 u32TriDimAddr)
 	OPTM_VDP_GFX_SetLayerNAddr(enLayerId, u32TriDimAddr);
 		
 	PRINT_OUT;
-#endif
 	
     return HI_SUCCESS;
 }
-
-
-
-HI_S32 OPTM_GfxSetLayerDeCmpEnable(HIFB_LAYER_ID_E enLayerId, HI_BOOL bEnable)
-{
-    return HI_SUCCESS;
-}
-
-
-HI_S32 OPTM_GfxSetGfxCmpAddr(HIFB_LAYER_ID_E enLayerId, HI_U32 u32CmpAddr)
-{	
-    return HI_SUCCESS;
-}
-
-
-HI_S32 OPTM_GfxSetGfxCmpRect(HIFB_LAYER_ID_E enLayerId, const HIFB_RECT *pstRect)
-{
-    return HI_SUCCESS;
-}
-
-/*this function called in the vysnc isr, handle cmp and nocmp buffer changing.*/
-HI_S32 OPTM_GfxGfxCmpHandle(HIFB_LAYER_ID_E enLayerId)
-{
-    return HI_SUCCESS;
-}
-
-
-/********************************************* 
-	 when change resolution or stride or address value,  
-         we should change from cmp mode to no cmp mode,
-         and WBC3 do a over scape update write
-*********************************************/
-
-HI_S32 OPTM_GfxChgCmp2Ncmp(HIFB_LAYER_ID_E enLayerId)
-{
-    return HI_SUCCESS;
-}
+#endif
 
 
 /*set the priority of layer in gp*/
 /*CNcomment:����ͼ����GP �е����ȼ�*/
 HI_S32 OPTM_GfxGetLayerPriority(HIFB_LAYER_ID_E enLayerId, HI_U32 *pU32Priority)
 {
-#if 1
-#warning TODO
-#else
 	HI_U32 i;
 	HI_U32 u32prio;
 	HI_U32 u32Index;
@@ -3983,8 +4403,7 @@ HI_S32 OPTM_GfxGetLayerPriority(HIFB_LAYER_ID_E enLayerId, HI_U32 *pU32Priority)
 		}		
 	}	
 
-	HIFB_ERROR("info:fail to get z_order of gfx%d!\n",enLayerId);
-#endif
+	HIFB_ERROR("info:fail to get z_order of gfx%d!\n",enLayerId); //4288
 	return HI_FAILURE;
 }
 
@@ -3992,131 +4411,123 @@ HI_S32 OPTM_GfxGetLayerPriority(HIFB_LAYER_ID_E enLayerId, HI_U32 *pU32Priority)
 /*CNcomment:����ͼ����GP �е����ȼ�*/
 HI_S32 OPTM_GfxSetLayerPriority(HIFB_LAYER_ID_E enLayerId, HIFB_ZORDER_E enZOrder)
 {
-#if 1
-#warning TODO
-#else
-	HI_S32  i;
-	HI_S32  j;
-	HI_CHAR prio[4];
-	HI_CHAR priotemp;
-	HI_U32  m,n;
-	HI_U32  u32Prio;
-	HI_U32  u32ExcIndex;
-	HI_U32  u32LayerPrio;
-	OPTM_VDP_CBM_MIX_E eCbmMixg;
-	
-	PRINT_IN;
-	
-	u32LayerPrio = 0;
-	OPTM_GfxGetLayerPriority(enLayerId, &u32LayerPrio);
+    HI_U32  u32Prio;
+    HI_U32  u32LayerPrio = 0;
+    OPTM_VDP_CBM_MIX_E eCbmMixg;
+    HI_U32  u32MaskUpBit = 0;
+    HI_U32  u32MaskDownBit = 0;
+    HI_U32  u32SwitchBit = 0;
+    HI_U32  u32MaskTopBit = 0;
+    HI_U32  u32MaskBit = 0;
+    HI_U32  u32LayerCount = 0;
+    HI_S32  count;
 
-	if (u32LayerPrio > 4 || u32LayerPrio < 1)
-	{
-		return HI_SUCCESS;
-	}
-
-	switch (enZOrder)
-	{
-		case HIFB_ZORDER_MOVEBOTTOM:
-		{
-			u32ExcIndex = 1;
-			break;
-		}	
-		case HIFB_ZORDER_MOVEDOWN:
-		{
-			u32ExcIndex = u32LayerPrio - 1;
-			break;
-		}	
-		case HIFB_ZORDER_MOVETOP:
-		{
-			u32ExcIndex = 4;
-			break;
-		}	
-		case HIFB_ZORDER_MOVEUP:
-		{
-			u32ExcIndex = u32LayerPrio + 1;
-			break;
-		}	
-		default:
-		{
-				return HI_FAILURE;
-		}
-	}
-	
-	if (u32ExcIndex > 4 || u32ExcIndex < 1)
-	{
-		return HI_SUCCESS;
-	}
-
-	eCbmMixg = (g_stGfxDevice[enLayerId].enGPId == OPTM_GFX_GP_0) ? VDP_CBM_MIXG0 : VDP_CBM_MIXG1;	
-	OPTM_VDP_CBM_GetMixerPrio(eCbmMixg, &u32Prio);
-
-	for (i = 0; i < 4; i++)
-	{
-		prio[i] = (u32Prio&0xf);
-		u32Prio = u32Prio >> 4;
-	}
-
-	if (u32LayerPrio > u32ExcIndex)
-	{
-		j = -1;
-	}
-	else if (u32ExcIndex > u32LayerPrio)
-	{
-		j = 1;
-	}
-	else
-	{	
-		return HI_SUCCESS;
-	}
-
-	priotemp = prio[u32LayerPrio-1];
-	m = u32LayerPrio-1;
-	n = u32ExcIndex-1;
-
-	if (m >=4 || n >= 4)
-	{
-		return HI_SUCCESS;
-	}
-	
-	for (i = m; i != n;)
-	{
-		if ((i >= 4 || i < 0) || ((i+j) >= 4 || (i+j) < 0))
-		{
-			return HI_FAILURE;
-		}
-		
-		prio[i] = prio[i+j];
-		i += j;
-	}
-
-	prio[i] = priotemp;
+    PRINT_IN;
 
 
-	u32Prio = 0;
-	for (i = 3; i >= 0; i--)
-	{
-		u32Prio = u32Prio << 4;
-		u32Prio |= prio[i];		
-	}
+    if (HI_SUCCESS != OPTM_GfxGetLayerPriority(enLayerId, &u32LayerPrio))
+    {
+        HIFB_ERROR("info:fail to set z_order of gfx%d!\n",enLayerId); //4312
+        return HI_FAILURE;
+    }
 
-	u32Prio &= 0xffff;
+    eCbmMixg = (g_stGfxDevice[enLayerId].enGPId == OPTM_GFX_GP_0) ? VDP_CBM_MIXG0 : VDP_CBM_MIXG1;
+    OPTM_VDP_CBM_GetMixerPrio(eCbmMixg, &u32Prio);
+    u32LayerCount = (g_stGfxDevice[enLayerId].enGPId == OPTM_GFX_GP_0) ? OPTM_GP0_GFX_COUNT : OPTM_GP1_GFX_COUNT;
 
-	OPTM_VDP_SetMixgPrio(eCbmMixg, u32Prio);
+    u32SwitchBit = (u32Prio >> (4*(u32LayerPrio-1))) & 0xf;
 
-	g_stGfxGPDevice[g_stGfxDevice[enLayerId].enGPId].u32Prior = u32Prio;
-	
-	PRINT_OUT;
-#endif
+    for(count = u32LayerPrio; count > 0; count--)
+    {
+        u32MaskUpBit = 0xf | (u32MaskUpBit << 4);
+    }
 
-	return HI_SUCCESS;
+    for(count = u32LayerPrio; count <= u32LayerCount; count++)
+    {
+        u32MaskDownBit = 0xf | (u32MaskDownBit << 4);
+    }
+    u32MaskDownBit <<= 4*(u32LayerPrio-1);
+
+    u32MaskBit = 0xf;
+    u32MaskTopBit = 0xf;
+    for(count = 1; count < u32LayerCount; count++)
+    {
+        u32MaskBit = 0xf | (u32MaskBit << 4);
+        u32MaskTopBit = u32MaskTopBit << 4;
+    }
+
+    //printk("u32LayerPrio=%d,u32SwitchBit=0x%x,32Prio=0x%x\n",u32LayerPrio,u32SwitchBit,u32Prio);
+    //printk("u32MaskBit 0x%x,u32MaskTopBit 0x%x\n",u32MaskBit,u32MaskTopBit);
+    u32Prio &= u32MaskBit;
+    switch (enZOrder)
+    {
+        case HIFB_ZORDER_MOVEBOTTOM:
+        {
+            if (u32LayerPrio == 1)
+            {
+               return HI_SUCCESS;
+            }
+            /*µ±Ç°layerÖ®ÉÏµÄZÐòÖµ±£³Ö²»±ä|µ±Ç°layerÖ®ÏÂµÄZÐòÖµÉÏÒÆ|µ±Ç°layer ZÐòÖµ*/
+            u32Prio = (u32Prio&(~u32MaskUpBit)) | \
+                      ((u32MaskUpBit&((u32Prio&u32MaskUpBit)<<4))&(~0xf)) |
+                      u32SwitchBit;
+            break;
+        }
+        case HIFB_ZORDER_MOVEDOWN:
+        {
+            if (u32LayerPrio == 1)
+            {
+               return HI_SUCCESS;
+            }
+
+            u32Prio = ((u32Prio&(0xf<<4*(u32LayerPrio-1)))>>4) | \
+                      ((u32Prio&(0xf<<4*(u32LayerPrio-2)))<<4) | \
+                       (~((0xf<<4*(u32LayerPrio-1))|(0xf<<4*(u32LayerPrio-2)))&u32Prio);
+            break;
+        }
+        case HIFB_ZORDER_MOVETOP:
+        {
+            if (u32LayerPrio == u32LayerCount)
+            {
+               return HI_SUCCESS;
+            }
+            /*µ±Ç°layerÖ®ÏÂµÄZÐòÖµ±£³Ö²»±ä|µ±Ç°layerÖ®ÉÏµÄZÐòÖµÏÂÒÆ|µ±Ç°layer ZÐòÖµ*/
+            u32Prio = (u32Prio&(~u32MaskDownBit)) | \
+                      ((u32MaskDownBit&((u32Prio&u32MaskDownBit)>>4))&(~u32MaskTopBit)) | \
+                      (u32SwitchBit<<(4*(u32LayerCount-1)));
+            //printk("0x%x,0x%x,0x%x\n",(u32Prio&(~u32MaskDownBit)),(((u32MaskDownBit&(u32Prio&u32MaskDownBit))>>4)&(~u32MaskTopBit)),(u32SwitchBit<<(4*(u32LayerCount-1))));
+            break;
+        }
+        case HIFB_ZORDER_MOVEUP:
+        {
+
+            if (u32LayerPrio == u32LayerCount)
+            {
+               return HI_SUCCESS;
+            }
+            u32Prio = ((u32Prio&(0xf<<4*(u32LayerPrio-1)))<<4) | \
+                      ((u32Prio&(0xf<<4*u32LayerPrio))>>4) | \
+                       (~((0xf<<4*(u32LayerPrio-1))|(0xf<<4*u32LayerPrio))&u32Prio);
+            break;
+        }
+        default:
+        {
+                return HI_FAILURE;
+        }
+    }
+    u32Prio &= u32MaskBit;
+    //printk("u32Prio=0x%x,u32MaskDownBit=0x%x,u32MaskUpBit=0x%x\n",u32Prio,u32MaskDownBit,u32MaskUpBit);
+    OPTM_VDP_SetMixgPrio(eCbmMixg, u32Prio);
+
+    g_stGfxGPDevice[g_stGfxDevice[enLayerId].enGPId].u32Prior = u32Prio;
+
+    PRINT_OUT;
+
+    return HI_SUCCESS;
 }
 
 HI_S32 OPTM_GPMask(OPTM_VDP_LAYER_GP_E enGPId, HI_BOOL bFlag)
 {
-#if 1
-#warning TODO
-#else
 	HI_U32                      i;
 	HI_BOOL                     bEnable;
 	HI_U32                      u32LayerCount;
@@ -4131,19 +4542,7 @@ HI_S32 OPTM_GPMask(OPTM_VDP_LAYER_GP_E enGPId, HI_BOOL bFlag)
 	}
 
 	u32LayerCount = (OPTM_VDP_LAYER_GP0 == enGPId) ? OPTM_GP0_GFX_COUNT : OPTM_GP1_GFX_COUNT;
-	
-	if (OPTM_VDP_LAYER_GP0 == enGPId)
-	{
-		enLayerId   = HIFB_LAYER_HD_0;
-	}
-	else if (OPTM_VDP_LAYER_GP1 == enGPId)
-	{
-		enLayerId  = HIFB_LAYER_SD_0;
-	}
-	else
-	{
-		return HI_FAILURE;
-	}
+    enLayerId   = (OPTM_VDP_LAYER_GP0 == enGPId) ? HIFB_LAYER_HD_0 : HIFB_LAYER_SD_0;
 
 	g_stGfxGPDevice[enGPId].bMaskFlag = bFlag;
 	
@@ -4178,6 +4577,7 @@ HI_S32 OPTM_GPMask(OPTM_VDP_LAYER_GP_E enGPId, HI_BOOL bFlag)
 	              when set layer mask true, we save operations of user in global variable. 
 	              until layer mask become false, these operations will be setted to hardware.*/
 			bEnable = bFlag ? HI_FALSE : g_stGfxDevice[enLayerId+i].bEnable;		        	
+            //g_stGfxDevice[HIFB_LAYER_SD_0].bEnable = bEnable;
 			OPTM_VDP_GFX_SetLayerEnable(g_stGfxDevice[enLayerId+i].enGfxHalId, bEnable);				
 			OPTM_VDP_GFX_SetRegUp      (g_stGfxDevice[enLayerId+i].enGfxHalId);
 		}
@@ -4192,16 +4592,12 @@ HI_S32 OPTM_GPMask(OPTM_VDP_LAYER_GP_E enGPId, HI_BOOL bFlag)
 	}
 	
 	PRINT_OUT;
-#endif
 
 	return HI_SUCCESS;
 }
 
 HI_S32 OPTM_GPRecovery(OPTM_VDP_LAYER_GP_E enGPId)
 {
-#if 1
-#warning TODO
-#else
 	HI_U32                      i;
 	HI_U32                      u32LayerCount;
 	HI_RECT_S                   *pstDispRect;
@@ -4218,19 +4614,7 @@ HI_S32 OPTM_GPRecovery(OPTM_VDP_LAYER_GP_E enGPId)
 	OPTM_CheckGPMask_BYGPID(enGPId);
 	
 	u32LayerCount = (OPTM_VDP_LAYER_GP0 == enGPId) ? OPTM_GP0_GFX_COUNT : OPTM_GP1_GFX_COUNT;
-	
-	if (OPTM_VDP_LAYER_GP0 == enGPId)
-	{
-		enInitLayerId     = HIFB_LAYER_HD_0;
-	}
-	else if (OPTM_VDP_LAYER_GP1 == enGPId)
-	{
-		enInitLayerId    = HIFB_LAYER_SD_0;
-	}
-	else
-	{
-		return HI_FAILURE;
-	}
+    enInitLayerId   = (OPTM_VDP_LAYER_GP0 == enGPId) ? HIFB_LAYER_HD_0 : HIFB_LAYER_SD_0;
 
 	pstDispRect = &g_stGfxGPDevice[enGPId].stOutRect;
 
@@ -4242,11 +4626,18 @@ HI_S32 OPTM_GPRecovery(OPTM_VDP_LAYER_GP_E enGPId)
 	{
 		OPTM_GFX_WBC_S *pstWbc2;
 		pstWbc2 = &g_stGfxWbc2;
+
+        /*when in wbc mode , gfx4 have no zme, zme attached to wbc_gp0*/
+        g_stGfxDevice[HIFB_LAYER_SD_0].enReadMode = g_stGfxGPDevice[enGPId].bInterface ? VDP_RMODE_INTERLACE : VDP_RMODE_PROGRESSIVE;
 		/*****Recover WBC_GP0, Gfx4, Gp1*****/
 		OPTM_VDP_WBC_SetDitherMode(pstWbc2->enWbcHalId, pstWbc2->enDitherMode);
     	OPTM_VDP_WBC_SetOutFmt    (pstWbc2->enWbcHalId, pstWbc2->stWBCFmt);   
 		OPTM_VDP_WBC_SetOutIntf   (pstWbc2->enWbcHalId, pstWbc2->enReadMode);
-		OPTM_GfxSetLayerAddr      (HIFB_LAYER_SD_0, pstWbc2->stFrameBuffer.u32StartPhyAddr);
+        //OPTM_VDP_WBC_SetLayerAddr (pstWbc2->enWbcHalId, pstWbc2->u32WBCBuffer[pstWbc2->u32BufIndex],
+        //                          0x0, pstWbc2->u32BufferStride, 0x0);
+        OPTM_GfxSetWbcAddr  (pstWbc2->enWbcHalId, pstWbc2->u32WriteBufAddr,
+                            pstWbc2->u32BufferStride);
+        //OPTM_GfxSetLayerAddr      (HIFB_LAYER_SD_0, pstWbc2->u32ReadBufAddr);
 		OPTM_GfxSetLayerStride    (HIFB_LAYER_SD_0, pstWbc2->u32BufferStride);
 		OPTM_VDP_GFX_SetInDataFmt(g_stGfxDevice[HIFB_LAYER_SD_0].enGfxHalId, 
 					OPTM_PixerFmtTransferToHalFmt(pstWbc2->enDataFmt));
@@ -4269,7 +4660,7 @@ HI_S32 OPTM_GPRecovery(OPTM_VDP_LAYER_GP_E enGPId)
 		OPTM_GfxSetDispFMTSize((OPTM_GFX_GP_E)enGPId, pstDispRect);
 		OPTM_GfxSetCsc(enGPId, &g_stGfxGPDevice[enGPId].stCscPara, 
 						g_stGfxGPDevice[enGPId].bBGRState);
-		OPTM_VDP_GP_SetDispMode(enGPId, OPTM_GfxGetHalTriDimMode(g_stGfxGPDevice[enGPId].enTriDimMode));
+		//OPTM_VDP_GP_SetDispMode(enGPId, OPTM_GfxGetHalTriDimMode(g_stGfxGPDevice[enGPId].enTriDimMode));
 		OPTM_VDP_GP_SetRegUp   (enGPId);
 		/****recover all gfx in the gp******/
 		for (i = 0; i < u32LayerCount;i++)
@@ -4285,9 +4676,12 @@ HI_S32 OPTM_GPRecovery(OPTM_VDP_LAYER_GP_E enGPId)
 			//printk("===gp recovery enable %d=====.\n",g_stGfxDevice[enLayerId].bEnable);
 			OPTM_GfxSetLayerAlpha(enLayerId, &g_stGfxDevice[enLayerId].stAlpha);
 			OPTM_GfxSetLayKeyMask(enLayerId, &g_stGfxDevice[enLayerId].stColorkey);
+#ifdef CFG_HIFB_STEREO3D_HW_SUPPORT
 			OPTM_GfxSetTriDimEnable(enLayerId, g_stGfxDevice[enLayerId].b3DEnable);
 			OPTM_GfxSetTriDimMode(enLayerId, g_stGfxDevice[enLayerId].enTriDimMode);
 			OPTM_GfxSetTriDimAddr(enLayerId, g_stGfxDevice[enLayerId].u32TriDimAddr);
+            OPTM_GFX_SetStereoDepth(enLayerId, g_stGfxDevice[enLayerId].s32Depth);
+#endif
 			OPTM_GfxSetLayerPreMult(enLayerId, g_stGfxDevice[enLayerId].bPreMute);
 			OPTM_GfxSetLayerDataFmt(enLayerId, g_stGfxDevice[enLayerId].enDataFmt);
 			//printk("====gp recovery layer datafmt %d======.\n",g_stGfxDevice[enLayerId].enDataFmt);
@@ -4299,6 +4693,7 @@ HI_S32 OPTM_GPRecovery(OPTM_VDP_LAYER_GP_E enGPId)
 			//printk("====gp recovery layer addr 0x%x======.\n",g_stGfxDevice[enLayerId].NoCmpBufAddr);
 			
 			OPTM_VDP_GFX_SetLutAddr(g_stGfxDevice[enLayerId].enGfxHalId, g_stGfxDevice[enLayerId].stCluptTable.u32StartPhyAddr);
+            OPTM_VDP_GFX_SetParaUpd(g_stGfxDevice[enLayerId].enGfxHalId,VDP_DISP_COEFMODE_LUT);
 			OPTM_VDP_GFX_SetLayerBkg(g_stGfxDevice[enLayerId].enGfxHalId, g_stGfxDevice[enLayerId].stBkg);
 			OPTM_VDP_GFX_SetBitExtend(g_stGfxDevice[enLayerId].enGfxHalId, g_stGfxDevice[enLayerId].enBitExtend);
 			OPTM_GfxSetLayerReadMode(enLayerId, g_stGfxDevice[enLayerId].enReadMode);
@@ -4307,11 +4702,11 @@ HI_S32 OPTM_GPRecovery(OPTM_VDP_LAYER_GP_E enGPId)
 	}
 	
 	PRINT_OUT;
-#endif
 
 	return HI_SUCCESS;
 }
 
+#ifndef HI_BUILD_IN_BOOT
 HI_S32 OPTM_VO_Callback(HI_VOID* u32Param0, HI_VOID* u32Param1)
 {
 	HI_U32                      i;
@@ -4330,20 +4725,9 @@ HI_S32 OPTM_VO_Callback(HI_VOID* u32Param0, HI_VOID* u32Param1)
 		return HI_FAILURE;
 	}
 
-	u32LayerCount = (OPTM_VDP_LAYER_GP0 == *pEnGpHalId) ? OPTM_GP0_GFX_COUNT : OPTM_GP1_GFX_COUNT;
+	u32LayerCount = (OPTM_VDP_LAYER_GP0 == *pEnGpHalId) ? OPTM_GP0_GFX_COUNT : 0; //OPTM_GP1_GFX_COUNT;
 	
-	if (OPTM_VDP_LAYER_GP0 == *pEnGpHalId)
-	{
-		enInitLayerId     = HIFB_LAYER_HD_0;
-	}
-	else if (OPTM_VDP_LAYER_GP1 == *pEnGpHalId)
-	{
-		enInitLayerId    = HIFB_LAYER_SD_0;
-	}
-	else
-	{
-		return HI_SUCCESS;
-	}
+    enInitLayerId   = (OPTM_VDP_LAYER_GP0 == *pEnGpHalId) ? HIFB_LAYER_HD_0 : HIFB_LAYER_SD_0;
 	
 	for (i = 0; i < u32LayerCount;i++)
 	{
@@ -4358,14 +4742,25 @@ HI_S32 OPTM_VO_Callback(HI_VOID* u32Param0, HI_VOID* u32Param1)
 		
 		if (u32CTypeFlag & HIFB_CALLBACK_TYPE_VO)
 		{
+            if (pstDispInfo->stDispInfo.bInterlace &&
+                !pstDispInfo->stDispInfo.bIsBottomField &&
+                HIFB_LAYER_HD_0 == i)
+            {
+                continue;
+            }
+#if 0
 			if (HI_DRV_DISP_FIELD_PROGRESSIVE == pstDispInfo->eField
 				|| HI_DRV_DISP_FIELD_BOTTOM == pstDispInfo->eField)
 			{
+#endif
 				g_stGfxGPIrq[*pEnGpHalId].stGfxCallBack[i].stGfxIrq[HIFB_CALLBACK_TYPE_VO].pFunc(
 					(HI_VOID*)g_stGfxGPIrq[*pEnGpHalId].stGfxCallBack[i].stGfxIrq[HIFB_CALLBACK_TYPE_VO].u32Param0, 
 					HI_NULL);
 				/**when v sync , wake up V Block*/
+#ifdef OPTM_HIFB_WVM_ENABLE
 				OPTM_GfxWVBCallBack(enLayerId, HI_NULL);
+#endif
+#if 0
 			}
 			else if ((HIFB_LAYER_HD_1 == (enLayerId) || HIFB_LAYER_HD_2 == (enLayerId))
 				&& (HI_DRV_DISP_FIELD_TOP == pstDispInfo->eField))
@@ -4376,6 +4771,7 @@ HI_S32 OPTM_VO_Callback(HI_VOID* u32Param0, HI_VOID* u32Param1)
 				/**when v sync , wake up V Block*/
 				OPTM_GfxWVBCallBack(enLayerId, HI_NULL);
 			}
+#endif
 		}
 
 		if (u32CTypeFlag & HIFB_CALLBACK_TYPE_REGUP)
@@ -4388,12 +4784,13 @@ HI_S32 OPTM_VO_Callback(HI_VOID* u32Param0, HI_VOID* u32Param1)
 	return HI_SUCCESS;
 }
 
+extern OPTM_VDP_DISP_MODE_E OPTM_DISP_GetDispMode(OPTM_VDP_LAYER_GP_E enGpHalId);
+
 HI_S32 OPTM_Distribute_Callback(HI_VOID* u32Param0, HI_VOID* u32Param1)
 {
-#if 1
-#warning TODO
-#else
+#ifdef CFG_HIFB_STEREO3D_HW_SUPPORT
 	HIFB_STEREO_MODE_E          enTriDimMode;
+#endif
 	OPTM_VDP_LAYER_GP_E         *pEnGpHalId;
 	HI_DRV_DISP_CALLBACK_INFO_S *pstDispInfo;		
 
@@ -4409,19 +4806,28 @@ HI_S32 OPTM_Distribute_Callback(HI_VOID* u32Param0, HI_VOID* u32Param1)
 
 	OPTM_VO_Callback(u32Param0, u32Param1);
 
+#ifdef CFG_HIFB_STEREO3D_HW_SUPPORT
+
 	/************************3D Mode change*************************/
-	enTriDimMode = OPTM_AdaptTriDimModeFromDisp(pstDispInfo->stDispInfo.eDispMode);
-#if 1	
+	//enTriDimMode = OPTM_AdaptTriDimModeFromDisp(pstDispInfo->stDispInfo.eDispMode);
+    enTriDimMode = OPTM_AdaptTriDimModeFromDisp(OPTM_DISP_GetDispMode(g_stGfxGPDevice[*pEnGpHalId].enGpHalId));
+
 	if (enTriDimMode != g_stGfxGPDevice[*pEnGpHalId].enTriDimMode
 		&& (HIFB_STEREO_BUTT > enTriDimMode))
 	{
+        //printk("####get new disp mode %d\n####", enTriDimMode);
+        if (OPTM_CheckGfxCallbackReg((OPTM_GFX_GP_E)(*pEnGpHalId), HIFB_CALLBACK_TYPE_3DMode_CHG) != HI_SUCCESS)
+        {
+           return HI_SUCCESS;
+        }
+
 		g_stGfxGPDevice[*pEnGpHalId].enTriDimMode = enTriDimMode;
-		OPTM_VDP_GP_SetDispMode(*pEnGpHalId, OPTM_GfxGetHalTriDimMode(enTriDimMode));
+		//OPTM_VDP_GP_SetDispMode(*pEnGpHalId, OPTM_GfxGetHalTriDimMode(enTriDimMode));
 		OPTM_VDP_GP_SetRegUp   (*pEnGpHalId);
-     #ifndef HI_BUILD_IN_BOOT   
+
 		g_stGfxGPDevice[*pEnGpHalId].st3DModeChgWork.u32Data = *pEnGpHalId;
 	    queue_work(g_stGfxGPDevice[*pEnGpHalId].queue, &g_stGfxGPDevice[*pEnGpHalId].st3DModeChgWork.work);
-     #endif
+
 
 	 	/**************WBC_GP_INRECT == GP_INRECT******/
 		if (IS_MASTER_GP(*pEnGpHalId))
@@ -4429,17 +4835,24 @@ HI_S32 OPTM_Distribute_Callback(HI_VOID* u32Param0, HI_VOID* u32Param1)
 			g_stGfxGPDevice[OPTM_SLAVER_GPID].stInRect.s32Width  = g_stGfxGPDevice[*pEnGpHalId].stInRect.s32Width;
 			g_stGfxGPDevice[OPTM_SLAVER_GPID].stInRect.s32Height = g_stGfxGPDevice[*pEnGpHalId].stInRect.s32Height;
 
-			g_stGfxWbc2.enWbcMode = OPTM_WBC_MODE_LFET_EYE;
+            if (HIFB_STEREO_MONO == g_stGfxGPDevice[*pEnGpHalId].enTriDimMode)
+            {
+                g_stGfxWbc2.enWbcMode = OPTM_WBC_MODE_MONO;
+            }
+            else
+            {
+            	g_stGfxWbc2.enWbcMode = OPTM_WBC_MODE_LFET_EYE;
+            }
 			g_stGfxGPDevice[OPTM_SLAVER_GPID].unUpFlag.bits.WbcMode  = 1;
 			g_stGfxGPDevice[OPTM_SLAVER_GPID].unUpFlag.bits.InRect = 1;
 			g_stGfxGPDevice[OPTM_SLAVER_GPID].unUpFlag.bits.RegUp  = 1;
 		}
     }
 #endif	
-#endif
 
 	return HI_SUCCESS;
 }
+#endif
 
 HI_S32 OPTM_GFX_SetGpInUsrFlag(OPTM_GFX_GP_E enGpId, HI_BOOL bFlag)
 {
@@ -4465,6 +4878,7 @@ HI_S32 OPTM_GFX_GetGpInInitFlag(OPTM_GFX_GP_E enGpId)
 	return g_stGfxGPDevice[enGpId].bGPInInitial;
 }
 
+#ifndef HI_BUILD_IN_BOOT
 HI_S32 OPTM_GFX_SetGfxMask(OPTM_GFX_GP_E enGpId, HI_BOOL bFlag)
 {
 	HIFB_OSD_DATA_S stLayerData;
@@ -4510,9 +4924,6 @@ HI_S32 OPTM_GFX_GetGfxMask(OPTM_GFX_GP_E enGpId)
 
 HI_S32 OPTM_GFX_ClearLogoOsd(HIFB_LAYER_ID_E enLayerId)
 {
-#if 1
-#warning TODO
-#else
 	if (!g_stGfxGPDevice[OPTM_MASTER_GPID].bOpen &&
 		!g_stGfxGPDevice[OPTM_SLAVER_GPID].bOpen)
 	{
@@ -4529,75 +4940,102 @@ HI_S32 OPTM_GFX_ClearLogoOsd(HIFB_LAYER_ID_E enLayerId)
 	OPTM_VDP_GFX_SetLayerEnable(OPTM_GetGfxHalId(enLayerId), HI_FALSE);
 	OPTM_VDP_GFX_SetLayerAddrEX(OPTM_GetGfxHalId(enLayerId), HI_NULL);
 	OPTM_VDP_GFX_SetRegUp(OPTM_GetGfxHalId(enLayerId));
-#endif
 
 	return HI_SUCCESS;
 }
 
 HI_S32 OPTM_GFX_SetStereoDepth(HIFB_LAYER_ID_E enLayerId, HI_S32 s32Depth)
 {
-#if 1
-#warning TODO
-#else
-	OPTM_VDP_GFX_SetThreeDimDofEnable(OPTM_GetGfxHalId(enLayerId), HI_TRUE);
-	OPTM_VDP_GFX_SetThreeDimDofStep(OPTM_GetGfxHalId(enLayerId), s32Depth, (0-s32Depth));
+    g_stGfxDevice[enLayerId].s32Depth = s32Depth;
+
+    if (g_stGfxDevice[enLayerId].s32Depth != 0)
+    {
+        OPTM_VDP_GFX_SetThreeDimDofEnable(OPTM_GetGfxHalId(enLayerId), HI_TRUE);
+    }
+
+    OPTM_VDP_GFX_SetThreeDimDofStep(OPTM_GetGfxHalId(enLayerId), s32Depth, (0-s32Depth));
+    return HI_SUCCESS;
+}
 #endif
-	return HI_SUCCESS;
+
+HI_S32 OPTM_GFX_SetTCFlag(HI_BOOL bFlag)
+{
+    g_bTcWBCFlag = bFlag;
+    return HI_SUCCESS;
 }
 
 HI_VOID OPTM_GFX_GetOps(OPTM_GFX_OPS_S *ops)
 {
 	ops->OPTM_GfxCloseLayer         = OPTM_GfxCloseLayer;
 	ops->OPTM_GfxDeInit             = OPTM_GfxDeInit;
+#ifndef HI_BUILD_IN_BOOT
 	ops->OPTM_GfxGetLayerPriority   = OPTM_GfxGetLayerPriority;
 	ops->OPTM_GfxGetOSDData         = OPTM_GfxGetOSDData;
-//	ops->OPTM_GfxGfxCmpHandle       = OPTM_GfxGfxCmpHandle;
+#endif
 	ops->OPTM_GfxInit               = OPTM_GfxInit;
 	ops->OPTM_GfxOpenLayer          = OPTM_GfxOpenLayer;
-      
+#ifndef HI_BUILD_IN_BOOT
 	ops->OPTM_GfxSetCallback        = OPTM_GfxSetCallback;
-
+#endif
 	ops->OPTM_GfxSetClutAddr        = OPTM_GfxSetClutAddr;
 	ops->OPTM_GfxSetColorReg        = OPTM_GfxSetColorReg;
 	ops->OPTM_GfxSetEnable          = OPTM_GfxSetEnable;
-//	ops->OPTM_GfxSetGfxCmpAddr      = OPTM_GfxSetGfxCmpAddr;
-//	ops->OPTM_GfxSetGfxCmpRect      = OPTM_GfxSetGfxCmpRect;
 	ops->OPTM_GfxSetGpRect          = OPTM_GfxSetGpRect;
+#ifndef HI_BUILD_IN_BOOT
 	ops->OPTM_GfxSetGpInPutSize     = OPTM_GfxSetGpInPutSize;
+#endif
 	ops->OPTM_GfxSetLayerAddr       = OPTM_GfxSetLayerAddr;
 	ops->OPTM_GfxSetLayerAlpha      = OPTM_GfxSetLayerAlpha;
 	ops->OPTM_GfxSetLayerDataFmt    = OPTM_GfxSetLayerDataFmt;
-//	ops->OPTM_GfxSetLayerDeCmpEnable= OPTM_GfxSetLayerDeCmpEnable;
 	ops->OPTM_GfxSetLayerDeFlicker  = OPTM_GfxSetLayerDeFlicker;
 	ops->OPTM_GfxSetLayerPreMult    = OPTM_GfxSetLayerPreMult;
+#ifndef HI_BUILD_IN_BOOT
 	ops->OPTM_GfxSetLayerPriority   = OPTM_GfxSetLayerPriority;
+#endif
 	ops->OPTM_GfxSetLayerRect       = OPTM_GfxSetLayerRect;
 	ops->OPTM_GfxSetLayerStride     = OPTM_GfxSetLayerStride;
 	ops->OPTM_GfxSetLayKeyMask      = OPTM_GfxSetLayKeyMask;
 	ops->OPTM_GfxUpLayerReg         = OPTM_GfxUpLayerReg;
 	ops->OPTM_GfxWaitVBlank         = OPTM_GfxWaitVBlank;
 	ops->OPTM_GFX_GetDevCap         = OPTM_GFX_GetDevCap;
+#ifndef HI_BUILD_IN_BOOT
 	ops->OPTM_GfxGetOutRect         = OPTM_GfxGetOutRect;
+#endif
 	ops->OPTM_GfxGetLayerRect       = OPTM_GfxGetLayerRect;
 	ops->OPTM_GFX_SetGpInUsrFlag    = OPTM_GFX_SetGpInUsrFlag;
 	ops->OPTM_GFX_GetGpInUsrFlag    = OPTM_GFX_GetGpInUsrFlag;
 	ops->OPTM_GFX_SetGpInInitFlag   = OPTM_GFX_SetGpInInitFlag;
 	ops->OPTM_GFX_GetGpInInitFlag   = OPTM_GFX_GetGpInInitFlag;
+#ifndef HI_BUILD_IN_BOOT
 	ops->OPTM_GFX_SetGfxMask        = OPTM_GFX_SetGfxMask;
 	ops->OPTM_GFX_GetGfxMask        = OPTM_GFX_GetGfxMask;
 	ops->OPTM_GfxGetDispFMTSize     = OPTM_GfxGetDispFMTSize;
-
 	ops->OPTM_GFX_GetSlvLayerInfo	= OPTM_GFX_GetSlvLayerInfo;
+#endif
 	ops->OPTM_GFX_SetTCFlag 		= OPTM_GFX_SetTCFlag;
 
+#ifdef CFG_HIFB_COMPRESSION_SUPPORT
+    /***compression****/
+    ops->OPTM_GFX_CMP_Open          = OPTM_GFX_CMP_Open;
+    ops->OPTM_GFX_CMP_Close         = OPTM_GFX_CMP_Close;
+    ops->OPTM_GFX_CMP_GetSwitch     = OPTM_GFX_CMP_GetSwitch;
+    ops->OPTM_GFX_SetCmpRect        = OPTM_GFX_SetCmpRect;
+    ops->OPTM_GFX_SetCmpMode        = OPTM_GFX_SetCmpMode;
+    ops->OPTM_GFX_GetCmpMode        = OPTM_GFX_GetCmpMode;
+    ops->OPTM_GFX_SetCmpDDROpen     = OPTM_GFX_SetCmpDDROpen;
+#endif
+#ifdef CFG_HIFB_STEREO3D_HW_SUPPORT
 	/***3D****/
 	ops->OPTM_GfxSetTriDimEnable    = OPTM_GfxSetTriDimEnable;
 	ops->OPTM_GfxSetTriDimMode      = OPTM_GfxSetTriDimMode;
 	ops->OPTM_GfxSetTriDimAddr      = OPTM_GfxSetTriDimAddr;
+
 	ops->OPTM_GFX_SetStereoDepth    = OPTM_GFX_SetStereoDepth;
+#endif
+#ifndef HI_BUILD_IN_BOOT
 	ops->OPTM_GFX_ClearLogoOsd      = OPTM_GFX_ClearLogoOsd;
-		
 	ops->OPTM_GFX_SetGpDeflicker 	= OPTM_GfxSetGpDeflicker;
+#endif
 }
 
 /***********************************************************/

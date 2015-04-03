@@ -104,9 +104,12 @@ typedef struct
     HI_U32 u32ZmeFrmWOut;   /*zme output frame width*/
     HI_U32 u32ZmeFrmHOut;   /*zme output frame height*/
 
+    HI_U32 u32ZmeHdDeflicker;
+    HI_U32 u32ZmeSdDeflicker;
 
     HI_BOOL bZmeFrmFmtIn;    /*Frame format for zme input: 0-field; 1-frame*/
     HI_BOOL bZmeFrmFmtOut;   /*Frame format for zme Output: 0-field; 1-frame*/
+
 }OPTM_ALG_GZME_DRV_PARA_S; 
 
 

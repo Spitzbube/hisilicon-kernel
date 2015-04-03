@@ -119,8 +119,6 @@ obj-y += hifb/hifb_snapshot.o
 obj-y += hifb/adp/hifb_blit.o
 obj-y += hifb/adp/platform/alg/optm_alg_gzme.o
 obj-y += hifb/adp/platform/alg/optm_alg_zme_coef.o
-obj-y += hifb/adp/platform/cv200/optm_hal.o
-obj-y += hifb/adp/platform/cv200/optm_hifb.o
 obj-y += hifb/adp/platform/alg/optm_alg_gsharp.o
 
 obj-y += mce/drv_mce_intf.o

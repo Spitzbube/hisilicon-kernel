@@ -97,6 +97,8 @@ typedef enum
     /*CNcomment:�Ĵ�����������ж�*/
     HIFB_CALLBACK_TYPE_REGUP = 0x4,
 
+    HIFB_CALLBACK_TYPE_FRAME_START = 0x8,
+
     HIFB_CALLBACK_TYPE_FRAME_END = 0x10,
     
     HIFB_CALLBACK_TYPE_BUTT,
@@ -154,7 +156,7 @@ typedef struct
     HIFB_ALPHA_S stAlpha;
     HIFB_COLORKEYEX_S stColorKey; 
 	HIFB_SCAN_MODE_E eScanMode;
-	int fill; //
+	int enSlaveryLayerID; //112
 }HIFB_OSD_DATA_S;
 
 

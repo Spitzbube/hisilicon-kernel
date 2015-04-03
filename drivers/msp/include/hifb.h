@@ -483,18 +483,18 @@ typedef enum
 typedef struct
 {
 	HI_BOOL bShow; //0
-	int fill_4; //4
-	int fill_8; //8
+	HI_BOOL bOpen; //4
+	int eGfxWorkMode; //8
 	HI_U32 u32Stride; //12
 	HI_U32 u32WbcBufNum; //16
 	HI_U32 u32WbcBufSize; //20
-	int fill_24; //24
+	HI_U32 u32ReadBufAddr; //24
 	HIFB_RECT stSrcBufRect; //28
 	HIFB_RECT stCurWBCBufRect; //44
 	HIFB_RECT stMaxWbcBufRect; //60
 	HIFB_RECT stScreenRect; //76
 	HI_U32 eFmt; //92
-	int fill_96; //96
+	int eScanMode; //96
 	HI_U32 enLayerID; //100
 } HIFB_SLVLAYER_DATA_S;
 

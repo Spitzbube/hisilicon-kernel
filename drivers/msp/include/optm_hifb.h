@@ -220,7 +220,7 @@ typedef struct
 	/*��ȡͼ���������*/
 	HI_S32 (*OPTM_GFX_GetDevCap)(const HIFB_CAPABILITY_S **pstCap); //108
 	/*��ȡͼ�����������С*/
-	HI_S32 (*OPTM_GfxGetOutRect)(OPTM_GFX_GP_E enGpId, HIFB_RECT * pstOutputRect); //112
+	HI_S32 (*OPTM_GfxGetOutRect)(HIFB_LAYER_ID_E enLayerId, HIFB_RECT * pstOutputRect); //112
 	/*��ȡͼ������������С*/
 	HI_S32 (*OPTM_GfxGetLayerRect)(HIFB_LAYER_ID_E enLayerId, HIFB_RECT *pstRect); //116
 	/*�����û�����GP����ֱ��ʱ�־*/
