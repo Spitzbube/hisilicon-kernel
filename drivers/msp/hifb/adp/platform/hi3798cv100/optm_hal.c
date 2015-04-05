@@ -792,7 +792,7 @@ HI_VOID  OPTM_VDP_GFX_GetLayerInRect(HI_U32 u32Data, OPTM_VDP_DISP_RECT_S *stInR
     G0_SFPOS.u32 = OPTM_VDP_RegRead((HI_U32)((HI_U32)&(pOptmVdpReg->G0_SFPOS.u32)+ u32Data * OPTM_GFX_OFFSET));
     stInRect->u32SX = G0_SFPOS.bits.src_xfpos;
 
-    G0_VFPOS.u32 = OPTM_VDP_RegRead((HI_U32)((HI_U32)&(pOptmVdpReg->G0_VFPOS.u32) + u32Data * OPTM_VID_OFFSET));
+    G0_VFPOS.u32 = OPTM_VDP_RegRead((HI_U32)((HI_U32)&(pOptmVdpReg->G0_VFPOS.u32) + u32Data * OPTM_GFX_OFFSET));
     stInRect->u32VX = G0_VFPOS.bits.video_xfpos;
     stInRect->u32VY = G0_VFPOS.bits.video_yfpos;
     
@@ -804,7 +804,7 @@ HI_VOID  OPTM_VDP_GFX_GetLayerInRect(HI_U32 u32Data, OPTM_VDP_DISP_RECT_S *stInR
     stInRect->u32DXL = G0_DLPOS.bits.disp_xlpos + 1;
     stInRect->u32DYL = G0_DLPOS.bits.disp_ylpos + 1;
 
-    G0_VLPOS.u32 = OPTM_VDP_RegRead((HI_U32)((HI_U32)&(pOptmVdpReg->G0_VLPOS.u32) + u32Data * OPTM_VID_OFFSET));
+    G0_VLPOS.u32 = OPTM_VDP_RegRead((HI_U32)((HI_U32)&(pOptmVdpReg->G0_VLPOS.u32) + u32Data * OPTM_GFX_OFFSET));
     stInRect->u32VXL = G0_VLPOS.bits.video_xlpos + 1;
     stInRect->u32VYL = G0_VLPOS.bits.video_ylpos + 1;
 
@@ -831,12 +831,12 @@ HI_VOID  OPTM_VDP_GFX_SetLayerReso     (HI_U32 u32Data, OPTM_VDP_DISP_RECT_S  st
     G0_SFPOS.bits.src_xfpos = stRect.u32SX;
     OPTM_VDP_RegWrite((HI_U32)((HI_U32)&(pOptmVdpReg->G0_SFPOS.u32)+ u32Data * OPTM_GFX_OFFSET), G0_SFPOS.u32);
 
-    G0_VFPOS.u32 = OPTM_VDP_RegRead((HI_U32)((HI_U32)&(pOptmVdpReg->G0_VFPOS.u32) + u32Data * OPTM_GFX_OFFSET/*OPTM_VID_OFFSET*/));
+    G0_VFPOS.u32 = OPTM_VDP_RegRead((HI_U32)((HI_U32)&(pOptmVdpReg->G0_VFPOS.u32) + u32Data * OPTM_GFX_OFFSET));
     G0_VFPOS.bits.video_xfpos = stRect.u32VX;
     G0_VFPOS.bits.video_yfpos = stRect.u32VY;
-    OPTM_VDP_RegWrite((HI_U32)((HI_U32)&(pOptmVdpReg->G0_VFPOS.u32) + u32Data * OPTM_GFX_OFFSET/*OPTM_VID_OFFSET*/), G0_VFPOS.u32);
+    OPTM_VDP_RegWrite((HI_U32)((HI_U32)&(pOptmVdpReg->G0_VFPOS.u32) + u32Data * OPTM_GFX_OFFSET), G0_VFPOS.u32);
 
-    G0_VLPOS.u32 = OPTM_VDP_RegRead((HI_U32)((HI_U32)&(pOptmVdpReg->G0_VLPOS.u32) + u32Data * OPTM_GFX_OFFSET/*OPTM_VID_OFFSET*/));
+    G0_VLPOS.u32 = OPTM_VDP_RegRead((HI_U32)((HI_U32)&(pOptmVdpReg->G0_VLPOS.u32) + u32Data * OPTM_GFX_OFFSET));
     G0_VLPOS.bits.video_xlpos = stRect.u32VX + stRect.u32OWth;
 	if (G0_VLPOS.bits.video_xlpos)
 	{
@@ -847,7 +847,7 @@ HI_VOID  OPTM_VDP_GFX_SetLayerReso     (HI_U32 u32Data, OPTM_VDP_DISP_RECT_S  st
 	{
 		G0_VLPOS.bits.video_ylpos -= 1;
 	}
-    OPTM_VDP_RegWrite((HI_U32)((HI_U32)&(pOptmVdpReg->G0_VLPOS.u32) + u32Data * OPTM_GFX_OFFSET/*OPTM_VID_OFFSET*/), G0_VLPOS.u32);
+    OPTM_VDP_RegWrite((HI_U32)((HI_U32)&(pOptmVdpReg->G0_VLPOS.u32) + u32Data * OPTM_GFX_OFFSET), G0_VLPOS.u32);
 
     // display position
     G0_DFPOS.u32 = OPTM_VDP_RegRead((HI_U32)((HI_U32)&(pOptmVdpReg->G0_DFPOS.u32)+ u32Data * OPTM_GFX_OFFSET));
