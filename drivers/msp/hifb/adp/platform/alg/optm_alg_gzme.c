@@ -271,6 +271,7 @@ static HI_U32 OPTM_GZmeLoadSDCoefH(OPTM_GZME_COEF_RATIO_E enCoefRatio, HI_U8 *pu
 {
     HI_S16 u16TableTmp[8 * 8];
     HI_U32 u32TableTmpSize;
+    OPTM_ZME_COEF_BITARRAY_S stArray;   /*for DTI coefficient*/
 
 #warning TODO: OPTM_GZmeLoadSDCoefH
 
@@ -284,6 +285,10 @@ static HI_U32 OPTM_GZmeLoadSDCoefH(OPTM_GZME_COEF_RATIO_E enCoefRatio, HI_U8 *pu
     u32TableTmpSize = OPTM_GZmeTransCoefAlign(g_pOPTMGfxSDZmeCoef[enCoefRatio][GZME_COEF_8T8P_CH], (HI_S16)(8 * 8), u16TableTmp);
     memcpy(pu8Addr, u16TableTmp, u32TableTmpSize);
     pu8Addr += u32TableTmpSize;
+
+    //for LTI&CTI horizontal
+    OPTM_GDtiTransCoefHor(g_pOPTMGfxDtiZmeCoef[enCoefRatio][GDTI_COEF_2T8P_LH], g_pOPTMGfxDtiZmeCoef[enCoefRatio][GDTI_COEF_2T8P_CH], &stArray);
+    memcpy(pu8Addr, stArray.stBit, stArray.u32Size);
 
     return HI_SUCCESS;
 }
