@@ -130,6 +130,7 @@ obj-y += pdm/db/hi_db.o
 obj-y += hdmi/
 obj-y += hifb/
 obj-y += pq/
+obj-y += tde/
 obj-y += vo/
 
 obj-y += todo.o
