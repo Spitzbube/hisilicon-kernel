@@ -55,7 +55,6 @@ HI_S32 HIFB_DRV_TdeOpen(HI_VOID)
         return HI_SUCCESS;
     }
 	   
-#warning module HI_ID_TDE not yet implemented!
     if (HI_SUCCESS != HI_DRV_MODULE_GetFunction(HI_ID_TDE, (HI_VOID**)&ps_TdeExportFuncs))
     {
     	return HI_FAILURE;
@@ -171,7 +170,7 @@ HI_S32 HIFB_DRV_Blit(HIFB_BUFFER_S *pSrcImg, HIFB_BUFFER_S *pDstImg,  HIFB_BLIT_
 
     if(NULL == ps_TdeExportFuncs)
     {
-        HIFB_ERROR("Tde is not available!\n");
+        HIFB_ERROR("Tde is not available!\n"); //173
         return HI_FAILURE;
     }
 
@@ -309,7 +308,7 @@ HI_S32 HIFB_DRV_Blit(HIFB_BUFFER_S *pSrcImg, HIFB_BUFFER_S *pDstImg,  HIFB_BLIT_
         stOpt.stBlendOpt.bPixelAlphaEnable = HI_TRUE;
         stOpt.stBlendOpt.bSrc1AlphaPremulti = HI_TRUE;
         stOpt.stBlendOpt.bSrc2AlphaPremulti = HI_TRUE;
-        stOpt.stBlendOpt.eBlendCmd = TDE2_BLENDCMD_SRCOVER;
+        stOpt.stBlendOpt.eBlendCmd = TDE2_BLENDCMD_SRC; //TDE2_BLENDCMD_SRCOVER;
 
     }
     else
@@ -320,7 +319,7 @@ HI_S32 HIFB_DRV_Blit(HIFB_BUFFER_S *pSrcImg, HIFB_BUFFER_S *pDstImg,  HIFB_BLIT_
     s32Ret = ps_TdeExportFuncs->pfnTdeEnableRegionDeflicker(pstOpt->bRegionDeflicker);
     if (s32Ret != HI_SUCCESS)
     {
-        HIFB_ERROR("enable region deflicker failed!\n");
+        HIFB_ERROR("enable region deflicker failed!\n"); //323
         return s32Ret;
     }
 
@@ -336,7 +335,7 @@ HI_S32 HIFB_DRV_Blit(HIFB_BUFFER_S *pSrcImg, HIFB_BUFFER_S *pDstImg,  HIFB_BLIT_
     s32Ret = ps_TdeExportFuncs->pfnTdeBeginJob(&handle);
     if(s32Ret != HI_SUCCESS)
     {
-        HIFB_ERROR("begin job failed\n");
+        HIFB_ERROR("begin job failed\n"); //339
         return s32Ret;
     }
 
@@ -349,7 +348,7 @@ HI_S32 HIFB_DRV_Blit(HIFB_BUFFER_S *pSrcImg, HIFB_BUFFER_S *pDstImg,  HIFB_BLIT_
                      &stDstRect, &stOpt);
     if(s32Ret != HI_SUCCESS)
     {
-        HIFB_ERROR("tde blit failed\n");    
+        HIFB_ERROR("tde blit failed\n"); //352
         ps_TdeExportFuncs->pfnTdeCancelJob(handle);
         return s32Ret;
     }
@@ -366,7 +365,7 @@ HI_S32 HIFB_DRV_Blit(HIFB_BUFFER_S *pSrcImg, HIFB_BUFFER_S *pDstImg,  HIFB_BLIT_
     }
     if(s32Ret != HI_SUCCESS)
     {
-        HIFB_ERROR("end job failed\n"); 
+        HIFB_ERROR("end job failed\n"); //369
         ps_TdeExportFuncs->pfnTdeCancelJob(handle);
         return s32Ret;
     }
@@ -376,7 +375,7 @@ HI_S32 HIFB_DRV_Blit(HIFB_BUFFER_S *pSrcImg, HIFB_BUFFER_S *pDstImg,  HIFB_BLIT_
         s32Ret = ps_TdeExportFuncs->pfnTdeEnableRegionDeflicker(HI_FALSE);
         if (s32Ret != HI_SUCCESS)
         {
-            HIFB_ERROR("disable region deflicker failed!\n");
+            HIFB_ERROR("disable region deflicker failed!\n"); //379
             return s32Ret;
         }
     } 
@@ -399,7 +398,7 @@ HI_S32 HIFB_DRV_ClearRect(HIFB_SURFACE_S* pDstImg, HIFB_BLIT_OPT_S* pstOpt)
 
     if(NULL == ps_TdeExportFuncs)
     {
-        HIFB_ERROR("Tde is not available!\n");
+        HIFB_ERROR("Tde is not available!\n"); //402
         return HI_FAILURE;
     }
     
@@ -422,7 +421,7 @@ HI_S32 HIFB_DRV_ClearRect(HIFB_SURFACE_S* pDstImg, HIFB_BLIT_OPT_S* pstOpt)
     s32Ret = ps_TdeExportFuncs->pfnTdeBeginJob(&s32Handle);
     if(s32Ret != HI_SUCCESS)
     {
-        HIFB_ERROR("begin job failed\n");
+        HIFB_ERROR("begin job failed\n"); //425
         return s32Ret;
     }
 
@@ -431,7 +430,7 @@ HI_S32 HIFB_DRV_ClearRect(HIFB_SURFACE_S* pDstImg, HIFB_BLIT_OPT_S* pstOpt)
     s32Ret = ps_TdeExportFuncs->pfnTdeQuickFill(s32Handle, &TDESurface, &Rect, 0x0);
     if(s32Ret != HI_SUCCESS)
     {
-        HIFB_ERROR("tde quick fill failed s32Ret:0x%x\n", s32Ret);    
+        HIFB_ERROR("tde quick fill failed s32Ret:0x%x\n", s32Ret); //434
         ps_TdeExportFuncs->pfnTdeCancelJob(s32Handle);
         return s32Ret;
     }
@@ -439,7 +438,7 @@ HI_S32 HIFB_DRV_ClearRect(HIFB_SURFACE_S* pDstImg, HIFB_BLIT_OPT_S* pstOpt)
     s32Ret = ps_TdeExportFuncs->pfnTdeEndJob(s32Handle, pstOpt->bBlock, 100, HI_FALSE, HI_NULL, HI_NULL);
     if(s32Ret != HI_SUCCESS)
     {
-        HIFB_ERROR("end job failed ret:%d\n", s32Ret); 
+        HIFB_ERROR("end job failed ret:%d\n", s32Ret); //442
         ps_TdeExportFuncs->pfnTdeCancelJob(s32Handle);
         return s32Ret;
     }
@@ -451,7 +450,7 @@ HI_VOID HIFB_DRV_WaitAllTdeDone(HI_BOOL bSync)
 {
     if(NULL == ps_TdeExportFuncs)
     {
-        HIFB_ERROR("Tde is not available!\n");
+        HIFB_ERROR("Tde is not available!\n"); //454
         //return -1;
         return;
     }
@@ -464,7 +463,7 @@ HI_S32 HIFB_DRV_CalScaleRect(const TDE2_RECT_S* pstSrcRect, const TDE2_RECT_S* p
 {
     if(NULL == ps_TdeExportFuncs)
     {
-        HIFB_ERROR("Tde is not available!\n");
+        HIFB_ERROR("Tde is not available!\n"); //467
         return HI_FAILURE;
     }
     return ps_TdeExportFuncs->pfnTdeCalScaleRect(pstSrcRect, pstDstRect, pstRectInSrc, pstRectInDst);
@@ -474,7 +473,7 @@ HI_S32 HIFB_DRV_WaitForDone(TDE_HANDLE s32Handle, HI_U32 u32TimeOut)
 {
     if(NULL == ps_TdeExportFuncs)
     {
-        HIFB_ERROR("Tde is not available!\n");
+        HIFB_ERROR("Tde is not available!\n"); //477
         return HI_FAILURE;
     }
     return ps_TdeExportFuncs->pfnTdeWaitForDone(s32Handle, u32TimeOut);

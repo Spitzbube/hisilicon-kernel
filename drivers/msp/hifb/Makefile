@@ -13,6 +13,7 @@ ccflags-y += -Idrivers/msp/hifb/adp/platform/alg
 
 obj-y += adp/platform/hi3798cv100/optm_hal.o
 obj-y += adp/platform/cv200/optm_hifb.o
+obj-y += adp/hifb_blit.o
 obj-y += adp/hifb_drv_adpt.o
 obj-y += hifb_comm.o
 obj-y += hifb_fence.o
