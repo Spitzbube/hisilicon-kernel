@@ -5005,7 +5005,8 @@ typedef union
     struct
     {
         unsigned int    Reserved_343          : 29  ; // [28..0] 
-        unsigned int    dither_md             : 3   ; // [31..29] 
+        int fill                              : 1; //29
+        unsigned int    dither_md             : 1   ; // [30..30]
     } bits;
 
     // Define an unsigned member
@@ -8616,13 +8617,37 @@ typedef union
 
 } U_DATE_COEFF55;
 
+typedef union
+{
+    // Define the struct bits
+    struct
+    {
+    } bits;
+
+    // Define an unsigned member
+    unsigned int    u32;
+
+} U_AWADDR_SRVLNC_START;
+
+typedef union
+{
+    // Define the struct bits
+    struct
+    {
+    } bits;
+
+    // Define an unsigned member
+    unsigned int    u32;
+
+} U_AWADDR_SRVLNC_END;
+
 //==============================================================================
 // Define the global struct
 typedef struct
 {
     U_VOCTRL             VOCTRL;
-    U_VOINTSTA           VOINTSTA;
-    U_VOMSKINTSTA        VOMSKINTSTA;
+    U_VOINTSTA           VOINTSTA; //4
+    U_VOMSKINTSTA        VOMSKINTSTA; //8
     U_VOINTMSK           VOINTMSK;
     U_VDPVERSION1        VDPVERSION1;
     U_VDPVERSION2        VDPVERSION2;
@@ -8912,41 +8937,41 @@ typedef struct
     U_G0_CTRL            G0_CTRL; //0x7000
     U_G0_UPD             G0_UPD; //0x7004
     unsigned int         Reserved_61[2];
-    U_G0_ADDR            G0_ADDR;
+    U_G0_ADDR            G0_ADDR; //0x7010
     unsigned int         Reserved_62;
-    U_G0_NADDR           G0_NADDR;
+    U_G0_NADDR           G0_NADDR; //0x7018
     U_G0_STRIDE          G0_STRIDE; //0x701c
-    U_G0_IRESO           G0_IRESO;
-    U_G0_SFPOS           G0_SFPOS;
+    U_G0_IRESO           G0_IRESO; //0x7020
+    U_G0_SFPOS           G0_SFPOS; //0x7024
     unsigned int         Reserved_63[2];
     U_G0_CBMPARA         G0_CBMPARA; //0x7030
     U_G0_CKEYMAX         G0_CKEYMAX; //0x7034
     U_G0_CKEYMIN         G0_CKEYMIN; //0x7038
-    U_G0_CMASK           G0_CMASK;
+    U_G0_CMASK           G0_CMASK; //0x703c
     U_G0_PARAADDR        G0_PARAADDR; //0x7040
-    U_G0_PARAUP          G0_PARAUP;
+    U_G0_PARAUP          G0_PARAUP; //0x7044
     unsigned int         Reserved_64[2];
-    U_G0_DCMP_ADDR       G0_DCMP_ADDR;
-    U_G0_DCMP_NADDR      G0_DCMP_NADDR;
-    U_G0_DCMP_OFFSET     G0_DCMP_OFFSET;
+    U_G0_DCMP_ADDR       G0_DCMP_ADDR; //0x7050
+    U_G0_DCMP_NADDR      G0_DCMP_NADDR; //0x7054
+    U_G0_DCMP_OFFSET     G0_DCMP_OFFSET; //0x7058
     unsigned int         Reserved_65[9];
-    U_G0_DFPOS           G0_DFPOS;
-    U_G0_DLPOS           G0_DLPOS;
-    U_G0_VFPOS           G0_VFPOS;
-    U_G0_VLPOS           G0_VLPOS;
+    U_G0_DFPOS           G0_DFPOS; //0x7080
+    U_G0_DLPOS           G0_DLPOS; //0x7084
+    U_G0_VFPOS           G0_VFPOS; //0x7088
+    U_G0_VLPOS           G0_VLPOS; //0x708c
     U_G0_BK              G0_BK; //0x7090
     U_G0_ALPHA           G0_ALPHA; //0x7094
     unsigned int         Reserved_66[2];
-    U_G0_DOF_CTRL        G0_DOF_CTRL;
-    U_G0_DOF_STEP        G0_DOF_STEP;
+    U_G0_DOF_CTRL        G0_DOF_CTRL; //0x70a0
+    U_G0_DOF_STEP        G0_DOF_STEP; //0x70a4
     unsigned int         Reserved_67[3030-2048];
     U_GP0_CTRL           GP0_CTRL; //0x8000
-    U_GP0_UPD            GP0_UPD;
+    U_GP0_UPD            GP0_UPD; //0x8004
     U_GP0_ORESO          GP0_ORESO;
     U_GP0_IRESO          GP0_IRESO;
-    U_GP0_HCOEFAD        GP0_HCOEFAD;
-    U_GP0_VCOEFAD        GP0_VCOEFAD;
-    U_GP0_PARAUP         GP0_PARAUP;
+    U_GP0_HCOEFAD        GP0_HCOEFAD; //0x8010
+    U_GP0_VCOEFAD        GP0_VCOEFAD; //0x8014
+    U_GP0_PARAUP         GP0_PARAUP; //0x8018
     unsigned int         Reserved_68;
     U_GP0_GALPHA         GP0_GALPHA; //0x8020
     unsigned int         Reserved_69[55];
@@ -8957,19 +8982,19 @@ typedef struct
     U_GP0_BK             GP0_BK;
     U_GP0_ALPHA          GP0_ALPHA;
     unsigned int         Reserved_70[2];
-    U_GP0_CSC_IDC        GP0_CSC_IDC;
-    U_GP0_CSC_ODC        GP0_CSC_ODC;
-    U_GP0_CSC_IODC       GP0_CSC_IODC;
-    U_GP0_CSC_P0         GP0_CSC_P0;
-    U_GP0_CSC_P1         GP0_CSC_P1;
-    U_GP0_CSC_P2         GP0_CSC_P2;
-    U_GP0_CSC_P3         GP0_CSC_P3;
-    U_GP0_CSC_P4         GP0_CSC_P4;
-    U_GP0_ZME_HSP        GP0_ZME_HSP;
-    U_GP0_ZME_HOFFSET    GP0_ZME_HOFFSET;
-    U_GP0_ZME_VSP        GP0_ZME_VSP;
-    U_GP0_ZME_VSR        GP0_ZME_VSR;
-    U_GP0_ZME_VOFFSET    GP0_ZME_VOFFSET;
+    U_GP0_CSC_IDC        GP0_CSC_IDC; //0x8120
+    U_GP0_CSC_ODC        GP0_CSC_ODC; //0x8124
+    U_GP0_CSC_IODC       GP0_CSC_IODC; //0x8128
+    U_GP0_CSC_P0         GP0_CSC_P0; //0x812c
+    U_GP0_CSC_P1         GP0_CSC_P1; //0x8130
+    U_GP0_CSC_P2         GP0_CSC_P2; //0x8134
+    U_GP0_CSC_P3         GP0_CSC_P3; //0x8138
+    U_GP0_CSC_P4         GP0_CSC_P4; //0x813c
+    U_GP0_ZME_HSP        GP0_ZME_HSP; //0x8140
+    U_GP0_ZME_HOFFSET    GP0_ZME_HOFFSET; //0x8144
+    U_GP0_ZME_VSP        GP0_ZME_VSP; //0x8148
+    U_GP0_ZME_VSR        GP0_ZME_VSR; //0x814c
+    U_GP0_ZME_VOFFSET    GP0_ZME_VOFFSET; //0x8150
     unsigned int         Reserved_71[3];
     U_GP0_ZME_LTICTRL    GP0_ZME_LTICTRL; //0x8160
     U_GP0_ZME_LHPASSCOEF GP0_ZME_LHPASSCOEF; //0x8164
@@ -8985,22 +9010,28 @@ typedef struct
 #if 0
     U_WBC_G0_CTRL        WBC_G0_CTRL; //????
     U_WBC_G0_UPD         WBC_G0_UPD; //???
-#else
-    int fill_WBC_G0_CTRL[2];
-#endif
     U_WBC_G0_CMP         WBC_G0_CMP;
+#else
+    int fill_WBC_G0_CTRL[3];
+#endif
     unsigned int         Reserved_75;
+#if 0
     U_WBC_G0_AR_ADDR     WBC_G0_AR_ADDR;
     U_WBC_G0_GB_ADDR     WBC_G0_GB_ADDR;
-#if 0
-    U_WBC_G0_STRIDE      WBC_G0_STRIDE; //????
-#else
-    int fill_WBC_G0_STRIDE;
-#endif
+    U_WBC_G0_STRIDE      WBC_G0_STRIDE;
     U_WBC_G0_OFFSET      WBC_G0_OFFSET;
     U_WBC_G0_ORESO       WBC_G0_ORESO;
     U_WBC_G0_FCROP       WBC_G0_FCROP;
     U_WBC_G0_LCROP       WBC_G0_LCROP;
+#else
+    int fill_WBC_G0_AR_ADDR;
+    int fill_WBC_G0_GB_ADDR;
+    int fill_WBC_G0_STRIDE;
+    int fill_WBC_G0_OFFSET;
+    int fill_WBC_G0_ORESO;
+    int fill_WBC_G0_FCROP;
+    int fill_WBC_G0_LCROP;
+#endif
     unsigned int         Reserved_76[501- 256];
     U_WBC_GP0_CTRL       WBC_GP0_CTRL; //0x9400
     U_WBC_GP0_UPD        WBC_GP0_UPD; //0x9404
@@ -9010,20 +9041,25 @@ typedef struct
     U_WBC_GP0_STRIDE     WBC_GP0_STRIDE; //0x9418
     unsigned int         Reserved_78;
     U_WBC_GP0_ORESO      WBC_GP0_ORESO;
-    U_WBC_GP0_FCROP      WBC_GP0_FCROP;
-    U_WBC_GP0_LCROP      WBC_GP0_LCROP;
+    U_WBC_GP0_FCROP      WBC_GP0_FCROP; //0x9424
+    U_WBC_GP0_LCROP      WBC_GP0_LCROP; //0x9428
     unsigned int         Reserved_79[53];
     U_WBC_GP0_DITHER_CTRL WBC_GP0_DITHER_CTRL; //0x9500
     U_WBC_GP0_DITHER_COEF0 WBC_GP0_DITHER_COEF0;
     U_WBC_GP0_DITHER_COEF1 WBC_GP0_DITHER_COEF1;
     unsigned int         Reserved_80[189];
 
-    U_WBC_G0_CTRL        WBC_G0_CTRL; //0x9800???
+    U_WBC_G0_CTRL        WBC_G0_CTRL; //0x9800
     U_WBC_G0_UPD         WBC_G0_UPD; //0x9804
-    unsigned int         Reserved_0x9808[2];
-    U_WBC_GP0_YADDR      WBC_G0_YADDR; //0x9810
-    U_WBC_GP0_CADDR      WBC_G0_CADDR; //0x9814
+    U_WBC_G0_CMP         WBC_G0_CMP; //0x9808
+    unsigned int         Reserved_0x980c;
+    U_WBC_GP0_YADDR      WBC_G0_AR_ADDR; //0x9810
+    U_WBC_GP0_CADDR      WBC_G0_GB_ADDR; //0x9814
     U_WBC_G0_STRIDE      WBC_G0_STRIDE; //0x9818
+    U_WBC_G0_OFFSET      WBC_G0_OFFSET; //0x981c
+    U_WBC_G0_ORESO       WBC_G0_ORESO; //0x9820
+    U_WBC_G0_FCROP       WBC_G0_FCROP; //0x9824
+    U_WBC_G0_LCROP       WBC_G0_LCROP; //0x9828
 
     U_WBC_DHD0_CTRL      WBC_DHD0_CTRL;
     U_WBC_DHD0_UPD       WBC_DHD0_UPD;
@@ -9087,7 +9123,7 @@ typedef struct
     U_WBC_DHD0_CSCP2     WBC_DHD0_CSCP2;
     U_WBC_DHD0_CSCP3     WBC_DHD0_CSCP3;
     U_WBC_DHD0_CSCP4     WBC_DHD0_CSCP4;
-    unsigned int         Reserved_92[57-7];
+    unsigned int         Reserved_92[57-11];
 
     int fill_9c00[256];
 
@@ -9109,7 +9145,7 @@ typedef struct
     unsigned int         Reserved_99[5];
     U_CBM_ATTR           CBM_ATTR;
     unsigned int         Reserved_100[751];
-    U_DHD0_CTRL          DHD0_CTRL;
+    U_DHD0_CTRL          DHD0_CTRL; //0xc000
     U_DHD0_VSYNC         DHD0_VSYNC;
     U_DHD0_HSYNC1        DHD0_HSYNC1;
     U_DHD0_HSYNC2        DHD0_HSYNC2;
@@ -9284,6 +9320,11 @@ typedef struct
 
 typedef struct
 {
+	int fill[64]; //0
+    U_AWADDR_SRVLNC_START awaddr_srvlnc_start; //0x100
+    U_AWADDR_SRVLNC_END  awaddr_srvlnc_end; //0x104
+    int fill2[62];
+    unsigned int          awaddr_srvlnc_status; //0x200
 
 } OPTM_MDDRC_REGS_S;
 
