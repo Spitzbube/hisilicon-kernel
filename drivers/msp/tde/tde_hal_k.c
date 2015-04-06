@@ -508,13 +508,13 @@ typedef struct hiTDE_PARA_TABLE_S
 /*                         TDE hal inner variable definition                */
 /****************************************************************************/
 /* Base addr of register after mapping */
-STATIC volatile HI_U32* s_pu32BaseVirAddr = HI_NULL;
+STATIC volatile HI_U32* s_pu32BaseVirAddr = HI_NULL; //811437D4 +0
 
 /* State information when Aq is suspend */
 STATIC TDE_SUSP_STAT_S s_stSuspStat = {0};
 
 /* Head address of config argument table */
-STATIC TDE_PARA_TABLE_S s_stParaTable = {0};
+STATIC TDE_PARA_TABLE_S s_stParaTable = {0}; //811437E8 +20
 
 /* Deflicker level, default is auto */
 STATIC TDE_DEFLICKER_LEVEL_E s_eDeflickerLevel = TDE_DEFLICKER_AUTO;
@@ -532,8 +532,8 @@ STATIC HI_U32 s_u32Rgb2YuvCsc[TDE_CSCTABLE_SIZE] =
 STATIC HI_U32 s_u32Yuv2RgbCsc[TDE_CSCTABLE_SIZE] = 
     {0x00000100, 0x01000167, 0xff49ffa8, 0x01c60100, 0x00000000, 0x06030000, 0x00000000};
 
-STATIC HI_U32 s_u32Rgb2YuvCoefAddr = 0;
-STATIC HI_U32 s_u32Yuv2RgbCoefAddr = 0;
+STATIC HI_U32 s_u32Rgb2YuvCoefAddr = 0; //811437E0 +12
+STATIC HI_U32 s_u32Yuv2RgbCoefAddr = 0; //811437E4 +16
 
 //STATIC HI_CHIP_TYPE_E s_enChipType = HI_CHIP_TYPE_BUTT;
 //STATIC HI_CHIP_VERSION_E s_enChipVersion = HI_CHIP_VERSION_BUTT;
@@ -571,22 +571,24 @@ extern HI_VOID HI_DRV_SYS_GetChipVersion(HI_CHIP_TYPE_E *penChipType, HI_CHIP_VE
 *****************************************************************************/
 HI_S32 TdeHalInit(HI_U32 u32BaseAddr)
 {
+#if 0
     s_stSuspStat.s32AqSuspLine = TDE_SUSP_LINE_INVAL;
     s_stSuspStat.pSwNode = HI_NULL;
+#endif
 
-    /*init the pool memery of tde*//*CNcomment:³õÊ¼»¯TDEÄÚ´æ³Ø*/
+    /*init the pool memery of tde*//*CNcomment:ï¿½ï¿½Ê¼ï¿½ï¿½TDEï¿½Ú´ï¿½ï¿½*/
     if (HI_SUCCESS != wmeminit())
     {
         goto TDE_INIT_ERR;
     }
 
-    /*config start address for the parameter  *//*CNcomment: ÅäÖÃ²ÎÊý±íÊ×µØÖ· */
+    /*config start address for the parameter  *//*CNcomment: ï¿½ï¿½ï¿½Ã²ï¿½ï¿½ï¿½ï¿½ï¿½×µï¿½Ö· */
     if (HI_SUCCESS != TdeHalInitParaTable())
     {
         goto TDE_INIT_ERR;
     }
 
-     /*map address for the register *//*CNcomment:¼Ä´æÆ÷Ó³Éä*/
+     /*map address for the register *//*CNcomment:ï¿½Ä´ï¿½ï¿½ï¿½Ó³ï¿½ï¿½*/
     s_pu32BaseVirAddr = (volatile HI_U32*)HI_GFX_REG_MAP(u32BaseAddr, TDE_REG_SIZE);
     if(HI_NULL == s_pu32BaseVirAddr)
     {
@@ -597,7 +599,7 @@ HI_S32 TdeHalInit(HI_U32 u32BaseAddr)
 		
     TdeHalCtlReset();
 
-    TdeHalInitQueue(); /* init SQ/AQ *//*CNcomment: ³õÊ¼»¯SQ/AQ */
+    TdeHalInitQueue(); /* init SQ/AQ *//*CNcomment: ï¿½ï¿½Ê¼ï¿½ï¿½SQ/AQ */
     
     return HI_SUCCESS;
 
@@ -682,11 +684,11 @@ HI_VOID TdeHalRelease(HI_VOID)
     }
 #endif
 
-    /* unmap the base address*//*CNcomment:  ·´Ó³Éä»ùµØÖ· */
+    /* unmap the base address*//*CNcomment:  ï¿½ï¿½Ó³ï¿½ï¿½ï¿½ï¿½Ö· */
     HI_GFX_REG_UNMAP(s_pu32BaseVirAddr);
     s_pu32BaseVirAddr = HI_NULL;
 
-     /*free the pool of memery*//*CNcomment:TDEÄÚ´æ³ØÈ¥³õÊ¼»¯*/
+     /*free the pool of memery*//*CNcomment:TDEï¿½Ú´ï¿½ï¿½È¥ï¿½ï¿½Ê¼ï¿½ï¿½*/
     wmemterm();
     
     return;
@@ -717,7 +719,7 @@ HI_BOOL TdeHalCtlIsIdleSafely(HI_VOID)
 {
     HI_U32 i = 0;
     
-    /*get the state of tde one more time ,make sure it's idle *//*CNcomment: Á¬Ðø¶ÁÈ¡¶à´ÎÓ²¼þ×´Ì¬,È·±£TDEÍê³É */
+    /*get the state of tde one more time ,make sure it's idle *//*CNcomment: ï¿½ï¿½ï¿½ï¿½ï¿½È¡ï¿½ï¿½ï¿½Ó²ï¿½ï¿½×´Ì¬,È·ï¿½ï¿½TDEï¿½ï¿½ï¿½ */
     for (i = 0; i < TDE_MAX_READ_STATUS_TIME; i++)
     {
         if (!TdeHalCtlIsIdle())
@@ -773,11 +775,17 @@ HI_VOID TdeHalResetStatus(HI_VOID)
 *****************************************************************************/
 HI_VOID TdeHalCtlReset(HI_VOID)
 {
-    /*reset *//*CNcomment: ¸´Î» */
+    /*reset *//*CNcomment: ï¿½ï¿½Î» */
     TDE_WRITE_REG(s_pu32BaseVirAddr, TDE_RST, 0xffffffff);
 
-    /* clear the state of interrupt*//*CNcomment: ÇëÖÐ¶Ï×´Ì¬ */
+    /* clear the state of interrupt*//*CNcomment: ï¿½ï¿½ï¿½Ð¶ï¿½×´Ì¬ */
     TDE_WRITE_REG(s_pu32BaseVirAddr, TDE_INT, 0x800f001f);
+
+    /* write TDE_REQ_TH*//*CNcomment: å†™ç”³è¯·é—¨é™æŽ§åˆ¶å¯„å­˜å™¨*/
+    TDE_WRITE_REG(s_pu32BaseVirAddr, TDE_REQ_TH, 0x01fef7cf);
+
+    /* write TDE_BUS_LIMITER*//*CNcomment: å†™æ€»çº¿æµé‡æŽ§åˆ¶å¯„å­˜å™¨*/
+    TDE_WRITE_REG(s_pu32BaseVirAddr, TDE_BUS_LIMITER, 0x80770000);
 
     return;
 }
@@ -824,7 +832,7 @@ HI_VOID TdeHalCtlIntClear(TDE_LIST_TYPE_E enListType, HI_U32 u32Stats)
     TDE_WRITE_REG(s_pu32BaseVirAddr, TDE_INT, u32ReadStats);
 }
 
-/*get the queue of tde*//*CNcomment:ÅÐ¶ÏTDEµÄ¹¤×÷¶ÓÁÐÊÇÍ¬²½»¹ÊÇÒì²½*/
+/*get the queue of tde*//*CNcomment:ï¿½Ð¶ï¿½TDEï¿½Ä¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ì²½*/
 HI_BOOL TdeHalIsSqWork()
 {
     return (HI_BOOL)((TDE_READ_REG(s_pu32BaseVirAddr, TDE_STA) & 0x4) >> 2);
@@ -849,7 +857,7 @@ HI_VOID TdeHalNodeInitNd(TDE_HWNode_S* pHWNode, HI_BOOL bChild)
     TDE_ASSERT(HI_NULL != pHWNode);
 
      /*it need set father's info and clear Update info when node is child*/
-     /*CNcomment: Èç¹ûÊÇ×Ó½Úµã, »¹ÐèÒª¸¸½ÚµãµÄÉèÖÃÐÅÏ¢,Ö»°ÑUpdateÇå¿Õ */
+     /*CNcomment: ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó½Úµï¿½, ï¿½ï¿½ï¿½ï¿½Òªï¿½ï¿½ï¿½Úµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢,Ö»ï¿½ï¿½Updateï¿½ï¿½ï¿½ */
     if (bChild)
     {
         TDE_2D_RSZ_U unRsz;
@@ -858,7 +866,7 @@ HI_VOID TdeHalNodeInitNd(TDE_HWNode_S* pHWNode, HI_BOOL bChild)
         unRsz.u32All = pHWNode->u32TDE_2D_RSZ;
         
         /*it's not need set parameter info when node is child*/
-        /*CNcomment: Èç¹ûÊÇ×Ó½ÚµãÔò²»ÐèÒª¸üÐÂ²ÎÊý±í */
+        /*CNcomment: ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó½Úµï¿½ï¿½ï¿½ï¿½ï¿½Òªï¿½ï¿½ï¿½Â²ï¿½ï¿½ï¿½ï¿½ */
         unRsz.stBits.u32VfCoefReload = 0;
         unRsz.stBits.u32HfCoefReload = 0;
         pHWNode->u32TDE_2D_RSZ = unRsz.u32All;
@@ -871,13 +879,13 @@ HI_VOID TdeHalNodeInitNd(TDE_HWNode_S* pHWNode, HI_BOOL bChild)
         TDE_SET_UPDATE(u32TDE_CLIP_STOP, pHWNode->u64TDE_UPDATE);
 	 }
     }
-    else /*clear all info*//*CNcomment:·ñÔòËùÓÐÐÅÏ¢Çå¿Õ */
+    else /*clear all info*//*CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½ */
     {
         memset(pHWNode, 0, sizeof(TDE_HWNode_S));
     }
     
-    /*open interrupt*//*CNcomment:¿ªÆôÁ´±íÍê³ÉÖÐ¶Ï,
-    Í¬²½Á´±í¿É¸üÐÂÖÐ¶Ï, ¹Ø±Õ½ÚµãÍê³ÉÖÐ¶Ï */
+    /*open interrupt*//*CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð¶ï¿½,
+    Í¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½É¸ï¿½ï¿½ï¿½ï¿½Ð¶ï¿½, ï¿½Ø±Õ½Úµï¿½ï¿½ï¿½ï¿½ï¿½Ð¶ï¿½ */
     unIns.u32All = pHWNode->u32TDE_INS;
     unIns.stBits.u32SqIrqMask = TDE_SQ_UPDATE_MASK_EN | TDE_SQ_COMP_LIST_MASK_EN | TDE_SQ_CUR_LINE_MASK_EN;
     unIns.stBits.u32AqIrqMask = TDE_AQ_SUSP_MASK_EN | TDE_AQ_COMP_LIST_MASK_EN;
@@ -885,7 +893,7 @@ HI_VOID TdeHalNodeInitNd(TDE_HWNode_S* pHWNode, HI_BOOL bChild)
     TDE_SET_UPDATE(u32TDE_INS, pHWNode->u64TDE_UPDATE);
 }
 
-/*modify bug*//*CNcomment: AE5D03390:Èí¼þ¹æ±ÜÇøÓòÍâclip bug */
+/*modify bug*//*CNcomment: AE5D03390:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½clip bug */
 HI_VOID TdeHalNodeInitChildNd(TDE_HWNode_S* pHWNode, HI_U32 u32TDE_CLIP_START, HI_U32 u32TDE_CLIP_STOP)
 {
     TDE_INS_U unIns;
@@ -897,12 +905,12 @@ HI_VOID TdeHalNodeInitChildNd(TDE_HWNode_S* pHWNode, HI_U32 u32TDE_CLIP_START, H
     bClipOut = pHWNode->u32TDE_CLIP_START >> 31;
 
      /*it need set father's info and clear Update info when node is child*/
-     /*CNcomment:Èç¹ûÊÇ×Ó½Úµã, »¹ÐèÒª¸¸½ÚµãµÄÉèÖÃÐÅÏ¢,Ö»°ÑUpdateÇå¿Õ */
+     /*CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó½Úµï¿½, ï¿½ï¿½ï¿½ï¿½Òªï¿½ï¿½ï¿½Úµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢,Ö»ï¿½ï¿½Updateï¿½ï¿½ï¿½ */
 
     unRsz.u32All = pHWNode->u32TDE_2D_RSZ;
 
     /*it's not need set parameter info when node is child*/
-    /*CNcomment: Èç¹ûÊÇ×Ó½ÚµãÔò²»ÐèÒª¸üÐÂ²ÎÊý±í */
+    /*CNcomment: ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó½Úµï¿½ï¿½ï¿½ï¿½ï¿½Òªï¿½ï¿½ï¿½Â²ï¿½ï¿½ï¿½ï¿½ */
     unRsz.stBits.u32VfCoefReload = 0;
     unRsz.stBits.u32HfCoefReload = 0;
     pHWNode->u32TDE_2D_RSZ = unRsz.u32All;
@@ -911,14 +919,14 @@ HI_VOID TdeHalNodeInitChildNd(TDE_HWNode_S* pHWNode, HI_U32 u32TDE_CLIP_START, H
 
     if(bClipOut)
     {
-        pHWNode->u32TDE_INS = pHWNode->u32TDE_INS | 0x4000; /*open clip function*//* CNcomment: ¿ªÆôclip ¹¦ÄÜ*/
+        pHWNode->u32TDE_INS = pHWNode->u32TDE_INS | 0x4000; /*open clip function*//* CNcomment: ï¿½ï¿½ï¿½ï¿½clip ï¿½ï¿½ï¿½ï¿½*/
         pHWNode->u32TDE_CLIP_START = u32TDE_CLIP_START;
         pHWNode->u32TDE_CLIP_STOP = u32TDE_CLIP_STOP;
         TDE_SET_UPDATE(u32TDE_CLIP_START, pHWNode->u64TDE_UPDATE);
         TDE_SET_UPDATE(u32TDE_CLIP_STOP, pHWNode->u64TDE_UPDATE);
     }
     
-    /*open interrupt*//* CNcomment:  ¿ªÆôÁ´±íÍê³ÉÖÐ¶Ï,Í¬²½Á´±í¿É¸üÐÂÖÐ¶Ï, ¹Ø±Õ½ÚµãÍê³ÉÖÐ¶Ï */
+    /*open interrupt*//* CNcomment:  ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð¶ï¿½,Í¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½É¸ï¿½ï¿½ï¿½ï¿½Ð¶ï¿½, ï¿½Ø±Õ½Úµï¿½ï¿½ï¿½ï¿½ï¿½Ð¶ï¿½ */
     unIns.u32All = pHWNode->u32TDE_INS;
     unIns.stBits.u32SqIrqMask = TDE_SQ_UPDATE_MASK_EN | TDE_SQ_COMP_LIST_MASK_EN;
     unIns.stBits.u32AqIrqMask = TDE_AQ_SUSP_MASK_EN | TDE_AQ_COMP_LIST_MASK_EN;
@@ -942,8 +950,8 @@ HI_U32 TdeHalNodeGetNdSize(TDE_HWNode_S* pHWNode)
     TDE_ASSERT(HI_NULL != pHWNode);
 
     /*calc the configer size that is set by u64TDE_UPDATE*/
-    /* CNcomment:  Í³¼Æu64TDE_UPDATEÖÐµÄÓÐÐ§ÉèÖÃ,
-    ¼ÆËãµ±Ç°ÅäÖÃÏÂËùÐè´óÐ¡ */
+    /* CNcomment:  Í³ï¿½ï¿½u64TDE_UPDATEï¿½Ðµï¿½ï¿½ï¿½Ð§ï¿½ï¿½ï¿½ï¿½,
+    ï¿½ï¿½ï¿½ãµ±Ç°ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð¡ */
     for (i = 0; i < sizeof(TDE_HWNode_S)/4 - 2; i++)
     {
         if ( 1 == ((pHWNode->u64TDE_UPDATE >> i) & 1) )
@@ -952,7 +960,7 @@ HI_U32 TdeHalNodeGetNdSize(TDE_HWNode_S* pHWNode)
         }
     }
     
-    return (u32Size << 0x2); /*return the size according word*//* CNcomment:  ¸ù¾ÝWord·µ»Ø×Ö½ÚÊý */
+    return (u32Size << 0x2); /*return the size according word*//* CNcomment:  ï¿½ï¿½ï¿½Wordï¿½ï¿½ï¿½ï¿½ï¿½Ö½ï¿½ï¿½ï¿½ */
 }
 
 /*****************************************************************************
@@ -973,7 +981,7 @@ HI_S32 TdeHalNodeMakeNd(HI_VOID* pBuf, TDE_HWNode_S* pHWNode)
     TDE_ASSERT(HI_NULL != pBuf);
     TDE_ASSERT(HI_NULL != pHWNode);
 
-    /*copy data from node to buf of node*//* CNcomment:  ½«pHWNodeÖÐµÄÓÐÐ§Êý¾Ý¸´ÖÆµ½±£´æ½ÚµãµÄbufferÖÐ */
+    /*copy data from node to buf of node*//* CNcomment:  ï¿½ï¿½pHWNodeï¿½Ðµï¿½ï¿½ï¿½Ð§ï¿½ï¿½Ý¸ï¿½ï¿½Æµï¿½ï¿½ï¿½ï¿½ï¿½Úµï¿½ï¿½bufferï¿½ï¿½ */
     for (i = 0; i < (sizeof(TDE_HWNode_S) - sizeof(pHWNode->u64TDE_UPDATE))/4; i++)
     {
         if ( 1 == ((pHWNode->u64TDE_UPDATE >> i) & 1) )
@@ -1003,13 +1011,13 @@ HI_S32 TdeHalNodeExecute(TDE_LIST_TYPE_E enListType, HI_U32 u32NodePhyAddr, HI_U
     
     if (enListType == TDE_LIST_AQ)
     {
-        /*tde is idle*//* CNcomment:TDE¿ÕÏÐ*/
+        /*tde is idle*//* CNcomment:TDEï¿½ï¿½ï¿½ï¿½*/
         if(TdeHalCtlIsIdleSafely())
         {
-            /*write the first node address*//* CNcomment:Ð´ÈëÊ×½ÚµãµØÖ·*/
+            /*write the first node address*//* CNcomment:Ð´ï¿½ï¿½ï¿½×½Úµï¿½ï¿½Ö·*/
             TDE_WRITE_REG(s_pu32BaseVirAddr, TDE_AQ_NADDR, u32NodePhyAddr);
 
-            /*write the first node update area*//* CNcomment:Ð´ÈëÊ×½Úµã¸üÐÂ±êÊ¶*/
+            /*write the first node update area*//* CNcomment:Ð´ï¿½ï¿½ï¿½×½Úµï¿½ï¿½ï¿½Â±ï¿½Ê¶*/
             TDE_WRITE_REG(s_pu32BaseVirAddr, TDE_AQ_UPDATE, (HI_U32)(u64Update & 0xffffffff));
             
 #if defined (TDE_VERSION_PILOT) || defined (TDE_VERSION_FPGA)
@@ -1019,9 +1027,9 @@ HI_S32 TdeHalNodeExecute(TDE_LIST_TYPE_E enListType, HI_U32 u32NodePhyAddr, HI_U
             unAqCtrl.u32All = TDE_READ_REG(s_pu32BaseVirAddr, TDE_AQ_CTRL);
 
             /*modiyf the break off to finish current node when use the temp buffer */
-            /* CNcomment:ÈôÐèÒªÊ¹ÓÃÁÙÊ±buffer,
-            Ôò´ò¶ÏÄ£Ê½Îªµ±Ç°½ÚµãÍê³É´ò¶Ï,·ñÔòÎªµ±Ç°½Úµã
-               µ±Ç°ÐÐÍê³É´ò¶Ï*/
+            /* CNcomment:ï¿½ï¿½ï¿½ï¿½ÒªÊ¹ï¿½ï¿½ï¿½ï¿½Ê±buffer,
+            ï¿½ï¿½ï¿½ï¿½Ä£Ê½Îªï¿½ï¿½Ç°ï¿½Úµï¿½ï¿½ï¿½É´ï¿½ï¿½,ï¿½ï¿½ï¿½ï¿½Îªï¿½ï¿½Ç°ï¿½Úµï¿½
+               ï¿½ï¿½Ç°ï¿½ï¿½ï¿½ï¿½É´ï¿½ï¿½*/
             if (HI_TRUE ==  bAqUseBuff)
             {
                 unAqCtrl.stBits.u32AqOperMode = TDE_AQ_CTRL_COMP_LIST;
@@ -1037,7 +1045,7 @@ HI_S32 TdeHalNodeExecute(TDE_LIST_TYPE_E enListType, HI_U32 u32NodePhyAddr, HI_U
 
             mb();
 
-            /*start Aq list*//* CNcomment:Æô¶¯Aq*/
+            /*start Aq list*//* CNcomment:ï¿½ï¿½ï¿½ï¿½Aq*/
             TDE_WRITE_REG(s_pu32BaseVirAddr, TDE_CTRL, 0x1);   
         }
         else
@@ -1047,19 +1055,19 @@ HI_S32 TdeHalNodeExecute(TDE_LIST_TYPE_E enListType, HI_U32 u32NodePhyAddr, HI_U
     }
     else
     {
-        /*it can submit the Sq list when idle and Aq is running*//* CNcomment:TDE¿ÕÏÐ»òÒì²½Á´±íÔÚ¹¤×÷£¬¶¼¿ÉÌá½»Í¬²½Á´±í*/
+        /*it can submit the Sq list when idle and Aq is running*//* CNcomment:TDEï¿½ï¿½ï¿½Ð»ï¿½ï¿½ì²½ï¿½ï¿½ï¿½ï¿½ï¿½Ú¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½á½»Í¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½*/
         if(TdeHalCtlIsIdle() || ((TDE_READ_REG(s_pu32BaseVirAddr, TDE_STA) & 0x4) >> 2))
         {
-            /*write the first node address*//* CNcomment:Ð´ÈëÊ×½ÚµãµØÖ·*/
+            /*write the first node address*//* CNcomment:Ð´ï¿½ï¿½ï¿½×½Úµï¿½ï¿½Ö·*/
             TDE_WRITE_REG(s_pu32BaseVirAddr, TDE_SQ_NADDR, u32NodePhyAddr);
 
-             /*write the first node need update area*//* CNcomment:Ð´ÈëÊ×½Úµã¸üÐÂ±êÊ¶*/
+             /*write the first node need update area*//* CNcomment:Ð´ï¿½ï¿½ï¿½×½Úµï¿½ï¿½ï¿½Â±ï¿½Ê¶*/
             TDE_WRITE_REG(s_pu32BaseVirAddr, TDE_SQ_UPDATE, (HI_U32)(u64Update & 0xffffffff));
             
 #if defined (TDE_VERSION_PILOT) || defined (TDE_VERSION_FPGA)
             TDE_WRITE_REG(s_pu32BaseVirAddr, TDE_SQ_UPDATE2, (HI_U32)((u64Update >> 32) & 0xffffffff));
 #endif
-             /*enable the Sq list*//* CNcomment:Ê¹ÄÜÍ¬²½Á´±í*/
+             /*enable the Sq list*//* CNcomment:Ê¹ï¿½ï¿½Í¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½*/
             unSqCtrl.u32All = TDE_READ_REG(s_pu32BaseVirAddr, TDE_SQ_CTRL);
 
             unSqCtrl.stBits.u32SqEn = 0x1;
@@ -1067,7 +1075,7 @@ HI_S32 TdeHalNodeExecute(TDE_LIST_TYPE_E enListType, HI_U32 u32NodePhyAddr, HI_U
 
             TDE_WRITE_REG(s_pu32BaseVirAddr, TDE_SQ_CTRL, unSqCtrl.u32All);
 
-            /*start the Sq list*//* CNcomment: Æô¶¯Sq*/
+            /*start the Sq list*//* CNcomment: ï¿½ï¿½ï¿½ï¿½Sq*/
             //TDE_WRITE_REG(s_pu32BaseVirAddr, TDE_CTRL, 0x101);
         }
         else
@@ -1133,13 +1141,13 @@ HI_VOID TdeHalNodeSetSrc1(TDE_HWNode_S* pHWNode, TDE_DRV_SURFACE_S* pDrvSurface)
     TDE_ASSERT(HI_NULL != pHWNode);
     TDE_ASSERT(HI_NULL != pDrvSurface);
 
-    /*set the source bitmap attribute info*//*CNcomment:ÅäÖÃÔ´Î»Í¼ÊôÐÔÐÅÏ¢*/
+    /*set the source bitmap attribute info*//*CNcomment:ï¿½ï¿½ï¿½ï¿½Ô´Î»Í¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢*/
     unSrcType.u32All = pHWNode->u32TDE_S1_TYPE;
     unSrcType.stBits.u32SrcColorFmt = (HI_U32)pDrvSurface->enColorFmt;
     unSrcType.stBits.u32AlphaRange = (HI_U32)pDrvSurface->bAlphaMax255;
     unSrcType.stBits.u32HScanOrd = (HI_U32)pDrvSurface->enHScan;
     unSrcType.stBits.u32VScanOrd = (HI_U32)pDrvSurface->enVScan;
-    /*file zero of low area and top area use low area extend*//*CNcomment:Ò»Ö±Ê¹ÓÃµÍÎ»Ìî³äÎª0,¸ßÎ»Ê¹ÓÃµÍÎ»µÄÀ©Õ¹·½Ê½*/
+    /*file zero of low area and top area use low area extend*//*CNcomment:Ò»Ö±Ê¹ï¿½Ãµï¿½Î»ï¿½ï¿½ï¿½Îª0,ï¿½ï¿½Î»Ê¹ï¿½Ãµï¿½Î»ï¿½ï¿½ï¿½ï¿½Õ¹ï¿½ï¿½Ê½*/
     unSrcType.stBits.u32RgbExp = 0; 
    
     unXy.u32All = pHWNode->u32TDE_S1_XY;
@@ -1147,7 +1155,7 @@ HI_VOID TdeHalNodeSetSrc1(TDE_HWNode_S* pHWNode, TDE_DRV_SURFACE_S* pDrvSurface)
     unXy.stBits.u32Y = pDrvSurface->u32Ypos;
 
 #if defined (TDE_VERSION_PILOT) || defined (TDE_VERSION_FPGA)
-    /*MB format*//*CNcomment:Èç¹ûÊÇºê¿é¸ñÊ½*/
+    /*MB format*//*CNcomment:ï¿½ï¿½ï¿½ï¿½Çºï¿½ï¿½ï¿½Ê½*/
     if (pDrvSurface->enColorFmt >= TDE_DRV_COLOR_FMT_YCbCr400MBP)
     {
         unSrcType.stBits.u32Pitch = pDrvSurface->u32CbCrPitch;
@@ -1183,13 +1191,13 @@ HI_VOID TdeHalNodeSetSrc1(TDE_HWNode_S* pHWNode, TDE_DRV_SURFACE_S* pDrvSurface)
     }
 
     /*target bitmapis same with source bitmap 1,so not need set*/
-    /*CNcomment:Ô´1Î»Í¼¿í¸ß×ÜÊÇÓëTargetÎ»Í¼Ò»ÖÂ,Òò´Ë²»ÉèÖÃÔ´1µÄ´óÐ¡*/
+    /*CNcomment:Ô´1Î»Í¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½TargetÎ»Í¼Ò»ï¿½ï¿½,ï¿½ï¿½Ë²ï¿½ï¿½ï¿½ï¿½ï¿½Ô´1ï¿½Ä´ï¿½Ð¡*/
 
-    /*config the node*//*CNcomment:ÅäÖÃ»º´æ½Úµã*/
+    /*config the node*//*CNcomment:ï¿½ï¿½ï¿½Ã»ï¿½ï¿½ï¿½Úµï¿½*/
     pHWNode->u32TDE_S1_TYPE = unSrcType.u32All;
     pHWNode->u32TDE_S1_XY = unXy.u32All;
 
-    /*set update area to 1*//*CNcomment:HWNode.TDE_UPDATEÖÐÓÐÅäÖÃÏî¶ÔÓ¦Î»Éè1*/
+    /*set update area to 1*//*CNcomment:HWNode.TDE_UPDATEï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó¦Î»ï¿½ï¿½1*/
     TDE_SET_UPDATE(u32TDE_S1_ADDR, pHWNode->u64TDE_UPDATE);
     TDE_SET_UPDATE(u32TDE_S1_TYPE, pHWNode->u64TDE_UPDATE);
     TDE_SET_UPDATE(u32TDE_S1_XY, pHWNode->u64TDE_UPDATE);
@@ -1205,28 +1213,28 @@ HI_VOID TdeHalNodeSetSrc1Ex(TDE_HWNode_S* pHWNode, TDE_DRV_SURFACE_S* pDrvSurfac
     TDE_ASSERT(HI_NULL != pHWNode);
     TDE_ASSERT(HI_NULL != pDrvSurface);
 
-    /*set attribute for source bitmap *//*CNcomment:ÅäÖÃÔ´Î»Í¼ÊôÐÔÐÅÏ¢*/
+    /*set attribute for source bitmap *//*CNcomment:ï¿½ï¿½ï¿½ï¿½Ô´Î»Í¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢*/
     unSrcType.u32All = pHWNode->u32TDE_S1_TYPE;
     unSrcType.stBits.u32Pitch = (HI_U32)pDrvSurface->u32Pitch;
     unSrcType.stBits.u32SrcColorFmt = (HI_U32)pDrvSurface->enColorFmt;
     unSrcType.stBits.u32AlphaRange = (HI_U32)pDrvSurface->bAlphaMax255;
     unSrcType.stBits.u32HScanOrd = (HI_U32)pDrvSurface->enHScan;
     unSrcType.stBits.u32VScanOrd = (HI_U32)pDrvSurface->enVScan;
-    /*file zero of low area and top area use low area extend*//*CNcomment:Ò»Ö±Ê¹ÓÃµÍÎ»Ìî³äÎª0,¸ßÎ»Ê¹ÓÃµÍÎ»µÄÀ©Õ¹·½Ê½*/
+    /*file zero of low area and top area use low area extend*//*CNcomment:Ò»Ö±Ê¹ï¿½Ãµï¿½Î»ï¿½ï¿½ï¿½Îª0,ï¿½ï¿½Î»Ê¹ï¿½Ãµï¿½Î»ï¿½ï¿½ï¿½ï¿½Õ¹ï¿½ï¿½Ê½*/
     unSrcType.stBits.u32RgbExp = 0; 
     unXy.u32All = pHWNode->u32TDE_S1_XY;
     unXy.stBits.u32X = pDrvSurface->u32Xpos;
     unXy.stBits.u32Y = pDrvSurface->u32Ypos;
 
     /*target bitmapis same with source bitmap 1,so not need set*/
-    /*CNcomment:Ô´1Î»Í¼¿í¸ß×ÜÊÇÓëTargetÎ»Í¼Ò»ÖÂ,Òò´Ë²»ÉèÖÃÔ´1µÄ´óÐ¡*/
+    /*CNcomment:Ô´1Î»Í¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½TargetÎ»Í¼Ò»ï¿½ï¿½,ï¿½ï¿½Ë²ï¿½ï¿½ï¿½ï¿½ï¿½Ô´1ï¿½Ä´ï¿½Ð¡*/
 
-     /*config the node*//*CNcomment:ÅäÖÃ»º´æ½Úµã*/
+     /*config the node*//*CNcomment:ï¿½ï¿½ï¿½Ã»ï¿½ï¿½ï¿½Úµï¿½*/
     pHWNode->u32TDE_S1_ADDR = pDrvSurface->u32PhyAddr;
     pHWNode->u32TDE_S1_TYPE = unSrcType.u32All;
     pHWNode->u32TDE_S1_XY = unXy.u32All;
 
-   /*set update area to 1*//*CNcomment:HWNode.TDE_UPDATEÖÐÓÐÅäÖÃÏî¶ÔÓ¦Î»Éè1*/
+   /*set update area to 1*//*CNcomment:HWNode.TDE_UPDATEï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó¦Î»ï¿½ï¿½1*/
     TDE_SET_UPDATE(u32TDE_S1_ADDR, pHWNode->u64TDE_UPDATE);
     TDE_SET_UPDATE(u32TDE_S1_TYPE, pHWNode->u64TDE_UPDATE);
     TDE_SET_UPDATE(u32TDE_S1_XY, pHWNode->u64TDE_UPDATE);
@@ -1270,7 +1278,7 @@ HI_VOID TdeHalNodeSetSrcMbY(TDE_HWNode_S* pHWNode, TDE_DRV_SURFACE_S* pDrvMbY, T
 
     if (TDE_MB_RASTER_OPT == enMbOpt)
     {
-        /*CNcomment: Èç¹ûÊÇºê¿éÓë¹âÕ¤»ìºÏ²Ù×÷Ä£Ê½,ÁÁ¶ÈÐÅÏ¢Ö±½ÓÉèÖÃµ½Src2ÖÐ */
+        /*CNcomment: ï¿½ï¿½ï¿½ï¿½Çºï¿½ï¿½ï¿½ï¿½ï¿½Õ¤ï¿½ï¿½Ï²ï¿½ï¿½ï¿½Ä£Ê½,ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢Ö±ï¿½ï¿½ï¿½ï¿½ï¿½Ãµï¿½Src2ï¿½ï¿½ */
         TdeHalNodeSetSrc2BaseEx(pHWNode, pDrvMbY, HI_TRUE);
 
         return;
@@ -1284,7 +1292,7 @@ HI_VOID TdeHalNodeSetSrcMbY(TDE_HWNode_S* pHWNode, TDE_DRV_SURFACE_S* pDrvMbY, T
     {
         TDE_SUR_SIZE_U unSurSize;
         unSurSize.u32All = pHWNode->u32TDE_S2_SIZE;
-        /*CNcomment:µ±ÎªÈçÉÏÀàÐÍÊ±,ÐèÒªÅäÖÃÔ´2µÄ´óÐ¡,×÷ÎªÎ»Í¼´óÐ¡ÐÅÏ¢*/
+        /*CNcomment:ï¿½ï¿½Îªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê±,ï¿½ï¿½Òªï¿½ï¿½ï¿½ï¿½Ô´2ï¿½Ä´ï¿½Ð¡,ï¿½ï¿½ÎªÎ»Í¼ï¿½ï¿½Ð¡ï¿½ï¿½Ï¢*/
         unSurSize.stBits.u32Width = (HI_U32)pDrvMbY->u32Width;
         unSurSize.stBits.u32Height = (HI_U32)pDrvMbY->u32Height;
         pHWNode->u32TDE_S2_SIZE = unSurSize.u32All;
@@ -1339,7 +1347,7 @@ HI_VOID TdeHalNodeSetTgt(TDE_HWNode_S* pHWNode, TDE_DRV_SURFACE_S* pDrvSurface, 
     
     TDE_ASSERT(HI_NULL != pHWNode);
 
-    /*set bitmap attribute info*//*CNcomment:ÅäÖÃÔ´Î»Í¼ÊôÐÔÐÅÏ¢*/
+    /*set bitmap attribute info*//*CNcomment:ï¿½ï¿½ï¿½ï¿½Ô´Î»Í¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢*/
     unTarType.u32All = pHWNode->u32TDE_TAR_TYPE;
     unTarType.stBits.u32Pitch = (HI_U32)pDrvSurface->u32Pitch;
     unTarType.stBits.u32TarColorFmt = (HI_U32)pDrvSurface->enColorFmt;
@@ -1347,19 +1355,19 @@ HI_VOID TdeHalNodeSetTgt(TDE_HWNode_S* pHWNode, TDE_DRV_SURFACE_S* pDrvSurface, 
     unTarType.stBits.u32HScanOrd = (HI_U32)pDrvSurface->enHScan;
     unTarType.stBits.u32VScanOrd = (HI_U32)pDrvSurface->enVScan;
     unTarType.stBits.u32AlphaFrom = (HI_U32)enAlphaFrom;
-    unTarType.stBits.u32RgbRound = 0; /*CNcomment:Ò»Ö±Ê¹ÓÃÊ¹ÓÃËÄÉáÎÞÈëµÄ½ØÎ»·½Ê½*/
+    unTarType.stBits.u32RgbRound = 0; /*CNcomment:Ò»Ö±Ê¹ï¿½ï¿½Ê¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä½ï¿½Î»ï¿½ï¿½Ê½*/
 
     if (unTarType.stBits.u32TarColorFmt == TDE_DRV_COLOR_FMT_AYCbCr8888)
     {
         unTarType.stBits.u32TarColorFmt = TDE_DRV_COLOR_FMT_ARGB8888;
     }
 
-    /*set bitmap size info*//*CNcomment:ÅäÖÃÎ»Í¼´óÐ¡ÐÅÏ¢*/
+    /*set bitmap size info*//*CNcomment:ï¿½ï¿½ï¿½ï¿½Î»Í¼ï¿½ï¿½Ð¡ï¿½ï¿½Ï¢*/
     unSurSize.u32All = pHWNode->u32TDE_TS_SIZE;
     unSurSize.stBits.u32Width = (HI_U32)pDrvSurface->u32Width;
     unSurSize.stBits.u32Height = (HI_U32)pDrvSurface->u32Height;
 
-    /*set alpha info*//*CNcomment:ÉèÖÃalphaÅÐ¾öãÐÖµ */
+    /*set alpha info*//*CNcomment:ï¿½ï¿½ï¿½ï¿½alphaï¿½Ð¾ï¿½ï¿½ï¿½Öµ */
 #ifdef TDE_VERSION_MPW
     unSurSize.stBits.u32AlphaThresholdHigh = ((s_u8AlphaThresholdValue >>1) >> 4); //change the range 0-128
     unSurSize.stBits.u32AlphaThresholdLow = ((s_u8AlphaThresholdValue >>1) & 0x0f);
@@ -1397,13 +1405,13 @@ HI_VOID TdeHalNodeSetTgt(TDE_HWNode_S* pHWNode, TDE_DRV_SURFACE_S* pDrvSurface, 
         unTarType.stBits.u32TarColorFmt     = TDE_DRV_COLOR_FMT_ARGB8888;
     }
 
-    /*set node info*//*CNcomment:ÅäÖÃ»º´æ½Úµã*/
+    /*set node info*//*CNcomment:ï¿½ï¿½ï¿½Ã»ï¿½ï¿½ï¿½Úµï¿½*/
     pHWNode->u32TDE_TAR_ADDR = pDrvSurface->u32PhyAddr;
     pHWNode->u32TDE_TAR_TYPE = unTarType.u32All;
     pHWNode->u32TDE_TAR_XY = unXy.u32All;
     pHWNode->u32TDE_TS_SIZE = unSurSize.u32All;
 
-     /*set node update info to 1*//*CNcomment:HWNode.TDE_UPDATEÖÐÓÐÅäÖÃÏî¶ÔÓ¦Î»Éè1*/
+     /*set node update info to 1*//*CNcomment:HWNode.TDE_UPDATEï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó¦Î»ï¿½ï¿½1*/
     TDE_SET_UPDATE(u32TDE_TAR_ADDR, pHWNode->u64TDE_UPDATE);
     TDE_SET_UPDATE(u32TDE_TAR_TYPE, pHWNode->u64TDE_UPDATE);
     TDE_SET_UPDATE(u32TDE_TAR_XY, pHWNode->u64TDE_UPDATE);
@@ -1437,7 +1445,7 @@ HI_VOID TdeHalNodeSetBaseOperate(TDE_HWNode_S* pHWNode, TDE_DRV_BASEOPT_MODE_E e
 
     switch (enMode)
     {
-    case TDE_QUIKE_FILL:/*quick file*//*CNcomment:¿ìËÙÌî³ä*/
+    case TDE_QUIKE_FILL:/*quick file*//*CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½*/
         {
             TDE_ASSERT(HI_NULL != pstColorFill);
             TDE_FILL_DATA_BY_FMT(pHWNode->u32TDE_S1_FILL, 
@@ -1449,14 +1457,14 @@ HI_VOID TdeHalNodeSetBaseOperate(TDE_HWNode_S* pHWNode, TDE_DRV_BASEOPT_MODE_E e
             unIns.stBits.u32Src2Mod = TDE_SRC_MODE_DISA;
         }
         break;
-    case TDE_QUIKE_COPY:/*quick copy*//*CNcomment:¿ìËÙ¿½±´*/
+    case TDE_QUIKE_COPY:/*quick copy*//*CNcomment:ï¿½ï¿½ï¿½Ù¿ï¿½ï¿½ï¿½*/
         {
             unAluMode.stBits.u32AluMod = TDE_SRC1_BYPASS;
             unIns.stBits.u32Src1Mod = TDE_SRC_QUICK_COPY;
             unIns.stBits.u32Src2Mod = TDE_SRC_MODE_DISA;
         }
         break;
-    case TDE_NORM_FILL_1OPT:/*signal fill*//*CNcomment:ÆÕÍ¨µ¥Ô´Ìî³ä*/
+    case TDE_NORM_FILL_1OPT:/*signal fill*//*CNcomment:ï¿½ï¿½Í¨ï¿½ï¿½Ô´ï¿½ï¿½ï¿½*/
         {
             TDE_ASSERT(HI_NULL != pstColorFill);
             TDE_FILL_DATA_BY_FMT(pHWNode->u32TDE_S2_FILL, 
@@ -1476,7 +1484,7 @@ HI_VOID TdeHalNodeSetBaseOperate(TDE_HWNode_S* pHWNode, TDE_DRV_BASEOPT_MODE_E e
             }
         }
         break;
-    case TDE_NORM_BLIT_1OPT:/*signal blit*//*CNcomment:ÆÕÍ¨µ¥Ô´²Ù×÷°áÒÆ*/
+    case TDE_NORM_BLIT_1OPT:/*signal blit*//*CNcomment:ï¿½ï¿½Í¨ï¿½ï¿½Ô´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½*/
         {
             unIns.stBits.u32Src1Mod = TDE_SRC_MODE_DISA;
             unIns.stBits.u32Src2Mod = TDE_SRC_MODE_BMP;
@@ -1490,7 +1498,7 @@ HI_VOID TdeHalNodeSetBaseOperate(TDE_HWNode_S* pHWNode, TDE_DRV_BASEOPT_MODE_E e
             }
         }
         break;
-    case TDE_NORM_FILL_2OPT:/*signal color with bitmap operation and blit*//*CNcomment:µ¥É«ºÍÎ»Í¼ÔËËã²Ù×÷°áÒÆ*/
+    case TDE_NORM_FILL_2OPT:/*signal color with bitmap operation and blit*//*CNcomment:ï¿½ï¿½É«ï¿½ï¿½Î»Í¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½*/
         {
             TDE_ASSERT(HI_NULL != pstColorFill);
             TDE_FILL_DATA_BY_FMT(pHWNode->u32TDE_S2_FILL, 
@@ -1509,7 +1517,7 @@ HI_VOID TdeHalNodeSetBaseOperate(TDE_HWNode_S* pHWNode, TDE_DRV_BASEOPT_MODE_E e
             }
         }
         break;
-    case TDE_NORM_BLIT_2OPT:/*double blit*//*CNcomment:ÆÕÍ¨Ë«Ô´²Ù×÷°áÒÆ */
+    case TDE_NORM_BLIT_2OPT:/*double blit*//*CNcomment:ï¿½ï¿½Í¨Ë«Ô´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ */
         {
             unIns.stBits.u32Src1Mod = TDE_SRC_MODE_BMP;
             unIns.stBits.u32Src2Mod = TDE_SRC_MODE_BMP;
@@ -1523,7 +1531,7 @@ HI_VOID TdeHalNodeSetBaseOperate(TDE_HWNode_S* pHWNode, TDE_DRV_BASEOPT_MODE_E e
             }
         }
         break;
-    case TDE_MB_2OPT:/*mb combination operation*//*CNcomment:ºê¿éºÏ²¢²Ù×÷*/
+    case TDE_MB_2OPT:/*mb combination operation*//*CNcomment:ï¿½ï¿½ï¿½Ï²ï¿½ï¿½ï¿½ï¿½ï¿½*/
         {
             unIns.stBits.u32Src1Mod = TDE_SRC_MODE_BMP;
             unIns.stBits.u32Src2Mod = TDE_SRC_MODE_BMP;
@@ -1543,7 +1551,7 @@ HI_VOID TdeHalNodeSetBaseOperate(TDE_HWNode_S* pHWNode, TDE_DRV_BASEOPT_MODE_E e
             }
         }
         break;
-    case TDE_MB_C_OPT:/*mb cbcr sampling operation*//*CNcomment:ºê¿éÉ«¶ÈÉÏ²ÉÑù²Ù×÷*/
+    case TDE_MB_C_OPT:/*mb cbcr sampling operation*//*CNcomment:ï¿½ï¿½ï¿½É«ï¿½ï¿½ï¿½Ï²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½*/
         {
             unIns.stBits.u32Src1Mod = TDE_SRC_MODE_DISA;
             unIns.stBits.u32Src2Mod = TDE_SRC_MODE_BMP;
@@ -1551,7 +1559,7 @@ HI_VOID TdeHalNodeSetBaseOperate(TDE_HWNode_S* pHWNode, TDE_DRV_BASEOPT_MODE_E e
             unAluMode.stBits.u32AluMod = TDE_SRC2_BYPASS;
         }
         break;
-    case TDE_MB_Y_OPT:/*mb ligthness resize*//*CNcomment:ºê¿éÁÁ¶ÈËõ·Å*/
+    case TDE_MB_Y_OPT:/*mb ligthness resize*//*CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½*/
         {
             unIns.stBits.u32Src1Mod = TDE_SRC_MODE_BMP;
             unIns.stBits.u32Src2Mod = TDE_SRC_MODE_DISA;
@@ -1591,11 +1599,11 @@ HI_VOID TdeHalNodeSetBaseOperate(TDE_HWNode_S* pHWNode, TDE_DRV_BASEOPT_MODE_E e
         break;
     }
 
-    /*set node*//*CNcomment:ÅäÖÃ»º´æ½Úµã*/
+    /*set node*//*CNcomment:ï¿½ï¿½ï¿½Ã»ï¿½ï¿½ï¿½Úµï¿½*/
     pHWNode->u32TDE_ALU = unAluMode.u32All;
     pHWNode->u32TDE_INS = unIns.u32All;
 
-    /*set node update area to 1*//*CNcomment:WNode.TDE_UPDATEÖÐÓÐÅäÖÃÏî¶ÔÓ¦Î»Éè1*/
+    /*set node update area to 1*//*CNcomment:WNode.TDE_UPDATEï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó¦Î»ï¿½ï¿½1*/
     TDE_SET_UPDATE(u32TDE_ALU, pHWNode->u64TDE_UPDATE);
     TDE_SET_UPDATE(u32TDE_INS, pHWNode->u64TDE_UPDATE);
 
@@ -1630,12 +1638,12 @@ HI_VOID TdeHalNodeSetGlobalAlpha(TDE_HWNode_S* pHWNode, HI_U8 u8Alpha, HI_BOOL b
 
     TDE_ALPHA_ADJUST(u8Alpha);
     
-    /*set node*//*CNcomment:ÅäÖÃ»º´æ½Úµã*/
+    /*set node*//*CNcomment:ï¿½ï¿½ï¿½Ã»ï¿½ï¿½ï¿½Úµï¿½*/
     unAluMode.u32All = pHWNode->u32TDE_ALU;
     unAluMode.stBits.u32GlobalAlpha = u8Alpha;
     pHWNode->u32TDE_ALU = unAluMode.u32All;
 
-    /*set node update area to 1*//*CNcomment:HWNode.TDE_UPDATEÖÐÓÐÅäÖÃÏî¶ÔÓ¦Î»Éè1*/
+    /*set node update area to 1*//*CNcomment:HWNode.TDE_UPDATEï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó¦Î»ï¿½ï¿½1*/
     TDE_SET_UPDATE(u32TDE_ALU, pHWNode->u64TDE_UPDATE);
 
     return;
@@ -1660,20 +1668,20 @@ HI_VOID TdeHalNodeSetExpAlpha(TDE_HWNode_S* pHWNode, TDE_DRV_SRC_E enSrc, HI_U8 
     TDE_ALPHA_ADJUST(u8Alpha0);
     TDE_ALPHA_ADJUST(u8Alpha1);
     
-    /*set alpha0 alpha1*//*CNcomment:ÅäÖÃalpha0, alpha1*/
+    /*set alpha0 alpha1*//*CNcomment:ï¿½ï¿½ï¿½ï¿½alpha0, alpha1*/
     unConv.u32All = pHWNode->u32TDE_COLOR_CONV;
     unConv.stBits.u32Alpha0 = u8Alpha0;
     unConv.stBits.u32Alpha1 = u8Alpha1;
     pHWNode->u32TDE_COLOR_CONV = unConv.u32All;
 
-    /*set node update area to 1*//*CNcomment:HWNode.TDE_UPDATEÖÐÓÐÅäÖÃÏî¶ÔÓ¦Î»Éè1*/
+    /*set node update area to 1*//*CNcomment:HWNode.TDE_UPDATEï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó¦Î»ï¿½ï¿½1*/
     TDE_SET_UPDATE(u32TDE_COLOR_CONV, pHWNode->u64TDE_UPDATE);
 
     if(TDE_DRV_SRC_S1 & enSrc)
     {
         pHWNode->u32TDE_S1_TYPE |= 0x20000000;
         
-        /*set node update area to 1*//*CNcomment:HWNode.TDE_UPDATEÖÐÓÐÅäÖÃÏî¶ÔÓ¦Î»Éè1*/
+        /*set node update area to 1*//*CNcomment:HWNode.TDE_UPDATEï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó¦Î»ï¿½ï¿½1*/
         TDE_SET_UPDATE(u32TDE_S1_TYPE, pHWNode->u64TDE_UPDATE);
     }
 
@@ -1681,7 +1689,7 @@ HI_VOID TdeHalNodeSetExpAlpha(TDE_HWNode_S* pHWNode, TDE_DRV_SRC_E enSrc, HI_U8 
     {
         pHWNode->u32TDE_S2_TYPE |= 0x20000000;
         
-        /*set node update area to 1*//*CNcomment:HWNode.TDE_UPDATEÖÐÓÐÅäÖÃÏî¶ÔÓ¦Î»Éè1*/
+        /*set node update area to 1*//*CNcomment:HWNode.TDE_UPDATEï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó¦Î»ï¿½ï¿½1*/
         TDE_SET_UPDATE(u32TDE_S2_TYPE, pHWNode->u64TDE_UPDATE);
     }
 
@@ -1725,13 +1733,13 @@ HI_VOID TdeHalNodeSetRop(TDE_HWNode_S* pHWNode, TDE2_ROP_CODE_E enRgbRop, TDE2_R
     TDE_ALU_U unAluMode;
     
     TDE_ASSERT(HI_NULL != pHWNode);
-    /*set node*//*CNcomment:ÅäÖÃ»º´æ½Úµã*/
+    /*set node*//*CNcomment:ï¿½ï¿½ï¿½Ã»ï¿½ï¿½ï¿½Úµï¿½*/
     unAluMode.u32All = pHWNode->u32TDE_ALU;
     unAluMode.stBits.u32RgbRopMod = (HI_U32)enRgbRop;
     unAluMode.stBits.u32AlphaRopMod = (HI_U32)enAlphaRop;
     pHWNode->u32TDE_ALU = unAluMode.u32All;
 
-    /*set node update area to 1*//*CNcomment:HWNode.TDE_UPDATEÖÐÓÐÅäÖÃÏî¶ÔÓ¦Î»Éè1*/
+    /*set node update area to 1*//*CNcomment:HWNode.TDE_UPDATEï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó¦Î»ï¿½ï¿½1*/
     TDE_SET_UPDATE(u32TDE_ALU, pHWNode->u64TDE_UPDATE);
 }
 
@@ -1752,7 +1760,7 @@ HI_VOID TdeHalNodeSetBlend(TDE_HWNode_S *pHWNode, TDE2_BLEND_OPT_S *pstBlendOpt)
     TDE_ASSERT(HI_NULL != pHWNode);
 
     unAlphaBlend.u32All = pHWNode->u32TDE_ALPHA_BLEND;
-    /*those paramter is fix ,app cann't view*//*CNcomment: ÕâËÄ¸ö²ÎÊýÇý¶¯¹Ì¶¨£¬¶ÔÍâ²»¿É¼û */
+    /*those paramter is fix ,app cann't view*//*CNcomment: ï¿½ï¿½ï¿½Ä¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ì¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½â²»ï¿½É¼ï¿½ */
     unAlphaBlend.stBits.u32Src1PixelAlphaEn = HI_TRUE;
     unAlphaBlend.stBits.u32Src1GlobalAlphaEn = HI_FALSE;
     unAlphaBlend.stBits.u32Src1MultiGlobalEn = HI_FALSE;
@@ -1763,7 +1771,7 @@ HI_VOID TdeHalNodeSetBlend(TDE_HWNode_S *pHWNode, TDE2_BLEND_OPT_S *pstBlendOpt)
     unAlphaBlend.stBits.u32Src2PixelAlphaEn = pstBlendOpt->bPixelAlphaEnable;
     unAlphaBlend.stBits.u32Src2GlobalAlphaEn = pstBlendOpt->bGlobalAlphaEnable;
 
-    /*set mode for src1 and src2*//*CNcomment:  ÅäÖÃSrc1¡¢Src2Ä£Ê½ */
+    /*set mode for src1 and src2*//*CNcomment:  ï¿½ï¿½ï¿½ï¿½Src1ï¿½ï¿½Src2Ä£Ê½ */
     switch(pstBlendOpt->eBlendCmd)
     {
         /**< fs: sa      fd: 1.0-sa */
@@ -1864,7 +1872,7 @@ HI_VOID TdeHalNodeSetBlend(TDE_HWNode_S *pHWNode, TDE2_BLEND_OPT_S *pstBlendOpt)
             unAlphaBlend.stBits.u32Src2BlendMode = TDE2_BLEND_ZERO;
             break;
         }
-        /*user parameter*//*CNcomment:  ÓÃ»§×Ô¼ºÅäÖÃ²ÎÊý */
+        /*user parameter*//*CNcomment:  ï¿½Ã»ï¿½ï¿½Ô¼ï¿½ï¿½ï¿½ï¿½Ã²ï¿½ï¿½ï¿½ */
         case TDE2_BLENDCMD_CONFIG:
         default:
         {
@@ -1944,18 +1952,18 @@ HI_VOID TdeHalNodeSetClutOpt(TDE_HWNode_S* pHWNode, TDE_DRV_CLUT_CMD_S* pClutCmd
     TDE_ASSERT(HI_NULL != pClutCmd);
     
     unIns.u32All = pHWNode->u32TDE_INS;
-    unIns.stBits.u32Clut = 1; /*enable clut operation*//*CNcomment: Ê¹ÄÜClut²Ù×÷*/
+    unIns.stBits.u32Clut = 1; /*enable clut operation*//*CNcomment: Ê¹ï¿½ï¿½Clutï¿½ï¿½ï¿½ï¿½*/
 
     unConv.u32All = pHWNode->u32TDE_COLOR_CONV;
     unConv.stBits.u32ClutMod = (HI_U32)pClutCmd->enClutMode;
-    unConv.stBits.u32ClutReload = (HI_U32)bReload; /*reload clut to register*//*CNcomment: reload clut µ½¼Ä´æÆ÷ */
+    unConv.stBits.u32ClutReload = (HI_U32)bReload; /*reload clut to register*//*CNcomment: reload clut ï¿½ï¿½ï¿½Ä´ï¿½ï¿½ï¿½ */
 
-     /*set node*//*CNcomment:ÅäÖÃ»º´æ½Úµã*/
+     /*set node*//*CNcomment:ï¿½ï¿½ï¿½Ã»ï¿½ï¿½ï¿½Úµï¿½*/
     pHWNode->u32TDE_CLUT_ADDR = (HI_U32)pClutCmd->pu8PhyClutAddr;
     pHWNode->u32TDE_INS = unIns.u32All;
     pHWNode->u32TDE_COLOR_CONV = unConv.u32All;
 
-    /*set node update area to 1*//*CNcomment:HWNode.TDE_UPDATEÖÐÓÐÅäÖÃÏî¶ÔÓ¦Î»Éè1*/
+    /*set node update area to 1*//*CNcomment:HWNode.TDE_UPDATEï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó¦Î»ï¿½ï¿½1*/
     TDE_SET_UPDATE(u32TDE_CLUT_ADDR, pHWNode->u64TDE_UPDATE);
     TDE_SET_UPDATE(u32TDE_INS, pHWNode->u64TDE_UPDATE);
     TDE_SET_UPDATE(u32TDE_COLOR_CONV, pHWNode->u64TDE_UPDATE);
@@ -1981,7 +1989,7 @@ HI_VOID TdeHalNodeSetColorKey(TDE_HWNode_S* pHWNode, TDE_COLORFMT_CATEGORY_E enF
     TDE_ASSERT(HI_NULL != pColorKey);
     
     unIns.u32All = pHWNode->u32TDE_INS;
-    unIns.stBits.u32ColorKey = 1; /*enable color key operation*//*CNcomment:Ê¹ÄÜColor Key²Ù×÷*/
+    unIns.stBits.u32ColorKey = 1; /*enable color key operation*//*CNcomment:Ê¹ï¿½ï¿½Color Keyï¿½ï¿½ï¿½ï¿½*/
     unAluMode.u32All = pHWNode->u32TDE_ALU;
     unAluMode.stBits.u32CkSel = (HI_U32)pColorKey->enColorKeyMode;
 
@@ -2057,7 +2065,7 @@ HI_VOID TdeHalNodeSetColorKey(TDE_HWNode_S* pHWNode, TDE_COLORFMT_CATEGORY_E enF
             unAluMode.stBits.u32CkAMod = TDE_COLORKEY_AREA_IN;
         }
     }
-    else if (TDE_COLORFMT_CATEGORY_CLUT == enFmtCat)/*clut format use index*//*CNcomment:CLUT¸ñÊ½Ö»ÓÃË÷Òý*/
+    else if (TDE_COLORFMT_CATEGORY_CLUT == enFmtCat)/*clut format use index*//*CNcomment:CLUTï¿½ï¿½Ê½Ö»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½*/
     {
         TDE_ALPHA_ADJUST(pColorKey->unColorKeyValue.struCkClut.stAlpha.u8CompMin);
         TDE_ALPHA_ADJUST(pColorKey->unColorKeyValue.struCkClut.stAlpha.u8CompMax);
@@ -2097,7 +2105,7 @@ HI_VOID TdeHalNodeSetColorKey(TDE_HWNode_S* pHWNode, TDE_COLORFMT_CATEGORY_E enF
             unAluMode.stBits.u32CkAMod = TDE_COLORKEY_AREA_IN;
         }
     }
-    else if (TDE_COLORFMT_CATEGORY_YCbCr == enFmtCat)/*YCbCr format*//*CNcomment:YCbCr¸ñÊ½*/
+    else if (TDE_COLORFMT_CATEGORY_YCbCr == enFmtCat)/*YCbCr format*//*CNcomment:YCbCrï¿½ï¿½Ê½*/
     {
         TDE_ALPHA_ADJUST(pColorKey->unColorKeyValue.struCkYCbCr.stAlpha.u8CompMin);
         TDE_ALPHA_ADJUST(pColorKey->unColorKeyValue.struCkYCbCr.stAlpha.u8CompMax);
@@ -2176,7 +2184,7 @@ HI_VOID TdeHalNodeSetColorKey(TDE_HWNode_S* pHWNode, TDE_COLORFMT_CATEGORY_E enF
     pHWNode->u32TDE_ALU = unAluMode.u32All;
     pHWNode->u32TDE_INS = unIns.u32All;
     
-    /*set node update area to 1*//*CNcomment:HWNode.TDE_UPDATEÖÐÓÐÅäÖÃÏî¶ÔÓ¦Î»Éè1*/
+    /*set node update area to 1*//*CNcomment:HWNode.TDE_UPDATEï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó¦Î»ï¿½ï¿½1*/
     TDE_SET_UPDATE(u32TDE_ALU, pHWNode->u64TDE_UPDATE);
     TDE_SET_UPDATE(u32TDE_INS, pHWNode->u64TDE_UPDATE);
     TDE_SET_UPDATE(u32TDE_CK_MIN, pHWNode->u64TDE_UPDATE);
@@ -2205,7 +2213,7 @@ HI_VOID TdeHalNodeSetClipping(TDE_HWNode_S* pHWNode, TDE_DRV_CLIP_CMD_S* pClip)
     TDE_ASSERT(HI_NULL != pClip);
     
     unIns.u32All = pHWNode->u32TDE_INS;
-    unIns.stBits.u32Clip = 1; /*enable clip operation*//*CNcomment:ÆôÓÃclip²Ù×÷*/
+    unIns.stBits.u32Clip = 1; /*enable clip operation*//*CNcomment:ï¿½ï¿½ï¿½ï¿½clipï¿½ï¿½ï¿½ï¿½*/
 
     if(pClip->bInsideClip)
     {
@@ -2213,21 +2221,21 @@ HI_VOID TdeHalNodeSetClipping(TDE_HWNode_S* pHWNode, TDE_DRV_CLIP_CMD_S* pClip)
     }
     else
     {
-        /*over clip*//*CNcomment: ÇøÓòÍâclipÖ¸Ê¾ */
+        /*over clip*//*CNcomment: ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½clipÖ¸Ê¾ */
         unClipPos.u32All = 0x80000000; 
     }
     unClipPos.stBits.u32Width = pClip->u16ClipStartX;
     unClipPos.stBits.u32Height = pClip->u16ClipStartY;
     pHWNode->u32TDE_CLIP_START = unClipPos.u32All;
 
-    unClipPos.u32All = 0; /*reset for next set*//*CNcomment:  ÖØÐÂ¸´Î»,×¼±¸ÏÂÒ»ÉèÖÃ AI7D02798 */
+    unClipPos.u32All = 0; /*reset for next set*//*CNcomment:  ï¿½ï¿½ï¿½Â¸ï¿½Î»,×¼ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ AI7D02798 */
     unClipPos.stBits.u32Width = pClip->u16ClipEndX;
     unClipPos.stBits.u32Height = pClip->u16ClipEndY;
     pHWNode->u32TDE_CLIP_STOP = unClipPos.u32All;
 
     pHWNode->u32TDE_INS = unIns.u32All;
 
-    /*set node update area to 1*//*CNcomment:HWNode.TDE_UPDATEÖÐÓÐÅäÖÃÏî¶ÔÓ¦Î»Éè1*/
+    /*set node update area to 1*//*CNcomment:HWNode.TDE_UPDATEï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó¦Î»ï¿½ï¿½1*/
     TDE_SET_UPDATE(u32TDE_CLIP_START, pHWNode->u64TDE_UPDATE);
     TDE_SET_UPDATE(u32TDE_CLIP_STOP, pHWNode->u64TDE_UPDATE);
     TDE_SET_UPDATE(u32TDE_INS, pHWNode->u64TDE_UPDATE);
@@ -2253,7 +2261,7 @@ HI_VOID TdeHalNodeSetFlicker(TDE_HWNode_S* pHWNode, TDE_DRV_FLICKER_CMD_S* pFlic
     TDE_ASSERT(HI_NULL != pFlicker);
     
     unIns.u32All = pHWNode->u32TDE_INS;
-    unIns.stBits.u32DfeEn = 1; /*enbale Flicker*//*CNcomment:Ê¹ÄÜ¿¹ÉÁË¸*/
+    unIns.stBits.u32DfeEn = 1; /*enbale Flicker*//*CNcomment:Ê¹ï¿½Ü¿ï¿½ï¿½ï¿½Ë¸*/
     unRsz.u32All = pHWNode->u32TDE_2D_RSZ;
     if (pFlicker->enDeflickerMode == TDE2_DEFLICKER_MODE_RGB)
     {
@@ -2265,7 +2273,7 @@ HI_VOID TdeHalNodeSetFlicker(TDE_HWNode_S* pHWNode, TDE_DRV_FLICKER_CMD_S* pFlic
     }
     unRsz.stBits.u32DfeMod = (HI_U32)pFlicker->enDfeMode;
 
-    /*set node*//*CNcomment:ÅäÖÃ»º´æ½Úµã*/
+    /*set node*//*CNcomment:ï¿½ï¿½ï¿½Ã»ï¿½ï¿½ï¿½Úµï¿½*/
     switch(s_eDeflickerLevel)
     {
         case TDE_DEFLICKER_LOW:
@@ -2310,7 +2318,7 @@ HI_VOID TdeHalNodeSetFlicker(TDE_HWNode_S* pHWNode, TDE_DRV_FLICKER_CMD_S* pFlic
     pHWNode->u32TDE_INS = unIns.u32All;
     pHWNode->u32TDE_2D_RSZ = unRsz.u32All;
     
-    /*set node update area to 1*//*CNcomment:HWNode.TDE_UPDATEÖÐÓÐÅäÖÃÏî¶ÔÓ¦Î»Éè1*/
+    /*set node update area to 1*//*CNcomment:HWNode.TDE_UPDATEï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó¦Î»ï¿½ï¿½1*/
     TDE_SET_UPDATE(u32TDE_INS, pHWNode->u64TDE_UPDATE);
     TDE_SET_UPDATE(u32TDE_2D_RSZ, pHWNode->u64TDE_UPDATE);
     TDE_SET_UPDATE(u32TDE_DFE_COEF0, pHWNode->u64TDE_UPDATE);
@@ -2350,46 +2358,46 @@ TDE_NODE_SUBM_TYPE_E enNodeType)
     unRsz.stBits.u32HfMod = pResize->enFilterH;
     unRsz.stBits.u32VfMod = pResize->enFilterV;
 
-    /*plumb Flicker*//*CNcomment: ´¹Ö±ÂË²¨ */
+    /*plumb Flicker*//*CNcomment: ï¿½ï¿½Ö±ï¿½Ë²ï¿½ */
     if (TDE_DRV_FILTER_NONE != pResize->enFilterV)
     {
-        unRsz.stBits.u32VfRingEn = pResize->bVfRing;  /*enable middle Flicker*//*CNcomment: Ê¹ÄÜÖÐÖµÂË²¨*/
-        unRsz.stBits.u32VfCoefReload = 0x1; /*load parameter*//*CNcomment:ÔØÈë´¹Ö±²ÎÊý*/
-        /*set v resize parameter of start address*//*CNcomment:¸ù¾Ý²½³¤ÅäÖÃ´¹Ö±Ëõ·Å²ÎÊý±íÊ×µØÖ· */
+        unRsz.stBits.u32VfRingEn = pResize->bVfRing;  /*enable middle Flicker*//*CNcomment: Ê¹ï¿½ï¿½ï¿½ï¿½Öµï¿½Ë²ï¿½*/
+        unRsz.stBits.u32VfCoefReload = 0x1; /*load parameter*//*CNcomment:ï¿½ï¿½ï¿½ë´¹Ö±ï¿½ï¿½ï¿½ï¿½*/
+        /*set v resize parameter of start address*//*CNcomment:ï¿½ï¿½Ý²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã´ï¿½Ö±ï¿½ï¿½ï¿½Å²ï¿½ï¿½ï¿½ï¿½ï¿½×µï¿½Ö· */
         pHWNode->u32TDE_VF_COEF_ADDR = s_stParaTable.u32VfCoefAddr
                       + TdeHalGetResizeParaVTable(pResize->u32StepV) * TDE_PARA_VTABLE_SIZE;
         TDE_SET_UPDATE(u32TDE_VF_COEF_ADDR, pHWNode->u64TDE_UPDATE);
 
         if (TDE_NODE_SUBM_PARENT == enNodeType)
         {
-       /*set plumb offset*//*CNcomment:  ÉèÖÃ´¹Ö±Æ«ÒÆ */
-        u32Sign = pResize->u32OffsetY >> 31; /*get symbol*//*CNcomment: ÌáÈ¡·ûºÅ*/
+       /*set plumb offset*//*CNcomment:  ï¿½ï¿½ï¿½Ã´ï¿½Ö±Æ«ï¿½ï¿½ */
+        u32Sign = pResize->u32OffsetY >> 31; /*get symbol*//*CNcomment: ï¿½ï¿½È¡ï¿½ï¿½ï¿½*/
         pHWNode->u32TDE_RSZ_Y_OFST = (u32Sign << 16) | (pResize->u32OffsetY & 0xffff);
         TDE_SET_UPDATE(u32TDE_RSZ_Y_OFST, pHWNode->u64TDE_UPDATE);
-        unIns.stBits.u32Resize = 0x1; /*enable resize*//*CNcomment: Ê¹ÄÜËõ·Å*/
+        unIns.stBits.u32Resize = 0x1; /*enable resize*//*CNcomment: Ê¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½*/
         }
     }
-    /*h Flicker*//*CNcomment: Ë®Æ½ÂË²¨ */
+    /*h Flicker*//*CNcomment: Ë®Æ½ï¿½Ë²ï¿½ */
     if (TDE_DRV_FILTER_NONE != pResize->enFilterH)
     {
-        unRsz.stBits.u32HfRingEn = pResize->bHfRing; /*enable middle Flicker*//*CNcomment: Ê¹ÄÜÖÐÖµÂË²¨*/
-        unRsz.stBits.u32HfCoefReload = 0x1;/*load parameter*//*CNcomment:ÔØÈë´¹Ö±²ÎÊý*/
-        /*set h resize parameter of start address*//*CNcomment:¸ù¾Ý²½³¤ÅäÖÃ´¹Ö±Ëõ·Å²ÎÊý±íÊ×µØÖ· */
+        unRsz.stBits.u32HfRingEn = pResize->bHfRing; /*enable middle Flicker*//*CNcomment: Ê¹ï¿½ï¿½ï¿½ï¿½Öµï¿½Ë²ï¿½*/
+        unRsz.stBits.u32HfCoefReload = 0x1;/*load parameter*//*CNcomment:ï¿½ï¿½ï¿½ë´¹Ö±ï¿½ï¿½ï¿½ï¿½*/
+        /*set h resize parameter of start address*//*CNcomment:ï¿½ï¿½Ý²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã´ï¿½Ö±ï¿½ï¿½ï¿½Å²ï¿½ï¿½ï¿½ï¿½ï¿½×µï¿½Ö· */
         pHWNode->u32TDE_HF_COEF_ADDR = s_stParaTable.u32HfCoefAddr
                     + TdeHalGetResizeParaHTable(pResize->u32StepH) * TDE_PARA_HTABLE_SIZE;
         TDE_SET_UPDATE(u32TDE_HF_COEF_ADDR, pHWNode->u64TDE_UPDATE);
 
         if (TDE_NODE_SUBM_PARENT == enNodeType)
         {
-        /*set h offset*//*CNcomment:  ÉèÖÃË®Æ½Æ«ÒÆ */
-        u32Sign = pResize->u32OffsetX >> 31; /*get symbol*//*CNcomment: ÌáÈ¡·ûºÅ*/
+        /*set h offset*//*CNcomment:  ï¿½ï¿½ï¿½ï¿½Ë®Æ½Æ«ï¿½ï¿½ */
+        u32Sign = pResize->u32OffsetX >> 31; /*get symbol*//*CNcomment: ï¿½ï¿½È¡ï¿½ï¿½ï¿½*/
         pHWNode->u32TDE_RSZ_X_OFST = (u32Sign << 16) | (pResize->u32OffsetX & 0xffff);
         TDE_SET_UPDATE(u32TDE_RSZ_X_OFST, pHWNode->u64TDE_UPDATE);
-        unIns.stBits.u32Resize = 0x1; /*enable resize*//*CNcomment:Ê¹ÄÜËõ·Å*/
+        unIns.stBits.u32Resize = 0x1; /*enable resize*//*CNcomment:Ê¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½*/
         }
     }
 
-    unRsz.stBits.u32CoefSym = pResize->bCoefSym;/*Flicker parameter*//*CNcomment:¶Ô³ÆÂË²¨ÏµÊý*/
+    unRsz.stBits.u32CoefSym = pResize->bCoefSym;/*Flicker parameter*//*CNcomment:ï¿½Ô³ï¿½ï¿½Ë²ï¿½Ïµï¿½ï¿½*/
     pHWNode->u32TDE_2D_RSZ = unRsz.u32All;
     if (TDE_NODE_SUBM_PARENT == enNodeType)
     {
@@ -2400,7 +2408,7 @@ TDE_NODE_SUBM_TYPE_E enNodeType)
         unTarType.stBits.u32DfeLastlineOutEn = pResize->bLastLineOut;
         pHWNode->u32TDE_TAR_TYPE = unTarType.u32All;
 
-        /*set flicker step*//*CNcomment:   ÉèÖÃÂË²¨²½³¤ */
+        /*set flicker step*//*CNcomment:   ï¿½ï¿½ï¿½ï¿½ï¿½Ë²ï¿½ï¿½ï¿½ï¿½ï¿½ */
 #ifdef TDE_VERSION_MPW
         u16HStep = pResize->u32StepH & 0xffff;
         u16VStep = pResize->u32StepV & 0xffff;
@@ -2452,11 +2460,11 @@ HI_VOID TdeHalNodeSetColorConvert(TDE_HWNode_S* pHWNode, TDE_DRV_CONV_MODE_CMD_S
     unConv.stBits.u32OutColorSpace = (HI_U32)pConv->bOutMetrixVid;
     unConv.stBits.u32OutColorImetry = (HI_U32)pConv->bOutMetrix709;
 
-    /*set node*//*CNcomment:ÅäÖÃ»º´æ½Úµã*/
+    /*set node*//*CNcomment:ï¿½ï¿½ï¿½Ã»ï¿½ï¿½ï¿½Úµï¿½*/
     pHWNode->u32TDE_COLOR_CONV = unConv.u32All;
     pHWNode->u32TDE_INS = unIns.u32All;
 
-    /*set node update area to 1*//*CNcomment:HWNode.TDE_UPDATEÖÐÓÐÅäÖÃÏî¶ÔÓ¦Î»Éè1*/
+    /*set node update area to 1*//*CNcomment:HWNode.TDE_UPDATEï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó¦Î»ï¿½ï¿½1*/
     TDE_SET_UPDATE(u32TDE_COLOR_CONV, pHWNode->u64TDE_UPDATE);
     TDE_SET_UPDATE(u32TDE_INS, pHWNode->u64TDE_UPDATE);
 
@@ -2489,7 +2497,7 @@ HI_VOID TdeHalNodeAddChild(TDE_HWNode_S* pHWNode, TDE_CHILD_INFO* pChildInfo)
        TDE_TS_SIZE
        */
 
-    /*CNcomment: ¸ù¾ÝUpdateÐÅÏ¢ÅäÖÃ¼Ä´æÆ÷:
+    /*CNcomment: ï¿½ï¿½ï¿½Updateï¿½ï¿½Ï¢ï¿½ï¿½ï¿½Ã¼Ä´ï¿½ï¿½ï¿½:
        u32TDE_RSZ_OFST
        u32TDE_2D_RSZ
        TDE_S2_XY
@@ -2516,14 +2524,14 @@ HI_VOID TdeHalNodeAddChild(TDE_HWNode_S* pHWNode, TDE_CHILD_INFO* pChildInfo)
     {
         HI_U32 u32Sign;
         
-        /*set h offset*//* CNcomment: ÉèÖÃË®Æ½Æ«ÒÆ */
-        u32Sign = pChildInfo->u32HOfst >> 31;/*get symbol*/ /*CNcomment:ÌáÈ¡·ûºÅ*/
+        /*set h offset*//* CNcomment: ï¿½ï¿½ï¿½ï¿½Ë®Æ½Æ«ï¿½ï¿½ */
+        u32Sign = pChildInfo->u32HOfst >> 31;/*get symbol*/ /*CNcomment:ï¿½ï¿½È¡ï¿½ï¿½ï¿½*/
         pHWNode->u32TDE_RSZ_X_OFST = (u32Sign << 16) | (pChildInfo->u32HOfst & 0xffff);
 
         TDE_SET_UPDATE(u32TDE_RSZ_X_OFST, pHWNode->u64TDE_UPDATE);
 
-        /*set v offset*//* CNcomment: ÉèÖÃ´¹Ö±Æ«ÒÆ */
-        u32Sign = pChildInfo->u32VOfst >> 31; /*get symbol*/ /*CNcomment:ÌáÈ¡·ûºÅ*/
+        /*set v offset*//* CNcomment: ï¿½ï¿½ï¿½Ã´ï¿½Ö±Æ«ï¿½ï¿½ */
+        u32Sign = pChildInfo->u32VOfst >> 31; /*get symbol*/ /*CNcomment:ï¿½ï¿½È¡ï¿½ï¿½ï¿½*/
         pHWNode->u32TDE_RSZ_Y_OFST = (u32Sign << 16) | (pChildInfo->u32VOfst & 0xffff);
 
         TDE_SET_UPDATE(u32TDE_RSZ_Y_OFST, pHWNode->u64TDE_UPDATE);
@@ -2555,7 +2563,7 @@ HI_VOID TdeHalNodeAddChild(TDE_HWNode_S* pHWNode, TDE_CHILD_INFO* pChildInfo)
         pHWNode->u32TDE_TS_SIZE = unSz.u32All;
         TDE_SET_UPDATE(u32TDE_TS_SIZE, pHWNode->u64TDE_UPDATE);
     }
-    /*fill block info*/ /*CNcomment: Ìî³ä¿éÀàÐÍÐÅÏ¢ */
+    /*fill block info*/ /*CNcomment: ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ */
     unIns.u32All = pHWNode->u32TDE_INS;
     unIns.stBits.u32BlockFlag = (HI_U32)pChildInfo->enSliceType;
     if (pChildInfo->enSliceType == TDE_FIRST_BLOCK_SLICE_TYPE)
@@ -2600,7 +2608,7 @@ HI_VOID TdeHalNodeSetMbMode(TDE_HWNode_S* pHWNode, TDE_DRV_MB_CMD_S* pMbCmd)
     unIns.stBits.u32MbMode = (HI_U32)pMbCmd->enMbMode;
     pHWNode->u32TDE_INS = unIns.u32All;
 
-    /*set node update area to 1*//*CNcomment:HWNode.TDE_UPDATEÖÐÓÐÅäÖÃÏî¶ÔÓ¦Î»Éè1*/
+    /*set node update area to 1*//*CNcomment:HWNode.TDE_UPDATEï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó¦Î»ï¿½ï¿½1*/
     TDE_SET_UPDATE(u32TDE_INS, pHWNode->u64TDE_UPDATE);
 
     return;
@@ -2627,8 +2635,8 @@ HI_VOID TDeHalNodeSetCsc(TDE_HWNode_S* pHWNode, TDE2_CSC_OPT_S stCscOpt)
 	pHWNode->u32TDE_OCSC_ADDR = stCscOpt.u32OCSCParamAddr;
 
     	/*use correct parameter when user not use user parameter and enable ICSC function*/
-        /*CNcomment:ÈôÓÃ»§Î´¿ªÆô×Ô¶¨ÒåÏµÊýÇÒICSC¹¦ÄÜÊ¹ÄÜ,
-        ÔòÇ¿ÖÆÊ¹ÓÃTDEµÄÐÞÕýÏµÊý(TDEÄ¬ÈÏÏµÊý´æÔÚÎÊÌâ)*/
+        /*CNcomment:ï¿½ï¿½ï¿½Ã»ï¿½Î´ï¿½ï¿½ï¿½ï¿½ï¿½Ô¶ï¿½ï¿½ï¿½Ïµï¿½ï¿½ï¿½ï¿½ICSCï¿½ï¿½ï¿½ï¿½Ê¹ï¿½ï¿½,
+        ï¿½ï¿½Ç¿ï¿½ï¿½Ê¹ï¿½ï¿½TDEï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ïµï¿½ï¿½(TDEÄ¬ï¿½ï¿½Ïµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½)*/
         if (!stCscOpt.bICSCUserEnable && unIns.stBits.u32IcsConv)
         {
             unColorConv.stBits.u32IcscCustomEn = 1;
@@ -2744,7 +2752,7 @@ HI_VOID TdeHalNodeSuspend(HI_VOID)
     //TDE_BUF_NODE_S* pstBufNode;
 
     /*read current node physics address and save physics address and virtual address*/
-    /*CNcomment:¶ÁÈ¡µ±Ç°½ÚµãÎïÀíµØÖ·,²¢±£´æÆä¶ÔÓ¦µÄÎïÀí/ÐéÄâµØÖ·*/
+    /*CNcomment:ï¿½ï¿½È¡ï¿½ï¿½Ç°ï¿½Úµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö·,ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó¦ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½/ï¿½ï¿½ï¿½ï¿½ï¿½Ö·*/
     u32SuspNodePhyAddr = TdeHalCurNode(TDE_LIST_AQ);
     if (0 == u32SuspNodePhyAddr)
     {
@@ -2781,7 +2789,7 @@ HI_VOID TdeHalNodeSuspend(HI_VOID)
     }
     #endif
 
-    /*save current line infor*//*CNcomment:±£´æµ±Ç°ÐÐÐÅÏ¢*/
+    /*save current line infor*//*CNcomment:ï¿½ï¿½ï¿½æµ±Ç°ï¿½ï¿½ï¿½ï¿½Ï¢*/
     s_stSuspStat.s32AqSuspLine = (HI_S32)TdeHalCurLine();
 }
 
@@ -2819,21 +2827,23 @@ STATIC HI_S32 TdeHalInitParaTable(HI_VOID)
     pHfCoef = (HI_U32 *)TDE_MALLOC(TDE_PARA_HTABLE_SIZE * TDE_PARA_HTABLE_NUM);
     if (HI_NULL == pHfCoef)
     {
-        TDE_TRACE(TDE_KERN_INFO, "Alloc horizontal coef failed!\n");
+        TDE_TRACE(TDE_KERN_INFO, "Alloc horizontal coef failed!\n"); //2517
         return HI_FAILURE;
     }
     
     pVfCoef = (HI_U32 *)TDE_MALLOC(TDE_PARA_VTABLE_SIZE * TDE_PARA_VTABLE_NUM);
     if (HI_NULL == pVfCoef)
     {
-        TDE_TRACE(TDE_KERN_INFO, "Alloc vertical coef failed\n");
+        TDE_TRACE(TDE_KERN_INFO, "Alloc vertical coef failed\n"); //2524
         TDE_FREE(pHfCoef);
         return HI_FAILURE;
     }
 
+#if 0
     memset(pHfCoef, 0, (TDE_PARA_HTABLE_SIZE * TDE_PARA_HTABLE_NUM));
     memset(pVfCoef, 0, (TDE_PARA_VTABLE_SIZE * TDE_PARA_VTABLE_NUM));
-    /*copy parameter according other offer way*//* CNcomment:°´ÕÕËã·¨×éÌá¹©µÄ½á¹¹¿½±´²ÎÊý±í */
+#endif
+    /*copy parameter according other offer way*//* CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ã·¨ï¿½ï¿½ï¿½á¹©ï¿½Ä½á¹¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ */
     for (i = 0; i < TDE_PARA_HTABLE_NUM; i++)
     {
         memcpy(pHfCoef + i*(TDE_PARA_HTABLE_SIZE/4), OrgHfCoef + i*(TDE_PARA_HTABLE_ORG_SIZE/4), (TDE_PARA_HTABLE_ORG_SIZE));
@@ -2853,20 +2863,19 @@ STATIC HI_S32 TdeHalInitParaTable(HI_VOID)
     s_stParaTable.u32HfCoefAddr = wgetphy((HI_VOID *)pHfCoef);
     s_stParaTable.u32VfCoefAddr = wgetphy((HI_VOID *)pVfCoef);
 
-#ifdef TDE_VERSION_PILOT
     pRgb2YuvCsc = (HI_U32 *)TDE_MALLOC(TDE_CSCTABLE_SIZE * sizeof(HI_U32));
     if (HI_NULL == pRgb2YuvCsc)
     {
         TDE_FREE(pHfCoef);
         TDE_FREE(pVfCoef);
-        TDE_TRACE(TDE_KERN_INFO, "Alloc csc coef failed!\n");
+        TDE_TRACE(TDE_KERN_INFO, "Alloc csc coef failed!\n"); //2554
         return HI_FAILURE;
     }
     
     pYuv2RgbCsc = (HI_U32 *)TDE_MALLOC(TDE_CSCTABLE_SIZE * sizeof(HI_U32));
     if (HI_NULL == pYuv2RgbCsc)
     {
-        TDE_TRACE(TDE_KERN_INFO, "Alloc csc coef failed\n");
+        TDE_TRACE(TDE_KERN_INFO, "Alloc csc coef failed\n"); //2561
         TDE_FREE(pHfCoef);
         TDE_FREE(pVfCoef);
         TDE_FREE(pRgb2YuvCsc);
@@ -2878,7 +2887,6 @@ STATIC HI_S32 TdeHalInitParaTable(HI_VOID)
 
     s_u32Rgb2YuvCoefAddr = wgetphy((HI_VOID *)pRgb2YuvCsc);
     s_u32Yuv2RgbCoefAddr = wgetphy((HI_VOID *)pYuv2RgbCsc);
-#endif
 
     return HI_SUCCESS;
 }
@@ -2939,7 +2947,7 @@ STATIC HI_VOID TdeHalNodeSetSrc2Base(TDE_HWNode_S* pHWNode, TDE_DRV_SURFACE_S* p
     TDE_ASSERT(HI_NULL != pHWNode);
     TDE_ASSERT(HI_NULL != pDrvSurface);
 
-    /*set attribute info for source bitmap*//*CNcomment:ÅäÖÃÔ´Î»Í¼ÊôÐÔÐÅÏ¢*/
+    /*set attribute info for source bitmap*//*CNcomment:ï¿½ï¿½ï¿½ï¿½Ô´Î»Í¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢*/
     unSrcType.u32All = 0;
     unSrcType.stBits.u32SrcColorFmt = (HI_U32)pDrvSurface->enColorFmt;
     unSrcType.stBits.u32AlphaRange = (HI_U32)pDrvSurface->bAlphaMax255;
@@ -2985,11 +2993,11 @@ STATIC HI_VOID TdeHalNodeSetSrc2Base(TDE_HWNode_S* pHWNode, TDE_DRV_SURFACE_S* p
 #endif
     }
 
-    /*set node*//*CNcomment:ÅäÖÃ»º´æ½Úµã*/
+    /*set node*//*CNcomment:ï¿½ï¿½ï¿½Ã»ï¿½ï¿½ï¿½Úµï¿½*/
     pHWNode->u32TDE_S2_TYPE = unSrcType.u32All;
     pHWNode->u32TDE_S2_XY = unXy.u32All;
 
-    /*set node update area to 1*//*CNcomment:HWNode.TDE_UPDATEÖÐÓÐÅäÖÃÏî¶ÔÓ¦Î»Éè1*/
+    /*set node update area to 1*//*CNcomment:HWNode.TDE_UPDATEï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó¦Î»ï¿½ï¿½1*/
     TDE_SET_UPDATE(u32TDE_S2_ADDR, pHWNode->u64TDE_UPDATE);
     TDE_SET_UPDATE(u32TDE_S2_TYPE, pHWNode->u64TDE_UPDATE);
     TDE_SET_UPDATE(u32TDE_S2_XY, pHWNode->u64TDE_UPDATE);
@@ -2998,7 +3006,7 @@ STATIC HI_VOID TdeHalNodeSetSrc2Base(TDE_HWNode_S* pHWNode, TDE_DRV_SURFACE_S* p
     {
         TDE_SUR_SIZE_U unSurSize;
         unSurSize.u32All = 0;
-        /*set size info of bitmap*//*CNcomment:ÅäÖÃÎ»Í¼´óÐ¡ÐÅÏ¢*/
+        /*set size info of bitmap*//*CNcomment:ï¿½ï¿½ï¿½ï¿½Î»Í¼ï¿½ï¿½Ð¡ï¿½ï¿½Ï¢*/
         unSurSize.stBits.u32Width = (HI_U32)pDrvSurface->u32Width;
         unSurSize.stBits.u32Height = (HI_U32)pDrvSurface->u32Height;
         pHWNode->u32TDE_S2_SIZE = unSurSize.u32All;
@@ -3016,7 +3024,7 @@ STATIC HI_VOID TdeHalNodeSetSrc2BaseEx(TDE_HWNode_S* pHWNode, TDE_DRV_SURFACE_S*
     TDE_ASSERT(HI_NULL != pHWNode);
     TDE_ASSERT(HI_NULL != pDrvSurface);
 
-    /*set attribute info for source bitmap *//*CNcomment:ÅäÖÃÔ´Î»Í¼ÊôÐÔÐÅÏ¢*/
+    /*set attribute info for source bitmap *//*CNcomment:ï¿½ï¿½ï¿½ï¿½Ô´Î»Í¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢*/
     unSrcType.u32All = 0;
     unSrcType.stBits.u32Pitch = pDrvSurface->u32Pitch;
     unSrcType.stBits.u32SrcColorFmt = (HI_U32)pDrvSurface->enColorFmt;
@@ -3029,12 +3037,12 @@ STATIC HI_VOID TdeHalNodeSetSrc2BaseEx(TDE_HWNode_S* pHWNode, TDE_DRV_SURFACE_S*
     unXy.stBits.u32X = pDrvSurface->u32Xpos;
     unXy.stBits.u32Y = pDrvSurface->u32Ypos;
 
-    /*set node*//*CNcomment:ÅäÖÃ»º´æ½Úµã*/
+    /*set node*//*CNcomment:ï¿½ï¿½ï¿½Ã»ï¿½ï¿½ï¿½Úµï¿½*/
     pHWNode->u32TDE_S2_ADDR = pDrvSurface->u32PhyAddr;
     pHWNode->u32TDE_S2_TYPE = unSrcType.u32All;
     pHWNode->u32TDE_S2_XY = unXy.u32All;
 
-    /*set node update area to 1*//*CNcomment:HWNode.TDE_UPDATEÖÐÓÐÅäÖÃÏî¶ÔÓ¦Î»Éè1*/
+    /*set node update area to 1*//*CNcomment:HWNode.TDE_UPDATEï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó¦Î»ï¿½ï¿½1*/
     TDE_SET_UPDATE(u32TDE_S2_ADDR, pHWNode->u64TDE_UPDATE);
     TDE_SET_UPDATE(u32TDE_S2_TYPE, pHWNode->u64TDE_UPDATE);
     TDE_SET_UPDATE(u32TDE_S2_XY, pHWNode->u64TDE_UPDATE);
@@ -3043,7 +3051,7 @@ STATIC HI_VOID TdeHalNodeSetSrc2BaseEx(TDE_HWNode_S* pHWNode, TDE_DRV_SURFACE_S*
     {
         TDE_SUR_SIZE_U unSurSize;
         unSurSize.u32All = 0;
-        /*set size info of bitmap*//*CNcomment:ÅäÖÃÎ»Í¼´óÐ¡ÐÅÏ¢*/
+        /*set size info of bitmap*//*CNcomment:ï¿½ï¿½ï¿½ï¿½Î»Í¼ï¿½ï¿½Ð¡ï¿½ï¿½Ï¢*/
         unSurSize.stBits.u32Width = (HI_U32)pDrvSurface->u32Width;
         unSurSize.stBits.u32Height = (HI_U32)pDrvSurface->u32Height;
         pHWNode->u32TDE_S2_SIZE = unSurSize.u32All;
@@ -3163,7 +3171,7 @@ STATIC INLINE HI_U32 TdeHalGetResizeParaVTable(HI_U32 u32Step)
 {
     HI_U32 u32Index;
 
-    /*get index table according step*//*CNcomment: ¸ù¾Ý²½³¤ÕÒµ½±íµÄË÷Òý */
+    /*get index table according step*//*CNcomment: ï¿½ï¿½Ý²ï¿½ï¿½ï¿½ï¿½Òµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ */
     if (u32Step < TDE_RESIZE_PARA_AREA_0)
     {
         u32Index = 0;
@@ -3269,26 +3277,26 @@ HI_S32 TdeHalRestoreAloneNode(HI_VOID)
     unTgtType.u32All = 0;
 
     /*find the set of current node start position and according line number modify start position*/
-    /*CNcomment:ÕÒµ½µ±Ç°½ÚµãÆðÊ¼Î»ÖÃµÄÉèÖÃ,¸ù¾Ý±£´æµÄÐÐºÅÐÞ¸ÄÆðÊ¼Î»ÖÃ */
+    /*CNcomment:ï¿½Òµï¿½ï¿½ï¿½Ç°ï¿½Úµï¿½ï¿½ï¿½Ê¼Î»ï¿½Ãµï¿½ï¿½ï¿½ï¿½ï¿½,ï¿½ï¿½Ý±ï¿½ï¿½ï¿½ï¿½ï¿½Ðºï¿½ï¿½Þ¸ï¿½ï¿½ï¿½Ê¼Î»ï¿½ï¿½ */
 
     /*resume source 1 info*/
-    /*CNcomment: -1- »Ö¸´s1ÐÅÏ¢-- */
+    /*CNcomment: -1- ï¿½Ö¸ï¿½s1ï¿½ï¿½Ï¢-- */
     /*not need get/set bitmap size info,source size is same with target size */
-    /*CNcomment:²»Ðè»ñÈ¡/ÉèÖÃÎ»Í¼³ß´çÐÅÏ¢, S1³ß´çºÍTgt³ß´çÒ»ÖÂ */
-    /*CNcomment: »ñÈ¡S1É¨Ãè·½ÏòÐÅÏ¢ */
+    /*CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½È¡/ï¿½ï¿½ï¿½ï¿½Î»Í¼ï¿½ß´ï¿½ï¿½ï¿½Ï¢, S1ï¿½ß´ï¿½ï¿½Tgtï¿½ß´ï¿½Ò»ï¿½ï¿½ */
+    /*CNcomment: ï¿½ï¿½È¡S1É¨ï¿½è·½ï¿½ï¿½ï¿½ï¿½Ï¢ */
     TDE_GET_MEMBER_IN_BUFNODE(pu32CurVirAddr, u32TDE_S1_TYPE, s_stSuspStat.pstSwBuf);
     if (HI_NULL != pu32CurVirAddr)
     {
         unSrcType.u32All = *pu32CurVirAddr;
     }
     /*get/set source 1 bitmap position info*/
-    /*CNcomment: »ñÈ¡/ÉèÖÃS1Î»Í¼Î»ÖÃÐÅÏ¢ */
+    /*CNcomment: ï¿½ï¿½È¡/ï¿½ï¿½ï¿½ï¿½S1Î»Í¼Î»ï¿½ï¿½ï¿½ï¿½Ï¢ */
     TDE_GET_MEMBER_IN_BUFNODE(pu32CurVirAddr, u32TDE_S1_XY, s_stSuspStat.pstSwBuf);
     if (HI_NULL != pu32CurVirAddr)
     {
         unXy.u32All = *pu32CurVirAddr;
 
-        if (1 == unSrcType.stBits.u32VScanOrd) /*in reverse scan*//*CNcomment:·´É¨Ãè*/
+        if (1 == unSrcType.stBits.u32VScanOrd) /*in reverse scan*//*CNcomment:ï¿½ï¿½É¨ï¿½ï¿½*/
         {
             unXy.stBits.u32Y -= u16CurLine;
         }
@@ -3299,12 +3307,12 @@ HI_S32 TdeHalRestoreAloneNode(HI_VOID)
         *pu32CurVirAddr = unXy.u32All;
     }
 
-    /*resume source 2 info*//*CNcomment: -2- »Ö¸´s2ÐÅÏ¢-- */
+    /*resume source 2 info*//*CNcomment: -2- ï¿½Ö¸ï¿½s2ï¿½ï¿½Ï¢-- */
     unXy.u32All = 0;
     unSrcType.u32All = 0;
     
     /*get/set source 2 bitmap position info*/
-    /*CNcomment: »ñÈ¡/ÉèÖÃS2Î»Í¼³ß´çÐÅÏ¢ */
+    /*CNcomment: ï¿½ï¿½È¡/ï¿½ï¿½ï¿½ï¿½S2Î»Í¼ï¿½ß´ï¿½ï¿½ï¿½Ï¢ */
     TDE_GET_MEMBER_IN_BUFNODE(pu32CurVirAddr, u32TDE_S2_SIZE, s_stSuspStat.pstSwBuf);
     if (HI_NULL != pu32CurVirAddr)
     {
@@ -3312,19 +3320,19 @@ HI_S32 TdeHalRestoreAloneNode(HI_VOID)
         unSize.stBits.u32Height -= u16CurLine;
         *pu32CurVirAddr = unSize.u32All;
     }
-    /*CNcomment: »ñÈ¡S2É¨Ãè·½ÏòÐÅÏ¢ */
+    /*CNcomment: ï¿½ï¿½È¡S2É¨ï¿½è·½ï¿½ï¿½ï¿½ï¿½Ï¢ */
     TDE_GET_MEMBER_IN_BUFNODE(pu32CurVirAddr, u32TDE_S2_TYPE, s_stSuspStat.pstSwBuf);
     if (HI_NULL != pu32CurVirAddr)
     {
         unSrcType.u32All = *pu32CurVirAddr;
     }
     /*get/set source 2 bitmap position info*/
-    /*CNcomment: »ñÈ¡/ÉèÖÃS2Î»Í¼Î»ÖÃÐÅÏ¢ */
+    /*CNcomment: ï¿½ï¿½È¡/ï¿½ï¿½ï¿½ï¿½S2Î»Í¼Î»ï¿½ï¿½ï¿½ï¿½Ï¢ */
     TDE_GET_MEMBER_IN_BUFNODE(pu32CurVirAddr, u32TDE_S2_XY, s_stSuspStat.pstSwBuf);
     if (HI_NULL != pu32CurVirAddr)
     {
         unXy.u32All = *pu32CurVirAddr;
-        if (1 == unSrcType.stBits.u32VScanOrd) /*CNcomment:·´É¨Ãè*/
+        if (1 == unSrcType.stBits.u32VScanOrd) /*CNcomment:ï¿½ï¿½É¨ï¿½ï¿½*/
         {
             unXy.stBits.u32Y -= u16CurLine;
         }
@@ -3335,13 +3343,13 @@ HI_S32 TdeHalRestoreAloneNode(HI_VOID)
         *pu32CurVirAddr = unXy.u32All;
     }
 
-    /*resume source 3 info*//*CNcomment: -3- »Ö¸´s3ÐÅÏ¢-- */
+    /*resume source 3 info*//*CNcomment: -3- ï¿½Ö¸ï¿½s3ï¿½ï¿½Ï¢-- */
     unSize.u32All = 0;
     unSrcType.u32All = 0;
     unXy.u32All = 0;
 
     /*get/set source target bitmap size info*/
-    /*CNcomment: »ñÈ¡/ÉèÖÃTgtÎ»Í¼³ß´çÐÅÏ¢ */
+    /*CNcomment: ï¿½ï¿½È¡/ï¿½ï¿½ï¿½ï¿½TgtÎ»Í¼ï¿½ß´ï¿½ï¿½ï¿½Ï¢ */
     TDE_GET_MEMBER_IN_BUFNODE(pu32CurVirAddr, u32TDE_TS_SIZE, s_stSuspStat.pstSwBuf);
     if (HI_NULL != pu32CurVirAddr)
     {
@@ -3349,18 +3357,18 @@ HI_S32 TdeHalRestoreAloneNode(HI_VOID)
         unSize.stBits.u32Height -= u16CurLine;
         *pu32CurVirAddr = unSize.u32All;
     }
-    /*CNcomment: »ñÈ¡TgtÉ¨Ãè·½ÏòÐÅÏ¢ */
+    /*CNcomment: ï¿½ï¿½È¡TgtÉ¨ï¿½è·½ï¿½ï¿½ï¿½ï¿½Ï¢ */
     TDE_GET_MEMBER_IN_BUFNODE(pu32CurVirAddr, u32TDE_TAR_TYPE, s_stSuspStat.pstSwBuf);
     if (HI_NULL != pu32CurVirAddr)
     {
         unTgtType.u32All = *pu32CurVirAddr;
     }
-    /*CNcomment: »ñÈ¡/ÉèÖÃTgtÎ»Í¼Î»ÖÃÐÅÏ¢ */
+    /*CNcomment: ï¿½ï¿½È¡/ï¿½ï¿½ï¿½ï¿½TgtÎ»Í¼Î»ï¿½ï¿½ï¿½ï¿½Ï¢ */
     TDE_GET_MEMBER_IN_BUFNODE(pu32CurVirAddr, u32TDE_TAR_XY, s_stSuspStat.pstSwBuf);
     if (HI_NULL != pu32CurVirAddr)
     {
         unXy.u32All = *pu32CurVirAddr;
-        if (1 == unTgtType.stBits.u32VScanOrd) /*CNcomment:·´É¨Ãè*/
+        if (1 == unTgtType.stBits.u32VScanOrd) /*CNcomment:ï¿½ï¿½É¨ï¿½ï¿½*/
         {
             unXy.stBits.u32Y -= u16CurLine;
         }
@@ -3371,7 +3379,7 @@ HI_S32 TdeHalRestoreAloneNode(HI_VOID)
         *pu32CurVirAddr = unXy.u32All;
     }
 
-    /*CNcomment:Ð´Èëµ±Ç°AQÁ´±íÎïÀíµØÖ·*/
+    /*CNcomment:Ð´ï¿½ëµ±Ç°AQï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö·*/
     TDE_WRITE_REG(s_pu32BaseVirAddr, TDE_AQ_NADDR, s_stSuspStat.pstSwBuf->u32PhyAddr);
     TDE_WRITE_REG(s_pu32BaseVirAddr, TDE_AQ_UPDATE, s_stSuspStat.pstSwBuf->u32CurUpdate);
     return HI_SUCCESS;
@@ -3455,8 +3463,8 @@ STATIC INLINE HI_VOID TdeHalSetChildToParent(HI_U32* pParent, HI_U32* pChild, HI
     }    
     /*CNcomment: AE5D03314 end */
     
-    /*CNcomment: ½«µ±Ç°½ÚµãµÄTDE_S1_XY, TDE_S2_XY, TDE_TAR_XY, TDE_S2_SIZE, 
-       TDE_TS_SIZE, TDE_RSZ_X_OFST,TDE_RSZ_X_OFST ÅäÖÃµ½¸¸½ÚµãµÄÏàÓ¦ÏîÖÐ */
+    /*CNcomment: ï¿½ï¿½ï¿½ï¿½Ç°ï¿½Úµï¿½ï¿½TDE_S1_XY, TDE_S2_XY, TDE_TAR_XY, TDE_S2_SIZE, 
+       TDE_TS_SIZE, TDE_RSZ_X_OFST,TDE_RSZ_X_OFST ï¿½ï¿½ï¿½Ãµï¿½ï¿½ï¿½ï¿½Úµï¿½ï¿½ï¿½ï¿½Ó¦ï¿½ï¿½ï¿½ï¿½ */
     TDE_GET_MEMBER_IN_BUFF(pu32ParentInBuf, u32TDE_S1_XY, pParent, u32ParentUpdt);
     TDE_GET_MEMBER_IN_BUFF(pu32ChildInBuf, u32TDE_S1_XY, pChild, ChildUpdt);
     if (HI_NULL != pu32ParentInBuf && HI_NULL != pu32ChildInBuf)
@@ -3519,7 +3527,7 @@ STATIC INLINE HI_VOID TdeHalSetXyByAdjInfo(TDE_HWNode_S* pHWNode, TDE_CHILD_INFO
     case TDE_CHILD_SCALE_NORM:
     case TDE_CHILD_SCALE_MBC:
         {
-            /*CNcomment: Ö±½Ó°´ÕÕS2·Ö¿é */
+            /*CNcomment: Ö±ï¿½Ó°ï¿½ï¿½ï¿½S2ï¿½Ö¿ï¿½ */
             unXy.u32All = pHWNode->u32TDE_S2_XY;
             unXy.stBits.u32X = pChildInfo->u32Xi;
             unXy.stBits.u32Y = pChildInfo->u32Yi;
@@ -3529,7 +3537,7 @@ STATIC INLINE HI_VOID TdeHalSetXyByAdjInfo(TDE_HWNode_S* pHWNode, TDE_CHILD_INFO
         }
     case TDE_CHILD_SCALE_MBY:
         {
-            /*CNcomment: Ö±½Ó°´ÕÕS1·Ö¿é */
+            /*CNcomment: Ö±ï¿½Ó°ï¿½ï¿½ï¿½S1ï¿½Ö¿ï¿½ */
             unXy.u32All = pHWNode->u32TDE_S1_XY;
             unXy.stBits.u32X = pChildInfo->u32Xi;
             unXy.stBits.u32Y = pChildInfo->u32Yi;
@@ -3540,7 +3548,7 @@ STATIC INLINE HI_VOID TdeHalSetXyByAdjInfo(TDE_HWNode_S* pHWNode, TDE_CHILD_INFO
     case TDE_CHILD_SCALE_MB_CONCA_H:
     case TDE_CHILD_SCALE_MB_CONCA_M:
         {
-            /*CNcomment: °´ÕÕÁÁ¶ÈS1·Ö¿é, µ÷ÕûÉ«¶ÈS2ÆðÊ¼Î»ÖÃ */
+            /*CNcomment: ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½S1ï¿½Ö¿ï¿½, ï¿½ï¿½ï¿½ï¿½É«ï¿½ï¿½S2ï¿½ï¿½Ê¼Î»ï¿½ï¿½ */
             unXy.u32All = pHWNode->u32TDE_S1_XY;
             unXy.stBits.u32X = pChildInfo->u32Xi;
             unXy.stBits.u32Y = pChildInfo->u32Yi;
@@ -3556,7 +3564,7 @@ STATIC INLINE HI_VOID TdeHalSetXyByAdjInfo(TDE_HWNode_S* pHWNode, TDE_CHILD_INFO
         }
     case TDE_CHILD_SCALE_MB_CONCA_L:
         {
-            /*CNcomment: °´ÕÕÁÁ¶ÈS1·Ö¿é, µ÷ÕûÉ«¶ÈS2ÆðÊ¼Î»ÖÃ */
+            /*CNcomment: ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½S1ï¿½Ö¿ï¿½, ï¿½ï¿½ï¿½ï¿½É«ï¿½ï¿½S2ï¿½ï¿½Ê¼Î»ï¿½ï¿½ */
             unXy.u32All = pHWNode->u32TDE_S1_XY;
             unXy.stBits.u32X = pChildInfo->u32Xi;
             unXy.stBits.u32Y = pChildInfo->u32Yi;
@@ -3584,7 +3592,7 @@ STATIC INLINE HI_VOID TdeHalSetXyByAdjInfo(TDE_HWNode_S* pHWNode, TDE_CHILD_INFO
         }
     case TDE_CHILD_SCALE_MB_CONCA_CUS:
         {
-            /*CNcomment: °´ÕÕÉ«¶ÈS2·Ö¿é, µ÷ÕûÁÁ¶ÈS1ÆðÊ¼Î»ÖÃ */
+            /*CNcomment: ï¿½ï¿½ï¿½ï¿½É«ï¿½ï¿½S2ï¿½Ö¿ï¿½, ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½S1ï¿½ï¿½Ê¼Î»ï¿½ï¿½ */
             unXy.u32All = pHWNode->u32TDE_S2_XY;
             unXy.stBits.u32X = pChildInfo->u32Xi;
             unXy.stBits.u32Y = pChildInfo->u32Yi;
@@ -3610,28 +3618,30 @@ STATIC INLINE HI_VOID TdeHalInitQueue(HI_VOID)
     TDE_SQ_CTRL_U unSqCtrl;
 
     /*write 0 to Aq/Sq list start address register*/
-    /*CNcomment: ½«Aq/SqÁ´±íÊ×µØÖ·¼Ä´æÆ÷Ð´0 */
+    /*CNcomment: ï¿½ï¿½Aq/Sqï¿½ï¿½ï¿½ï¿½ï¿½×µï¿½Ö·ï¿½Ä´ï¿½ï¿½ï¿½Ð´0 */
     TDE_WRITE_REG(s_pu32BaseVirAddr, TDE_AQ_NADDR, 0);
-    TDE_WRITE_REG(s_pu32BaseVirAddr, TDE_SQ_NADDR, 0);
+    //TDE_WRITE_REG(s_pu32BaseVirAddr, TDE_SQ_NADDR, 0);
 
     unAqCtrl.u32All = TDE_READ_REG(s_pu32BaseVirAddr, TDE_AQ_CTRL);
-    unSqCtrl.u32All = TDE_READ_REG(s_pu32BaseVirAddr, TDE_SQ_CTRL);
+    //unSqCtrl.u32All = TDE_READ_REG(s_pu32BaseVirAddr, TDE_SQ_CTRL);
 
     
-    /*enable Aq/Sq list*//*CNcomment: Ê¹ÄÜAq/SqÁ´±í */
+    /*enable Aq/Sq list*//*CNcomment: Ê¹ï¿½ï¿½Aq/Sqï¿½ï¿½ï¿½ï¿½ */
     unAqCtrl.stBits.u32AqEn = 1;
-    unSqCtrl.stBits.u32SqEn = 0;   /*hardware disable*//*CNcomment: Ó²¼þÔÝÊ±ÆÁ±Î*/
+#if 0
+    unSqCtrl.stBits.u32SqEn = 0;   /*hardware disable*//*CNcomment: Ó²ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½*/
 
-    /*CNcomment:  ÉèÖÃSQµÄ´¥·¢Ìõ¼þºÍÍ¬²½Ä£Ê½ */
+    /*CNcomment:  ï¿½ï¿½ï¿½ï¿½SQï¿½Ä´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¬ï¿½ï¿½Ä£Ê½ */
     unSqCtrl.stBits.u32TrigMode = 0;
     unSqCtrl.stBits.u32TrigCond = 0;
-
-    /*set Sq/Aq operation mode*//*CNcomment:  ÅäÖÃSq/Aq²Ù×÷Ä£Ê½ */
-    unSqCtrl.stBits.u32SqOperMode = TDE_SQ_CTRL_COMP_LIST; 
+#endif
+    /*set Sq/Aq operation mode*//*CNcomment:  ï¿½ï¿½ï¿½ï¿½Sq/Aqï¿½ï¿½ï¿½ï¿½Ä£Ê½ */
+    //unSqCtrl.stBits.u32SqOperMode = TDE_SQ_CTRL_COMP_LIST;
     unAqCtrl.stBits.u32AqOperMode = TDE_AQ_CTRL_COMP_LINE;
 
     TDE_WRITE_REG(s_pu32BaseVirAddr, TDE_AQ_CTRL, unAqCtrl.u32All);
-    TDE_WRITE_REG(s_pu32BaseVirAddr, TDE_SQ_CTRL, unSqCtrl.u32All);
+    //TDE_WRITE_REG(s_pu32BaseVirAddr, TDE_SQ_CTRL, unSqCtrl.u32All);
+    TDE_WRITE_REG(s_pu32BaseVirAddr, TDE_AXI_ID, 0x1010);
 }
 
 HI_S32 TdeHalSetDeflicerLevel(TDE_DEFLICKER_LEVEL_E eDeflickerLevel)

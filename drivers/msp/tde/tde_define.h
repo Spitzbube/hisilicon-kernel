@@ -93,6 +93,9 @@ typedef enum hiTDE_NOTIFY_MODE_E
 #define TDE_MAX_WAIT_TIMEOUT 2000
 #define TDE_USE_SPINLOCK
 
+#ifndef TDE_BOOT
+#define TDE_CACH_STRATEGY
+#endif
 //#define TDE_TIME_COUNT
 
 
@@ -141,8 +144,14 @@ STATIC INLINE HI_VOID TDE_FREE(HI_VOID* ptr)
 {
     wfree(ptr);
 }
+#ifndef TDE_BOOT
+#define TDE_LOCK(lock,lockflags) spin_lock_irqsave(lock, lockflags)
 
-
+#define TDE_UNLOCK(lock,lockflags) spin_unlock_irqrestore(lock, lockflags)
+#else
+#define TDE_LOCK(lock,lockflags)
+#define TDE_UNLOCK(lock,lockflags)
+#endif
 #define TDE_INIT_WAITQUEUE_HEAD(pqueue) init_waitqueue_head(pqueue)
 
 #define TDE_WAIT_EVENT_INTERRUPTIBLE_TIMEOUT(queue, condition, timeout) wait_event_interruptible_timeout(queue, condition, timeout)

@@ -91,7 +91,7 @@ HI_S32 tde_init_module_k(HI_VOID)
     if (0 != request_irq(TDE_INTNUM, (irq_handler_t)tde_osr_isr,
                          IRQF_PROBE_SHARED, "hi_tde_irq", NULL))
     {
-        TDE_TRACE(TDE_KERN_ERR, "request_irq for TDE failure!\n");
+        TDE_TRACE(TDE_KERN_ERR, "request_irq for TDE failure!\n"); //96
         TdeHalRelease();
         return -1;
     }
@@ -101,7 +101,7 @@ HI_S32 tde_init_module_k(HI_VOID)
     ret = HI_GFX_MODULE_Register(HIGFX_TDE_ID, TDE_NAME,&s_TdeExportFuncs);
     if (HI_SUCCESS != ret)
     {
-        TDE_TRACE(TDE_KERN_ERR, "register module failed!\n");
+        TDE_TRACE(TDE_KERN_ERR, "register module failed!\n"); //106
         tde_cleanup_module_k();
         return ret;
     }
