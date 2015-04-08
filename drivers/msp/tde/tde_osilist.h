@@ -34,7 +34,7 @@ typedef struct hiTDE_SWNODE_S
     HI_S32 s32Handle;           		/* Job handle of the instruct */
     HI_S32 s32Index;            		/* Instruct serial number in job, form one on start, the same number is the same instruct */
     TDE_NODE_SUBM_TYPE_E enSubmType; 	/* current node type */
-    TDE_NOTIFY_MODE_E enNotiType;   	/* Notice type after node completed */
+    TDE_NOTIFY_MODE_E enNotiType; //20  	/* Notice type after node completed */
     TDE_NODE_BUF_S stNodeBuf;       	/* Node of operate config */
     HI_U32 u32PhyBuffNum;           	/* Number of physical buffer distributed */
     struct hiTDE_SWNODE_S *pstParentNodeInCmd;	/* The head software node of this instruct */
@@ -47,18 +47,20 @@ typedef struct hiTDE_SWJOB_S
     HI_S32 s32Handle;               /* Job handle */
     TDE_FUNC_CB       pFuncComplCB; /* Pointer of callback fuction */
     HI_VOID * pFuncPara;            /* Arguments of callback function */
-    TDE_NOTIFY_MODE_E enNotiType;   /* Notice type after node completed */
+    TDE_NOTIFY_MODE_E enNotiType; //20   /* Notice type after node completed */
     HI_U32 u32CmdNum;               /* Instruct number of job */
     HI_U32 u32NodeNum;              /* Node number of job */
-    TDE_SWNODE_S *pstFirstCmd;      /* Software node of first instruct in job */
+    TDE_SWNODE_S *pstFirstCmd; //32     /* Software node of first instruct in job */
     TDE_SWNODE_S *pstLastCmd;       /* Software node of last instruct in job  */
-    TDE_SWNODE_S *pstTailNode;      /* Last software node of job */
+    TDE_SWNODE_S *pstTailNode; //40     /* Last software node of job */
     wait_queue_head_t stQuery;      /* Wait queue used in query */
-    HI_BOOL bInQuery;               /* If user is  quering or not */
-    HI_BOOL bSubmitted;             /* If have submitted */
+    HI_BOOL bInQuery; //56              /* If user is  quering or not */
+    pid_t pid; //???
+    HI_BOOL bSubmitted; //64            /* If have submitted */
     HI_BOOL bAqUseBuff;             /* If using temporary buffer */
-    HI_U8   u8WaitForDoneCount;     /* wait job count */    
+    HI_U8   u8WaitForDoneCount; //72    /* wait job count */
     TDE_SWNODE_S *pstParentCmd;     /* Record parent node */
+
 }TDE_SWJOB_S;
 
 /****************************************************************************/
@@ -140,7 +142,7 @@ HI_S32      TdeOsiListAddNode(TDE_HANDLE s32Handle, TDE_NODE_BUF_S* pSwNode,
 * Return:        success/fail/time out
 * Others:        none
 *****************************************************************************/
-HI_S32      TdeOsiListSubmitJob(TDE_HANDLE s32Handle, TDE_LIST_TYPE_E enListType,
+HI_S32      TdeOsiListSubmitJob(TDE_HANDLE s32Handle/*, TDE_LIST_TYPE_E enListType*/,
                                 HI_U32 u32TimeOut, TDE_FUNC_CB pFuncComplCB, HI_VOID *pFuncPara,
                                 TDE_NOTIFY_MODE_E enNotiType);
 
@@ -153,7 +155,7 @@ HI_S32      TdeOsiListSubmitJob(TDE_HANDLE s32Handle, TDE_LIST_TYPE_E enListType
  Calls        :
  Called By    :
 *****************************************************************************/
-HI_S32 TdeOsiListWaitAllDone(TDE_LIST_TYPE_E enListType);
+HI_S32 TdeOsiListWaitAllDone(/*TDE_LIST_TYPE_E enListType*/HI_VOID);
 
 /*****************************************************************************
  Prototype    : TdeOsiListReset
@@ -213,7 +215,7 @@ HI_VOID     TdeOsiListSqUpdateProc(HI_VOID);
 * Return:        task handle is created
 * Others:        none
 *****************************************************************************/
-HI_VOID     TdeOsiListCompProc(TDE_LIST_TYPE_E enListType);
+HI_VOID     TdeOsiListCompProc(/*TDE_LIST_TYPE_E enListType*/HI_VOID);
 
 /*****************************************************************************
 * Function:      TdeOsiAqSuspProc
@@ -233,7 +235,7 @@ HI_VOID     TdeOsiListSuspLineProc(TDE_LIST_TYPE_E enListType);
 * Return:        task handle is created
 * Others:        none
 *****************************************************************************/
-HI_VOID     TdeOsiListNodeComp(TDE_LIST_TYPE_E enListType);
+HI_VOID     TdeOsiListNodeComp(/*TDE_LIST_TYPE_E enListType*/HI_VOID);
 
 
 /*****************************************************************************
@@ -256,6 +258,8 @@ HI_U32  TdeOsiListGetPhyBuff(HI_U32 u32CbCrOffset);
 * Others:        none
 *****************************************************************************/
 HI_VOID  TdeOsiListPutPhyBuff(HI_U32 u32BuffNum);
+
+HI_VOID TdeOsiListFreeSerialCmd(TDE_SWNODE_S *pstFstCmd, TDE_SWNODE_S *pstLastCmd);
 
 #ifdef __cplusplus
  #if __cplusplus

@@ -1004,12 +1004,12 @@ HI_S32 TdeHalNodeMakeNd(HI_VOID* pBuf, TDE_HWNode_S* pHWNode)
 * Return:        none
 * Others:        none
 *****************************************************************************/
-HI_S32 TdeHalNodeExecute(TDE_LIST_TYPE_E enListType, HI_U32 u32NodePhyAddr, HI_U64 u64Update, HI_BOOL bAqUseBuff)
+HI_S32 TdeHalNodeExecute(/*TDE_LIST_TYPE_E enListType,*/ HI_U32 u32NodePhyAddr, HI_U64 u64Update, HI_BOOL bAqUseBuff)
 {
     TDE_AQ_CTRL_U unAqCtrl;
     TDE_SQ_CTRL_U unSqCtrl;
     
-    if (enListType == TDE_LIST_AQ)
+//    if (enListType == TDE_LIST_AQ)
     {
         /*tde is idle*//* CNcomment:TDE����*/
         if(TdeHalCtlIsIdleSafely())
@@ -1053,6 +1053,7 @@ HI_S32 TdeHalNodeExecute(TDE_LIST_TYPE_E enListType, HI_U32 u32NodePhyAddr, HI_U
             return HI_FAILURE;
         }
     }
+#if 0
     else
     {
         /*it can submit the Sq list when idle and Aq is running*//* CNcomment:TDE���л��첽�����ڹ����������ύͬ������*/
@@ -1083,7 +1084,7 @@ HI_S32 TdeHalNodeExecute(TDE_LIST_TYPE_E enListType, HI_U32 u32NodePhyAddr, HI_U
             return HI_FAILURE;
         }
     }
-    
+#endif
     return HI_SUCCESS;
 }
 
@@ -1096,7 +1097,7 @@ HI_S32 TdeHalNodeExecute(TDE_LIST_TYPE_E enListType, HI_U32 u32NodePhyAddr, HI_U
 * Return:        none
 * Others:        none
 *****************************************************************************/
-HI_VOID TdeHalNodeEnableCompleteInt(HI_VOID* pBuf, TDE_LIST_TYPE_E enType)
+HI_VOID TdeHalNodeEnableCompleteInt(HI_VOID* pBuf/*, TDE_LIST_TYPE_E enType*/)
 {
     HI_U32 *pu32Ins = (HI_U32*)pBuf;
     TDE_INS_U unIns;
@@ -1104,16 +1105,18 @@ HI_VOID TdeHalNodeEnableCompleteInt(HI_VOID* pBuf, TDE_LIST_TYPE_E enType)
 
     TDE_ASSERT(HI_NULL != pBuf);
     unIns.u32All = *pu32Ins;
-    if (TDE_LIST_AQ == enType)
+    //if (TDE_LIST_AQ == enType)
     {
         u32Mask = unIns.stBits.u32AqIrqMask;
         unIns.stBits.u32AqIrqMask = TDE_AQ_COMP_NODE_MASK_EN | u32Mask;
     }
+#if 0
     else
     {
         u32Mask = unIns.stBits.u32SqIrqMask;
         unIns.stBits.u32SqIrqMask = TDE_SQ_COMP_NODE_MASK_EN | u32Mask;
     }
+#endif
     *pu32Ins = unIns.u32All;
 }
 
@@ -2753,7 +2756,7 @@ HI_VOID TdeHalNodeSuspend(HI_VOID)
 
     /*read current node physics address and save physics address and virtual address*/
     /*CNcomment:��ȡ��ǰ�ڵ������ַ,���������Ӧ������/�����ַ*/
-    u32SuspNodePhyAddr = TdeHalCurNode(TDE_LIST_AQ);
+    u32SuspNodePhyAddr = TdeHalCurNode(/*TDE_LIST_AQ*/);
     if (0 == u32SuspNodePhyAddr)
     {
         s_stSuspStat.pSwNode = HI_NULL;
@@ -2912,18 +2915,20 @@ STATIC INLINE HI_U32 TdeHalCurLine(HI_VOID)
 * Return:       the address of current running node
 * Others:        none
 *****************************************************************************/
-HI_U32 TdeHalCurNode(TDE_LIST_TYPE_E enListType)
+HI_U32 TdeHalCurNode(/*TDE_LIST_TYPE_E enListType*/HI_VOID)
 {
     HI_U32 u32Addr = 0;
     
-    if (TDE_LIST_AQ == enListType)
+    //if (TDE_LIST_AQ == enListType)
     {
         u32Addr = TDE_READ_REG(s_pu32BaseVirAddr, TDE_AQ_ADDR);
     }
+#if 0
     else
     {
         u32Addr = TDE_READ_REG(s_pu32BaseVirAddr, TDE_SQ_ADDR);
     }
+#endif
     return u32Addr;
 }
 /*****************************************************************************

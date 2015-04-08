@@ -81,9 +81,9 @@ typedef struct hiTDE_NODE_BUF_S
 typedef enum hiTDE_NOTIFY_MODE_E
 {
     TDE_JOB_NONE_NOTIFY = 0,    /* none notify after job end */
-    TDE_JOB_COMPL_NOTIFY,   	/* notify after job end */
-    TDE_JOB_WAKE_NOTIFY,    	/* wake noytify after job end */
-    TDE_JOB_NOTIFY_BUTT
+    TDE_JOB_COMPL_NOTIFY, //1  	/* notify after job end */
+    TDE_JOB_WAKE_NOTIFY, //2   	/* wake noytify after job end */
+    TDE_JOB_NOTIFY_BUTT //3
 } TDE_NOTIFY_MODE_E;
 
 #define TDE_VERSION_PILOT 

@@ -794,7 +794,7 @@ HI_S32  TdeHalNodeMakeNd(HI_VOID* pBuf, TDE_HWNode_S* pHWNode);
 * Return:        None
 * Others:        None
 *****************************************************************************/
-HI_VOID TdeHalNodeEnableCompleteInt(HI_VOID* pBuf, TDE_LIST_TYPE_E enType);
+HI_VOID TdeHalNodeEnableCompleteInt(HI_VOID* pBuf/*, TDE_LIST_TYPE_E enType*/);
 
 /*****************************************************************************
 * Function:      TdeHalNodeComplteAqList
@@ -1140,7 +1140,7 @@ HI_S32 TdeHalGetAlphaThresholdState(HI_BOOL *pbEnAlphaThreshold);
 * Return:        Success / Fail
 * Others:        None
 *****************************************************************************/
-HI_S32 TdeHalNodeExecute(TDE_LIST_TYPE_E enListType, HI_U32 u32NodePhyAddr, HI_U64 u64Update, HI_BOOL bAqUseBuff);
+HI_S32 TdeHalNodeExecute(/*TDE_LIST_TYPE_E enListType,*/ HI_U32 u32NodePhyAddr, HI_U64 u64Update, HI_BOOL bAqUseBuff);
 
 /*****************************************************************************
 * Function:      TdeHalRestoreAloneNode
@@ -1160,7 +1160,7 @@ HI_S32 TdeHalRestoreAloneNode(HI_VOID);
 * Return:        None
 * Others:        None
 *****************************************************************************/
-HI_U32 TdeHalCurNode(TDE_LIST_TYPE_E enListType);
+HI_U32 TdeHalCurNode(/*TDE_LIST_TYPE_E enListType*/HI_VOID);
 
 HI_VOID TdeHalResumeInit(HI_VOID);
 

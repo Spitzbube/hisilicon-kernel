@@ -3514,7 +3514,7 @@ STATIC void TdeOsiGetVUpdateInfo(UpdateConfig *reg, UpdateInfo *info, int scaler
 	HI_S32 ratio=(HI_S32)(4096*(reg->ori_in_height-1)/(reg->zme_out_height-1)+1/2);
 	HI_S32 dratio=4096*(reg->zme_out_height-1)/(reg->ori_in_height-1);
 	//TDE_ASSERT(update_vstart>=0 && update_vstop<reg->ori_in_height);
-	TDE_TRACE(TDE_KERN_DEBUG, "update_vstart:%d, update_vstop:%d, ori_in_height:%d, ratio:%d£¬dratio:%d\n",\
+	TDE_TRACE(TDE_KERN_DEBUG, "update_vstart:%d, update_vstop:%d, ori_in_height:%d, ratio:%dï¿½ï¿½dratio:%d\n",\
 	update_vstart, update_vstop, reg->ori_in_height, ratio, dratio);
 
 	if(scaler_en==0 && deflicker_en==1)
@@ -5586,12 +5586,16 @@ STATIC HI_S32 TdeOsiSetNodeFinish(TDE_HANDLE s32Handle, TDE_HWNode_S* pHWNode,
     stSwNode.u64Update = pHWNode->u64TDE_UPDATE;
     stSwNode.u32PhyAddr = wgetphy(pBuf) + TDE_NODE_HEAD_BYTE;
 
+#if 1
+#warning TODO
+#else
     if((s32Ret = TdeOsiListAddNode(s32Handle, &stSwNode, enSubmType, u32WorkBufNum)) < 0)
     {
         TDE_TRACE(TDE_KERN_INFO, "TdeOsiListAddNode fail!\n");
         TDE_FREE(pBuf);
         return s32Ret;
     }
+#endif
     return HI_SUCCESS;
 }
 
@@ -5659,7 +5663,7 @@ HI_S32     TdeOsiEndJob(TDE_HANDLE s32Handle, HI_BOOL bBlock, HI_U32 u32TimeOut,
         enNotiType = TDE_JOB_COMPL_NOTIFY;
     }
 
-    return TdeOsiListSubmitJob(s32Handle, enListType, u32TimeOut, pFuncComplCB, pFuncPara, enNotiType);
+    return TdeOsiListSubmitJob(s32Handle/*, enListType*/, u32TimeOut, pFuncComplCB, pFuncPara, enNotiType);
 }
 EXPORT_SYMBOL(TdeOsiEndJob);
 
@@ -5719,7 +5723,7 @@ HI_S32 TdeOsiWaitAllDone(HI_BOOL bSync)
         return HI_ERR_TDE_UNSUPPORTED_OPERATION;
     }
 
-    return TdeOsiListWaitAllDone(enListType);
+    return TdeOsiListWaitAllDone(/*enListType*/);
 }
 EXPORT_SYMBOL(TdeOsiWaitAllDone);
 

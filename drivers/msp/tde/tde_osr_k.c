@@ -544,7 +544,7 @@ STATIC void tde_tasklet_func(unsigned long int_status)
 #endif
     if(int_status&TDE_DRV_INT_NODE_COMP_AQ)
     {
-        TdeOsiListNodeComp(TDE_LIST_AQ);
+        TdeOsiListNodeComp(/*TDE_LIST_AQ*/);
     }
 #if HI_TDE_SQ_SUPPORT
     if(int_status&TDE_DRV_INT_HEAD_UPDATE_SQ) /*AI7D02874*/

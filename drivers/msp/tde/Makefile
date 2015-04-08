@@ -11,6 +11,7 @@ ccflags-y += -Idrivers/msp/include
 
 obj-y += tde_osr_k.o
 obj-y += tde_hal_k.o
+obj-y += tde_handle_k.o
 obj-y += tde_osilist_k.o
 obj-y += tde_osictl_k.o
 obj-y += tde_proc_k.o
