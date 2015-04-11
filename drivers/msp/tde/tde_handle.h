@@ -31,7 +31,7 @@ extern "C" {
 typedef struct hiHandleMgr
 {
     struct list_head stHeader;  /* Use to organiza handle */
-    spinlock_t lock; //???
+    spinlock_t lock; //8
     HI_S32   handle;
     HI_VOID *res; //16
 } HI_HANDLE_MGR;
@@ -39,7 +39,6 @@ typedef struct hiHandleMgr
 //STATIC HI_HANDLE_MGR *s_pstTdeHandleList = NULL; /* Manager list of global handle */
 
 //STATIC HI_S32 s_handle = 1; /* handle=0, reserve */
-STATIC HI_S32 s_s32HandleNum = 0;
 
 #define TDE_MAX_JOB_NUM 512
 #define TDE_MAX_HANDLE_VALUE 0x7fffffff

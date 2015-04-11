@@ -55,7 +55,7 @@ typedef struct hiTDE_SWJOB_S
     TDE_SWNODE_S *pstTailNode; //40     /* Last software node of job */
     wait_queue_head_t stQuery;      /* Wait queue used in query */
     HI_BOOL bInQuery; //56              /* If user is  quering or not */
-    pid_t pid; //???
+    pid_t pid; //60
     HI_BOOL bSubmitted; //64            /* If have submitted */
     HI_BOOL bAqUseBuff;             /* If using temporary buffer */
     HI_U8   u8WaitForDoneCount; //72    /* wait job count */
