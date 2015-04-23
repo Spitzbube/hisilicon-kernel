@@ -34,149 +34,149 @@ extern "C"{
 
 /*************************** Structure Definition ****************************/
 /** \addtogroup      TDE */
-/** @{ */  /** <!-- ¡¾ TDE¡¿ */  
+/** @{ */  /** <!-- ï¿½ï¿½ TDEï¿½ï¿½ */  
 
 
 /**Definition of the TDE handle*/
-/**CNcomment:TDE¾ä±ú¶¨Òå */
+/**CNcomment:TDEï¿½ï¿½ï¿½ï¿½ï¿½ */
 typedef HI_S32 TDE_HANDLE;
 
 /**TDE callback functions*/
-/**CNcomment:TDEÖÐ¶Ï»Øµ÷º¯Êý */
+/**CNcomment:TDEï¿½Ð¶Ï»Øµï¿½ï¿½ï¿½ï¿½ï¿½ */
 typedef HI_VOID (* TDE_FUNC_CB) (HI_VOID *pParaml, HI_VOID *pParamr);
 
 typedef HI_VOID (* TDE_TRIG_SEL)(HI_U32);
 
 /**RGB and packet YUV formats*/
-/**CNcomment:RGBºÍPacket YUV ÑÕÉ«¸ñÊ½ */
+/**CNcomment:RGBï¿½ï¿½Packet YUV ï¿½ï¿½É«ï¿½ï¿½Ê½ */
 typedef enum hiTDE2_COLOR_FMT_E
 {
-    TDE2_COLOR_FMT_RGB444 = 0,          /**<For the RGB444 format, red occupies four bits, green occupies four bits, and blue occupies four bits. Other formats may be deduced by analogy.*//**<CNcomment:RGB444¸ñÊ½, RedÕ¼4bits GreenÕ¼4bits, BlueÕ¼4bits,ÆäÓà¸ñÊ½ÒÀ´ËÀàÍÆ */
-    TDE2_COLOR_FMT_BGR444,              /**<BGR444 format*//**<CNcomment:BGR444¸ñÊ½ */    
-    TDE2_COLOR_FMT_RGB555,              /**<RGB555 format*//**<CNcomment:RGB555¸ñÊ½ */
-    TDE2_COLOR_FMT_BGR555,              /**<BGR555 format*//**<CNcomment:BGR555¸ñÊ½ */
-    TDE2_COLOR_FMT_RGB565,              /**<RGB565 format*//**<CNcomment:RGB565¸ñÊ½ */
-    TDE2_COLOR_FMT_BGR565,              /**<BGR565 format*//**<CNcomment:BGR565¸ñÊ½ */
-    TDE2_COLOR_FMT_RGB888,              /**<RGB888 format*//**<CNcomment:RGB888¸ñÊ½ */
-    TDE2_COLOR_FMT_BGR888,              /**<BGR888 format*//**<CNcomment:BGR888¸ñÊ½ */
-    TDE2_COLOR_FMT_ARGB4444,          /**<ARGB4444 format*//**<CNcomment:ARGB4444¸ñÊ½ */
-    TDE2_COLOR_FMT_ABGR4444,           /**<ABGR4444 format*//**<CNcomment:ABGR4444¸ñÊ½ */
-    TDE2_COLOR_FMT_RGBA4444,            /**<RGBA4444 format*//**<CNcomment:RGBA4444¸ñÊ½ */
-    TDE2_COLOR_FMT_BGRA4444,            /**<BGRA4444 format*//**<CNcomment:BGRA4444¸ñÊ½ */
-    TDE2_COLOR_FMT_ARGB1555,            /**<ARGB1555 format*//**<CNcomment:ARGB1555¸ñÊ½ */
-    TDE2_COLOR_FMT_ABGR1555,            /**<ABGR1555 format*//**<CNcomment:ABGR1555¸ñÊ½ */
-    TDE2_COLOR_FMT_RGBA1555,            /**<RGBA1555 format*//**<CNcomment:RGBA1555¸ñÊ½ */
-    TDE2_COLOR_FMT_BGRA1555,            /**<BGRA1555 format*//**<CNcomment:BGRA1555¸ñÊ½ */
-    TDE2_COLOR_FMT_ARGB8565,            /**<ARGB8565 format*//**<CNcomment:ARGB8565¸ñÊ½ */
-    TDE2_COLOR_FMT_ABGR8565,            /**<ABGR8565 format*//**<CNcomment:ABGR8565¸ñÊ½ */
-    TDE2_COLOR_FMT_RGBA8565,            /**<RGBA8565 format*//**<CNcomment:RGBA8565¸ñÊ½ */
-    TDE2_COLOR_FMT_BGRA8565,            /**<BGRA8565 format*//**<CNcomment:BGRA8565¸ñÊ½ */
-    TDE2_COLOR_FMT_ARGB8888,            /**<ARGB8888 format*//**<CNcomment:ARGB8888¸ñÊ½ */
-    TDE2_COLOR_FMT_ABGR8888,            /**<ABGR8888 format*//**<CNcomment:ABGR8888¸ñÊ½ */
-    TDE2_COLOR_FMT_RGBA8888,            /**<RGBA8888 format*//**<CNcomment:RGBA8888¸ñÊ½ */
-    TDE2_COLOR_FMT_BGRA8888,            /**<BGRA8888 format*//**<CNcomment:BGRA8888¸ñÊ½ */
-    TDE2_COLOR_FMT_RABG8888,            /**<RABG8888 format*//**<CNcomment:RABG8888¸ñÊ½ */
-    TDE2_COLOR_FMT_CLUT1,               /**<1-bit palette format without alpha component. Each pixel occupies one bit.*//**<CNcomment:ÎÞAlpha·ÖÁ¿,µ÷É«°å1bit¸ñÊ½,Ã¿¸öÏñÓÃ1¸öbit±íÊ¾ */
-    TDE2_COLOR_FMT_CLUT2,               /**<2-bit palette format without alpha component. Each pixel occupies two bits.*//**<CNcomment:ÎÞAlpha·ÖÁ¿,µ÷É«°å2bit¸ñÊ½,Ã¿¸öÏñÓÃ2¸öbit±íÊ¾ */
-    TDE2_COLOR_FMT_CLUT4,               /**<4-bit palette format without alpha component. Each pixel occupies four bits.*//**<CNcomment:ÎÞAlpha·ÖÁ¿,µ÷É«°å4bit¸ñÊ½,Ã¿¸öÏñÓÃ4¸öbit±íÊ¾ */
-    TDE2_COLOR_FMT_CLUT8,               /**<8-bit palette format without alpha component. Each pixel occupies eight bits.*//**<CNcomment:ÎÞAlpha·ÖÁ¿,µ÷É«°å8bit¸ñÊ½,Ã¿¸öÏñÓÃ8¸öbit±íÊ¾ */
-    TDE2_COLOR_FMT_ACLUT44,             /**<1-bit palette format with alpha component. Each pixel occupies one bit.*//**<CNcomment:ÓÐAlpha·ÖÁ¿,µ÷É«°å1bit¸ñÊ½,Ã¿¸öÏñÓÃ1¸öbit±íÊ¾ */
-    TDE2_COLOR_FMT_ACLUT88,             /**<1-bit palette format with alpha component. Each pixel occupies one bit.*//**<CNcomment:ÓÐAlpha·ÖÁ¿,µ÷É«°å1bit¸ñÊ½,Ã¿¸öÏñÓÃ1¸öbit±íÊ¾ */
-    TDE2_COLOR_FMT_A1,                  /**<Alpha format. Each pixel occupies one bit.*//**<CNcomment:alpha¸ñÊ½£¬Ã¿¸öµãÓÃ1bit */
-    TDE2_COLOR_FMT_A8,                  /**<Alpha format. Each pixel occupies eight bits.*//**<CNcomment:alpha¸ñÊ½£¬Ã¿¸öµãÓÃ8bit */
-    TDE2_COLOR_FMT_YCbCr888,            /**<YUV packet format without alpha component*//**<CNcomment:YUV packet¸ñÊ½£¬ÎÞalpha·ÖÁ¿*/
-    TDE2_COLOR_FMT_AYCbCr8888,          /**<YUV packet format with alpha component*//**<CNcomment:YUV packet¸ñÊ½£¬ÓÐalpha·ÖÁ¿*/
-    TDE2_COLOR_FMT_YCbCr422,            /**<YUV packet422 format*//**<CNcomment:YUV packet422¸ñÊ½ */
-    TDE2_COLOR_FMT_byte,                /**<Only for fast copy*//**<CNcomment:½öÓÃÓÚÊý¾Ý¿ìËÙcopy*/
-    TDE2_COLOR_FMT_halfword,            /**<Only for fast copy*//**<CNcomment:½öÓÃÓÚÊý¾Ý¿ìËÙcopy*/
-    TDE2_COLOR_FMT_JPG_YCbCr400MBP,     /**<Semi-planar YUV400 format, for JPG decoding*//**<CNcomment:Semi-planar YUV400¸ñÊ½ ,¶ÔÓ¦ÓÚJPG½âÂë*/
-    TDE2_COLOR_FMT_JPG_YCbCr422MBHP,    /**<Semi-planar YUV422 format, horizontal sampling, for JPG decoding*//**<CNcomment:Semi-planar YUV422¸ñÊ½,Ë®Æ½·½Ïò²ÉÑù£¬¶ÔÓ¦ÓÚJPG½âÂë */
-    TDE2_COLOR_FMT_JPG_YCbCr422MBVP,    /**<Semi-planar YUV422 format, vertical sampling, for JPG decoding*//**<CNcomment:Semi-planar YUV422¸ñÊ½,´¹Ö±·½Ïò²ÉÑù£¬¶ÔÓ¦ÓÚJPG½âÂë */
-    TDE2_COLOR_FMT_MP1_YCbCr420MBP,     /**<Semi-planar YUV420 format*//**<CNcomment:Semi-planar YUV420¸ñÊ½ */
-    TDE2_COLOR_FMT_MP2_YCbCr420MBP,     /**<Semi-planar YUV420 format*//**<CNcomment:Semi-planar YUV420¸ñÊ½ */
-    TDE2_COLOR_FMT_MP2_YCbCr420MBI,     /**<Semi-planar YUV400 format*//**<CNcomment:Semi-planar YUV400¸ñÊ½ */
-    TDE2_COLOR_FMT_JPG_YCbCr420MBP,     /**<Semi-planar YUV400 format, for JPG decoding*//**<CNcomment:Semi-planar YUV400¸ñÊ½,¶ÔÓÚÓ¦ÓÚJPG */
-    TDE2_COLOR_FMT_JPG_YCbCr444MBP,     /**<Semi-planar YUV444 format*//**<CNcomment:Semi-planar YUV444¸ñÊ½ */
-    TDE2_COLOR_FMT_BUTT                 /**<End of enumeration*//**<CNcomment: Ã¶¾ÙÁ¿½áÊø*/
+    TDE2_COLOR_FMT_RGB444 = 0,          /**<For the RGB444 format, red occupies four bits, green occupies four bits, and blue occupies four bits. Other formats may be deduced by analogy.*//**<CNcomment:RGB444ï¿½ï¿½Ê½, RedÕ¼4bits GreenÕ¼4bits, BlueÕ¼4bits,ï¿½ï¿½ï¿½ï¿½ï¿½Ê½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ */
+    TDE2_COLOR_FMT_BGR444,              /**<BGR444 format*//**<CNcomment:BGR444ï¿½ï¿½Ê½ */    
+    TDE2_COLOR_FMT_RGB555,              /**<RGB555 format*//**<CNcomment:RGB555ï¿½ï¿½Ê½ */
+    TDE2_COLOR_FMT_BGR555,              /**<BGR555 format*//**<CNcomment:BGR555ï¿½ï¿½Ê½ */
+    TDE2_COLOR_FMT_RGB565,              /**<RGB565 format*//**<CNcomment:RGB565ï¿½ï¿½Ê½ */
+    TDE2_COLOR_FMT_BGR565,              /**<BGR565 format*//**<CNcomment:BGR565ï¿½ï¿½Ê½ */
+    TDE2_COLOR_FMT_RGB888,              /**<RGB888 format*//**<CNcomment:RGB888ï¿½ï¿½Ê½ */
+    TDE2_COLOR_FMT_BGR888,              /**<BGR888 format*//**<CNcomment:BGR888ï¿½ï¿½Ê½ */
+    TDE2_COLOR_FMT_ARGB4444,          /**<ARGB4444 format*//**<CNcomment:ARGB4444ï¿½ï¿½Ê½ */
+    TDE2_COLOR_FMT_ABGR4444,           /**<ABGR4444 format*//**<CNcomment:ABGR4444ï¿½ï¿½Ê½ */
+    TDE2_COLOR_FMT_RGBA4444,            /**<RGBA4444 format*//**<CNcomment:RGBA4444ï¿½ï¿½Ê½ */
+    TDE2_COLOR_FMT_BGRA4444,            /**<BGRA4444 format*//**<CNcomment:BGRA4444ï¿½ï¿½Ê½ */
+    TDE2_COLOR_FMT_ARGB1555,            /**<ARGB1555 format*//**<CNcomment:ARGB1555ï¿½ï¿½Ê½ */
+    TDE2_COLOR_FMT_ABGR1555,            /**<ABGR1555 format*//**<CNcomment:ABGR1555ï¿½ï¿½Ê½ */
+    TDE2_COLOR_FMT_RGBA1555,            /**<RGBA1555 format*//**<CNcomment:RGBA1555ï¿½ï¿½Ê½ */
+    TDE2_COLOR_FMT_BGRA1555,            /**<BGRA1555 format*//**<CNcomment:BGRA1555ï¿½ï¿½Ê½ */
+    TDE2_COLOR_FMT_ARGB8565,            /**<ARGB8565 format*//**<CNcomment:ARGB8565ï¿½ï¿½Ê½ */
+    TDE2_COLOR_FMT_ABGR8565,            /**<ABGR8565 format*//**<CNcomment:ABGR8565ï¿½ï¿½Ê½ */
+    TDE2_COLOR_FMT_RGBA8565,            /**<RGBA8565 format*//**<CNcomment:RGBA8565ï¿½ï¿½Ê½ */
+    TDE2_COLOR_FMT_BGRA8565,            /**<BGRA8565 format*//**<CNcomment:BGRA8565ï¿½ï¿½Ê½ */
+    TDE2_COLOR_FMT_ARGB8888,            /**<ARGB8888 format*//**<CNcomment:ARGB8888ï¿½ï¿½Ê½ */
+    TDE2_COLOR_FMT_ABGR8888,            /**<ABGR8888 format*//**<CNcomment:ABGR8888ï¿½ï¿½Ê½ */
+    TDE2_COLOR_FMT_RGBA8888,            /**<RGBA8888 format*//**<CNcomment:RGBA8888ï¿½ï¿½Ê½ */
+    TDE2_COLOR_FMT_BGRA8888,            /**<BGRA8888 format*//**<CNcomment:BGRA8888ï¿½ï¿½Ê½ */
+    TDE2_COLOR_FMT_RABG8888,            /**<RABG8888 format*//**<CNcomment:RABG8888ï¿½ï¿½Ê½ */
+    TDE2_COLOR_FMT_CLUT1,               /**<1-bit palette format without alpha component. Each pixel occupies one bit.*//**<CNcomment:ï¿½ï¿½Alphaï¿½ï¿½ï¿½ï¿½,ï¿½ï¿½É«ï¿½ï¿½1bitï¿½ï¿½Ê½,Ã¿ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½1ï¿½ï¿½bitï¿½ï¿½Ê¾ */
+    TDE2_COLOR_FMT_CLUT2,               /**<2-bit palette format without alpha component. Each pixel occupies two bits.*//**<CNcomment:ï¿½ï¿½Alphaï¿½ï¿½ï¿½ï¿½,ï¿½ï¿½É«ï¿½ï¿½2bitï¿½ï¿½Ê½,Ã¿ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½2ï¿½ï¿½bitï¿½ï¿½Ê¾ */
+    TDE2_COLOR_FMT_CLUT4,               /**<4-bit palette format without alpha component. Each pixel occupies four bits.*//**<CNcomment:ï¿½ï¿½Alphaï¿½ï¿½ï¿½ï¿½,ï¿½ï¿½É«ï¿½ï¿½4bitï¿½ï¿½Ê½,Ã¿ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½4ï¿½ï¿½bitï¿½ï¿½Ê¾ */
+    TDE2_COLOR_FMT_CLUT8,               /**<8-bit palette format without alpha component. Each pixel occupies eight bits.*//**<CNcomment:ï¿½ï¿½Alphaï¿½ï¿½ï¿½ï¿½,ï¿½ï¿½É«ï¿½ï¿½8bitï¿½ï¿½Ê½,Ã¿ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½8ï¿½ï¿½bitï¿½ï¿½Ê¾ */
+    TDE2_COLOR_FMT_ACLUT44,             /**<1-bit palette format with alpha component. Each pixel occupies one bit.*//**<CNcomment:ï¿½ï¿½Alphaï¿½ï¿½ï¿½ï¿½,ï¿½ï¿½É«ï¿½ï¿½1bitï¿½ï¿½Ê½,Ã¿ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½1ï¿½ï¿½bitï¿½ï¿½Ê¾ */
+    TDE2_COLOR_FMT_ACLUT88,             /**<1-bit palette format with alpha component. Each pixel occupies one bit.*//**<CNcomment:ï¿½ï¿½Alphaï¿½ï¿½ï¿½ï¿½,ï¿½ï¿½É«ï¿½ï¿½1bitï¿½ï¿½Ê½,Ã¿ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½1ï¿½ï¿½bitï¿½ï¿½Ê¾ */
+    TDE2_COLOR_FMT_A1,                  /**<Alpha format. Each pixel occupies one bit.*//**<CNcomment:alphaï¿½ï¿½Ê½ï¿½ï¿½Ã¿ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½1bit */
+    TDE2_COLOR_FMT_A8,                  /**<Alpha format. Each pixel occupies eight bits.*//**<CNcomment:alphaï¿½ï¿½Ê½ï¿½ï¿½Ã¿ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½8bit */
+    TDE2_COLOR_FMT_YCbCr888,            /**<YUV packet format without alpha component*//**<CNcomment:YUV packetï¿½ï¿½Ê½ï¿½ï¿½ï¿½ï¿½alphaï¿½ï¿½ï¿½ï¿½*/
+    TDE2_COLOR_FMT_AYCbCr8888,          /**<YUV packet format with alpha component*//**<CNcomment:YUV packetï¿½ï¿½Ê½ï¿½ï¿½ï¿½ï¿½alphaï¿½ï¿½ï¿½ï¿½*/
+    TDE2_COLOR_FMT_YCbCr422, //35           /**<YUV packet422 format*//**<CNcomment:YUV packet422ï¿½ï¿½Ê½ */
+    TDE2_COLOR_FMT_byte,                /**<Only for fast copy*//**<CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ý¿ï¿½ï¿½ï¿½copy*/
+    TDE2_COLOR_FMT_halfword,            /**<Only for fast copy*//**<CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ý¿ï¿½ï¿½ï¿½copy*/
+    TDE2_COLOR_FMT_JPG_YCbCr400MBP,     /**<Semi-planar YUV400 format, for JPG decoding*//**<CNcomment:Semi-planar YUV400ï¿½ï¿½Ê½ ,ï¿½ï¿½Ó¦ï¿½ï¿½JPGï¿½ï¿½ï¿½ï¿½*/
+    TDE2_COLOR_FMT_JPG_YCbCr422MBHP,    /**<Semi-planar YUV422 format, horizontal sampling, for JPG decoding*//**<CNcomment:Semi-planar YUV422ï¿½ï¿½Ê½,Ë®Æ½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó¦ï¿½ï¿½JPGï¿½ï¿½ï¿½ï¿½ */
+    TDE2_COLOR_FMT_JPG_YCbCr422MBVP,    /**<Semi-planar YUV422 format, vertical sampling, for JPG decoding*//**<CNcomment:Semi-planar YUV422ï¿½ï¿½Ê½,ï¿½ï¿½Ö±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó¦ï¿½ï¿½JPGï¿½ï¿½ï¿½ï¿½ */
+    TDE2_COLOR_FMT_MP1_YCbCr420MBP,     /**<Semi-planar YUV420 format*//**<CNcomment:Semi-planar YUV420ï¿½ï¿½Ê½ */
+    TDE2_COLOR_FMT_MP2_YCbCr420MBP,     /**<Semi-planar YUV420 format*//**<CNcomment:Semi-planar YUV420ï¿½ï¿½Ê½ */
+    TDE2_COLOR_FMT_MP2_YCbCr420MBI,     /**<Semi-planar YUV400 format*//**<CNcomment:Semi-planar YUV400ï¿½ï¿½Ê½ */
+    TDE2_COLOR_FMT_JPG_YCbCr420MBP,     /**<Semi-planar YUV400 format, for JPG decoding*//**<CNcomment:Semi-planar YUV400ï¿½ï¿½Ê½,ï¿½ï¿½ï¿½ï¿½Ó¦ï¿½ï¿½JPG */
+    TDE2_COLOR_FMT_JPG_YCbCr444MBP,     /**<Semi-planar YUV444 format*//**<CNcomment:Semi-planar YUV444ï¿½ï¿½Ê½ */
+    TDE2_COLOR_FMT_BUTT                 /**<End of enumeration*//**<CNcomment: Ã¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½*/
 } TDE2_COLOR_FMT_E;
 
 /**Definition of the semi-planar YUV format*/
-/**CNcomment:Semi-planar YUV ¸ñÊ½¶¨Òå */
+/**CNcomment:Semi-planar YUV ï¿½ï¿½Ê½ï¿½ï¿½ï¿½ï¿½ */
 typedef enum hiTDE2_MB_COLORFMT_E
 {
-    TDE2_MB_COLOR_FMT_JPG_YCbCr400MBP = 0,/**<Semi-planar YUV400 format, for JPG decoding*//**<CNcomment:Semi-planar YUV400¸ñÊ½ ,¶ÔÓ¦ÓÚJPG½âÂë*/
-    TDE2_MB_COLOR_FMT_JPG_YCbCr422MBHP,   /**<Semi-planar YUV422 format, horizontal sampling, for JPG decoding*//**<CNcomment:Semi-planar YUV422¸ñÊ½,Ë®Æ½·½Ïò²ÉÑù£¬¶ÔÓ¦ÓÚJPG½âÂë */
-    TDE2_MB_COLOR_FMT_JPG_YCbCr422MBVP,   /**<Semi-planar YUV422 format, vertical sampling, for JPG decoding*//**<CNcomment:Semi-planar YUV422¸ñÊ½,´¹Ö±·½Ïò²ÉÑù£¬¶ÔÓ¦ÓÚJPG½âÂë */
-    TDE2_MB_COLOR_FMT_MP1_YCbCr420MBP,    /**<Semi-planar YUV420 format*//**<CNcomment:Semi-planar YUV420¸ñÊ½ */
-    TDE2_MB_COLOR_FMT_MP2_YCbCr420MBP,    /**<Semi-planar YUV420 format*//**<CNcomment:Semi-planar YUV420¸ñÊ½ */
-    TDE2_MB_COLOR_FMT_MP2_YCbCr420MBI,    /**<Semi-planar YUV400 format*//**<CNcomment:Semi-planar YUV400¸ñÊ½ */
-    TDE2_MB_COLOR_FMT_JPG_YCbCr420MBP,    /**<Semi-planar YUV400 format, for JPG pictures*//**<CNcomment:Semi-planar YUV400¸ñÊ½,¶ÔÓÚÓ¦ÓÚJPG */
-    TDE2_MB_COLOR_FMT_JPG_YCbCr444MBP,    /**<Semi-planar YUV444 format, for JPG pictures*//**<CNcomment:Semi-planar YUV444¸ñÊ½,¶ÔÓÚÓ¦ÓÚJPG */
+    TDE2_MB_COLOR_FMT_JPG_YCbCr400MBP = 0,/**<Semi-planar YUV400 format, for JPG decoding*//**<CNcomment:Semi-planar YUV400ï¿½ï¿½Ê½ ,ï¿½ï¿½Ó¦ï¿½ï¿½JPGï¿½ï¿½ï¿½ï¿½*/
+    TDE2_MB_COLOR_FMT_JPG_YCbCr422MBHP,   /**<Semi-planar YUV422 format, horizontal sampling, for JPG decoding*//**<CNcomment:Semi-planar YUV422ï¿½ï¿½Ê½,Ë®Æ½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó¦ï¿½ï¿½JPGï¿½ï¿½ï¿½ï¿½ */
+    TDE2_MB_COLOR_FMT_JPG_YCbCr422MBVP,   /**<Semi-planar YUV422 format, vertical sampling, for JPG decoding*//**<CNcomment:Semi-planar YUV422ï¿½ï¿½Ê½,ï¿½ï¿½Ö±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó¦ï¿½ï¿½JPGï¿½ï¿½ï¿½ï¿½ */
+    TDE2_MB_COLOR_FMT_MP1_YCbCr420MBP, //3   /**<Semi-planar YUV420 format*//**<CNcomment:Semi-planar YUV420ï¿½ï¿½Ê½ */
+    TDE2_MB_COLOR_FMT_MP2_YCbCr420MBP,    /**<Semi-planar YUV420 format*//**<CNcomment:Semi-planar YUV420ï¿½ï¿½Ê½ */
+    TDE2_MB_COLOR_FMT_MP2_YCbCr420MBI,    /**<Semi-planar YUV400 format*//**<CNcomment:Semi-planar YUV400ï¿½ï¿½Ê½ */
+    TDE2_MB_COLOR_FMT_JPG_YCbCr420MBP,    /**<Semi-planar YUV400 format, for JPG pictures*//**<CNcomment:Semi-planar YUV400ï¿½ï¿½Ê½,ï¿½ï¿½ï¿½ï¿½Ó¦ï¿½ï¿½JPG */
+    TDE2_MB_COLOR_FMT_JPG_YCbCr444MBP, //7   /**<Semi-planar YUV444 format, for JPG pictures*//**<CNcomment:Semi-planar YUV444ï¿½ï¿½Ê½,ï¿½ï¿½ï¿½ï¿½Ó¦ï¿½ï¿½JPG */
     TDE2_MB_COLOR_FMT_BUTT
 } TDE2_MB_COLOR_FMT_E;
 
 /**Structure of the bitmap information set by customers*/
-/**CNcomment:ÓÃ»§ÉèÖÃµÄÎ»Í¼ÐÅÏ¢½á¹¹ */
+/**CNcomment:ï¿½Ã»ï¿½ï¿½ï¿½ï¿½Ãµï¿½Î»Í¼ï¿½ï¿½Ï¢ï¿½á¹¹ */
 typedef struct hiTDE2_SURFACE_S
 {
-    HI_U32 u32PhyAddr;              /**<Header address of a bitmap or the Y component*//**<CNcomment:Î»Í¼Ê×µØÖ·»òY·ÖÁ¿µØÖ· */
+    HI_U32 u32PhyAddr;              /**<Header address of a bitmap or the Y component*//**<CNcomment:Î»Í¼ï¿½×µï¿½Ö·ï¿½ï¿½Yï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö· */
 
-    TDE2_COLOR_FMT_E enColorFmt;    /**<Color format*//**<CNcomment:ÑÕÉ«¸ñÊ½ */
+    TDE2_COLOR_FMT_E enColorFmt;    /**<Color format*//**<CNcomment:ï¿½ï¿½É«ï¿½ï¿½Ê½ */
 
-    HI_U32 u32Height;               /**<Bitmap height*//**<CNcomment:Î»Í¼¸ß¶È */
+    HI_U32 u32Height;               /**<Bitmap height*//**<CNcomment:Î»Í¼ï¿½ß¶ï¿½ */
 
-    HI_U32 u32Width;                /**<Bitmap width*//**<CNcomment:Î»Í¼¿í¶È */
+    HI_U32 u32Width;                /**<Bitmap width*//**<CNcomment:Î»Í¼ï¿½ï¿½ï¿½ */
 
-    HI_U32 u32Stride;               /**<Stride of a bitmap or the Y component*//**<CNcomment:Î»Í¼¿ç¶È»òY·ÖÁ¿¿ç¶È */
-    HI_U8* pu8ClutPhyAddr;          /**<Address of the color look-up table (CLUT), for color extension or color correction*//**<CNcomment:Clut±íµØÖ·,ÓÃ×÷ÑÕÉ«À©Õ¹»òÑÕÉ«Ð£Õý*/
+    HI_U32 u32Stride;               /**<Stride of a bitmap or the Y component*//**<CNcomment:Î»Í¼ï¿½ï¿½È»ï¿½Yï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ */
+    HI_U8* pu8ClutPhyAddr;          /**<Address of the color look-up table (CLUT), for color extension or color correction*//**<CNcomment:Clutï¿½ï¿½ï¿½Ö·,ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½É«ï¿½ï¿½Õ¹ï¿½ï¿½ï¿½ï¿½É«Ð£ï¿½ï¿½*/
 
-    HI_BOOL bYCbCrClut;             /**<Whether the CLUT is in the YCbCr space.*//**<CNcomment:Clut±íÊÇ·ñÎ»ÓÚYCbCr¿Õ¼ä */
+    HI_BOOL bYCbCrClut;             /**<Whether the CLUT is in the YCbCr space.*//**<CNcomment:Clutï¿½ï¿½ï¿½Ç·ï¿½Î»ï¿½ï¿½YCbCrï¿½Õ¼ï¿½ */
 
-    HI_BOOL bAlphaMax255;           /**<The maximum alpha value of a bitmap is 255 or 128.*//**<CNcomment:Î»Í¼alpha×î´óÖµÎª255»¹ÊÇ128 */
+    HI_BOOL bAlphaMax255;           /**<The maximum alpha value of a bitmap is 255 or 128.*//**<CNcomment:Î»Í¼alphaï¿½ï¿½ï¿½ÖµÎª255ï¿½ï¿½ï¿½ï¿½128 */
 
-    HI_BOOL bAlphaExt1555;          /*<Whether to enable the alpha extension of an ARGB1555 bitmap.*//**<CNcomment:ÊÇ·ñÊ¹ÄÜ1555µÄAlphaÀ©Õ¹ */
-    HI_U8 u8Alpha0;                 /**<Values of alpha0 and alpha1, used as the ARGB1555 format*//**<CNcomment:Alpha0¡¢Alpha1Öµ£¬ÓÃ×÷ARGB1555¸ñÊ½ */
-    HI_U8 u8Alpha1;                 /**<Values of alpha0 and alpha1, used as the ARGB1555 format*//**<CNcomment:Alpha0¡¢Alpha1Öµ£¬ÓÃ×÷ARGB1555¸ñÊ½ */
-    HI_U32 u32CbCrPhyAddr;          /**<Address of the CbCr component, pilot*//**<CNcomment:CbCr·ÖÁ¿µØÖ·,pilot */        
-    HI_U32 u32CbCrStride;           /**<Stride of the CbCr component, pilot*//**<CNcomment:CbCr·ÖÁ¿¿ç¶È,pilot */
+    HI_BOOL bAlphaExt1555;          /*<Whether to enable the alpha extension of an ARGB1555 bitmap.*//**<CNcomment:ï¿½Ç·ï¿½Ê¹ï¿½ï¿½1555ï¿½ï¿½Alphaï¿½ï¿½Õ¹ */
+    HI_U8 u8Alpha0;                 /**<Values of alpha0 and alpha1, used as the ARGB1555 format*//**<CNcomment:Alpha0ï¿½ï¿½Alpha1Öµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ARGB1555ï¿½ï¿½Ê½ */
+    HI_U8 u8Alpha1;                 /**<Values of alpha0 and alpha1, used as the ARGB1555 format*//**<CNcomment:Alpha0ï¿½ï¿½Alpha1Öµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ARGB1555ï¿½ï¿½Ê½ */
+    HI_U32 u32CbCrPhyAddr;          /**<Address of the CbCr component, pilot*//**<CNcomment:CbCrï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö·,pilot */        
+    HI_U32 u32CbCrStride;           /**<Stride of the CbCr component, pilot*//**<CNcomment:CbCrï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½,pilot */
 } TDE2_SURFACE_S;
 
 /**Definition of the semi-planar YUV data*/
-/**CNcomment:Semi-planar YUV¸ñÊ½Êý¾Ý¶¨Òå */
+/**CNcomment:Semi-planar YUVï¿½ï¿½Ê½ï¿½ï¿½Ý¶ï¿½ï¿½ï¿½ */
 typedef struct hiTDE2_MB_S
 {
-    TDE2_MB_COLOR_FMT_E enMbFmt;        /**<YUV format*//**<CNcomment:YUV¸ñÊ½ */
-    HI_U32              u32YPhyAddr;    /**<Physical address of the Y component*//**<CNcomment:Y·ÖÁ¿ÎïÀíµØÖ· */
-    HI_U32              u32YWidth;      /**<Width of the Y component*//**<CNcomment:Y·ÖÁ¿¿í¶È */
-    HI_U32              u32YHeight;     /**<Height of the Y component*//**<CNcomment:Y·ÖÁ¿¸ß¶È */
-    HI_U32              u32YStride;     /**< Stride of the Y component, indicating bytes in each row*//**<CNcomment:Y·ÖÁ¿¿ç¶È£¬Ã¿ÐÐ×Ö½ÚÊý */
-    HI_U32              u32CbCrPhyAddr; /**<Width of the UV component*//**<CNcomment:UV·ÖÁ¿¿í¶È */
-    HI_U32              u32CbCrStride;  /**<Stride of the UV component, indicating the bytes in each row*//**<CNcomment:UV·ÖÁ¿¿ç¶È,Ã¿ÐÐ×Ö½ÚÊý */
+    TDE2_MB_COLOR_FMT_E enMbFmt;        /**<YUV format*//**<CNcomment:YUVï¿½ï¿½Ê½ */
+    HI_U32              u32YPhyAddr;    /**<Physical address of the Y component*//**<CNcomment:Yï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö· */
+    HI_U32              u32YWidth;      /**<Width of the Y component*//**<CNcomment:Yï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ */
+    HI_U32              u32YHeight;     /**<Height of the Y component*//**<CNcomment:Yï¿½ï¿½ï¿½ï¿½ï¿½ß¶ï¿½ */
+    HI_U32              u32YStride;     /**< Stride of the Y component, indicating bytes in each row*//**<CNcomment:Yï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È£ï¿½Ã¿ï¿½ï¿½ï¿½Ö½ï¿½ï¿½ï¿½ */
+    HI_U32              u32CbCrPhyAddr; /**<Width of the UV component*//**<CNcomment:UVï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ */
+    HI_U32              u32CbCrStride;  /**<Stride of the UV component, indicating the bytes in each row*//**<CNcomment:UVï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½,Ã¿ï¿½ï¿½ï¿½Ö½ï¿½ï¿½ï¿½ */
 } TDE2_MB_S;
 
 /**Definition of the TDE rectangle*/
-/**CNcomment:TDE¾ØÐÎ¶¨Òå*/
+/**CNcomment:TDEï¿½ï¿½ï¿½Î¶ï¿½ï¿½ï¿½*/
 typedef struct hiTDE2_RECT_S
 {
-    HI_S32 s32Xpos;     /**<Horizontal coordinate*//**<CNcomment:x×ø±ê */
-    HI_S32 s32Ypos;     /**<Vertical coordinate*//**<CNcomment:y×ø±ê */
-    HI_U32 u32Width;    /**<Width*//**<CNcomment:¿í¶È */
-    HI_U32 u32Height;   /**<Height*//**<CNcomment:¸ß¶È */
+    HI_S32 s32Xpos;     /**<Horizontal coordinate*//**<CNcomment:xï¿½ï¿½ï¿½ */
+    HI_S32 s32Ypos;     /**<Vertical coordinate*//**<CNcomment:yï¿½ï¿½ï¿½ */
+    HI_U32 u32Width;    /**<Width*//**<CNcomment:ï¿½ï¿½ï¿½ */
+    HI_U32 u32Height;   /**<Height*//**<CNcomment:ï¿½ß¶ï¿½ */
 } TDE2_RECT_S;
 
 /**Logical operation type*/
-/**CNcomment:Âß¼­ÔËËã·½Ê½ */
+/**CNcomment:ï¿½ß¼ï¿½ï¿½ï¿½ï¿½ã·½Ê½ */
 typedef enum hiTDE2_ALUCMD_E
 {
-    TDE2_ALUCMD_NONE = 0x0,         /**<No alpha and raster of operation (ROP) blending*//**<CNcomment:²»½øÐÐalphaºÍropµþ¼Ó */    
-    TDE2_ALUCMD_BLEND = 0x1,        /**<Alpha blending*//**<CNcomment:Alpha»ìºÏ*/
-    TDE2_ALUCMD_ROP = 0x2,          /**<ROP blending*//**<CNcomment:½øÐÐropµþ¼Ó */
-    TDE2_ALUCMD_COLORIZE = 0x4,     /**<Colorize operation*//**<CNcomment:½øÐÐColorize²Ù×÷ */
-    TDE2_ALUCMD_BUTT = 0x8          /**<End of enumeration*//**<CNcomment:Ã¶¾Ù½áÊø */
+    TDE2_ALUCMD_NONE = 0x0,         /**<No alpha and raster of operation (ROP) blending*//**<CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½alphaï¿½ï¿½ropï¿½ï¿½ï¿½ï¿½ */    
+    TDE2_ALUCMD_BLEND = 0x1,        /**<Alpha blending*//**<CNcomment:Alphaï¿½ï¿½ï¿½*/
+    TDE2_ALUCMD_ROP = 0x2,          /**<ROP blending*//**<CNcomment:ï¿½ï¿½ï¿½ï¿½ropï¿½ï¿½ï¿½ï¿½ */
+    TDE2_ALUCMD_COLORIZE = 0x4,     /**<Colorize operation*//**<CNcomment:ï¿½ï¿½ï¿½ï¿½Colorizeï¿½ï¿½ï¿½ï¿½ */
+    TDE2_ALUCMD_BUTT = 0x8          /**<End of enumeration*//**<CNcomment:Ã¶ï¿½Ù½ï¿½ï¿½ï¿½ */
 } TDE2_ALUCMD_E;
 
 /**Definition of ROP codes*/
-/**CNcomment:ROP²Ù×÷Âë¶¨Òå */
+/**CNcomment:ROPï¿½ï¿½ï¿½ï¿½ï¿½ë¶¨ï¿½ï¿½ */
 typedef enum hiTDE2_ROP_CODE_E
 {
     TDE2_ROP_BLACK = 0,     /**<Blackness*/
@@ -199,122 +199,122 @@ typedef enum hiTDE2_ROP_CODE_E
 } TDE2_ROP_CODE_E;
 
 /**Definition of the blit mirror*/
-/**CNcomment:blit¾µÏñ¶¨Òå */
+/**CNcomment:blitï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ */
 typedef enum hiTDE2_MIRROR_E
 {
-    TDE2_MIRROR_NONE = 0,       /**<No mirror*//**<CNcomment:²»½øÐÐ¾µÏñ */
-    TDE2_MIRROR_HORIZONTAL,     /**<Horizontal mirror*//**<CNcomment:Ë®Æ½¾µÏñ */
-    TDE2_MIRROR_VERTICAL,       /**<Vertical mirror*//**<CNcomment:´¹Ö±¾µÏñ */
-    TDE2_MIRROR_BOTH,           /**<Horizontal and vertical mirror*//**<CNcomment:´¹Ö±ºÍË®Æ½¾µÏñ */
+    TDE2_MIRROR_NONE = 0,       /**<No mirror*//**<CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½Ð¾ï¿½ï¿½ï¿½ */
+    TDE2_MIRROR_HORIZONTAL,     /**<Horizontal mirror*//**<CNcomment:Ë®Æ½ï¿½ï¿½ï¿½ï¿½ */
+    TDE2_MIRROR_VERTICAL,       /**<Vertical mirror*//**<CNcomment:ï¿½ï¿½Ö±ï¿½ï¿½ï¿½ï¿½ */
+    TDE2_MIRROR_BOTH,           /**<Horizontal and vertical mirror*//**<CNcomment:ï¿½ï¿½Ö±ï¿½ï¿½Ë®Æ½ï¿½ï¿½ï¿½ï¿½ */
     TDE2_MIRROR_BUTT
 } TDE2_MIRROR_E;
 
 /**Clip operation type*/
-/**CNcomment:Clip²Ù×÷ÀàÐÍ*/
+/**CNcomment:Clipï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½*/
 typedef enum hiTDE2_CLIPMODE_E
 {
-    TDE2_CLIPMODE_NONE = 0, /**<No clip*//**<CNcomment:ÎÞclip²Ù×÷ */
-    TDE2_CLIPMODE_INSIDE,   /**<Clip the data within the rectangle to output and discard others*//**<CNcomment:¼ôÇÐ¾ØÐÎ·¶Î§ÄÚµÄÊý¾ÝÊä³ö,ÆäÓàÈÓµô*/
-    TDE2_CLIPMODE_OUTSIDE,  /**<Clip the data outside the rectangle to output and discard others*//**<CNcomment:¼ôÇÐ¾ØÐÎ·¶Î§ÍâµÄÊý¾ÝÊä³ö£¬ÆäÓàÈÓµô*/
+    TDE2_CLIPMODE_NONE = 0, /**<No clip*//**<CNcomment:ï¿½ï¿½clipï¿½ï¿½ï¿½ï¿½ */
+    TDE2_CLIPMODE_INSIDE, //1  /**<Clip the data within the rectangle to output and discard others*//**<CNcomment:ï¿½ï¿½ï¿½Ð¾ï¿½ï¿½Î·ï¿½Î§ï¿½Úµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½,ï¿½ï¿½ï¿½ï¿½ï¿½Óµï¿½*/
+    TDE2_CLIPMODE_OUTSIDE,  /**<Clip the data outside the rectangle to output and discard others*//**<CNcomment:ï¿½ï¿½ï¿½Ð¾ï¿½ï¿½Î·ï¿½Î§ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Óµï¿½*/
     TDE2_CLIPMODE_BUTT
 } TDE2_CLIPMODE_E;
 
 /**Scaling mode for the macroblock*/
-/**CNcomment:ºê¿é¸ñÊ½Ëõ·ÅÀàÐÍ*/
+/**CNcomment:ï¿½ï¿½ï¿½ï¿½Ê½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½*/
 typedef enum hiTDE2_MBRESIZE_E
 {
-    TDE2_MBRESIZE_NONE = 0,         /**<No scaling*//**<CNcomment:²»×öËõ·Å */
-    TDE2_MBRESIZE_QUALITY_LOW,      /**<Low-quality scaling*//**<CNcomment:µÍÖÊÁ¿Ëõ·Å */
-    TDE2_MBRESIZE_QUALITY_MIDDLE,   /**<Medium-quality scaling*//**<CNcomment:ÖÐÖÊÁ¿Ëõ·Å */
-    TDE2_MBRESIZE_QUALITY_HIGH,     /**<High-quality scaling*//**<CNcomment:¸ßÖÊÁ¿Ëõ·Å */
+    TDE2_MBRESIZE_NONE = 0,         /**<No scaling*//**<CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ */
+    TDE2_MBRESIZE_QUALITY_LOW, //1     /**<Low-quality scaling*//**<CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ */
+    TDE2_MBRESIZE_QUALITY_MIDDLE, //2  /**<Medium-quality scaling*//**<CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ */
+    TDE2_MBRESIZE_QUALITY_HIGH, //3    /**<High-quality scaling*//**<CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ */
     TDE2_MBRESIZE_BUTT
 } TDE2_MBRESIZE_E;
 
 /**Definition of fill colors*/
-/**CNcomment:Ìî³äÉ«¶¨Òå */
+/**CNcomment:ï¿½ï¿½ï¿½É«ï¿½ï¿½ï¿½ï¿½ */
 typedef struct hiTDE2_FILLCOLOR_S
 {
-    TDE2_COLOR_FMT_E enColorFmt;    /**<TDE pixel format*//**<CNcomment:TDEÏñËØ¸ñÊ½ */
-    HI_U32           u32FillColor;  /**<Fill colors that vary according to pixel formats*//**<CNcomment:Ìî³äÑÕÉ«£¬¸ù¾ÝÏñËØ¸ñÊ½¶ø²»Í¬ */
+    TDE2_COLOR_FMT_E enColorFmt;    /**<TDE pixel format*//**<CNcomment:TDEï¿½ï¿½ï¿½Ø¸ï¿½Ê½ */
+    HI_U32           u32FillColor;  /**<Fill colors that vary according to pixel formats*//**<CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½É«ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ø¸ï¿½Ê½ï¿½ï¿½Í¬ */
 } TDE2_FILLCOLOR_S;
 
 /**Definition of colorkey modes*/
-/**CNcomment:colorkeyÑ¡Ôñ·½Ïò¶¨Òå */
+/**CNcomment:colorkeyÑ¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ */
 typedef enum hiTDE2_COLORKEY_MODE_E
 {
-    TDE2_COLORKEY_MODE_NONE = 0,     /**<No colorkey*//**<CNcomment:²»×öcolor key */
-    TDE2_COLORKEY_MODE_FOREGROUND,   /**<When performing the colorkey operation on the foreground bitmap, you need to perform this operation before the CLUT for color extension and perform this operation after the CLUT for color correction.*//**<CNcomment:¶ÔÇ°¾°Î»Í¼½øÐÐcolor key£¬ËµÃ÷:¶ÔÓÚÑÕÉ«À©Õ¹£¬ÔÚCLUTÇ°×öcolor key£»¶ÔÓÚÑÕÉ«Ð£Õý:ÔÚCLUTºó×öcolor key */
-    TDE2_COLORKEY_MODE_BACKGROUND,   /**<Perform the colorkey operation on the background bitmap*//**<CNcomment:¶Ô±³¾°Î»Í¼½øÐÐcolor key*/
+    TDE2_COLORKEY_MODE_NONE = 0,     /**<No colorkey*//**<CNcomment:ï¿½ï¿½ï¿½ï¿½color key */
+    TDE2_COLORKEY_MODE_FOREGROUND, //1  /**<When performing the colorkey operation on the foreground bitmap, you need to perform this operation before the CLUT for color extension and perform this operation after the CLUT for color correction.*//**<CNcomment:ï¿½ï¿½Ç°ï¿½ï¿½Î»Í¼ï¿½ï¿½ï¿½ï¿½color keyï¿½ï¿½Ëµï¿½ï¿½:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½É«ï¿½ï¿½Õ¹ï¿½ï¿½ï¿½ï¿½CLUTÇ°ï¿½ï¿½color keyï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½É«Ð£ï¿½ï¿½:ï¿½ï¿½CLUTï¿½ï¿½ï¿½ï¿½color key */
+    TDE2_COLORKEY_MODE_BACKGROUND, //2  /**<Perform the colorkey operation on the background bitmap*//**<CNcomment:ï¿½Ô±ï¿½ï¿½ï¿½Î»Í¼ï¿½ï¿½ï¿½ï¿½color key*/
     TDE2_COLORKEY_MODE_BUTT
 } TDE2_COLORKEY_MODE_E;
 
 /**Definition of colorkey range*/
-/**CNcomment:colorkey·¶Î§¶¨Òå */
+/**CNcomment:colorkeyï¿½ï¿½Î§ï¿½ï¿½ï¿½ï¿½ */
 typedef struct hiTDE2_COLORKEY_COMP_S
 {
-    HI_U8 u8CompMin;           /**<Minimum value of a component*//**<CNcomment:·ÖÁ¿×îÐ¡Öµ*/
-    HI_U8 u8CompMax;           /**<Maximum value of a component*//**<CNcomment:·ÖÁ¿×î´óÖµ*/
-    HI_U8 bCompOut;            /**<The colorkey of a component is within or beyond the range.*//**<CNcomment:·ÖÁ¿¹Ø¼üÉ«ÔÚ·¶Î§ÄÚ/·¶Î§Íâ*/
-    HI_U8 bCompIgnore;         /**<Whether to ignore a component.*//**<CNcomment:·ÖÁ¿ÊÇ·ñºöÂÔ*/
-    HI_U8 u8CompMask;          /**<Component mask*//**<CNcomment:·ÖÁ¿ÑÚÂë*/
+    HI_U8 u8CompMin;           /**<Minimum value of a component*//**<CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð¡Öµ*/
+    HI_U8 u8CompMax;           /**<Maximum value of a component*//**<CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Öµ*/
+    HI_U8 bCompOut;            /**<The colorkey of a component is within or beyond the range.*//**<CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½Ø¼ï¿½É«ï¿½Ú·ï¿½Î§ï¿½ï¿½/ï¿½ï¿½Î§ï¿½ï¿½*/
+    HI_U8 bCompIgnore;         /**<Whether to ignore a component.*//**<CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ï¿½ï¿½ï¿½*/
+    HI_U8 u8CompMask;          /**<Component mask*//**<CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½*/
     HI_U8 u8Reserved;
     HI_U8 u8Reserved1;
     HI_U8 u8Reserved2;
 } TDE2_COLORKEY_COMP_S;
 
 /**Definition of colorkey values*/
-/**CNcomment:colorkeyÖµ¶¨Òå */
+/**CNcomment:colorkeyÖµï¿½ï¿½ï¿½ï¿½ */
 typedef union hiTDE2_COLORKEY_U
 {
     struct
     {
-        TDE2_COLORKEY_COMP_S stAlpha;   /**<Alpha component*//**<CNcomment:alpha ·ÖÁ¿ÐÅÏ¢ */
-        TDE2_COLORKEY_COMP_S stRed;     /**<Red component*//**<CNcomment:ºìÉ«·ÖÁ¿ÐÅÏ¢ */
-        TDE2_COLORKEY_COMP_S stGreen;   /**<Green component*//**<CNcomment:ÂÌÉ«·ÖÁ¿ÐÅÏ¢ */
-        TDE2_COLORKEY_COMP_S stBlue;    /**<Blue component*//**<CNcomment:À¶É«·ÖÁ¿ÐÅÏ¢ */
+        TDE2_COLORKEY_COMP_S stAlpha;   /**<Alpha component*//**<CNcomment:alpha ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ */
+        TDE2_COLORKEY_COMP_S stRed;     /**<Red component*//**<CNcomment:ï¿½ï¿½É«ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ */
+        TDE2_COLORKEY_COMP_S stGreen;   /**<Green component*//**<CNcomment:ï¿½ï¿½É«ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ */
+        TDE2_COLORKEY_COMP_S stBlue;    /**<Blue component*//**<CNcomment:ï¿½ï¿½É«ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ */
     } struCkARGB;
     struct
     {
-        TDE2_COLORKEY_COMP_S stAlpha;   /**<Alpha component*//**<CNcomment:alpha ·ÖÁ¿ÐÅÏ¢ */
-        TDE2_COLORKEY_COMP_S stY;       /**<Y component*//**<CNcomment:Y·ÖÁ¿ÐÅÏ¢ */
-        TDE2_COLORKEY_COMP_S stCb;      /**<Cb component*//**<CNcomment:Cb·ÖÁ¿ÐÅÏ¢ */
-        TDE2_COLORKEY_COMP_S stCr;      /**<Cr component*//**<CNcomment:Cr·ÖÁ¿ÐÅÏ¢ */
+        TDE2_COLORKEY_COMP_S stAlpha;   /**<Alpha component*//**<CNcomment:alpha ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ */
+        TDE2_COLORKEY_COMP_S stY;       /**<Y component*//**<CNcomment:Yï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ */
+        TDE2_COLORKEY_COMP_S stCb;      /**<Cb component*//**<CNcomment:Cbï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ */
+        TDE2_COLORKEY_COMP_S stCr;      /**<Cr component*//**<CNcomment:Crï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ */
     } struCkYCbCr;
     struct
     {
-        TDE2_COLORKEY_COMP_S stAlpha;   /**<Alpha component*//**<CNcomment:alpha ·ÖÁ¿ÐÅÏ¢ */
-        TDE2_COLORKEY_COMP_S stClut;    /**<Palette component*//**<CNcomment:µ÷É«°å·ÖÁ¿ÐÅÏ¢ */
+        TDE2_COLORKEY_COMP_S stAlpha;   /**<Alpha component*//**<CNcomment:alpha ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ */
+        TDE2_COLORKEY_COMP_S stClut;    /**<Palette component*//**<CNcomment:ï¿½ï¿½É«ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ */
     } struCkClut;
 } TDE2_COLORKEY_U;
 
 /*Definition of alpha output sources*/
-/**CNcomment:Êä³öalpha¶¨Òå */
+/**CNcomment:ï¿½ï¿½ï¿½alphaï¿½ï¿½ï¿½ï¿½ */
 typedef enum hiTDE2_OUTALPHA_FROM_E
 {
-    TDE2_OUTALPHA_FROM_NORM = 0,    /**<Output from the result of alpha blending or anti-flicker*//**<CNcomment:À´Ô´ÓÚalpha blendingµÄ½á¹û»òÕß¿¹ÉÁË¸µÄ½á¹û */
-    TDE2_OUTALPHA_FROM_BACKGROUND,  /**<Output from the background bitmap*//**<CNcomment:À´Ô´ÓÚ±³¾°Î»Í¼ */
-    TDE2_OUTALPHA_FROM_FOREGROUND,  /**<Output from the foreground bitmap*//**<CNcomment:À´Ô´ÓÚÇ°¾°Î»Í¼ */
-    TDE2_OUTALPHA_FROM_GLOBALALPHA, /**<Output from the global alpha*//**<CNcomment:À´Ô´ÓÚÈ«¾Öalpha */
+    TDE2_OUTALPHA_FROM_NORM = 0,    /**<Output from the result of alpha blending or anti-flicker*//**<CNcomment:ï¿½ï¿½Ô´ï¿½ï¿½alpha blendingï¿½Ä½ï¿½ï¿½ï¿½ï¿½ß¿ï¿½ï¿½ï¿½Ë¸ï¿½Ä½ï¿½ï¿½ */
+    TDE2_OUTALPHA_FROM_BACKGROUND, //1 /**<Output from the background bitmap*//**<CNcomment:ï¿½ï¿½Ô´ï¿½Ú±ï¿½ï¿½ï¿½Î»Í¼ */
+    TDE2_OUTALPHA_FROM_FOREGROUND, //2 /**<Output from the foreground bitmap*//**<CNcomment:ï¿½ï¿½Ô´ï¿½ï¿½Ç°ï¿½ï¿½Î»Í¼ */
+    TDE2_OUTALPHA_FROM_GLOBALALPHA, //3 /**<Output from the global alpha*//**<CNcomment:ï¿½ï¿½Ô´ï¿½ï¿½È«ï¿½ï¿½alpha */
     TDE2_OUTALPHA_FROM_BUTT
 } TDE2_OUTALPHA_FROM_E;
 
 /**Definition of filtering*/
-/**CNcomment:Ëõ·ÅÂË²¨¶¨Òå */
+/**CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½Ë²ï¿½ï¿½ï¿½ï¿½ï¿½ */
 typedef enum hiTDE2_FILTER_MODE_E
 {
-    TDE2_FILTER_MODE_COLOR = 0, /**<Filter the color*//**<CNcomment:¶ÔÑÕÉ«½øÐÐÂË²¨ */
-    TDE2_FILTER_MODE_ALPHA,     /**<Filter the alpha channel*//**<CNcomment:¶ÔalphaÍ¨µÀÂË²¨ */
-    TDE2_FILTER_MODE_BOTH,      /**<Filter the color and alpha channel*//**<CNcomment:¶ÔÑÕÉ«ºÍalphaÍ¨µÀÍ¬Ê±ÂË²¨ */
+    TDE2_FILTER_MODE_COLOR = 0, /**<Filter the color*//**<CNcomment:ï¿½ï¿½ï¿½ï¿½É«ï¿½ï¿½ï¿½ï¿½ï¿½Ë²ï¿½ */
+    TDE2_FILTER_MODE_ALPHA,     /**<Filter the alpha channel*//**<CNcomment:ï¿½ï¿½alphaÍ¨ï¿½ï¿½ï¿½Ë²ï¿½ */
+    TDE2_FILTER_MODE_BOTH,      /**<Filter the color and alpha channel*//**<CNcomment:ï¿½ï¿½ï¿½ï¿½É«ï¿½ï¿½alphaÍ¨ï¿½ï¿½Í¬Ê±ï¿½Ë²ï¿½ */
     TDE2_FILTER_MODE_BUTT
 } TDE2_FILTER_MODE_E;
 
 /**Configuration of the anti-flicker channel*/
-/**CNcomment:¿¹ÉÁË¸´¦ÀíÍ¨µÀÅäÖÃ */
+/**CNcomment:ï¿½ï¿½ï¿½ï¿½Ë¸ï¿½ï¿½ï¿½ï¿½Í¨ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ */
 typedef enum hiTDE2_DEFLICKER_MODE_E
 {
-    TDE2_DEFLICKER_MODE_NONE = 0,   /*<No anti-flicker*//**<CNcomment:²»×ö¿¹ÉÁ */
-    TDE2_DEFLICKER_MODE_RGB,        /**<Perform anti-flicker on the RGB component*//**<CNcomment:RGB·ÖÁ¿¿¹ÉÁ */
-    TDE2_DEFLICKER_MODE_BOTH,       /**<Perform anti-flicker on the alpha component*//**<CNcomment:alpha·ÖÁ¿¿¹ÉÁ */
+    TDE2_DEFLICKER_MODE_NONE = 0,   /*<No anti-flicker*//**<CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ */
+    TDE2_DEFLICKER_MODE_RGB,        /**<Perform anti-flicker on the RGB component*//**<CNcomment:RGBï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ */
+    TDE2_DEFLICKER_MODE_BOTH,       /**<Perform anti-flicker on the alpha component*//**<CNcomment:alphaï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ */
     TDE2_DEFLICKER_MODE_BUTT
 }TDE2_DEFLICKER_MODE_E;
 
@@ -336,7 +336,7 @@ typedef enum hiTDE2_BLEND_MODE_E
 }TDE2_BLEND_MODE_E;
 
 /**Alpha blending command. You can set parameters or select Porter or Duff.*/
-/**CNcomment:alpha»ìºÏÃüÁî,¿ÉÒÔÑ¡Ôñ×Ô¼ºÅäÖÃ²ÎÊý£¬Ò²¿ÉÒÔÑ¡ÔñPorter/DuffÖÐµÄÒ»ÖÖ */
+/**CNcomment:alphaï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½,ï¿½ï¿½ï¿½ï¿½Ñ¡ï¿½ï¿½ï¿½Ô¼ï¿½ï¿½ï¿½ï¿½Ã²ï¿½ï¿½ï¿½Ò²ï¿½ï¿½ï¿½ï¿½Ñ¡ï¿½ï¿½Porter/Duffï¿½Ðµï¿½Ò»ï¿½ï¿½ */
 /* pixel = (source * fs + destination * fd),
    sa = source alpha,
    da = destination alpha */
@@ -356,66 +356,66 @@ typedef enum hiTDE2_BLENDCMD_E
     TDE2_BLENDCMD_ADD,      /**< fs: 1.0     fd: 1.0 */
     TDE2_BLENDCMD_XOR,      /**< fs: 1.0-da  fd: 1.0-sa */
     TDE2_BLENDCMD_DST,      /**< fs: 0.0     fd: 1.0 */
-    TDE2_BLENDCMD_CONFIG,   /**<You can set the parameteres.*//**<CNcomment:ÓÃ»§×Ô¼ºÅäÖÃ²ÎÊý*/
+    TDE2_BLENDCMD_CONFIG, //14  /**<You can set the parameteres.*//**<CNcomment:ï¿½Ã»ï¿½ï¿½Ô¼ï¿½ï¿½ï¿½ï¿½Ã²ï¿½ï¿½ï¿½*/
     TDE2_BLENDCMD_BUTT
 }TDE2_BLENDCMD_E;
 
 /**Options for the alpha blending operation*/
-/**CNcomment:alpha»ìºÏ²Ù×÷Ñ¡Ïî */
+/**CNcomment:alphaï¿½ï¿½Ï²ï¿½ï¿½ï¿½Ñ¡ï¿½ï¿½ */
 typedef struct hiTDE2_BLEND_OPT_S
 {
-    HI_BOOL  bGlobalAlphaEnable;        /**<Global alpha enable*//**<CNcomment:ÊÇ·ñÊ¹ÄÜÈ«¾Öalpha */
-    HI_BOOL  bPixelAlphaEnable;         /**<Pixel alpha enable*//**<CNcomment:ÊÇ·ñÊ¹ÄÜÏóËØalpha */
-    HI_BOOL bSrc1AlphaPremulti;         /**<Src1 alpha premultiply enable*//**<CNcomment:ÊÇ·ñÊ¹ÄÜSrc1 alphaÔ¤³Ë */
-    HI_BOOL bSrc2AlphaPremulti;         /**<Src2 alpha premultiply enable*//**<CNcomment:ÊÇ·ñÊ¹ÄÜSrc2 alphaÔ¤³Ë */
-    TDE2_BLENDCMD_E eBlendCmd;          /**<Alpha blending command*//**<CNcomment:alpha»ìºÏÃüÁî*/    
-    TDE2_BLEND_MODE_E eSrc1BlendMode;   /**<Src1 blending mode select. It is valid when eBlendCmd is set to TDE2_BLENDCMD_CONFIG.*//**<CNcomment:Src1 blendÄ£Ê½Ñ¡Ôñ,ÔÚeBlendCmd = TDE2_BLENDCMD_CONFIGÊ±ÓÐÐ§ */
-    TDE2_BLEND_MODE_E eSrc2BlendMode;   /**<Src2 blending mode select. It is valid when eBlendCmd is set to TDE2_BLENDCMD_CONFIG.*//**<CNcomment:Src2 blendÄ£Ê½Ñ¡Ôñ,ÔÚeBlendCmd = TDE2_BLENDCMD_CONFIGÊ±ÓÐÐ§ */
+    HI_BOOL  bGlobalAlphaEnable;        /**<Global alpha enable*//**<CNcomment:ï¿½Ç·ï¿½Ê¹ï¿½ï¿½È«ï¿½ï¿½alpha */
+    HI_BOOL  bPixelAlphaEnable;         /**<Pixel alpha enable*//**<CNcomment:ï¿½Ç·ï¿½Ê¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½alpha */
+    HI_BOOL bSrc1AlphaPremulti;         /**<Src1 alpha premultiply enable*//**<CNcomment:ï¿½Ç·ï¿½Ê¹ï¿½ï¿½Src1 alphaÔ¤ï¿½ï¿½ */
+    HI_BOOL bSrc2AlphaPremulti;         /**<Src2 alpha premultiply enable*//**<CNcomment:ï¿½Ç·ï¿½Ê¹ï¿½ï¿½Src2 alphaÔ¤ï¿½ï¿½ */
+    TDE2_BLENDCMD_E eBlendCmd;          /**<Alpha blending command*//**<CNcomment:alphaï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½*/    
+    TDE2_BLEND_MODE_E eSrc1BlendMode;   /**<Src1 blending mode select. It is valid when eBlendCmd is set to TDE2_BLENDCMD_CONFIG.*//**<CNcomment:Src1 blendÄ£Ê½Ñ¡ï¿½ï¿½,ï¿½ï¿½eBlendCmd = TDE2_BLENDCMD_CONFIGÊ±ï¿½ï¿½Ð§ */
+    TDE2_BLEND_MODE_E eSrc2BlendMode;   /**<Src2 blending mode select. It is valid when eBlendCmd is set to TDE2_BLENDCMD_CONFIG.*//**<CNcomment:Src2 blendÄ£Ê½Ñ¡ï¿½ï¿½,ï¿½ï¿½eBlendCmd = TDE2_BLENDCMD_CONFIGÊ±ï¿½ï¿½Ð§ */
 }TDE2_BLEND_OPT_S;
 
 /**CSC parameter option*/
-/**CNcomment:CSC²ÎÊýÑ¡Ïî*/
+/**CNcomment:CSCï¿½ï¿½ï¿½ï¿½Ñ¡ï¿½ï¿½*/
 typedef struct hiTDE2_CSC_OPT_S
 {
-    HI_BOOL bICSCUserEnable;		/**User-defined ICSC parameter enable*//**CNcomment:ÓÃ»§×Ô¶¨ÒåICSC²ÎÊýÊ¹ÄÜ*/
-    HI_BOOL bICSCParamReload;	/**User-defined ICSC parameter reload enable*//**CNcomment:ÖØÐÂ¼ÓÔØÓÃ»§×Ô¶¨ÒåICSC²ÎÊýÊ¹ÄÜ*/
-    HI_BOOL bOCSCUserEnable;		/**User-defined OCSC parameter enable*//**CNcomment:ÓÃ»§×Ô¶¨ÒåOCSC²ÎÊýÊ¹ÄÜ*/
-    HI_BOOL bOCSCParamReload;	/**User-defined OCSC parameter reload enable*//**CNcomment:ÖØÐÂ¼ÓÔØÓÃ»§×Ô¶¨ÒåOCSC²ÎÊýÊ¹ÄÜ*/
-    HI_U32 u32ICSCParamAddr;		/**ICSC parameter address. The address must be 128-bit aligned.*//**CNcomment:ICSC²ÎÊýµØÖ·£¬ÒªÇó128bit¶ÔÆë*/
-    HI_U32 u32OCSCParamAddr;	/**OCSC parameter address. The address must be 128-bit aligned.*//**CNcomment:OCSC²ÎÊýµØÖ·£¬ÒªÇó128bit¶ÔÆë*/
+    HI_BOOL bICSCUserEnable;		/**User-defined ICSC parameter enable*//**CNcomment:ï¿½Ã»ï¿½ï¿½Ô¶ï¿½ï¿½ï¿½ICSCï¿½ï¿½ï¿½ï¿½Ê¹ï¿½ï¿½*/
+    HI_BOOL bICSCParamReload;	/**User-defined ICSC parameter reload enable*//**CNcomment:ï¿½ï¿½ï¿½Â¼ï¿½ï¿½ï¿½ï¿½Ã»ï¿½ï¿½Ô¶ï¿½ï¿½ï¿½ICSCï¿½ï¿½ï¿½ï¿½Ê¹ï¿½ï¿½*/
+    HI_BOOL bOCSCUserEnable;		/**User-defined OCSC parameter enable*//**CNcomment:ï¿½Ã»ï¿½ï¿½Ô¶ï¿½ï¿½ï¿½OCSCï¿½ï¿½ï¿½ï¿½Ê¹ï¿½ï¿½*/
+    HI_BOOL bOCSCParamReload;	/**User-defined OCSC parameter reload enable*//**CNcomment:ï¿½ï¿½ï¿½Â¼ï¿½ï¿½ï¿½ï¿½Ã»ï¿½ï¿½Ô¶ï¿½ï¿½ï¿½OCSCï¿½ï¿½ï¿½ï¿½Ê¹ï¿½ï¿½*/
+    HI_U32 u32ICSCParamAddr;		/**ICSC parameter address. The address must be 128-bit aligned.*//**CNcomment:ICSCï¿½ï¿½ï¿½ï¿½ï¿½Ö·ï¿½ï¿½Òªï¿½ï¿½128bitï¿½ï¿½ï¿½ï¿½*/
+    HI_U32 u32OCSCParamAddr;	/**OCSC parameter address. The address must be 128-bit aligned.*//**CNcomment:OCSCï¿½ï¿½ï¿½ï¿½ï¿½Ö·ï¿½ï¿½Òªï¿½ï¿½128bitï¿½ï¿½ï¿½ï¿½*/
 }TDE2_CSC_OPT_S;
 
 /**Definition of blit operation options*/
-/**CNcomment:blit²Ù×÷Ñ¡Ïî¶¨Òå */
+/**CNcomment:blitï¿½ï¿½ï¿½ï¿½Ñ¡ï¿½î¶¨ï¿½ï¿½ */
 typedef struct hiTDE2_OPT_S
 {
-    TDE2_ALUCMD_E enAluCmd;                 /**<Logical operation type*//**<CNcomment:Âß¼­ÔËËãÀàÐÍ*/
+    TDE2_ALUCMD_E enAluCmd;                 /**<Logical operation type*//**<CNcomment:ï¿½ß¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½*/
 
-    TDE2_ROP_CODE_E enRopCode_Color;        /**<ROP type of the color space*//**<CNcomment:ÑÕÉ«¿Õ¼äROPÀàÐÍ*/
+    TDE2_ROP_CODE_E enRopCode_Color;        /**<ROP type of the color space*//**<CNcomment:ï¿½ï¿½É«ï¿½Õ¼ï¿½ROPï¿½ï¿½ï¿½ï¿½*/
 
-    TDE2_ROP_CODE_E enRopCode_Alpha;        /**<ROP type of the alpha component*//**<CNcomment:AlphaµÄROPÀàÐÍ*/
+    TDE2_ROP_CODE_E enRopCode_Alpha;        /**<ROP type of the alpha component*//**<CNcomment:Alphaï¿½ï¿½ROPï¿½ï¿½ï¿½ï¿½*/
 
-    TDE2_COLORKEY_MODE_E enColorKeyMode;    /**<Colorkey mode*//**<CNcomment:color key·½Ê½*/
+    TDE2_COLORKEY_MODE_E enColorKeyMode;    /**<Colorkey mode*//**<CNcomment:color keyï¿½ï¿½Ê½*/
 
-    TDE2_COLORKEY_U unColorKeyValue;        /**<Colorkey value*//**<CNcomment:color keyÉèÖÃÖµ*/
+    TDE2_COLORKEY_U unColorKeyValue;        /**<Colorkey value*//**<CNcomment:color keyï¿½ï¿½ï¿½ï¿½Öµ*/
 
-    TDE2_CLIPMODE_E enClipMode;             /**<Perform the clip operation within or beyond the area*//**<CNcomment:ÇøÓòÄÚ×÷clip»¹ÊÇÇøÓòÍâ×÷clip*/
+    TDE2_CLIPMODE_E enClipMode;             /**<Perform the clip operation within or beyond the area*//**<CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½clipï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½clip*/
 
-    TDE2_RECT_S stClipRect;                 /**<Definition of the clipping area*//**<CNcomment:clipÇøÓò¶¨Òå*/
+    TDE2_RECT_S stClipRect;                 /**<Definition of the clipping area*//**<CNcomment:clipï¿½ï¿½ï¿½ï¿½ï¿½ï¿½*/
 
-    TDE2_DEFLICKER_MODE_E enDeflickerMode;  /**<Anti-flicker mode*//**<CNcomment:¿¹ÉÁË¸Ä£Ê½*/
+    TDE2_DEFLICKER_MODE_E enDeflickerMode; //68 /**<Anti-flicker mode*//**<CNcomment:ï¿½ï¿½ï¿½ï¿½Ë¸Ä£Ê½*/
 
-    HI_BOOL bResize;                        /**<Whether to scale*//**<CNcomment:ÊÇ·ñËõ·Å*/
+    HI_BOOL bResize; //72                       /**<Whether to scale*//**<CNcomment:ï¿½Ç·ï¿½ï¿½ï¿½ï¿½ï¿½*/
 
-    TDE2_FILTER_MODE_E enFilterMode;        /**<Filtering mode during scaling*//**< CNcomment:Ëõ·ÅÊ±Ê¹ÓÃµÄÂË²¨Ä£Ê½ */
+    TDE2_FILTER_MODE_E enFilterMode;        /**<Filtering mode during scaling*//**< CNcomment:ï¿½ï¿½ï¿½ï¿½Ê±Ê¹ï¿½Ãµï¿½ï¿½Ë²ï¿½Ä£Ê½ */
 
-    TDE2_MIRROR_E enMirror;                 /**<Mirror type*//**<CNcomment:¾µÏñÀàÐÍ*/
+    TDE2_MIRROR_E enMirror;                 /**<Mirror type*//**<CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½*/
 
-    HI_BOOL bClutReload;                    /**<Whether to reload the CLUT*//**<CNcomment:ÊÇ·ñÖØÐÂ¼ÓÔØClut±í*/
+    HI_BOOL bClutReload;                    /**<Whether to reload the CLUT*//**<CNcomment:ï¿½Ç·ï¿½ï¿½ï¿½ï¿½Â¼ï¿½ï¿½ï¿½Clutï¿½ï¿½*/
 
-    HI_U8   u8GlobalAlpha;                  /**<Global alpha value*//**<CNcomment:È«¾ÖAlphaÖµ*/
+    HI_U8   u8GlobalAlpha;                  /**<Global alpha value*//**<CNcomment:È«ï¿½ï¿½AlphaÖµ*/
 
-    TDE2_OUTALPHA_FROM_E enOutAlphaFrom;    /**<Source of the output alpha*//**<CNcomment:Êä³öalphaÀ´Ô´*/
+    TDE2_OUTALPHA_FROM_E enOutAlphaFrom;    /**<Source of the output alpha*//**<CNcomment:ï¿½ï¿½ï¿½alphaï¿½ï¿½Ô´*/
     
     HI_U32 u32Colorize;                     /**<Colorize value*//**<CNcomment:ColorizeÖµ */
 
@@ -425,72 +425,72 @@ typedef struct hiTDE2_OPT_S
 } TDE2_OPT_S;
 
 /**Definition of macroblock operation options*/
-/**CNcomment:ºê¿é²Ù×÷Ñ¡Ïî¶¨Òå */
+/**CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ñ¡ï¿½î¶¨ï¿½ï¿½ */
 typedef struct hiTDE2_MBOPT_S
 {
-    TDE2_CLIPMODE_E enClipMode;     /**<Clip mode*//**<CNcomment:ClipÄ£Ê½Ñ¡Ôñ*/
+    TDE2_CLIPMODE_E enClipMode;     /**<Clip mode*//**<CNcomment:ClipÄ£Ê½Ñ¡ï¿½ï¿½*/
 
-    TDE2_RECT_S stClipRect;         /**<Definition of the clipping area*//**<CNcomment:clipÇøÓò¶¨Òå*/
+    TDE2_RECT_S stClipRect;         /**<Definition of the clipping area*//**<CNcomment:clipï¿½ï¿½ï¿½ï¿½ï¿½ï¿½*/
 
-    HI_BOOL bDeflicker;             /**<Whether to perform anti-flicker*//**<CNcomment:ÊÇ·ñ¿¹ÉÁË¸*/
+    HI_BOOL bDeflicker;             /**<Whether to perform anti-flicker*//**<CNcomment:ï¿½Ç·ï¿½ï¿½ï¿½Ë¸*/
 
-    TDE2_MBRESIZE_E enResize;       /**<Scaling information*//**<CNcomment:Ëõ·ÅÐÅÏ¢*/
+    TDE2_MBRESIZE_E enResize; //24      /**<Scaling information*//**<CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢*/
 
-    HI_BOOL bSetOutAlpha;           /**<If the alpha value is not set, the maximum alpha value is output by default.*//**<CNcomment:Èç¹û²»ÉèÖÃAlpha,ÔòÄ¬ÈÏÊä³ö×î´óAlphaÖµ*/
+    HI_BOOL bSetOutAlpha;           /**<If the alpha value is not set, the maximum alpha value is output by default.*//**<CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Alpha,ï¿½ï¿½Ä¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½AlphaÖµ*/
     
-    HI_U8   u8OutAlpha;             /**<Global alpha for operation*//**<CNcomment:²Î¼ÓÔËËãµÄÈ«¾Öalpha */
+    HI_U8   u8OutAlpha;             /**<Global alpha for operation*//**<CNcomment:ï¿½Î¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È«ï¿½ï¿½alpha */
 } TDE2_MBOPT_S;
 
 /**Definition of the pattern filling operation*/
-/**CNcomment:Ä£Ê½Ìî³ä²Ù×÷ÐÅÏ¢¶¨Òå */
+/**CNcomment:Ä£Ê½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½ï¿½ */
 typedef struct hiTDE2_PATTERN_FILL_OPT_S
 {
-    TDE2_ALUCMD_E enAluCmd;                 /**<Logical operation type*//**<CNcomment:Âß¼­ÔËËãÀàÐÍ*/
+    TDE2_ALUCMD_E enAluCmd;                 /**<Logical operation type*//**<CNcomment:ï¿½ß¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½*/
 
-    TDE2_ROP_CODE_E enRopCode_Color;        /**<ROP type of the color space*//**<CNcomment:ÑÕÉ«¿Õ¼äROPÀàÐÍ*/
+    TDE2_ROP_CODE_E enRopCode_Color;        /**<ROP type of the color space*//**<CNcomment:ï¿½ï¿½É«ï¿½Õ¼ï¿½ROPï¿½ï¿½ï¿½ï¿½*/
 
-    TDE2_ROP_CODE_E enRopCode_Alpha;        /**<ROP type of the alpha component*//**<CNcomment:alphaµÄROPÀàÐÍ*/
+    TDE2_ROP_CODE_E enRopCode_Alpha;        /**<ROP type of the alpha component*//**<CNcomment:alphaï¿½ï¿½ROPï¿½ï¿½ï¿½ï¿½*/
 
-    TDE2_COLORKEY_MODE_E enColorKeyMode;    /**<Colorkey mode*//**<CNcomment:color key·½Ê½*/
+    TDE2_COLORKEY_MODE_E enColorKeyMode;    /**<Colorkey mode*//**<CNcomment:color keyï¿½ï¿½Ê½*/
 
     TDE2_COLORKEY_U unColorKeyValue;        /**<Colorkey value*//**<CNcomment:color keyÖµ*/
 
     TDE2_CLIPMODE_E enClipMode;             /**<Clip mode*//**<CNcomment:clipÄ£Ê½*/
 
-    TDE2_RECT_S stClipRect;                 /**<Clipping area*//**<CNcomment:clipÇøÓò*/
+    TDE2_RECT_S stClipRect;                 /**<Clipping area*//**<CNcomment:clipï¿½ï¿½ï¿½ï¿½*/
 
-    HI_BOOL bClutReload;                    /**<Whether to reload the CLUT*//**<CNcomment:ÊÇ·ñÖØÔØclut±í*/
+    HI_BOOL bClutReload;                    /**<Whether to reload the CLUT*//**<CNcomment:ï¿½Ç·ï¿½ï¿½ï¿½ï¿½ï¿½clutï¿½ï¿½*/
 
-    HI_U8 u8GlobalAlpha;                    /**<Global alpha*//**<CNcomment:È«¾Öalpha*/
+    HI_U8 u8GlobalAlpha;                    /**<Global alpha*//**<CNcomment:È«ï¿½ï¿½alpha*/
 
-    TDE2_OUTALPHA_FROM_E enOutAlphaFrom;    /**<Source of the output alpha*//**<CNcomment:Êä³öalphaÀ´Ô´*/
+    TDE2_OUTALPHA_FROM_E enOutAlphaFrom;    /**<Source of the output alpha*//**<CNcomment:ï¿½ï¿½ï¿½alphaï¿½ï¿½Ô´*/
 
     HI_U32 u32Colorize;                     /**<Colorize value*//**<CNcomment:ColorizeÖµ*/
 
-    TDE2_BLEND_OPT_S stBlendOpt;           /**<Options of the blending operation*//**<CNcomment:Blend²Ù×÷Ñ¡Ïî */
+    TDE2_BLEND_OPT_S stBlendOpt;           /**<Options of the blending operation*//**<CNcomment:Blendï¿½ï¿½ï¿½ï¿½Ñ¡ï¿½ï¿½ */
 
-    TDE2_CSC_OPT_S stCscOpt;		/**<CSC parameter option*//**<CNcomment:Csc²ÎÊýÑ¡Ïî*/
+    TDE2_CSC_OPT_S stCscOpt;		/**<CSC parameter option*//**<CNcomment:Cscï¿½ï¿½ï¿½ï¿½Ñ¡ï¿½ï¿½*/
     
 }TDE2_PATTERN_FILL_OPT_S;
 
 /**Definition of rotation directions*/
-/**CNcomment:Ðý×ª·½Ïò¶¨Òå */
+/**CNcomment:ï¿½ï¿½×ªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ */
 typedef enum hiTDE_ROTATE_ANGLE_E
 {
-    TDE_ROTATE_CLOCKWISE_90 = 0,    /**<Rotate 90¡ã clockwise*//**< CNcomment:Ë³Ê±ÕëÐý×ª90¶È */
-    TDE_ROTATE_CLOCKWISE_180,       /**<Rotate 180¡ã clockwise*//**< CNcomment:Ë³Ê±ÕëÐý×ª180¶È */
-    TDE_ROTATE_CLOCKWISE_270,       /**<Rotate 270¡ã clockwise*//**< CNcomment:Ë³Ê±ÕëÐý×ª270¶È */
+    TDE_ROTATE_CLOCKWISE_90 = 0,    /**<Rotate 90ï¿½ï¿½ clockwise*//**< CNcomment:Ë³Ê±ï¿½ï¿½ï¿½ï¿½×ª90ï¿½ï¿½ */
+    TDE_ROTATE_CLOCKWISE_180,       /**<Rotate 180ï¿½ï¿½ clockwise*//**< CNcomment:Ë³Ê±ï¿½ï¿½ï¿½ï¿½×ª180ï¿½ï¿½ */
+    TDE_ROTATE_CLOCKWISE_270,       /**<Rotate 270ï¿½ï¿½ clockwise*//**< CNcomment:Ë³Ê±ï¿½ï¿½ï¿½ï¿½×ª270ï¿½ï¿½ */
     TDE_ROTATE_BUTT
 } TDE_ROTATE_ANGLE_E;
 
 /**Definition of anti-flicker levels*/
-/**CNcomment:¿¹ÉÁË¸¼¶±ð¶¨Òå */
+/**CNcomment:ï¿½ï¿½ï¿½ï¿½Ë¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ */
 typedef enum hiTDE_DEFLICKER_LEVEL_E
 {
-    TDE_DEFLICKER_AUTO = 0, /**<Adaptation. The anti-flicker coefficient is selected by the TDE.*//**<CNcomment:×ÔÊÊÓ¦£¬ÓÉTDEÑ¡Ôñ¿¹ÉÁË¸ÏµÊý*/
-    TDE_DEFLICKER_LOW,      /**<Low-level anti-flicker*//**<CNcomment:µÍ¼¶±ð¿¹ÉÁË¸*/
-    TDE_DEFLICKER_MIDDLE,   /**<Medium-level anti-flicker*//**CNcomment:ÖÐ¼¶±ð¿¹ÉÁË¸*/
-    TDE_DEFLICKER_HIGH,     /**High-level anti-flicker*//**CNcomment:¸ß¼¶±ð¿¹ÉÁË¸*/
+    TDE_DEFLICKER_AUTO = 0, /**<Adaptation. The anti-flicker coefficient is selected by the TDE.*//**<CNcomment:ï¿½ï¿½ï¿½ï¿½Ó¦ï¿½ï¿½ï¿½ï¿½TDEÑ¡ï¿½ï¿½ï¿½ï¿½Ë¸Ïµï¿½ï¿½*/
+    TDE_DEFLICKER_LOW,      /**<Low-level anti-flicker*//**<CNcomment:ï¿½Í¼ï¿½ï¿½ï¿½ï¿½ï¿½Ë¸*/
+    TDE_DEFLICKER_MIDDLE,   /**<Medium-level anti-flicker*//**CNcomment:ï¿½Ð¼ï¿½ï¿½ï¿½ï¿½ï¿½Ë¸*/
+    TDE_DEFLICKER_HIGH,     /**High-level anti-flicker*//**CNcomment:ï¿½ß¼ï¿½ï¿½ï¿½ï¿½ï¿½Ë¸*/
     TDE_DEFLICKER_BUTT
 }TDE_DEFLICKER_LEVEL_E;
 

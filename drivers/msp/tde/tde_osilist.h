@@ -37,7 +37,7 @@ typedef struct hiTDE_SWNODE_S
     TDE_NOTIFY_MODE_E enNotiType; //20  	/* Notice type after node completed */
     TDE_NODE_BUF_S stNodeBuf;       	/* Node of operate config */
     HI_U32 u32PhyBuffNum;           	/* Number of physical buffer distributed */
-    struct hiTDE_SWNODE_S *pstParentNodeInCmd;	/* The head software node of this instruct */
+    struct hiTDE_SWNODE_S *pstParentNodeInCmd; //52	/* The head software node of this instruct */
 } TDE_SWNODE_S;
 
 /* Job definition */
@@ -51,7 +51,7 @@ typedef struct hiTDE_SWJOB_S
     HI_U32 u32CmdNum;               /* Instruct number of job */
     HI_U32 u32NodeNum;              /* Node number of job */
     TDE_SWNODE_S *pstFirstCmd; //32     /* Software node of first instruct in job */
-    TDE_SWNODE_S *pstLastCmd;       /* Software node of last instruct in job  */
+    TDE_SWNODE_S *pstLastCmd; //36      /* Software node of last instruct in job  */
     TDE_SWNODE_S *pstTailNode; //40     /* Last software node of job */
     wait_queue_head_t stQuery;      /* Wait queue used in query */
     HI_BOOL bInQuery; //56              /* If user is  quering or not */
@@ -59,7 +59,7 @@ typedef struct hiTDE_SWJOB_S
     HI_BOOL bSubmitted; //64            /* If have submitted */
     HI_BOOL bAqUseBuff;             /* If using temporary buffer */
     HI_U8   u8WaitForDoneCount; //72    /* wait job count */
-    TDE_SWNODE_S *pstParentCmd;     /* Record parent node */
+    TDE_SWNODE_S *pstParentCmd; //76    /* Record parent node */
 
 }TDE_SWJOB_S;
 

@@ -6,6 +6,7 @@ ccflags-y += -DHI_TDE_UNIT64_NUM=200
 ccflags-y += -DHI_TDE_UNIT128_NUM=348
 ccflags-y += -DHI_TDE_UNIT1024_NUM=8
 ccflags-y += -DHI_TDE_BUFFER=0x20000
+#ccflags-y += -DHI_TDE_BITMAPMASK_SUPPORT
 
 ccflags-y += -Idrivers/msp/include
 

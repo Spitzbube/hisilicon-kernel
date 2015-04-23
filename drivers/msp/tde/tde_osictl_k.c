@@ -18,6 +18,7 @@
 #include "tde_osictl.h"
 #include "tde_osilist.h"
 #include "tde_hal.h"
+#include "tde_handle.h"
 #include "wmalloc.h"
 #include "tde_proc.h"
 #include "tde_config.h"
@@ -390,12 +391,12 @@ typedef struct hiTDE_FILTER_OPT
     HI_S32  s32HOffset;
     HI_S32  s32VOffset;
     HI_U32  u32Bppi;
-    HI_U32  u32WorkBufNum;
+    HI_U32  u32WorkBufNum; //20
     HI_U32  bBadLastPix;        /* while blocking, last point of each block is if effective*/
     HI_BOOL bVRing;
     HI_BOOL bHRing;
-    HI_BOOL bEvenStartInX;      /* when input need up_sample, bEvenStartInX is set to HI_TRUE */
-    HI_BOOL bEvenStartOutX;     /* when input need drop_sample, bEvenStartInX is set to HI_TRUE */
+    HI_BOOL bEvenStartInX; //36     /* when input need up_sample, bEvenStartInX is set to HI_TRUE */
+    HI_BOOL bEvenStartOutX; //40    /* when input need drop_sample, bEvenStartInX is set to HI_TRUE */
     HI_BOOL bCoefSym;           /* coefficient is if symmetrical, use filed ground */
     HI_BOOL b2OptCbCr;
     TDE_SCANDIRECTION_S stSrcDire;
@@ -425,21 +426,6 @@ typedef enum hiTDE_PATTERN_OPERATION_CATEGORY_E
 /*                     TDE osi ctl inner variables definition   			*/
 /****************************************************************************/
 
-#if 0
-STATIC TDE_DRV_COLOR_FMT_E g_enTdeCommonDrvColorFmt[TDE2_COLOR_FMT_BUTT + 1] = {
-    TDE_DRV_COLOR_FMT_RGB444,   TDE_DRV_COLOR_FMT_RGB555,   TDE_DRV_COLOR_FMT_RGB565,
-    TDE_DRV_COLOR_FMT_RGB888,
-    TDE_DRV_COLOR_FMT_ARGB4444,
-    TDE_DRV_COLOR_FMT_ARGB1555, TDE_DRV_COLOR_FMT_ARGB8565, TDE_DRV_COLOR_FMT_ARGB8888,
-    TDE_DRV_COLOR_FMT_CLUT1,
-    TDE_DRV_COLOR_FMT_CLUT2,
-    TDE_DRV_COLOR_FMT_CLUT4,    TDE_DRV_COLOR_FMT_CLUT8,    TDE_DRV_COLOR_FMT_ACLUT44,
-    TDE_DRV_COLOR_FMT_ACLUT88,  TDE_DRV_COLOR_FMT_A1,
-    TDE_DRV_COLOR_FMT_A8,       TDE_DRV_COLOR_FMT_YCbCr888, TDE_DRV_COLOR_FMT_AYCbCr8888,
-    TDE_DRV_COLOR_FMT_YCbCr422, TDE_DRV_COLOR_FMT_byte,
-    TDE_DRV_COLOR_FMT_halfword, TDE_DRV_COLOR_FMT_BUTT
-};
-#endif
 STATIC TDE_DRV_COLOR_FMT_E g_enTdeCommonDrvColorFmt[TDE2_COLOR_FMT_BUTT + 1] = {
     TDE_DRV_COLOR_FMT_RGB444,   TDE_DRV_COLOR_FMT_RGB444,
     TDE_DRV_COLOR_FMT_RGB555,   TDE_DRV_COLOR_FMT_RGB555,
@@ -492,8 +478,8 @@ STATIC TDE_DRV_COLOR_FMT_E g_enTdeMbDrvColorFmt[TDE2_MB_COLOR_FMT_BUTT + 1] = {
     TDE_DRV_COLOR_FMT_YCbCr444MB,  TDE_DRV_COLOR_FMT_BUTT
 };
 
-STATIC TDE_DRV_FILTER_MODE_E g_enTdeFilterMode[TDE2_FILTER_MODE_BUTT + 1] = {
-    TDE_DRV_FILTER_COLOR, TDE_DRV_FILTER_ALPHA, TDE_DRV_FILTER_ALL, TDE_DRV_FILTER_ALL
+STATIC TDE_DRV_FILTER_MODE_E g_enTdeFilterMode[5/*TDE2_FILTER_MODE_BUTT + 1*/] = {
+    TDE_DRV_FILTER_COLOR, TDE_DRV_FILTER_ALPHA, TDE_DRV_FILTER_ALL, TDE_DRV_FILTER_NONE, TDE_DRV_FILTER_NONE
 };
 
 /* if local deflicker flag */
@@ -520,7 +506,7 @@ STATIC HI_S32                    TdeOsiGetScanInfo(TDE2_SURFACE_S *pSrc, TDE2_RE
 
 STATIC HI_S32                    TdeOsiGetInterRect(TDE2_RECT_S *pRect1, TDE2_RECT_S *pRect2, TDE2_RECT_S *pInterRect);
 
-STATIC INLINE HI_S32             TdeOsiSetMbPara(TDE_HANDLE s32Handle, TDE_HWNode_S* pHWNode,
+STATIC INLINE HI_S32             TdeOsiSetMbPara(TDE_HANDLE s32Handle, /*TDE_HWNode_S* pHWNode,*/
                                                  TDE2_MB_S* pstMB, TDE2_RECT_S  *pstMbRect,
                                                  TDE2_SURFACE_S* pstDst, TDE2_RECT_S  *pstDstRect,
                                                  TDE2_MBOPT_S* pMbOpt);
@@ -607,7 +593,7 @@ STATIC HI_S32                   TdeOsiSetClipPara(TDE2_SURFACE_S * pstBackGround
 STATIC HI_S32                    TdeOsiMbSetClipPara(TDE2_RECT_S * pstDstRect, TDE2_MBOPT_S *pstMbOpt,
                                                      TDE_HWNode_S *pstHwNode);
 
-STATIC HI_VOID                   TdeOsiSetBaseOptParaForBlit(TDE2_OPT_S * pstOpt, TDE2_SURFACE_S* pstSrc1, TDE2_SURFACE_S* pstSrc2,
+STATIC HI_S32                   TdeOsiSetBaseOptParaForBlit(TDE2_OPT_S * pstOpt, TDE2_SURFACE_S* pstSrc1, TDE2_SURFACE_S* pstSrc2,
                                                              TDE_OPERATION_CATEGORY_E enOptCategory, TDE_HWNode_S *pstHwNode);
 
 STATIC INLINE HI_VOID            TdeOsiSetResizePara(TDE_HWNode_S* pstHwNode, TDE_FILTER_OPT* pstFilterOpt,TDE_NODE_SUBM_TYPE_E enNodeType);
@@ -626,109 +612,6 @@ STATIC INLINE HI_VOID            TdeOsiSetExtAlpha(TDE2_SURFACE_S *pstBackGround
                                                    TDE_HWNode_S *pstHwNode);
 STATIC HI_S32                    TdeOsiYC422TmpOpt(TDE_HANDLE s32Handle, TDE2_SURFACE_S* pstForeGround, TDE2_RECT_S  *pstForeGroundRect,
                                                    TDE2_SURFACE_S* pstDst, TDE2_RECT_S  *pstDstRect, TDE2_OPT_S* pstOpt);
-
-#if 0
-/* DEBUG functions for Node params */
-STATIC INLINE HI_VOID TdeOsiPrintNodeInfo(TDE_HWNode_S* pHWNode)
-{
-    TDE_TRACE(TDE_KERN_DEBUG, "\n");
-    if(pHWNode->u64TDE_UPDATE & 0x1)
-        TDE_TRACE(TDE_KERN_DEBUG, "01 u32TDE_INS          \t0x%x\n" ,pHWNode->u32TDE_INS);
-    if((pHWNode->u64TDE_UPDATE >> 1) & 0x1)
-        TDE_TRACE(TDE_KERN_DEBUG, "02 u32TDE_S1_ADDR      \t0x%x\n" , pHWNode->u32TDE_S1_ADDR);
-    if((pHWNode->u64TDE_UPDATE >> 2) & 0x1)
-        TDE_TRACE(TDE_KERN_DEBUG, "03 u32TDE_S1_TYPE      \t0x%x\n" , pHWNode->u32TDE_S1_TYPE);
-    if((pHWNode->u64TDE_UPDATE >> 3) & 0x1)
-        TDE_TRACE(TDE_KERN_DEBUG, "04 u32TDE_S1_XY        \t0x%x\n" , pHWNode->u32TDE_S1_XY);
-    if((pHWNode->u64TDE_UPDATE >> 4) & 0x1)
-        TDE_TRACE(TDE_KERN_DEBUG, "05 u32TDE_S1_FILL      \t0x%x\n" , pHWNode->u32TDE_S1_FILL);
-    if((pHWNode->u64TDE_UPDATE >> 5) & 0x1)
-        TDE_TRACE(TDE_KERN_DEBUG, "06 u32TDE_S2_ADDR      \t0x%x\n" , pHWNode->u32TDE_S2_ADDR);
-    if((pHWNode->u64TDE_UPDATE >> 6) & 0x1)
-        TDE_TRACE(TDE_KERN_DEBUG, "07 u32TDE_S2_TYPE      \t0x%x\n" , pHWNode->u32TDE_S2_TYPE);
-    if((pHWNode->u64TDE_UPDATE >> 7) & 0x1)
-        TDE_TRACE(TDE_KERN_DEBUG, "08 u32TDE_S2_XY        \t0x%x\n" , pHWNode->u32TDE_S2_XY);
-    if((pHWNode->u64TDE_UPDATE >> 8) & 0x1)
-        TDE_TRACE(TDE_KERN_DEBUG, "09 u32TDE_S2_SIZE      \t0x%x\n" , pHWNode->u32TDE_S2_SIZE);
-    if((pHWNode->u64TDE_UPDATE >> 9) & 0x1)
-        TDE_TRACE(TDE_KERN_DEBUG, "10 u32TDE_S2_FILL      \t0x%x\n" , pHWNode->u32TDE_S2_FILL);
-    if((pHWNode->u64TDE_UPDATE >> 10) & 0x1)
-        TDE_TRACE(TDE_KERN_DEBUG, "11 u32TDE_TAR_ADDR     \t0x%x\n" , pHWNode->u32TDE_TAR_ADDR);
-    if((pHWNode->u64TDE_UPDATE >> 11) & 0x1)
-        TDE_TRACE(TDE_KERN_DEBUG, "12 u32TDE_TAR_TYPE     \t0x%x\n" , pHWNode->u32TDE_TAR_TYPE);
-    if((pHWNode->u64TDE_UPDATE >> 12) & 0x1)
-        TDE_TRACE(TDE_KERN_DEBUG, "13 u32TDE_TAR_XY       \t0x%x\n" , pHWNode->u32TDE_TAR_XY);
-    if((pHWNode->u64TDE_UPDATE >> 13) & 0x1)
-        TDE_TRACE(TDE_KERN_DEBUG, "14 u32TDE_TS_SIZE      \t0x%x\n" , pHWNode->u32TDE_TS_SIZE);
-    if((pHWNode->u64TDE_UPDATE >> 14) & 0x1)
-        TDE_TRACE(TDE_KERN_DEBUG, "15 u32TDE_COLOR_CONV   \t0x%x\n" , pHWNode->u32TDE_COLOR_CONV);
-    if((pHWNode->u64TDE_UPDATE >> 15) & 0x1)
-        TDE_TRACE(TDE_KERN_DEBUG, "16 u32TDE_CLUT_ADDR    \t0x%x\n" , pHWNode->u32TDE_CLUT_ADDR);
-    if((pHWNode->u64TDE_UPDATE >> 16) & 0x1)
-        TDE_TRACE(TDE_KERN_DEBUG, "17 u32TDE_2D_RSZ       \t0x%x\n" , pHWNode->u32TDE_2D_RSZ);
-    if((pHWNode->u64TDE_UPDATE >> 17) & 0x1)
-        TDE_TRACE(TDE_KERN_DEBUG, "18 u32TDE_HF_COEF_ADDR \t0x%x\n" , pHWNode->u32TDE_HF_COEF_ADDR);
-    if((pHWNode->u64TDE_UPDATE >> 18) & 0x1)
-        TDE_TRACE(TDE_KERN_DEBUG, "19 u32TDE_VF_COEF_ADDR \t0x%x\n" , pHWNode->u32TDE_VF_COEF_ADDR);
-    if((pHWNode->u64TDE_UPDATE >> 19) & 0x1)
-#ifdef TDE_VERSION_MPW
-        TDE_TRACE(TDE_KERN_DEBUG, "20 u32TDE_RSZ_STEP     \t0x%x\n" , pHWNode->u32TDE_RSZ_STEP);
-#else
-        TDE_TRACE(TDE_KERN_DEBUG, "20 u32TDE_RSZ_STEP     \t0x%x\n" , pHWNode->u32TDE_RSZ_HSTEP);
-#endif
-    if((pHWNode->u64TDE_UPDATE >> 20) & 0x1)
-        TDE_TRACE(TDE_KERN_DEBUG, "21 u32TDE_RSZ_Y_OFST   \t0x%x\n" , pHWNode->u32TDE_RSZ_Y_OFST);
-    if((pHWNode->u64TDE_UPDATE >> 21) & 0x1)
-        TDE_TRACE(TDE_KERN_DEBUG, "22 u32TDE_RSZ_X_OFST   \t0x%x\n" , pHWNode->u32TDE_RSZ_X_OFST);
-    if((pHWNode->u64TDE_UPDATE >> 22) & 0x1)
-        TDE_TRACE(TDE_KERN_DEBUG, "23 u32TDE_DFE_COEF0    \t0x%x\n" , pHWNode->u32TDE_DFE_COEF0);
-    if((pHWNode->u64TDE_UPDATE >> 23) & 0x1)
-        TDE_TRACE(TDE_KERN_DEBUG, "24 u32TDE_DFE_COEF1    \t0x%x\n" , pHWNode->u32TDE_DFE_COEF1);
-    if((pHWNode->u64TDE_UPDATE >> 24) & 0x1)
-        TDE_TRACE(TDE_KERN_DEBUG, "25 u32TDE_DFE_COEF2    \t0x%x\n" , pHWNode->u32TDE_DFE_COEF2);
-    if((pHWNode->u64TDE_UPDATE >> 25) & 0x1)
-        TDE_TRACE(TDE_KERN_DEBUG, "26 u32TDE_DFE_COEF3    \t0x%x\n" , pHWNode->u32TDE_DFE_COEF3);
-    if((pHWNode->u64TDE_UPDATE >> 26) & 0x1)
-        TDE_TRACE(TDE_KERN_DEBUG, "27 u32TDE_ALU          \t0x%x\n" , pHWNode->u32TDE_ALU);
-    if((pHWNode->u64TDE_UPDATE >> 27) & 0x1)
-        TDE_TRACE(TDE_KERN_DEBUG, "28 u32TDE_CK_MIN       \t0x%x\n" , pHWNode->u32TDE_CK_MIN);
-    if((pHWNode->u64TDE_UPDATE >> 28) & 0x1)
-        TDE_TRACE(TDE_KERN_DEBUG, "29 u32TDE_CK_MAX       \t0x%x\n" , pHWNode->u32TDE_CK_MAX);
-    if((pHWNode->u64TDE_UPDATE >> 29) & 0x1)
-        TDE_TRACE(TDE_KERN_DEBUG, "30 u32TDE_CLIP_START   \t0x%x\n" , pHWNode->u32TDE_CLIP_START);
-    if((pHWNode->u64TDE_UPDATE >> 30) & 0x1)
-        TDE_TRACE(TDE_KERN_DEBUG, "31 u32TDE_CLIP_STOP    \t0x%x\n" , pHWNode->u32TDE_CLIP_STOP);
-#ifdef TDE_VERSION_MPW
-    TDE_TRACE(TDE_KERN_DEBUG, "32 u64TDE_UPDATE       \t0x%x\n" , (HI_U32)(pHWNode->u64TDE_UPDATE&0xffffffff));
-#else
-    if((pHWNode->u64TDE_UPDATE >> 31) & 0x1)
-        TDE_TRACE(TDE_KERN_DEBUG, "32 u32TDE_Y1_ADDR    \t0x%x\n" , pHWNode->u32TDE_Y1_ADDR);
-    if((pHWNode->u64TDE_UPDATE >> 32) & 0x1)
-        TDE_TRACE(TDE_KERN_DEBUG, "33 u32TDE_Y1_PITCH    \t0x%x\n" , pHWNode->u32TDE_Y1_PITCH);
-    if((pHWNode->u64TDE_UPDATE >> 33) & 0x1)
-        TDE_TRACE(TDE_KERN_DEBUG, "34 u32TDE_Y2_ADDR    \t0x%x\n" , pHWNode->u32TDE_Y2_ADDR);
-    if((pHWNode->u64TDE_UPDATE >> 34) & 0x1)
-        TDE_TRACE(TDE_KERN_DEBUG, "35 u32TDE_Y2_PITCH    \t0x%x\n" , pHWNode->u32TDE_Y2_PITCH);
-    if((pHWNode->u64TDE_UPDATE >> 35) & 0x1)
-        TDE_TRACE(TDE_KERN_DEBUG, "36 u32TDE_RSZ_VSTEP    \t0x%x\n" , pHWNode->u32TDE_RSZ_VSTEP);
-    if((pHWNode->u64TDE_UPDATE >> 36) & 0x1)
-        TDE_TRACE(TDE_KERN_DEBUG, "37 u32TDE_ARGB_ORDER    \t0x%x\n" , pHWNode->u32TDE_ARGB_ORDER);
-    if((pHWNode->u64TDE_UPDATE >> 37) & 0x1)
-        TDE_TRACE(TDE_KERN_DEBUG, "38 u32TDE_CK_MASK    \t0x%x\n" , pHWNode->u32TDE_CK_MASK);
-    if((pHWNode->u64TDE_UPDATE >> 38) & 0x1)
-        TDE_TRACE(TDE_KERN_DEBUG, "39 u32TDE_COLORIZE    \t0x%x\n" , pHWNode->u32TDE_COLORIZE);
-    if((pHWNode->u64TDE_UPDATE >> 39) & 0x1)
-        TDE_TRACE(TDE_KERN_DEBUG, "40 u32TDE_ALPHA_BLEND    \t0x%x\n" , pHWNode->u32TDE_ALPHA_BLEND);
- if((pHWNode->u64TDE_UPDATE >> 40) & 0x1)
-        TDE_TRACE(TDE_KERN_DEBUG, "41 u32TDE_ICSC_ADDR    \t0x%x\n" , pHWNode->u32TDE_ICSC_ADDR);
- if((pHWNode->u64TDE_UPDATE >> 41) & 0x1)
-        TDE_TRACE(TDE_KERN_DEBUG, "42 u32TDE_OCSC_ADDR    \t0x%x\n" , pHWNode->u32TDE_OCSC_ADDR);
-    TDE_TRACE(TDE_KERN_DEBUG, "43 u64TDE_UPDATE       \t0x%x%x\n" , 
-        (HI_U32)((pHWNode->u64TDE_UPDATE >> 32)&0xffffffff), (HI_U32)(pHWNode->u64TDE_UPDATE&0xffffffff));
-#endif
-    TDE_TRACE(TDE_KERN_DEBUG, "\n");
-}
-#endif
 
 
 /****************************************************************************/
@@ -834,113 +717,16 @@ STATIC HI_S32 TdeOsiColorConvert(TDE2_FILLCOLOR_S *pstFillColor, TDE2_SURFACE_S 
     //HI_U8 bits_a, bits_r, bits_g, bits_b;
     TDE_COLORFMT_TRANSFORM_E enColorTrans;
 
-    TDE_ASSERT(NULL != pstFillColor);
-    TDE_ASSERT(NULL != pstSur);
-    TDE_ASSERT(NULL != pu32OutColor);
+    TDE_ASSERT(NULL != pstFillColor); //652
+    TDE_ASSERT(NULL != pstSur); //653
+    TDE_ASSERT(NULL != pu32OutColor); //654
     enColorTrans = TdeOsiGetFmtTransType(pstFillColor->enColorFmt, pstSur->enColorFmt);
 
-#if 0
-    switch(pstFillColor->enColorFmt)
-    {
-        case TDE2_COLOR_FMT_RGB444:
-        {
-            bits_a = 0;
-            bits_r = 4;
-            bits_g = 4;
-            bits_b = 4;
-            pstFillColor->u32FillColor &= 0xfff;
-            break;
-        }
-        case TDE2_COLOR_FMT_RGB555:
-        {
-            bits_a = 0;
-            bits_r = 5;
-            bits_g = 5;
-            bits_b = 5;
-            pstFillColor->u32FillColor &= 0x7fff;
-            break;
-        }
-        case TDE2_COLOR_FMT_RGB565:
-        {
-            bits_a = 0;
-            bits_r = 5;
-            bits_g = 6;
-            bits_b = 5;
-            pstFillColor->u32FillColor &= 0xffff;
-            break;
-        }
-        case TDE2_COLOR_FMT_RGB888:
-        {
-            bits_a = 0;
-            bits_r = 8;
-            bits_g = 8;
-            bits_b = 8;
-            pstFillColor->u32FillColor &= 0xffffff;
-            break;
-        }
-        case TDE2_COLOR_FMT_ARGB4444:
-        {
-            bits_a = 4;
-            bits_r = 4;
-            bits_g = 4;
-            bits_b = 4;
-            pstFillColor->u32FillColor &= 0xffff;
-            break;
-        }
-        case TDE2_COLOR_FMT_ARGB1555:
-        {
-            bits_a = 1;
-            bits_r = 5;
-            bits_g = 5;
-            bits_b = 5;
-            pstFillColor->u32FillColor &= 0xffff;
-            break;
-        }
-        case TDE2_COLOR_FMT_ARGB8565:
-        {
-            bits_a = 8;
-            bits_r = 5;
-            bits_g = 6;
-            bits_b = 5;
-            pstFillColor->u32FillColor &= 0xffffff;
-            break;
-        }
-        case TDE2_COLOR_FMT_ARGB8888:
-        {
-            bits_a = 8;
-            bits_r = 8;
-            bits_g = 8;
-            bits_b = 8;
-            pstFillColor->u32FillColor &= 0xffffffff;
-            break;
-        }
-        case TDE2_COLOR_FMT_YCbCr888:
-        {
-            bits_a = 0;
-            bits_r = 8;
-            bits_g = 8;
-            bits_b = 8;
-            pstFillColor->u32FillColor &= 0xffffff;
-            break;
-        }
-        case TDE2_COLOR_FMT_AYCbCr8888:
-        {
-            bits_a = 8;
-            bits_r = 8;
-            bits_g = 8;
-            bits_b = 8;
-            break;
-        }
-        default:
-            TDE_TRACE(TDE_KERN_INFO, "Unsupported color!\n");
-            return -1;
-    }
-#endif
     if (((TDE2_COLOR_FMT_CLUT1 <= pstFillColor->enColorFmt) 
         && (pstFillColor->enColorFmt <= TDE2_COLOR_FMT_A8))
         || (pstFillColor->enColorFmt >= TDE2_COLOR_FMT_YCbCr422))
     {
-        TDE_TRACE(TDE_KERN_INFO, "Unsupported color!\n");
+        TDE_TRACE(TDE_KERN_INFO, "Unsupported color!\n"); //661
         return -1;
     }
 
@@ -977,7 +763,7 @@ STATIC HI_S32 TdeOsiColorConvert(TDE2_FILLCOLOR_S *pstFillColor, TDE2_SURFACE_S 
         a = a << (8 - s_u8FmtBitAndOffsetArray[pstFillColor->enColorFmt].u8AlphaBits);
     }
     else
-    {       
+    {
         if(a)
         {
             a = pstSur->u8Alpha1;
@@ -1000,7 +786,7 @@ STATIC HI_S32 TdeOsiColorConvert(TDE2_FILLCOLOR_S *pstFillColor, TDE2_SURFACE_S 
     }
 #endif
 #if 0
-    r = (pstFillColor->u32FillColor >> (bits_b + bits_g)) << (8-bits_r) ; 
+    r = (pstFillColor->u32FillColor >> (bits_b + bits_g)) << (8-bits_r) ;
     g = (pstFillColor->u32FillColor >> bits_b) << (8-bits_g) ;
     b = pstFillColor->u32FillColor << (8-bits_b) ;
 #endif
@@ -1032,7 +818,7 @@ STATIC HI_S32 TdeOsiColorConvert(TDE2_FILLCOLOR_S *pstFillColor, TDE2_SURFACE_S 
             return 0;
         }
         default:
-            TDE_TRACE(TDE_KERN_INFO, "Unsupported color transport!\n");
+            TDE_TRACE(TDE_KERN_INFO, "Unsupported color transport!\n"); //718
             return -1;
     }
 }
@@ -1052,7 +838,7 @@ STATIC INLINE HI_S32 TdeOsiCheckResizePara(HI_U32 u32InWidth, HI_U32 u32InHeight
     if (((u32OutWidth * TDE_MAX_MINIFICATION_H) < u32InWidth)
         || ((u32OutHeight * TDE_MAX_MINIFICATION_V) < u32InHeight))
     {
-        TDE_TRACE(TDE_KERN_INFO, "Resize parameter error!\n");
+        TDE_TRACE(TDE_KERN_INFO, "Resize parameter error!\n"); //738
         return -1;
     }
     else
@@ -1337,7 +1123,7 @@ STATIC INLINE HI_S32 TdeOsiSetClutOpt(TDE2_SURFACE_S * pClutSur, TDE2_SURFACE_S 
         if ( (!pClutSur->bYCbCrClut && TDE_COLORFMT_CATEGORY_YCbCr == enFmtCate) 
              || (pClutSur->bYCbCrClut && TDE_COLORFMT_CATEGORY_ARGB == enFmtCate) )
         {
-            TDE_TRACE(TDE_KERN_INFO, "clut fmt not same\n");
+            TDE_TRACE(TDE_KERN_INFO, "clut fmt not same\n"); //1003
             return HI_ERR_TDE_UNSUPPORTED_OPERATION;
         }
         
@@ -1358,12 +1144,15 @@ STATIC INLINE HI_S32 TdeOsiSetClutOpt(TDE2_SURFACE_S * pClutSur, TDE2_SURFACE_S 
 
             if(((HI_U32)pClutSur->pu8ClutPhyAddr)%4)
             {
-                TDE_TRACE(TDE_KERN_INFO, "pClutSur->pu8ClutPhyAddr=%p\n", pClutSur->pu8ClutPhyAddr);
+                TDE_TRACE(TDE_KERN_INFO, "pClutSur->pu8ClutPhyAddr=%p\n", pClutSur->pu8ClutPhyAddr); //1024
                 return HI_ERR_TDE_NOT_ALIGNED;
             }
 
             stClutCmd.pu8PhyClutAddr = pClutSur->pu8ClutPhyAddr;
-            TdeHalNodeSetClutOpt(pstHWNode, &stClutCmd, bClutReload);
+            if (TdeHalNodeSetClutOpt(pstHWNode, &stClutCmd, bClutReload) < 0)
+            {
+            	return 0xa064800b;
+            }
         }
     }
     return HI_SUCCESS;
@@ -1502,7 +1291,7 @@ STATIC HI_S32  TdeOsiCheckDoubleSrcOpt(TDE2_COLOR_FMT_E enSrc1Fmt, TDE2_COLOR_FM
     TDE_COLORFMT_CATEGORY_E enSrc2Category;
     TDE_COLORFMT_CATEGORY_E enDstCategory;
 
-    TDE_CHECK_ALUCMD(pstOpt->enAluCmd);
+    TDE_CHECK_ALUCMD(pstOpt->enAluCmd); //1161
 
     /* get background pixel format category */
     enSrc1Category = TdeOsiGetFmtCategory(enSrc1Fmt);
@@ -1517,7 +1306,7 @@ STATIC HI_S32  TdeOsiCheckDoubleSrcOpt(TDE2_COLOR_FMT_E enSrc1Fmt, TDE2_COLOR_FM
         || (TDE_COLORFMT_CATEGORY_BYTE <= enSrc2Category)
         || (TDE_COLORFMT_CATEGORY_BYTE <= enDstCategory))
     {
-        TDE_TRACE(TDE_KERN_INFO, "unkown format!\n");
+        TDE_TRACE(TDE_KERN_INFO, "unkown format!\n"); //1176
         return -1;
     }
 
@@ -1533,7 +1322,7 @@ STATIC HI_S32  TdeOsiCheckDoubleSrcOpt(TDE2_COLOR_FMT_E enSrc1Fmt, TDE2_COLOR_FM
             /* target must have alpha bit */
             if (!TdeOsiWhetherContainAlpha(enDstFmt))
             {
-                TDE_TRACE(TDE_KERN_INFO, "Target must have alpha component!\n");
+                TDE_TRACE(TDE_KERN_INFO, "Target must have alpha component!\n"); //1188
                 return -1;
             }
         }
@@ -1557,7 +1346,7 @@ STATIC HI_S32  TdeOsiCheckDoubleSrcOpt(TDE2_COLOR_FMT_E enSrc1Fmt, TDE2_COLOR_FM
         if ((TDE_COLORFMT_CATEGORY_CLUT != enSrc2Category)
             || (TDE_COLORFMT_CATEGORY_CLUT != enDstCategory))
         {
-            TDE_TRACE(TDE_KERN_INFO, "Unsupported operation!\n");
+            TDE_TRACE(TDE_KERN_INFO, "Unsupported operation!\n"); //1198
             return -1;
         }
 
@@ -1566,7 +1355,7 @@ STATIC HI_S32  TdeOsiCheckDoubleSrcOpt(TDE2_COLOR_FMT_E enSrc1Fmt, TDE2_COLOR_FM
             || (TDE2_ALUCMD_NONE != pstOpt->enAluCmd)
             /*|| (TDE2_MIRROR_NONE != pstOpt->enMirror)*/) /*AI7D02892 undo mirror limit */
         {
-            TDE_TRACE(TDE_KERN_INFO, "It doesn't support deflicker or ROP or mirror!\n");
+            TDE_TRACE(TDE_KERN_INFO, "It doesn't support deflicker or ROP or mirror!\n"); //1207
             return -1;
         }
     }
@@ -1578,24 +1367,24 @@ STATIC HI_S32  TdeOsiCheckDoubleSrcOpt(TDE2_COLOR_FMT_E enSrc1Fmt, TDE2_COLOR_FM
         if ((TDE2_ALUCMD_NONE != pstOpt->enAluCmd)
             /*|| (TDE2_MIRROR_NONE != pstOpt->enMirror)*/) /*AI7D02892 undo mirror limit */
         {
-            TDE_TRACE(TDE_KERN_INFO, "It doesn't support Blend/ROP/Colorize!\n");
+            TDE_TRACE(TDE_KERN_INFO, "It doesn't support Blend/ROP/Colorize!\n"); //1219
             return -1;
         }
     }
 
     if (pstOpt->enAluCmd & TDE2_ALUCMD_ROP)
     {
-        TDE_CHECK_ROPCODE(pstOpt->enRopCode_Alpha);
-        TDE_CHECK_ROPCODE(pstOpt->enRopCode_Color);
+        TDE_CHECK_ROPCODE(pstOpt->enRopCode_Alpha); //1226
+        TDE_CHECK_ROPCODE(pstOpt->enRopCode_Color); //1227
     }	
 
     if (pstOpt->enAluCmd & TDE2_ALUCMD_BLEND)
     {
-        TDE_CHECK_BLENDCMD(pstOpt->stBlendOpt.eBlendCmd);
+        TDE_CHECK_BLENDCMD(pstOpt->stBlendOpt.eBlendCmd); //1232
         if (pstOpt->stBlendOpt.eBlendCmd == TDE2_BLENDCMD_CONFIG)
         {
-             TDE_CHECK_BLENDMODE(pstOpt->stBlendOpt.eSrc1BlendMode);
-   	      TDE_CHECK_BLENDMODE(pstOpt->stBlendOpt.eSrc2BlendMode);	  
+             TDE_CHECK_BLENDMODE(pstOpt->stBlendOpt.eSrc1BlendMode); //1235
+   	      TDE_CHECK_BLENDMODE(pstOpt->stBlendOpt.eSrc2BlendMode); //1236
         }    	
     }
  
@@ -1861,15 +1650,15 @@ STATIC HI_S32 TdeOsiGetScanInfo(TDE2_SURFACE_S *pSrc, TDE2_RECT_S *pstSrcRect, T
     TDE2_MIRROR_E enMirror = TDE2_MIRROR_NONE;
     HI_S32 s32SrcdBpp, s32DstBpp;
 
-    TDE_ASSERT(NULL != pSrc);
+    TDE_ASSERT(NULL != pSrc); //1500
     TDE_ASSERT(NULL != pstSrcRect);
     TDE_ASSERT(NULL != pstDst);
     TDE_ASSERT(NULL != pstDstRect);
     TDE_ASSERT(NULL != pstSrcDirection);
-    TDE_ASSERT(NULL != pstDstDirection);
+    TDE_ASSERT(NULL != pstDstDirection); //1505
 
     /* when writing, subbyte format align ask for byte align of start point */
-    TDE_CHECK_SUBBYTE_STARTX(pstDstRect->s32Xpos, pstDstRect->u32Width, pstDst->enColorFmt);
+    TDE_CHECK_SUBBYTE_STARTX(pstDstRect->s32Xpos, pstDstRect->u32Width, pstDst->enColorFmt); //1508
 
     /* default scanning direction */
     pstSrcDirection->enHScan = TDE_SCAN_LEFT_RIGHT;
@@ -1883,37 +1672,14 @@ STATIC HI_S32 TdeOsiGetScanInfo(TDE2_SURFACE_S *pSrc, TDE2_RECT_S *pstSrcRect, T
         {
             bFilter = HI_TRUE;
         }
-        #if 0
-        if ((pstOpt->enDeflickerMode != TDE2_DEFLICKER_MODE_NONE)
-            || (pstOpt->bResize && pstSrcRect->u32Height != pstDstRect->u32Height))
-        {
-            if (TDE2_COLOR_FMT_YCbCr422 == pstDst->enColorFmt)
-            {
-                pstSrcDirection->enHScan = TDE_SCAN_RIGHT_LEFT;
-                pstDstDirection->enHScan = TDE_SCAN_RIGHT_LEFT;
-            }
-        }
-        #endif
         enMirror = pstOpt->enMirror;
     }
 
     if (enMirror && bFilter)
     {
-        TDE_TRACE(TDE_KERN_INFO, "Could not support VF/FF/HF and Mirror\n!");
+        TDE_TRACE(TDE_KERN_INFO, "Could not support VF/FF/HF and Mirror\n!"); //1527
         return -1;
     }
-#if 0
-    if (TDE2_COLOR_FMT_YCbCr422 == pstDst->enColorFmt)
-    {
-        pstSrcDirection->enHScan = TDE_SCAN_RIGHT_LEFT;
-        pstDstDirection->enHScan = TDE_SCAN_RIGHT_LEFT;
-    }
-    else
-    {
-        pstSrcDirection->enHScan = TDE_SCAN_LEFT_RIGHT;
-        pstDstDirection->enHScan = TDE_SCAN_LEFT_RIGHT;
-    }
-#endif
 
     if (bFilter) /* if use filter, use default scanning direction */
     {
@@ -1937,7 +1703,7 @@ STATIC HI_S32 TdeOsiGetScanInfo(TDE2_SURFACE_S *pSrc, TDE2_RECT_S *pstSrcRect, T
 
         if ((s32DstBpp < 0) || (s32SrcdBpp < 0))
         {
-            TDE_TRACE(TDE_KERN_INFO, "bits per pixel less than 0!\n");
+            TDE_TRACE(TDE_KERN_INFO, "bits per pixel less than 0!\n"); //1553
             return -1;
         }
 
@@ -2059,13 +1825,16 @@ STATIC INLINE HI_BOOL TdeOsiIsRect1InRect2(TDE2_RECT_S *pRect1, TDE2_RECT_S *pRe
 * Return:        none
 * Others:        none
 *****************************************************************************/
-STATIC INLINE HI_S32 TdeOsiSetMbPara(TDE_HANDLE s32Handle, TDE_HWNode_S* pHWNode,
+STATIC INLINE HI_S32 TdeOsiSetMbPara(TDE_HANDLE s32Handle, /*TDE_HWNode_S* pHWNode,*/
                                      TDE2_MB_S* pstMB, TDE2_RECT_S  *pstMbRect,
                                      TDE2_SURFACE_S* pstDst, TDE2_RECT_S  *pstDstRect,
                                      TDE2_MBOPT_S* pMbOpt)
 {
-    TDE_DRV_SURFACE_S stDrvS1;
-    TDE_DRV_SURFACE_S stDrvS2;
+	TDE_HWNode_S* pHWNode = 0; //fp48
+	TDE_HWNode_S* pHWNode1 = 0; //fp52
+	TDE_HWNode_S* pHWNode2 = 0; //fp56
+    TDE_DRV_SURFACE_S stDrvS1 = {0}; //fp176
+    TDE_DRV_SURFACE_S stDrvS2 = {0}; //fp228
     TDE_DRV_SURFACE_S stDrvS1Tmp = {0};
     TDE_DRV_SURFACE_S stDrvS2Tmp = {0};
     TDE_DRV_CONV_MODE_CMD_S stConv = {0};
@@ -2097,7 +1866,7 @@ STATIC INLINE HI_S32 TdeOsiSetMbPara(TDE_HANDLE s32Handle, TDE_HWNode_S* pHWNode
     {
         enPicMode = TDE_TOP_FIELD_PIC_MODE;
     }
-#if 1
+#if 0
     if((pstDstRect->u32Height == pstMbRect->u32Height)
         &&(pstDstRect->u32Width == pstMbRect->u32Width))
     {
@@ -2123,33 +1892,47 @@ STATIC INLINE HI_S32 TdeOsiSetMbPara(TDE_HANDLE s32Handle, TDE_HWNode_S* pHWNode
         /* set brightness bitmap format which driver layer need */
         if (TdeOsiConvertMbSurface(pstMB, pstMbRect, &stDrvS1, HI_NULL, TDE_FRAME_PIC_MODE, HI_FALSE) < 0)
         {
-            TDE_TRACE(TDE_KERN_INFO, "TdeOsiConvertMbSurface error!\n");\
+            TDE_TRACE(TDE_KERN_INFO, "TdeOsiConvertMbSurface error!\n"); //1718
             return HI_ERR_TDE_INVALID_PARA;
         }
 
         /* 0nly operate on brightness */
-        TdeHalNodeInitNd(pHWNode, HI_FALSE);
+        TdeHalNodeInitNd(&pHWNode); //, HI_FALSE);
 
         /* foreground's size need set to brightness's size */
         TdeHalNodeSetSrcMbY(pHWNode, &stDrvS1, TDE_MB_Y_FILTER);
         TdeHalNodeSetSrcMbCbCr(pHWNode, &stDrvS1, TDE_MB_Y_FILTER);
         TdeHalNodeSetTgt(pHWNode, &stDrvDst, enAlphaFrom);
-        TdeHalNodeSetBaseOperate(pHWNode, TDE_MB_Y_OPT, TDE_ALU_NONE, 0);
+        if (TdeHalNodeSetBaseOperate(pHWNode, TDE_MB_Y_OPT, TDE_ALU_NONE, 0) < 0)
+        {
+        	TdeHalFreeNodeBuf(pHWNode);
+        	return 0xa064800b;
+        }
         stMbCmd.enMbMode = TDE_MB_CONCA_FILTER;
         TdeHalNodeSetMbMode(pHWNode, &stMbCmd);
         TdeHalNodeSetGlobalAlpha(pHWNode, pMbOpt->u8OutAlpha, HI_TRUE);
 
         if ((s32Ret = TdeOsiMbSetClipPara(pstDstRect, pMbOpt, pHWNode)) < 0)
         {
+        	TdeHalFreeNodeBuf(pHWNode);
             return s32Ret;
         }
 
-        TdeHalNodeSetColorConvert(pHWNode, &stConv);
+        if (TdeHalNodeSetColorConvert(pHWNode, &stConv) < 0)
+        {
+        	TdeHalFreeNodeBuf(pHWNode);
+        	return 0xa064800b;
+        }
         TDeHalNodeSetCsc(pHWNode, stCscOpt);
         /* if no filter operate,complete node setting directly */
         if ((TDE2_MBRESIZE_NONE == pMbOpt->enResize) && (HI_FALSE == pMbOpt->bDeflicker))
         {
-            return TdeOsiSetNodeFinish(s32Handle, pHWNode, 0, TDE_NODE_SUBM_ALONE);
+            s32Ret = TdeOsiSetNodeFinish(s32Handle, pHWNode, 0, TDE_NODE_SUBM_ALONE);
+            if (s32Ret < 0)
+            {
+            	TdeHalFreeNodeBuf(pHWNode);
+            	return s32Ret;
+            }
         }
         else
         {
@@ -2158,14 +1941,25 @@ STATIC INLINE HI_S32 TdeOsiSetMbPara(TDE_HANDLE s32Handle, TDE_HWNode_S* pHWNode
             TdeOsiCalcMbFilterOpt(&stFilterOpt, pstMB->enMbFmt, TDE2_MB_COLOR_FMT_JPG_YCbCr444MBP, 
                                   pstMbRect, pstDstRect, HI_FALSE, HI_FALSE, TDE_FRAME_PIC_MODE);
             stFilterOpt.stAdjInfo.enScaleMode = TDE_CHILD_SCALE_MBY;
-            return TdeOsiSetFilterChildNode(s32Handle, pHWNode, &stInRect, pstDstRect, enDeflickerMode,
+            s32Ret = TdeOsiSetFilterChildNode(s32Handle, pHWNode, &stInRect, pstDstRect, enDeflickerMode,
                                             &stFilterOpt);
+            if (s32Ret < 0)
+            {
+            	TdeHalFreeNodeBuf(pHWNode);
+            	return s32Ret;
+            }
         }
+#if 0 //TODO
+        return HI_SUCCESS;
+#endif
     }
-
+    else
+    {
+#warning TODO
     if (TdeOsiConvertMbSurface(pstMB, pstMbRect, &stDrvS1, &stDrvS2, enPicMode, HI_FALSE) < 0)
     {
-        TDE_TRACE(TDE_KERN_INFO, "could not transfer mb paras!\n");
+        TDE_TRACE(TDE_KERN_INFO, "could not transfer mb paras!\n"); //1780
+        TdeHalFreeNodeBuf(pHWNode);
         return HI_ERR_TDE_INVALID_PARA;
     }
 
@@ -2180,22 +1974,27 @@ STATIC INLINE HI_S32 TdeOsiSetMbPara(TDE_HANDLE s32Handle, TDE_HWNode_S* pHWNode
                               pstDst, pstDstRect, enPicMode, pMbOpt);
     if (-1 == s32Ret)
     {
+        TdeHalFreeNodeBuf(pHWNode);
         return HI_ERR_TDE_UNSUPPORTED_OPERATION;
     }
     u32WorkBufNum = (HI_U32)s32Ret;
-    TDE_TRACE(TDE_KERN_DEBUG, "u32WorkBufNum:%d\n", u32WorkBufNum);
+    TDE_TRACE(TDE_KERN_DEBUG, "u32WorkBufNum:%d\n", u32WorkBufNum); //1800
 
     switch (pMbOpt->enResize)
     {
         case TDE2_MBRESIZE_QUALITY_HIGH:
         {
             TDE2_DEFLICKER_MODE_E enDeflickerMode = ((pMbOpt->bDeflicker)?(TDE2_DEFLICKER_MODE_RGB):(TDE2_DEFLICKER_MODE_NONE));
-            TDE_TRACE(TDE_KERN_DEBUG, "High Quality Mb Resize!\n");
+            TDE_TRACE(TDE_KERN_DEBUG, "High Quality Mb Resize!\n"); //1807
             /* pass1. brightness zoom at first(deflicker) */
-            TdeHalNodeInitNd(pHWNode, HI_FALSE);
+			TdeHalNodeInitNd(&pHWNode); //, HI_FALSE);
             TdeHalNodeSetSrcMbY(pHWNode, &stDrvS1, TDE_MB_Y_FILTER);
             TdeHalNodeSetTgt(pHWNode, &stDrvS1Tmp, enAlphaFrom);
-            TdeHalNodeSetBaseOperate(pHWNode, TDE_MB_Y_OPT, TDE_ALU_NONE, 0);
+            if (TdeHalNodeSetBaseOperate(pHWNode, TDE_MB_Y_OPT, TDE_ALU_NONE, 0) < 0)
+            {
+                TdeHalFreeNodeBuf(pHWNode);
+            	return 0xa064800b;
+            }
             stMbCmd.enMbMode = TDE_MB_Y_FILTER;
             TdeHalNodeSetMbMode(pHWNode, &stMbCmd);
             TdeOsiCalcMbFilterOpt(&stFilterOpt, pstMB->enMbFmt, TDE2_MB_COLOR_FMT_JPG_YCbCr444MBP, 
@@ -2206,22 +2005,28 @@ STATIC INLINE HI_S32 TdeOsiSetMbPara(TDE_HANDLE s32Handle, TDE_HWNode_S* pHWNode
             if ((s32Ret = TdeOsiSetFilterChildNode(s32Handle, pHWNode, &stInRect, &stOutRect, enDeflickerMode,
                                               &stFilterOpt)) < 0)
             {
-                tde_osr_disableirq();
+                //tde_osr_disableirq();
                 TdeOsiListPutPhyBuff(u32WorkBufNum);
-                tde_osr_enableirq();
-                TDE_TRACE(TDE_KERN_INFO, "mb high quality pass1 fail\n!");
+                //tde_osr_enableirq();
+                TdeHalFreeNodeBuf(pHWNode);
+                TDE_TRACE(TDE_KERN_INFO, "mb high quality pass1 fail\n!"); //1829
                 return s32Ret;
             }
 
             /* pass2. chroma zoom at then */
-            TdeHalNodeInitNd(pHWNode, HI_FALSE);
+            TdeHalNodeInitNd(&pHWNode1); //, HI_FALSE);
 
             /* foreground size restore to chroma size */
-            TdeHalNodeSetSrcMbCbCr(pHWNode, &stDrvS2, TDE_MB_CbCr_FILTER);
-            TdeHalNodeSetTgt(pHWNode, &stDrvS2Tmp, enAlphaFrom);
-            TdeHalNodeSetBaseOperate(pHWNode, TDE_MB_C_OPT, TDE_ALU_NONE, 0);
+            TdeHalNodeSetSrcMbCbCr(pHWNode1, &stDrvS2, TDE_MB_CbCr_FILTER);
+            TdeHalNodeSetTgt(pHWNode1, &stDrvS2Tmp, enAlphaFrom);
+            if (TdeHalNodeSetBaseOperate(pHWNode1, TDE_MB_C_OPT, TDE_ALU_NONE, 0) < 0)
+            {
+                TdeHalFreeNodeBuf(pHWNode);
+                TdeHalFreeNodeBuf(pHWNode1);
+            	return 0xa064800b;
+            }
             stMbCmd.enMbMode = TDE_MB_CbCr_FILTER;
-            TdeHalNodeSetMbMode(pHWNode, &stMbCmd);
+            TdeHalNodeSetMbMode(pHWNode1, &stMbCmd);
 
             /* calculate chroma step and offset,
             	note:step calculation need use chroma width and height,
@@ -2231,41 +2036,61 @@ STATIC INLINE HI_S32 TdeOsiSetMbPara(TDE_HANDLE s32Handle, TDE_HWNode_S* pHWNode
             TDE_FILLUP_RECT_BY_DRVSURFACE(stInRect, stDrvS2);
             TDE_FILLUP_RECT_BY_DRVSURFACE(stOutRect, stDrvS2Tmp);
             TdeOsiSetFilterOptAdjInfo(&stDrvS2, &stDrvS2Tmp, &stFilterOpt, TDE_CHILD_SCALE_MBC);
-            if ((s32Ret = TdeOsiSetFilterChildNode(s32Handle, pHWNode, &stInRect, &stOutRect, HI_FALSE /*pMbOpt->bDeflicker*/,
+            if ((s32Ret = TdeOsiSetFilterChildNode(s32Handle, pHWNode1, &stInRect, &stOutRect, HI_FALSE /*pMbOpt->bDeflicker*/,
                                               &stFilterOpt)) < 0)
             {
-                tde_osr_disableirq();
+                //tde_osr_disableirq();
                 TdeOsiListPutPhyBuff(u32WorkBufNum);
-                tde_osr_enableirq();
-                TDE_TRACE(TDE_KERN_INFO, "mb high quality pass2 fail\n!");
+                //tde_osr_enableirq();
+                TdeHalFreeNodeBuf(pHWNode);
+                TdeHalFreeNodeBuf(pHWNode1);
+                TDE_TRACE(TDE_KERN_INFO, "mb high quality pass2 fail\n!"); //1862
                 return s32Ret;
             }
 
             /* pass3. brightness and chroma combination */
-            TdeHalNodeInitNd(pHWNode, HI_FALSE);
-            TdeHalNodeSetColorConvert(pHWNode, &stConv);
-            TDeHalNodeSetCsc(pHWNode, stCscOpt);
-            TdeHalNodeSetSrcMbY(pHWNode, &stDrvS1Tmp, TDE_MB_CONCA_FILTER);
-            TdeHalNodeSetSrcMbCbCr(pHWNode, &stDrvS2Tmp, TDE_MB_CONCA_FILTER);
-            TdeHalNodeSetTgt(pHWNode, &stDrvDst, enAlphaFrom);
-            TdeHalNodeSetGlobalAlpha(pHWNode, pMbOpt->u8OutAlpha, HI_TRUE);
-            TdeHalNodeSetBaseOperate(pHWNode, TDE_MB_2OPT, TDE_ALU_NONE, 0);
+            TdeHalNodeInitNd(&pHWNode2); //, HI_FALSE);
+            if (TdeHalNodeSetColorConvert(pHWNode2, &stConv) < 0)
+            {
+                TdeHalFreeNodeBuf(pHWNode);
+                TdeHalFreeNodeBuf(pHWNode1);
+                TdeHalFreeNodeBuf(pHWNode2);
+            	return 0xa064800b;
+            }
+            TDeHalNodeSetCsc(pHWNode2, stCscOpt);
+            TdeHalNodeSetSrcMbY(pHWNode2, &stDrvS1Tmp, TDE_MB_CONCA_FILTER);
+            TdeHalNodeSetSrcMbCbCr(pHWNode2, &stDrvS2Tmp, TDE_MB_CONCA_FILTER);
+            TdeHalNodeSetTgt(pHWNode2, &stDrvDst, enAlphaFrom);
+            TdeHalNodeSetGlobalAlpha(pHWNode2, pMbOpt->u8OutAlpha, HI_TRUE);
+            if (TdeHalNodeSetBaseOperate(pHWNode2, TDE_MB_2OPT, TDE_ALU_NONE, 0) < 0)
+            {
+                TdeHalFreeNodeBuf(pHWNode);
+                TdeHalFreeNodeBuf(pHWNode1);
+                TdeHalFreeNodeBuf(pHWNode2);
+            	return 0xa064800b;
+            }
             stMbCmd.enMbMode = TDE_MB_CONCA_FILTER;
-            TdeHalNodeSetMbMode(pHWNode, &stMbCmd);
+            TdeHalNodeSetMbMode(pHWNode2, &stMbCmd);
             TdeOsiSetFilterOptAdjInfo(&stDrvS1Tmp, &stDrvDst, &stFilterOpt, TDE_CHILD_SCALE_MB_CONCA_H);
 
-            if ((s32Ret = TdeOsiMbSetClipPara(pstDstRect, pMbOpt, pHWNode)) < 0)
+            if ((s32Ret = TdeOsiMbSetClipPara(pstDstRect, pMbOpt, pHWNode2)) < 0)
             {
-                tde_osr_disableirq();
+                //tde_osr_disableirq();
                 TdeOsiListPutPhyBuff(u32WorkBufNum);
-                tde_osr_enableirq();
+                //tde_osr_enableirq();
+                TdeHalFreeNodeBuf(pHWNode);
+                TdeHalFreeNodeBuf(pHWNode1);
+                TdeHalFreeNodeBuf(pHWNode2);
                 return s32Ret;
             }
-            if ((s32Ret = TdeOsiSetNodeFinish(s32Handle, pHWNode, u32WorkBufNum, TDE_NODE_SUBM_ALONE)) < 0)
+            if ((s32Ret = TdeOsiSetNodeFinish(s32Handle, pHWNode2, u32WorkBufNum, TDE_NODE_SUBM_ALONE)) < 0)
             {
-                tde_osr_disableirq();
+                //tde_osr_disableirq();
                 TdeOsiListPutPhyBuff(u32WorkBufNum);
-                tde_osr_enableirq();
+                //tde_osr_enableirq();
+                TdeHalFreeNodeBuf(pHWNode);
+                TdeHalFreeNodeBuf(pHWNode1);
+                TdeHalFreeNodeBuf(pHWNode2);
                 return s32Ret;
             }
 
@@ -2275,12 +2100,16 @@ STATIC INLINE HI_S32 TdeOsiSetMbPara(TDE_HANDLE s32Handle, TDE_HWNode_S* pHWNode
         {
             TDE2_DEFLICKER_MODE_E enDeflickerMode = ((pMbOpt->bDeflicker)?(TDE2_DEFLICKER_MODE_RGB):(TDE2_DEFLICKER_MODE_NONE));
 
-            TDE_TRACE(TDE_KERN_DEBUG, "Middle Quality Mb Resize!\n");
+            TDE_TRACE(TDE_KERN_DEBUG, "Middle Quality Mb Resize!\n"); //1913
             /* pass1. chroma up-sample */
-            TdeHalNodeInitNd(pHWNode, HI_FALSE);
+            TdeHalNodeInitNd(&pHWNode); //, HI_FALSE);
             TdeHalNodeSetSrcMbCbCr(pHWNode, &stDrvS2, TDE_MB_CbCr_FILTER);
             TdeHalNodeSetTgt(pHWNode, &stDrvS1Tmp, enAlphaFrom);
-            TdeHalNodeSetBaseOperate(pHWNode, TDE_MB_C_OPT, TDE_ALU_NONE, 0);
+            if (TdeHalNodeSetBaseOperate(pHWNode, TDE_MB_C_OPT, TDE_ALU_NONE, 0) < 0)
+            {
+                TdeHalFreeNodeBuf(pHWNode);
+            	return 0xa064800b;
+            }
             stMbCmd.enMbMode = TDE_MB_CbCr_FILTER;
             TdeHalNodeSetMbMode(pHWNode, &stMbCmd);
 
@@ -2295,32 +2124,45 @@ STATIC INLINE HI_S32 TdeOsiSetMbPara(TDE_HANDLE s32Handle, TDE_HWNode_S* pHWNode
             if ((s32Ret = TdeOsiSetFilterChildNode(s32Handle, pHWNode, &stInRect, &stOutRect, HI_FALSE,
                                               &stFilterOpt)) < 0)
             {
-                tde_osr_disableirq();
+                //tde_osr_disableirq();
                 TdeOsiListPutPhyBuff(u32WorkBufNum);
-                tde_osr_enableirq();
-                TDE_TRACE(TDE_KERN_INFO, "mb middle quality pass1 fail\n!");
+                //tde_osr_enableirq();
+                TdeHalFreeNodeBuf(pHWNode);
+                TDE_TRACE(TDE_KERN_INFO, "mb middle quality pass1 fail\n!"); //1939
                 return s32Ret;
             }
 
             /* pass2. combinate brightness and chroma, then zoom */
-            TdeHalNodeInitNd(pHWNode, HI_FALSE);
+            TdeHalNodeInitNd(&pHWNode1); //, HI_FALSE);
             /* set encode by TdeHalNodeSetColorConvert */
-            TdeHalNodeSetColorConvert(pHWNode, &stConv);
-            TDeHalNodeSetCsc(pHWNode, stCscOpt);
-            stDrvS1.enColorFmt = TDE_DRV_COLOR_FMT_YCbCr444MB;
-            TdeHalNodeSetSrcMbY(pHWNode, &stDrvS1, TDE_MB_CONCA_FILTER);
-            TdeHalNodeSetSrcMbCbCr(pHWNode, &stDrvS1Tmp, TDE_MB_CONCA_FILTER);
-            TdeHalNodeSetTgt(pHWNode, &stDrvDst, enAlphaFrom);
-            TdeHalNodeSetGlobalAlpha(pHWNode, pMbOpt->u8OutAlpha, HI_TRUE);
-            TdeHalNodeSetBaseOperate(pHWNode, TDE_MB_2OPT, TDE_ALU_NONE, 0);
-            stMbCmd.enMbMode = TDE_MB_CONCA_FILTER;
-            TdeHalNodeSetMbMode(pHWNode, &stMbCmd);
-
-            if ((s32Ret = TdeOsiMbSetClipPara(pstDstRect, pMbOpt, pHWNode)) < 0)
+            if (TdeHalNodeSetColorConvert(pHWNode1, &stConv) < 0)
             {
-                tde_osr_disableirq();
+                TdeHalFreeNodeBuf(pHWNode);
+                TdeHalFreeNodeBuf(pHWNode1);
+            	return 0xa064800b;
+            }
+            TDeHalNodeSetCsc(pHWNode1, stCscOpt);
+            stDrvS1.enColorFmt = TDE_DRV_COLOR_FMT_YCbCr444MB;
+            TdeHalNodeSetSrcMbY(pHWNode1, &stDrvS1, TDE_MB_CONCA_FILTER);
+            TdeHalNodeSetSrcMbCbCr(pHWNode1, &stDrvS1Tmp, TDE_MB_CONCA_FILTER);
+            TdeHalNodeSetTgt(pHWNode1, &stDrvDst, enAlphaFrom);
+            TdeHalNodeSetGlobalAlpha(pHWNode1, pMbOpt->u8OutAlpha, HI_TRUE);
+            if (TdeHalNodeSetBaseOperate(pHWNode1, TDE_MB_2OPT, TDE_ALU_NONE, 0) < 0)
+            {
+                TdeHalFreeNodeBuf(pHWNode);
+                TdeHalFreeNodeBuf(pHWNode1);
+            	return 0xa064800b;
+            }
+            stMbCmd.enMbMode = TDE_MB_CONCA_FILTER;
+            TdeHalNodeSetMbMode(pHWNode1, &stMbCmd);
+
+            if ((s32Ret = TdeOsiMbSetClipPara(pstDstRect, pMbOpt, pHWNode1)) < 0)
+            {
+                //tde_osr_disableirq();
                 TdeOsiListPutPhyBuff(u32WorkBufNum);
-                tde_osr_enableirq();
+                //tde_osr_enableirq();
+                TdeHalFreeNodeBuf(pHWNode);
+                TdeHalFreeNodeBuf(pHWNode1);
                 return s32Ret;
             }
             TdeOsiCalcMbFilterOpt(&stFilterOpt, pstMB->enMbFmt, TDE2_MB_COLOR_FMT_JPG_YCbCr444MBP, 
@@ -2328,12 +2170,14 @@ STATIC INLINE HI_S32 TdeOsiSetMbPara(TDE_HANDLE s32Handle, TDE_HWNode_S* pHWNode
             TDE_FILLUP_RECT_BY_DRVSURFACE(stInRect, stDrvS1);
             stFilterOpt.u32WorkBufNum = u32WorkBufNum;
             TdeOsiSetFilterOptAdjInfo(&stDrvS1, &stDrvDst, &stFilterOpt, TDE_CHILD_SCALE_MB_CONCA_M);
-            if((s32Ret = TdeOsiSetFilterChildNode(s32Handle, pHWNode, &stInRect, pstDstRect, 
+            if((s32Ret = TdeOsiSetFilterChildNode(s32Handle, pHWNode1, &stInRect, pstDstRect,
                                             enDeflickerMode, &stFilterOpt)) < 0)
             {
-                tde_osr_disableirq();
+                //tde_osr_disableirq();
                 TdeOsiListPutPhyBuff(u32WorkBufNum);
-                tde_osr_enableirq();
+                //tde_osr_enableirq();
+                TdeHalFreeNodeBuf(pHWNode);
+                TdeHalFreeNodeBuf(pHWNode1);
                 return s32Ret;
             }
             
@@ -2342,11 +2186,15 @@ STATIC INLINE HI_S32 TdeOsiSetMbPara(TDE_HANDLE s32Handle, TDE_HWNode_S* pHWNode
         case TDE2_MBRESIZE_QUALITY_LOW:
         {
             TDE2_DEFLICKER_MODE_E enDeflickerMode = ((pMbOpt->bDeflicker)?(TDE2_DEFLICKER_MODE_RGB):(TDE2_DEFLICKER_MODE_NONE));
-            TDE_TRACE(TDE_KERN_DEBUG, "Low Quality Mb Resize!\n");
+            TDE_TRACE(TDE_KERN_DEBUG, "Low Quality Mb Resize!\n"); //1992
             /* pass1. first connection and then zoom */
-            TdeHalNodeInitNd(pHWNode, HI_FALSE);
+            TdeHalNodeInitNd(&pHWNode); //, HI_FALSE);
             /* set encode by call TdeHalNodeSetColorConvert */
-            TdeHalNodeSetColorConvert(pHWNode, &stConv);
+            if (TdeHalNodeSetColorConvert(pHWNode, &stConv) < 0)
+            {
+                TdeHalFreeNodeBuf(pHWNode);
+            	return 0xa064800b;
+            }
             TDeHalNodeSetCsc(pHWNode, stCscOpt);
             TdeHalNodeSetSrcMbY(pHWNode, &stDrvS1, TDE_MB_CONCA_FILTER);
 
@@ -2354,14 +2202,19 @@ STATIC INLINE HI_S32 TdeOsiSetMbPara(TDE_HANDLE s32Handle, TDE_HWNode_S* pHWNode
             TdeHalNodeSetSrcMbCbCr(pHWNode, &stDrvS2, TDE_MB_CONCA_FILTER);
             TdeHalNodeSetTgt(pHWNode, &stDrvDst, enAlphaFrom);
             TdeHalNodeSetGlobalAlpha(pHWNode, pMbOpt->u8OutAlpha, HI_TRUE);
-            TdeHalNodeSetBaseOperate(pHWNode, TDE_MB_2OPT, TDE_ALU_NONE, 0);
+            if (TdeHalNodeSetBaseOperate(pHWNode, TDE_MB_2OPT, TDE_ALU_NONE, 0) < 0)
+            {
+                TdeHalFreeNodeBuf(pHWNode);
+            	return 0xa064800b;
+            }
             stMbCmd.enMbMode = TDE_MB_CONCA_FILTER;
             TdeHalNodeSetMbMode(pHWNode, &stMbCmd);
             if ((s32Ret = TdeOsiMbSetClipPara(pstDstRect, pMbOpt, pHWNode)) < 0)
             {
-                tde_osr_disableirq();
+                //tde_osr_disableirq();
                 TdeOsiListPutPhyBuff(u32WorkBufNum);
-                tde_osr_enableirq();
+                //tde_osr_enableirq();
+                TdeHalFreeNodeBuf(pHWNode);
                 return s32Ret;
             }
             TdeOsiCalcMbFilterOpt(&stFilterOpt, pstMB->enMbFmt, TDE2_MB_COLOR_FMT_JPG_YCbCr444MBP, 
@@ -2382,25 +2235,34 @@ STATIC INLINE HI_S32 TdeOsiSetMbPara(TDE_HANDLE s32Handle, TDE_HWNode_S* pHWNode
         default:     /*TDE_MBRESIZE_NONE*/
         {
             TDE2_DEFLICKER_MODE_E enDeflickerMode = ((pMbOpt->bDeflicker)?(TDE2_DEFLICKER_MODE_RGB):(TDE2_DEFLICKER_MODE_NONE));
-            TDE_TRACE(TDE_KERN_DEBUG, "Mb CUS by Filter!\n");
-            TDE_TRACE(TDE_KERN_DEBUG, "Mb CUS by Filter!\n");
+            TDE_TRACE(TDE_KERN_DEBUG, "Mb CUS by Filter!\n"); //2038
+            TDE_TRACE(TDE_KERN_DEBUG, "Mb CUS by Filter!\n"); //2039
             /* first up-sample, then connection */
-            TdeHalNodeInitNd(pHWNode, HI_FALSE);
+            TdeHalNodeInitNd(&pHWNode); //, HI_FALSE);
             /* set encode by call TdeHalNodeSetColorConvert */
-            TdeHalNodeSetColorConvert(pHWNode, &stConv);
+            if (TdeHalNodeSetColorConvert(pHWNode, &stConv) < 0)
+            {
+                TdeHalFreeNodeBuf(pHWNode);
+            	return 0xa064800b;
+            }
             TDeHalNodeSetCsc(pHWNode, stCscOpt);
             TdeHalNodeSetSrcMbY(pHWNode, &stDrvS1, TDE_MB_UPSAMP_CONCA);
             TdeHalNodeSetSrcMbCbCr(pHWNode, &stDrvS2, TDE_MB_UPSAMP_CONCA);
             TdeHalNodeSetTgt(pHWNode, &stDrvDst, enAlphaFrom);
             TdeHalNodeSetGlobalAlpha(pHWNode, pMbOpt->u8OutAlpha, HI_TRUE);
-            TdeHalNodeSetBaseOperate(pHWNode, TDE_MB_2OPT, TDE_ALU_CONCA, 0);
+            if (TdeHalNodeSetBaseOperate(pHWNode, TDE_MB_2OPT, TDE_ALU_CONCA, 0) < 0)
+            {
+                TdeHalFreeNodeBuf(pHWNode);
+            	return 0xa064800b;
+            }
             stMbCmd.enMbMode = TDE_MB_UPSAMP_CONCA;
             TdeHalNodeSetMbMode(pHWNode, &stMbCmd);
             if ((s32Ret = TdeOsiMbSetClipPara(pstDstRect, pMbOpt, pHWNode)) < 0)
             {
-                tde_osr_disableirq();
+                //tde_osr_disableirq();
                 TdeOsiListPutPhyBuff(u32WorkBufNum);
-                tde_osr_enableirq();
+                //tde_osr_enableirq();
+                TdeHalFreeNodeBuf(pHWNode);
                 return s32Ret;
             }
             TdeOsiCalcMbFilterOpt(&stFilterOpt, pstMB->enMbFmt, TDE2_MB_COLOR_FMT_JPG_YCbCr444MBP, 
@@ -2410,14 +2272,15 @@ STATIC INLINE HI_S32 TdeOsiSetMbPara(TDE_HANDLE s32Handle, TDE_HWNode_S* pHWNode
             if((s32Ret = TdeOsiSetFilterChildNode(s32Handle, pHWNode, &stInRect, pstDstRect, 
                                             enDeflickerMode, &stFilterOpt)) < 0)
             {
-                tde_osr_disableirq();
+                //tde_osr_disableirq();
                 TdeOsiListPutPhyBuff(u32WorkBufNum);
-                tde_osr_enableirq();
+                //tde_osr_enableirq();
+                TdeHalFreeNodeBuf(pHWNode);
                 return s32Ret;
             }
         }
     }
-
+    }
     return HI_SUCCESS;
 }
 
@@ -3213,12 +3076,17 @@ STATIC HI_S32 TdeOsiSetFilterChildNode(TDE_HANDLE s32Handle, TDE_HWNode_S* pNode
     HI_S32 i;
     HI_U32 u32TDE_CLIP_START = pNode->u32TDE_CLIP_START;
     HI_U32 u32TDE_CLIP_STOP = pNode->u32TDE_CLIP_STOP;
+	TDE_HWNode_S* r5;
+	TDE_HWNode_Outer_S* fp184;
 
-    TDE_TRACE(TDE_KERN_DEBUG, "slice calc u32MaxSliceNum: %d!\n", u32MaxSliceNum);
-
-    tde_osr_disableirq();    
+    TDE_TRACE(TDE_KERN_DEBUG, "slice calc u32MaxSliceNum: %d!\n", u32MaxSliceNum); //2726
+#if 0
+    tde_osr_disableirq();
     sliceInfo = TDE_MALLOC(u32MaxSliceNum * sizeof(TDE_SLICE_INFO));
     tde_osr_enableirq();
+#else
+    sliceInfo = kmalloc(u32MaxSliceNum * sizeof(TDE_SLICE_INFO), GFP_KERNEL);
+#endif
     if (HI_NULL == sliceInfo)
     {
         return HI_ERR_TDE_NO_MEM;
@@ -3245,7 +3113,7 @@ STATIC HI_S32 TdeOsiSetFilterChildNode(TDE_HANDLE s32Handle, TDE_HWNode_S* pNode
     if ((HI_FALSE == bDeflicker)
         && (TDE_NO_SCALE_STEP == pstFilterOpt->u32VStep))
     {
-        TDE_TRACE(TDE_KERN_DEBUG, "one slice block for filter!\n");
+        TDE_TRACE(TDE_KERN_DEBUG, "one slice block for filter!\n"); //2758
         u32SliceNum = 1;
         sliceInfo[0].s32SliceHOfst = pstFilterOpt->s32HOffset;
         sliceInfo[0].u32SliceWi = pInRect->u32Width;
@@ -3259,7 +3127,7 @@ STATIC HI_S32 TdeOsiSetFilterChildNode(TDE_HANDLE s32Handle, TDE_HWNode_S* pNode
     else if ((TDE_NO_SCALE_STEP == pstFilterOpt->u32HStep) 
              && ((bDeflicker) || (TDE_NO_SCALE_STEP != pstFilterOpt->u32VStep)))
     {
-        TDE_TRACE(TDE_KERN_DEBUG, "NoLap slice block for filter!\n");
+        TDE_TRACE(TDE_KERN_DEBUG, "NoLap slice block for filter!\n"); //2772
         u32SliceNum = TdeOsiCalcNoLapSlice(sliceInfo, u32MaxSliceNum, (HI_U32)(pInRect->s32Xpos), 
                                            (HI_U32)(pOutRect->s32Xpos),
                                            pInRect->u32Width, pstFilterOpt);
@@ -3270,16 +3138,24 @@ STATIC HI_S32 TdeOsiSetFilterChildNode(TDE_HANDLE s32Handle, TDE_HWNode_S* pNode
     else if ((TDE_NO_SCALE_STEP != pstFilterOpt->u32HStep) 
              && ((bDeflicker) || (TDE_NO_SCALE_STEP != pstFilterOpt->u32VStep)))
     {
-        TDE_TRACE(TDE_KERN_DEBUG, "OverLap slice block for filter!\n");
+        TDE_TRACE(TDE_KERN_DEBUG, "OverLap slice block for filter!\n"); //2783
         u32SliceNum = TdeOsiCalcOverLapSlice(sliceInfo, u32MaxSliceNum, pInRect->s32Xpos,
                                              pInRect->u32Width, (HI_U32)pOutRect->s32Xpos, 
                                              pOutRect->u32Width, pstFilterOpt);
-        TDE_TRACE(TDE_KERN_DEBUG, "slice real u32SliceNum: %d!\n", u32SliceNum);
+        TDE_TRACE(TDE_KERN_DEBUG, "slice real u32SliceNum: %d!\n", u32SliceNum); //2787
         stChildInfo.u64Update = 0x1F;
     }
 
+#if 0
     /* set filter parameter information of parent node */
     TdeOsiSetResizePara(pNode, pstFilterOpt, TDE_NODE_SUBM_PARENT);
+#else
+    if (TdeHalNodeSetResize(pNode, pstFilterOpt, TDE_NODE_SUBM_PARENT) < 0)
+    {
+    	kfree(sliceInfo);
+    	return 0xa064800b;
+    }
+#endif
 
     if (bDeflicker)
     {
@@ -3311,7 +3187,7 @@ STATIC HI_S32 TdeOsiSetFilterChildNode(TDE_HANDLE s32Handle, TDE_HWNode_S* pNode
     s32Ret = TdeOsiSetNodeFinish(s32Handle, pNode, pstFilterOpt->u32WorkBufNum, TDE_NODE_SUBM_PARENT);
     if (HI_SUCCESS != s32Ret)
     {
-        TDE_FREE(sliceInfo);
+        /*TDE_FREE*/kfree(sliceInfo);
         return s32Ret;
     }
 
@@ -3321,11 +3197,33 @@ STATIC HI_S32 TdeOsiSetFilterChildNode(TDE_HANDLE s32Handle, TDE_HWNode_S* pNode
     {
         for (i = u32FirstNum + 1; i < (HI_S32)u32SliceNum; i++)
         {
+            fp184 = wmalloc(sizeof(TDE_HWNode_Outer_S));
+			if (fp184 == NULL)
+			{
+				TDE_TRACE(TDE_KERN_INFO, "malloc (%d) failed, wgetfreenum(%d)!\n", sizeof(TDE_HWNode_Outer_S), wgetfreenum()); //2849
+				s32Ret = 0xa0648004;
+                /*TDE_FREE*/kfree(sliceInfo);
+                return s32Ret;
+			}
+
+			r5 = &(fp184->Data_16);
+
+            *r5 = *pNode;
+
             //TdeHalNodeInitNd(pNode, HI_TRUE);
             /* AE5D03390: outside software evade zone, clip bug */
-            TdeHalNodeInitChildNd(pNode,u32TDE_CLIP_START, u32TDE_CLIP_STOP);
+            TdeHalNodeInitChildNd(r5/*pNode*/,u32TDE_CLIP_START, u32TDE_CLIP_STOP);
             /* set child node fliter parameter information */
+#if 0
             TdeOsiSetResizePara(pNode, pstFilterOpt, TDE_NODE_SUBM_CHILD);
+#else
+			if (TdeHalNodeSetResize(r5/*pNode*/, pstFilterOpt, TDE_NODE_SUBM_CHILD) < 0)
+			{
+				/*TDE_FREE*/kfree(sliceInfo);
+				wfree(fp184);
+				return 0xa064800b;
+			}
+#endif
             stChildInfo.u32Xi = sliceInfo[i].u32SliceXi;
             stChildInfo.u32Yi = (HI_U32)pInRect->s32Ypos;
             stChildInfo.u32Wi = sliceInfo[i].u32SliceWi;
@@ -3337,13 +3235,14 @@ STATIC HI_S32 TdeOsiSetFilterChildNode(TDE_HANDLE s32Handle, TDE_HWNode_S* pNode
             stChildInfo.u32Wo = sliceInfo[i].u32SliceWo;
             stChildInfo.u32Ho = pOutRect->u32Height;
             stChildInfo.enSliceType = sliceInfo[i].enSliceType;
-            TdeHalNodeAddChild(pNode, &stChildInfo);
-            s32Ret = TdeOsiSetNodeFinish(s32Handle, pNode, 0, TDE_NODE_SUBM_CHILD);
+            TdeHalNodeAddChild(r5/*pNode*/, &stChildInfo);
+            s32Ret = TdeOsiSetNodeFinish(s32Handle, r5/*pNode*/, 0, TDE_NODE_SUBM_CHILD);
             if (HI_SUCCESS != s32Ret)
             {
-                tde_osr_disableirq();
-                TDE_FREE(sliceInfo);
-                tde_osr_enableirq();
+                //tde_osr_disableirq();
+                kfree/*TDE_FREE*/(sliceInfo);
+                //tde_osr_enableirq();
+                wfree(fp184);
                 return s32Ret;
             }
         }
@@ -3352,10 +3251,32 @@ STATIC HI_S32 TdeOsiSetFilterChildNode(TDE_HANDLE s32Handle, TDE_HWNode_S* pNode
     {
         for (i = u32FirstNum - 1; i >= 0; i--)
         {
+            fp184 = wmalloc(sizeof(TDE_HWNode_Outer_S));
+			if (fp184 == NULL)
+			{
+				TDE_TRACE(TDE_KERN_INFO, "malloc (%d) failed, wgetfreenum(%d)!\n", sizeof(TDE_HWNode_Outer_S), wgetfreenum()); //2904
+				s32Ret = 0xa0648004;
+                /*TDE_FREE*/kfree(sliceInfo);
+                return s32Ret;
+			}
+
+			r5 = &(fp184->Data_16);
+
+            *r5 = *pNode;
+
             //TdeHalNodeInitNd(pNode, HI_TRUE);
             /* AE5D03390:outside software evade zone, clip bug */
-            TdeHalNodeInitChildNd(pNode,u32TDE_CLIP_START, u32TDE_CLIP_STOP);
+            TdeHalNodeInitChildNd(r5/*pNode*/,u32TDE_CLIP_START, u32TDE_CLIP_STOP);
+#if 0
             TdeOsiSetResizePara(pNode, pstFilterOpt, TDE_NODE_SUBM_CHILD);
+#else
+			if (TdeHalNodeSetResize(r5/*pNode*/, pstFilterOpt, TDE_NODE_SUBM_CHILD) < 0)
+			{
+				/*TDE_FREE*/kfree(sliceInfo);
+				wfree(fp184);
+				return 0xa064800b;
+			}
+#endif
             stChildInfo.u32Xi = sliceInfo[i].u32SliceXi;
             stChildInfo.u32Yi = (HI_U32)pInRect->s32Ypos;
             stChildInfo.u32Wi = sliceInfo[i].u32SliceWi;
@@ -3367,21 +3288,22 @@ STATIC HI_S32 TdeOsiSetFilterChildNode(TDE_HANDLE s32Handle, TDE_HWNode_S* pNode
             stChildInfo.u32Wo = sliceInfo[i].u32SliceWo;
             stChildInfo.u32Ho = pOutRect->u32Height;
             stChildInfo.enSliceType = sliceInfo[i].enSliceType;
-            TdeHalNodeAddChild(pNode, &stChildInfo);
-            s32Ret = TdeOsiSetNodeFinish(s32Handle, pNode, 0, TDE_NODE_SUBM_CHILD);
+            TdeHalNodeAddChild(r5/*pNode*/, &stChildInfo);
+            s32Ret = TdeOsiSetNodeFinish(s32Handle, r5/*pNode*/, 0, TDE_NODE_SUBM_CHILD);
             if (HI_SUCCESS != s32Ret)
             {
-                tde_osr_disableirq();
-                TDE_FREE(sliceInfo);
-                tde_osr_enableirq();
+                //tde_osr_disableirq();
+                kfree/*TDE_FREE*/(sliceInfo);
+                //tde_osr_enableirq();
+                wfree(fp184);
                 return s32Ret;
             }
         }
     }
 
-    tde_osr_disableirq();
-    TDE_FREE(sliceInfo);
-    tde_osr_enableirq();
+    //tde_osr_disableirq();
+    kfree/*TDE_FREE*/(sliceInfo);
+    //tde_osr_enableirq();
     
     return HI_SUCCESS;
 }
@@ -3429,7 +3351,7 @@ STATIC void TdeOsiGetHUpdateInfo(UpdateConfig *reg, UpdateInfo *info, int scaler
 	HI_S32 dratio=4096*(reg->zme_out_width-1)/(reg->ori_in_width-1); 
 	//TDE_ASSERT(update_hstart>=0 && update_hstop<reg->ori_in_width);
 	TDE_TRACE(TDE_KERN_DEBUG, "update_start:%d, update_hstop:%d, ori_in_width:%d\n", \
-	 update_hstart, update_hstop, reg->ori_in_width);
+	 update_hstart, update_hstop, reg->ori_in_width); //3003
 
 	if(1 != scaler_en)  /*hor_scaler not enable*/
     {
@@ -3515,7 +3437,7 @@ STATIC void TdeOsiGetVUpdateInfo(UpdateConfig *reg, UpdateInfo *info, int scaler
 	HI_S32 dratio=4096*(reg->zme_out_height-1)/(reg->ori_in_height-1);
 	//TDE_ASSERT(update_vstart>=0 && update_vstop<reg->ori_in_height);
 	TDE_TRACE(TDE_KERN_DEBUG, "update_vstart:%d, update_vstop:%d, ori_in_height:%d, ratio:%d��dratio:%d\n",\
-	update_vstart, update_vstop, reg->ori_in_height, ratio, dratio);
+	update_vstart, update_vstop, reg->ori_in_height, ratio, dratio); //3087
 
 	if(scaler_en==0 && deflicker_en==1)
 	{
@@ -3592,14 +3514,14 @@ STATIC void TdeOsiGetVUpdateInfo(UpdateConfig *reg, UpdateInfo *info, int scaler
             /*the update outstreatched area exceed the down limit bordline*/
 			zme_vinstop = reg->ori_in_height - 1;
 			zme_voutstop = reg->zme_out_height - 1;
-            TDE_TRACE(TDE_KERN_DEBUG, "update_vstop:%d zme_voutstop:%d\n", update_vstop, zme_voutstop);
+            TDE_TRACE(TDE_KERN_DEBUG, "update_vstop:%d zme_voutstop:%d\n", update_vstop, zme_voutstop); //3164
 		}
 		else
 		{
             /*the update outstreatched area didn't exceed the down limit bordline*/
 			zme_vinstop = (update_vstop+2+1)*dratio;
             zme_voutstop = (zme_vinstop%4096)==0 ? (zme_vinstop>>12): (zme_vinstop>>12) + 1; 
-            TDE_TRACE(TDE_KERN_DEBUG, "update_vstop:%d zme_voutstop:%d\n", update_vstop, zme_voutstop);
+            TDE_TRACE(TDE_KERN_DEBUG, "update_vstop:%d zme_voutstop:%d\n", update_vstop, zme_voutstop); //3171
 			zme_vinstop = zme_voutstop*ratio>>12;
 			if(zme_vinstop+2>(reg->ori_in_height-1))
 			{
@@ -3619,7 +3541,7 @@ STATIC void TdeOsiGetVUpdateInfo(UpdateConfig *reg, UpdateInfo *info, int scaler
 				
 		info->zme_in_height = zme_vinstop - zme_vinstart +1;
 		info->zme_instart_h = zme_vinstart;
-        TDE_TRACE(TDE_KERN_DEBUG, "zme_voutstart:%d, zme_voutstop:%d\n", zme_voutstart, zme_voutstop);
+        TDE_TRACE(TDE_KERN_DEBUG, "zme_voutstart:%d, zme_voutstop:%d\n", zme_voutstart, zme_voutstop); //3187
 		info->zme_outstart_h = zme_voutstart;
 		info->zme_out_height = zme_voutstop - zme_voutstart +1;
 		info->zme_vphase = zme_vphase;
@@ -3812,7 +3734,7 @@ STATIC HI_S32 TdeOsiSetFilterNode(TDE_HANDLE s32Handle, TDE_HWNode_S* pNode, TDE
     
     TDE_TRACE(TDE_KERN_DEBUG, "InHeight:%d, InWidth:%d, OutHeight:%d, OutWidth:%d,UpdateX:%d, UpdateY:%d,\
         UpdateW:%d, UpdateH:%d\n", reg.ori_in_height, reg.ori_in_width, reg.zme_out_height, reg.zme_out_width,\
-        reg.update_instart_w, reg.update_instart_h, reg.update_in_width, reg.update_in_height);
+        reg.update_instart_w, reg.update_instart_h, reg.update_in_width, reg.update_in_height); //3380
     /* local deflicker */
     if (((pstForeGround->u32Width != pInRect->u32Width) || (pstForeGround->u32Height != pInRect->u32Height))
         && s_bRegionDeflicker)
@@ -3850,7 +3772,7 @@ STATIC HI_S32 TdeOsiSetFilterNode(TDE_HANDLE s32Handle, TDE_HWNode_S* pNode, TDE
             bScale = HI_TRUE;
         }
         
-        TDE_TRACE(TDE_KERN_DEBUG, "bHScale:%x\n", bScale);
+        TDE_TRACE(TDE_KERN_DEBUG, "bHScale:%x\n", bScale); //3418
         TdeOsiGetHUpdateInfo(&reg, &info, bScale);
 
         bScale = HI_FALSE;
@@ -3858,14 +3780,14 @@ STATIC HI_S32 TdeOsiSetFilterNode(TDE_HANDLE s32Handle, TDE_HWNode_S* pNode, TDE
         {
             bScale = HI_TRUE;
         }
-        TDE_TRACE(TDE_KERN_DEBUG, "bVScale:%x\n", bScale);
+        TDE_TRACE(TDE_KERN_DEBUG, "bVScale:%x\n", bScale); //3426
         TdeOsiGetVUpdateInfo(&reg, &info, bScale, bDeflicker);
         TDE_TRACE(TDE_KERN_DEBUG, "zme_instart_w:%d, zme_instart_h:%d, zme_in_width:%d, \
             zme_in_height:%d, zme_outstart_w:%d, zme_outstart_h:%d, zme_out_width:%d, \
             zme_out_height:%d, zme_hphase:%d, zme_vphase:%d, def_offsetup:%d, def_offsetdown:%d\n",
             info.zme_instart_w, info.zme_instart_h, info.zme_in_width, info.zme_in_height, \
             info.zme_outstart_w, info.zme_outstart_h, info.zme_out_width, info.zme_out_height, \
-            info.zme_hphase, info.zme_vphase, info.def_offsetup, info.def_offsetdown);
+            info.zme_hphase, info.zme_vphase, info.def_offsetup, info.def_offsetdown); //3433
 
         stUpdateInRect.s32Xpos = info.zme_instart_w;
         stUpdateInRect.s32Ypos = info.zme_instart_h;
@@ -4007,7 +3929,7 @@ STATIC INLINE HI_VOID TdeOsiCalcMbFilterOpt(TDE_FILTER_OPT* pstFilterOpt, TDE2_M
     
     pstFilterOpt->bCoefSym = HI_TRUE; 
     pstFilterOpt->enFilterMode = TDE_DRV_FILTER_COLOR;
-    TDE_TRACE(TDE_KERN_DEBUG, "\n");
+    TDE_TRACE(TDE_KERN_DEBUG, "\n"); //3565
 }
 
 /*****************************************************************************
@@ -4060,9 +3982,14 @@ STATIC INLINE HI_VOID TdeOsiAdjPara4YCbCr422R(TDE2_SURFACE_S *pstDst, TDE2_RECT_
 STATIC HI_S32 TdeOsi1SourceFill(TDE_HANDLE s32Handle, TDE2_SURFACE_S *pstDst,
                                 TDE2_RECT_S  *pstDstRect, TDE2_FILLCOLOR_S *pstFillColor, TDE2_OPT_S *pstOpt)
 {
+	HI_S32 s32Ret;
     TDE_DRV_BASEOPT_MODE_E enBaseMode = {0};
     TDE_DRV_ALU_MODE_E enAluMode = {0};
+#if 0
     TDE_HWNode_S stHWNode = {0};
+#else
+    TDE_HWNode_S* stHWNode = 0;
+#endif
     TDE_DRV_SURFACE_S stDrvSurface = {0};
     TDE_DRV_COLORFILL_S stDrvColorFill = {0};
     TDE_SCANDIRECTION_S stScanInfo = {0};
@@ -4071,14 +3998,14 @@ STATIC HI_S32 TdeOsi1SourceFill(TDE_HANDLE s32Handle, TDE2_SURFACE_S *pstDst,
 
     if ((HI_NULL == pstDst) || (HI_NULL == pstDstRect) || (HI_NULL == pstFillColor))
     {
-        TDE_TRACE(TDE_KERN_INFO, "NULL pointer!\n");
+        TDE_TRACE(TDE_KERN_INFO, "NULL pointer!\n"); //3630
         return HI_ERR_TDE_NULL_PTR;
     }
 
     memcpy(&stDstRect, pstDstRect, sizeof(TDE2_RECT_S));
     
-    TDE_CHECK_NOT_MB(pstDst->enColorFmt);
-    TDE_CHECK_NOT_MB(pstFillColor->enColorFmt);
+    TDE_CHECK_NOT_MB(pstDst->enColorFmt); //3636
+    TDE_CHECK_NOT_MB(pstFillColor->enColorFmt); //3637
 
     if (TdeOsiCheckSurface(pstDst, &stDstRect) < 0)
     {
@@ -4086,12 +4013,15 @@ STATIC HI_S32 TdeOsi1SourceFill(TDE_HANDLE s32Handle, TDE2_SURFACE_S *pstDst,
     }
 
    
-    TDE_CHECK_SUBBYTE_STARTX(stDstRect.s32Xpos, stDstRect.u32Width, pstDst->enColorFmt);
+    TDE_CHECK_SUBBYTE_STARTX(stDstRect.s32Xpos, stDstRect.u32Width, pstDst->enColorFmt); //3645
 
     TdeOsiAdjPara4YCbCr422R(pstDst, &stDstRect, pstFillColor);
 
-    
+#if 0
     TdeHalNodeInitNd(&stHWNode, HI_FALSE);
+#else
+    TdeHalNodeInitNd(&stHWNode);
+#endif
 
     //TdeOsiSetExtAlpha(pstDst, NULL, &stHWNode); /* AI7D02681 */
 
@@ -4112,26 +4042,66 @@ STATIC HI_S32 TdeOsi1SourceFill(TDE_HANDLE s32Handle, TDE2_SURFACE_S *pstDst,
     }
     else
     {
-        TDE_CHECK_ALUCMD(pstOpt->enAluCmd);
+#if 0
+        TDE_CHECK_ALUCMD(pstOpt->enAluCmd); //3669
+#else
+		if(TDE2_ALUCMD_BUTT <= pstOpt->enAluCmd)
+		{
+			TDE_TRACE(TDE_KERN_INFO, "enAluCmd error!\n"); //3669
+			TdeHalFreeNodeBuf(stHWNode);
+			return HI_ERR_TDE_INVALID_PARA;
+		}
+#endif
         enBaseMode = TDE_NORM_FILL_1OPT;
         if (pstOpt->enAluCmd & TDE2_ALUCMD_ROP)
         {        
-            TDE_CHECK_ROPCODE(pstOpt->enRopCode_Color);
+#if 0
+            TDE_CHECK_ROPCODE(pstOpt->enRopCode_Color); //3678
             TDE_CHECK_ROPCODE(pstOpt->enRopCode_Alpha);
+#else
+			if((TDE2_ROP_BUTT <= pstOpt->enRopCode_Color) || (TDE2_ROP_BUTT <= pstOpt->enRopCode_Alpha))
+			{
+				TDE_TRACE(TDE_KERN_INFO, "enRopCode error!\n"); //3678
+            	TdeHalFreeNodeBuf(stHWNode);
+				return HI_ERR_TDE_INVALID_PARA;
+			}
+#endif
             enAluMode = TDE_ALU_ROP;
 
             
-            TdeHalNodeSetRop(&stHWNode, pstOpt->enRopCode_Color, pstOpt->enRopCode_Alpha);
+            if (TdeHalNodeSetRop(stHWNode, pstOpt->enRopCode_Color, pstOpt->enRopCode_Alpha) < 0)
+            {
+            	TdeHalFreeNodeBuf(stHWNode);
+            	return 0xa064800b;
+            }
         }
 
         if (pstOpt->enAluCmd & TDE2_ALUCMD_BLEND)
         {
-            TDE_CHECK_BLENDCMD(pstOpt->stBlendOpt.eBlendCmd);
-	     if (TDE2_BLENDCMD_CONFIG == pstOpt->stBlendOpt.eBlendCmd)
-	     {
-	          TDE_CHECK_BLENDMODE(pstOpt->stBlendOpt.eSrc1BlendMode);
-		   TDE_CHECK_BLENDMODE(pstOpt->stBlendOpt.eSrc2BlendMode);	  
-	     }
+#if 0
+            TDE_CHECK_BLENDCMD(pstOpt->stBlendOpt.eBlendCmd); //3696
+#else
+            if (pstOpt->stBlendOpt.eBlendCmd >= TDE2_BLENDCMD_BUTT)
+            {
+                TDE_TRACE(TDE_KERN_INFO, "Unknown blend cmd!\n"); //3696
+            	TdeHalFreeNodeBuf(stHWNode);
+                return HI_ERR_TDE_INVALID_PARA;
+            }
+#endif
+			 if (TDE2_BLENDCMD_CONFIG == pstOpt->stBlendOpt.eBlendCmd)
+			 {
+#if 0
+				 TDE_CHECK_BLENDMODE(pstOpt->stBlendOpt.eSrc1BlendMode); //3704
+				 TDE_CHECK_BLENDMODE(pstOpt->stBlendOpt.eSrc2BlendMode);
+#else
+				if ((pstOpt->stBlendOpt.eSrc1BlendMode >= TDE2_BLEND_BUTT) || (pstOpt->stBlendOpt.eSrc2BlendMode >= TDE2_BLEND_BUTT))
+				{
+					TDE_TRACE(TDE_KERN_INFO, "Unknown blend mode!\n"); //3704
+	            	TdeHalFreeNodeBuf(stHWNode);
+					return HI_ERR_TDE_INVALID_PARA;
+				}
+#endif
+			}
             enAluMode = TDE_ALU_BLEND;
 
 #if 0
@@ -4140,19 +4110,27 @@ STATIC HI_S32 TdeOsi1SourceFill(TDE_HANDLE s32Handle, TDE2_SURFACE_S *pstDst,
                 enAluMode = TDE_ALU_BLEND_SRC2;
             }
 #else
-            TdeHalNodeSetBlend(&stHWNode, &pstOpt->stBlendOpt);
+            if (TdeHalNodeSetBlend(stHWNode, &pstOpt->stBlendOpt) < 0)
+            {
+            	TdeHalFreeNodeBuf(stHWNode);
+            	return 0xa064800b;
+            }
 #endif
 
             if (pstOpt->enAluCmd & TDE2_ALUCMD_ROP)
             {
                
-                TdeHalNodeEnableAlphaRop(&stHWNode);
+                TdeHalNodeEnableAlphaRop(stHWNode);
             }
         }
 
         if (pstOpt->enAluCmd & TDE2_ALUCMD_COLORIZE)
         {
-            TdeHalNodeSetColorize(&stHWNode, pstOpt->u32Colorize);
+            if (TdeHalNodeSetColorize(stHWNode, pstOpt->u32Colorize) < 0)
+            {
+            	TdeHalFreeNodeBuf(stHWNode);
+            	return 0xa064800b;
+            }
         }
         
         if(TDE2_ALUCMD_NONE == pstOpt->enAluCmd)
@@ -4169,25 +4147,36 @@ STATIC HI_S32 TdeOsi1SourceFill(TDE_HANDLE s32Handle, TDE2_SURFACE_S *pstDst,
         }
         else
         {
-            TDE_TRACE(TDE_KERN_INFO, "invalid alu command!\n");
+            TDE_TRACE(TDE_KERN_INFO, "invalid alu command!\n"); //3745
+        	TdeHalFreeNodeBuf(stHWNode);
             return HI_ERR_TDE_INVALID_PARA;
         }
 
         enOutAlphaFrom = pstOpt->enOutAlphaFrom;
-        TDE_CHECK_OUTALPHAFROM(enOutAlphaFrom);
+#if 0
+        TDE_CHECK_OUTALPHAFROM(enOutAlphaFrom); //3753
+#else
+        if(TDE2_OUTALPHA_FROM_BUTT <= enOutAlphaFrom)
+        {
+            TDE_TRACE(TDE_KERN_INFO, "enOutAlphaFrom error!\n"); //3753
+        	TdeHalFreeNodeBuf(stHWNode);
+            return HI_ERR_TDE_INVALID_PARA;
+        }
+#endif
         if(TDE2_OUTALPHA_FROM_FOREGROUND == enOutAlphaFrom)
         {
-            TDE_TRACE(TDE_KERN_INFO, "enOutAlphaFrom error!\n");
+            TDE_TRACE(TDE_KERN_INFO, "enOutAlphaFrom error!\n"); //3759
+            TdeHalFreeNodeBuf(stHWNode);
             return HI_ERR_TDE_INVALID_PARA;
-            
         }
 
         
-        TdeHalNodeSetGlobalAlpha(&stHWNode, pstOpt->u8GlobalAlpha, pstOpt->stBlendOpt.bGlobalAlphaEnable);
+        TdeHalNodeSetGlobalAlpha(stHWNode, pstOpt->u8GlobalAlpha, pstOpt->stBlendOpt.bGlobalAlphaEnable);
         
         
-        if(TdeOsiSetClipPara(NULL, NULL, pstDst, &stDstRect, pstDst, &stDstRect, pstOpt, &stHWNode) < 0)
+        if(TdeOsiSetClipPara(NULL, NULL, pstDst, &stDstRect, pstDst, &stDstRect, pstOpt, stHWNode) < 0)
         {
+            TdeHalFreeNodeBuf(stHWNode);
             return HI_ERR_TDE_CLIP_AREA;
         }
     }
@@ -4197,6 +4186,7 @@ STATIC HI_S32 TdeOsi1SourceFill(TDE_HANDLE s32Handle, TDE2_SURFACE_S *pstDst,
     {
         if(TdeOsiColorConvert(pstFillColor, pstDst, &stDrvColorFill.u32FillData) < 0)
         {
+        	TdeHalFreeNodeBuf(stHWNode);
             return HI_ERR_TDE_INVALID_PARA;
         }
 	
@@ -4212,7 +4202,11 @@ STATIC HI_S32 TdeOsi1SourceFill(TDE_HANDLE s32Handle, TDE2_SURFACE_S *pstDst,
 
 
    
-    TdeHalNodeSetBaseOperate(&stHWNode, enBaseMode, enAluMode, &stDrvColorFill);
+    if (TdeHalNodeSetBaseOperate(stHWNode, enBaseMode, enAluMode, &stDrvColorFill) < 0)
+    {
+    	TdeHalFreeNodeBuf(stHWNode);
+    	return 0xa064800b;
+    }
 
   
     stScanInfo.enHScan = TDE_SCAN_LEFT_RIGHT;
@@ -4224,15 +4218,22 @@ STATIC HI_S32 TdeOsi1SourceFill(TDE_HANDLE s32Handle, TDE2_SURFACE_S *pstDst,
     if (TDE_NORM_FILL_1OPT == enBaseMode)
     {
         
-        TdeHalNodeSetSrc1(&stHWNode, &stDrvSurface);
+        TdeHalNodeSetSrc1(stHWNode, &stDrvSurface);
     }
 
     
-    TdeHalNodeSetTgt(&stHWNode, &stDrvSurface, enOutAlphaFrom);
+    TdeHalNodeSetTgt(stHWNode, &stDrvSurface, enOutAlphaFrom);
 
-    TdeOsiSetExtAlpha(pstDst, NULL, &stHWNode); /* AI7D02681 */
+    TdeOsiSetExtAlpha(pstDst, NULL, stHWNode); /* AI7D02681 */
     
-    return TdeOsiSetNodeFinish(s32Handle, &stHWNode, 0, TDE_NODE_SUBM_ALONE);
+    s32Ret = TdeOsiSetNodeFinish(s32Handle, stHWNode, 0, TDE_NODE_SUBM_ALONE);
+    if (s32Ret < 0)
+    {
+    	TdeHalFreeNodeBuf(stHWNode);
+    	return s32Ret;
+    }
+
+    return HI_SUCCESS;
 }
 
 /*****************************************************************************
@@ -4256,7 +4257,11 @@ STATIC HI_S32 TdeOsi2SourceFill(TDE_HANDLE s32Handle, TDE2_SURFACE_S* pstSrc, TD
 {
     TDE_DRV_BASEOPT_MODE_E enBaseMode = TDE_QUIKE_FILL;
     TDE_DRV_ALU_MODE_E enAluMode = TDE_SRC1_BYPASS;
+#if 0
     TDE_HWNode_S stHWNode = {0};
+#else
+    TDE_HWNode_S* stHWNode = 0;
+#endif
     TDE_DRV_SURFACE_S stDrvSurface = {0};
     TDE_DRV_COLORFILL_S stDrvColorFill = {0};
     TDE_SCANDIRECTION_S stSrcScanInfo = {0};
@@ -4279,13 +4284,12 @@ STATIC HI_S32 TdeOsi2SourceFill(TDE_HANDLE s32Handle, TDE2_SURFACE_S* pstSrc, TD
     memcpy(&stDstRect, pstDstRect, sizeof(TDE2_RECT_S));
 
     
-    TDE_CHECK_COLORFMT(pstFillColor->enColorFmt);
+    TDE_CHECK_COLORFMT(pstFillColor->enColorFmt); //3865
 
    
-    TDE_CHECK_OUTALPHAFROM(pstOpt->enOutAlphaFrom);
-
+    TDE_CHECK_OUTALPHAFROM(pstOpt->enOutAlphaFrom); //3868
    
-    TDE_CHECK_ALUCMD(pstOpt->enAluCmd);
+    TDE_CHECK_ALUCMD(pstOpt->enAluCmd); //3870
     
     if (TdeOsiCheckSurface(pstDst, &stDstRect) < 0)
     {
@@ -4302,29 +4306,60 @@ STATIC HI_S32 TdeOsi2SourceFill(TDE_HANDLE s32Handle, TDE2_SURFACE_S* pstSrc, TD
         TDE_UNIFY_RECT(&stSrcRect, &stDstRect);
     }
 
-    TdeHalNodeInitNd(&stHWNode, HI_FALSE);
+    TdeHalNodeInitNd(&stHWNode); //, HI_FALSE);
 
     enBaseMode = TDE_NORM_FILL_2OPT;
     enAluMode = TDE_ALU_NONE;
 
     if (pstOpt->enAluCmd & TDE2_ALUCMD_ROP)
     {        
+#if 0
         TDE_CHECK_ROPCODE(pstOpt->enRopCode_Color);
         TDE_CHECK_ROPCODE(pstOpt->enRopCode_Alpha);
+#else
+        if((TDE2_ROP_BUTT <= pstOpt->enRopCode_Color) || (TDE2_ROP_BUTT <= pstOpt->enRopCode_Alpha))
+        {
+            TDE_TRACE(TDE_KERN_INFO, "enRopCode error!\n"); //3896
+            TdeHalFreeNodeBuf(stHWNode);
+            return HI_ERR_TDE_INVALID_PARA;
+        }
+#endif
         
         enAluMode = TDE_ALU_ROP;
 
        
-        TdeHalNodeSetRop(&stHWNode, pstOpt->enRopCode_Color, pstOpt->enRopCode_Alpha);
+        if (TdeHalNodeSetRop(stHWNode, pstOpt->enRopCode_Color, pstOpt->enRopCode_Alpha) < 0)
+        {
+            TdeHalFreeNodeBuf(stHWNode);
+        	return 0xa064800b;
+        }
     }
     
     if (pstOpt->enAluCmd & TDE2_ALUCMD_BLEND)
     {
+#if 0
         TDE_CHECK_BLENDCMD(pstOpt->stBlendOpt.eBlendCmd);
+#else
+		if (pstOpt->stBlendOpt.eBlendCmd >= TDE2_BLENDCMD_BUTT)
+		{
+			TDE_TRACE(TDE_KERN_INFO, "Unknown blend cmd!\n"); //3912
+            TdeHalFreeNodeBuf(stHWNode);
+			return HI_ERR_TDE_INVALID_PARA;
+		}
+#endif
         if (pstOpt->stBlendOpt.eBlendCmd == TDE2_BLENDCMD_CONFIG)
         {
+#if 0
              TDE_CHECK_BLENDMODE(pstOpt->stBlendOpt.eSrc1BlendMode);
-	      TDE_CHECK_BLENDMODE(pstOpt->stBlendOpt.eSrc2BlendMode);	  
+             TDE_CHECK_BLENDMODE(pstOpt->stBlendOpt.eSrc2BlendMode);
+#else
+			if ((pstOpt->stBlendOpt.eSrc1BlendMode >= TDE2_BLEND_BUTT) || (pstOpt->stBlendOpt.eSrc2BlendMode >= TDE2_BLEND_BUTT))
+			{
+				TDE_TRACE(TDE_KERN_INFO, "Unknown blend mode!\n"); //3920
+	            TdeHalFreeNodeBuf(stHWNode);
+				return HI_ERR_TDE_INVALID_PARA;
+			}
+#endif
          }
         enAluMode = TDE_ALU_BLEND;
 
@@ -4334,45 +4369,60 @@ STATIC HI_S32 TdeOsi2SourceFill(TDE_HANDLE s32Handle, TDE2_SURFACE_S* pstSrc, TD
             enAluMode = TDE_ALU_BLEND_SRC2;
         }
 #else
-        TdeHalNodeSetBlend(&stHWNode, &pstOpt->stBlendOpt);
+        if (TdeHalNodeSetBlend(stHWNode, &pstOpt->stBlendOpt) < 0)
+        {
+            TdeHalFreeNodeBuf(stHWNode);
+        	return 0xa064800b;
+        }
 #endif
 
         if (pstOpt->enAluCmd & TDE2_ALUCMD_ROP)
         {
            
-            TdeHalNodeEnableAlphaRop(&stHWNode);
+            TdeHalNodeEnableAlphaRop(stHWNode);
         }
     }
     
     if (pstOpt->enAluCmd & TDE2_ALUCMD_COLORIZE)
     {
-        TdeHalNodeSetColorize(&stHWNode, pstOpt->u32Colorize);
+        if (TdeHalNodeSetColorize(stHWNode, pstOpt->u32Colorize) < 0)
+        {
+            TdeHalFreeNodeBuf(stHWNode);
+        	return 0xa064800b;
+        }
     }
 
     
-    TdeHalNodeSetGlobalAlpha(&stHWNode, pstOpt->u8GlobalAlpha, pstOpt->stBlendOpt.bGlobalAlphaEnable);
+    TdeHalNodeSetGlobalAlpha(stHWNode, pstOpt->u8GlobalAlpha, pstOpt->stBlendOpt.bGlobalAlphaEnable);
 
     
-    if(TdeOsiSetClipPara(NULL, NULL, pstSrc, &stSrcRect, pstDst, &stDstRect, pstOpt, &stHWNode) < 0)
+    if(TdeOsiSetClipPara(NULL, NULL, pstSrc, &stSrcRect, pstDst, &stDstRect, pstOpt, stHWNode) < 0)
     {
+        TdeHalFreeNodeBuf(stHWNode);
         return HI_ERR_TDE_CLIP_AREA;
     }
     
     if(TdeOsiColorConvert(pstFillColor, pstSrc, &stDrvColorFill.u32FillData) < 0)
     {
+        TdeHalFreeNodeBuf(stHWNode);
         return HI_ERR_TDE_INVALID_PARA;
     }
 
     stDrvColorFill.enDrvColorFmt = TDE_DRV_COLOR_FMT_ARGB8888;//TDE2_COLOR_FMT_ARGB8888;
 
     
-    TdeHalNodeSetBaseOperate(&stHWNode, enBaseMode, enAluMode, &stDrvColorFill);
-    TdeOsiSetExtAlpha(NULL, pstSrc, &stHWNode);
+    if (TdeHalNodeSetBaseOperate(stHWNode, enBaseMode, enAluMode, &stDrvColorFill) < 0)
+    {
+        TdeHalFreeNodeBuf(stHWNode);
+    	return 0xa064800b;
+    }
+    TdeOsiSetExtAlpha(NULL, pstSrc, stHWNode);
     
     
     if (TdeOsiGetScanInfo(pstSrc, &stSrcRect, pstDst, &stDstRect, pstOpt, &stSrcScanInfo,
                           &stDstScanInfo) < 0)
     {
+        TdeHalFreeNodeBuf(stHWNode);
         return HI_ERR_TDE_INVALID_PARA;
     }
 
@@ -4380,17 +4430,18 @@ STATIC HI_S32 TdeOsi2SourceFill(TDE_HANDLE s32Handle, TDE2_SURFACE_S* pstSrc, TD
     TdeOsiConvertSurface(pstSrc, &stSrcRect, &stSrcScanInfo, &stDrvSurface, &stSrcOptArea);
 
     
-    TdeHalNodeSetSrc1(&stHWNode, &stDrvSurface);
+    TdeHalNodeSetSrc1(stHWNode, &stDrvSurface);
 
     
     TdeOsiConvertSurface(pstDst, &stDstRect, &stDstScanInfo, &stDrvSurface, &stDstOptArea);
 
   
-    TdeHalNodeSetTgt(&stHWNode, &stDrvSurface, pstOpt->enOutAlphaFrom);
+    TdeHalNodeSetTgt(stHWNode, &stDrvSurface, pstOpt->enOutAlphaFrom);
 
    
-    if((s32Ret = TdeOsiSetClutOpt(pstSrc, pstDst, &enClutUsage, pstOpt->bClutReload, &stHWNode)) < 0)
+    if((s32Ret = TdeOsiSetClutOpt(pstSrc, pstDst, &enClutUsage, pstOpt->bClutReload, stHWNode)) < 0)
     {
+        TdeHalFreeNodeBuf(stHWNode);
         return s32Ret;
     }
 
@@ -4416,11 +4467,16 @@ STATIC HI_S32 TdeOsi2SourceFill(TDE_HANDLE s32Handle, TDE2_SURFACE_S* pstSrc, TD
         enFmtCategory = TdeOsiGetFmtCategory(pstSrc->enColorFmt);
 
         
-        TdeHalNodeSetColorKey(&stHWNode, enFmtCategory, &stColorkey);
+        if (TdeHalNodeSetColorKey(stHWNode, enFmtCategory, &stColorkey) < 0)
+        {
+            TdeHalFreeNodeBuf(stHWNode);
+        	return 0xa064800b;
+        }
     }
     else if (TDE2_COLORKEY_MODE_BACKGROUND == pstOpt->enColorKeyMode)
     {
-        TDE_TRACE(TDE_KERN_INFO, "Unsupported solidraw colorkey in background mode!\n");
+        TDE_TRACE(TDE_KERN_INFO, "Unsupported solidraw colorkey in background mode!\n"); //4024
+        TdeHalFreeNodeBuf(stHWNode);
         return HI_ERR_TDE_INVALID_PARA;
     }
 
@@ -4436,14 +4492,26 @@ STATIC HI_S32 TdeOsi2SourceFill(TDE_HANDLE s32Handle, TDE2_SURFACE_S* pstSrc, TD
         stFilterOpt.enFilterMode = g_enTdeFilterMode[pstOpt->enFilterMode];
 
        
-        return TdeOsiSetFilterNode(s32Handle, &stHWNode, pstSrc, pstDst,
+        s32Ret = TdeOsiSetFilterNode(s32Handle, stHWNode, pstSrc, pstDst,
                                    &stSrcOptArea, &stDstOptArea, pstOpt->enDeflickerMode, &stFilterOpt);
+    	if (s32Ret < 0)
+    	{
+    		TdeHalFreeNodeBuf(stHWNode);
+    		return s32Ret;
+    	}
     }
     else
     {
         
-        return TdeOsiSetNodeFinish(s32Handle, &stHWNode, 0, TDE_NODE_SUBM_ALONE);
+    	s32Ret = TdeOsiSetNodeFinish(s32Handle, stHWNode, 0, TDE_NODE_SUBM_ALONE);
+    	if (s32Ret < 0)
+    	{
+    		TdeHalFreeNodeBuf(stHWNode);
+    		return s32Ret;
+    	}
     }
+
+    return HI_SUCCESS;
 }
 
 /*****************************************************************************
@@ -4511,8 +4579,8 @@ STATIC INLINE HI_S32 TdeOsiCheckSurface(TDE2_SURFACE_S* pstSurface, TDE2_RECT_S 
     {
         TDE_TRACE(TDE_KERN_INFO, "sw:%d, sh:%d, stride:%x, x:%d, y:%d, w:%d, h:%d\n", pstSurface->u32Width,
             pstSurface->u32Height, pstSurface->u32Stride, pstRect->s32Xpos, pstRect->s32Ypos,
-            pstRect->u32Width, pstRect->u32Height);
-        TDE_TRACE(TDE_KERN_INFO, "invalid surface size or operation area!");
+            pstRect->u32Width, pstRect->u32Height); //4124
+        TDE_TRACE(TDE_KERN_INFO, "invalid surface size or operation area!"); //4125
         return -1;
     }
 
@@ -4525,7 +4593,7 @@ STATIC INLINE HI_S32 TdeOsiCheckSurface(TDE2_SURFACE_S* pstSurface, TDE2_RECT_S 
     if ((TDE2_COLOR_FMT_YCbCr422 == pstSurface->enColorFmt)
         && ((pstRect->s32Xpos & 0x1) || (pstRect->u32Width & 0x1)))
     {
-        TDE_TRACE(TDE_KERN_INFO, "x, width of YCbCr422R couldn't be odd!\n");
+        TDE_TRACE(TDE_KERN_INFO, "x, width of YCbCr422R couldn't be odd!\n"); //4138
         return -1;
     }
 
@@ -4541,14 +4609,14 @@ STATIC INLINE HI_S32 TdeOsiCheckSurface(TDE2_SURFACE_S* pstSurface, TDE2_RECT_S 
            
             if (pstSurface->u32PhyAddr % u32BytePerPixel)
             {
-                TDE_TRACE(TDE_KERN_INFO, "Bitmap address is not aligned!\n");
+                TDE_TRACE(TDE_KERN_INFO, "Bitmap address is not aligned!\n"); //4154
                 return -1;
             }
 
             
             if (pstSurface->u32Stride % u32BytePerPixel)
             {
-                TDE_TRACE(TDE_KERN_INFO, "stride is not aligned!\n");
+                TDE_TRACE(TDE_KERN_INFO, "stride is not aligned!\n"); //4161
 
                 return -1;
             }
@@ -4558,14 +4626,14 @@ STATIC INLINE HI_S32 TdeOsiCheckSurface(TDE2_SURFACE_S* pstSurface, TDE2_RECT_S 
            
             if (pstSurface->u32PhyAddr % 4)
             {
-                TDE_TRACE(TDE_KERN_INFO, "Bitmap address is not aligned!\n");
+                TDE_TRACE(TDE_KERN_INFO, "Bitmap address is not aligned!\n"); //4171
                 return -1;
             }
 
             
             if (pstSurface->u32Stride % 4)
             {
-                TDE_TRACE(TDE_KERN_INFO, "stride is not aligned!\n");
+                TDE_TRACE(TDE_KERN_INFO, "stride is not aligned!\n"); //4178
 
                 return -1;
             }
@@ -4597,7 +4665,7 @@ STATIC INLINE HI_S32 TdeOsiCheckSurface(TDE2_SURFACE_S* pstSurface, TDE2_RECT_S 
     if ((TDE_MAX_RECT_WIDTH < pstRect->u32Width)
         || (TDE_MAX_RECT_HEIGHT < pstRect->u32Height))
     {
-        TDE_TRACE(TDE_KERN_INFO, "invalid operation area!");
+        TDE_TRACE(TDE_KERN_INFO, "invalid operation area!"); //4210
         return -1;
     }
 
@@ -4672,17 +4740,17 @@ STATIC TDE_OPERATION_CATEGORY_E  TdeOsiGetOptCategory(TDE2_SURFACE_S * pstBackGr
 
     if ((HI_NULL == pstDst) || (HI_NULL == pstDstRect))
     {
-        TDE_TRACE(TDE_KERN_INFO, "\n");
+        TDE_TRACE(TDE_KERN_INFO, "\n"); //4285
         return TDE_OPERATION_BUTT;
     }
 
     
-    TDE_CHECK_NOT_MB(pstDst->enColorFmt);
+    TDE_CHECK_NOT_MB(pstDst->enColorFmt); //4290
 
     
     if (TdeOsiCheckSurface(pstDst, pstDstRect) < 0)
     {
-        TDE_TRACE(TDE_KERN_INFO, "\n");
+        TDE_TRACE(TDE_KERN_INFO, "\n"); //4295
         return TDE_OPERATION_BUTT;
     }
 
@@ -4691,26 +4759,26 @@ STATIC TDE_OPERATION_CATEGORY_E  TdeOsiGetOptCategory(TDE2_SURFACE_S * pstBackGr
     {
         if ((HI_NULL == pstBackGroundRect) || (HI_NULL == pstForeGroundRect) || (HI_NULL == pstOpt))
         {
-            TDE_TRACE(TDE_KERN_INFO, "\n");
+            TDE_TRACE(TDE_KERN_INFO, "\n"); //4304
             return TDE_OPERATION_BUTT;
         }
 
         if (TdeOsiCheckSurface(pstBackGround, pstBackGroundRect) < 0)
         {
-            TDE_TRACE(TDE_KERN_INFO, "\n");
+            TDE_TRACE(TDE_KERN_INFO, "\n"); //4310
             return TDE_OPERATION_BUTT;
         }
 
         if (TdeOsiCheckSurface(pstForeGround, pstForeGroundRect) < 0)
         {
-            TDE_TRACE(TDE_KERN_INFO, "\n");
+            TDE_TRACE(TDE_KERN_INFO, "\n"); //4316
             return TDE_OPERATION_BUTT;
         }
 
         if ((pstBackGroundRect->u32Height != pstDstRect->u32Height)
             || (pstBackGroundRect->u32Width != pstDstRect->u32Width))
         {
-            TDE_TRACE(TDE_KERN_INFO, "\n");
+            TDE_TRACE(TDE_KERN_INFO, "\n"); //4323
             return TDE_OPERATION_BUTT;
         }
 
@@ -4747,7 +4815,7 @@ STATIC TDE_OPERATION_CATEGORY_E  TdeOsiGetOptCategory(TDE2_SURFACE_S * pstBackGr
     }
     else
     {
-        TDE_TRACE(TDE_KERN_INFO, "null pointer in single source 2 operation!");
+        TDE_TRACE(TDE_KERN_INFO, "null pointer in single source 2 operation!"); //4360
         return TDE_OPERATION_BUTT;
     }
 
@@ -4760,7 +4828,7 @@ STATIC TDE_OPERATION_CATEGORY_E  TdeOsiGetOptCategory(TDE2_SURFACE_S * pstBackGr
     
     if (TdeOsiCheckSurface(pTmpSrc2, pTmpSrc2Rect) < 0)
     {
-        TDE_TRACE(TDE_KERN_INFO, "\n");
+        TDE_TRACE(TDE_KERN_INFO, "\n"); //4373
         return TDE_OPERATION_BUTT;
     }
 
@@ -4778,7 +4846,7 @@ STATIC TDE_OPERATION_CATEGORY_E  TdeOsiGetOptCategory(TDE2_SURFACE_S * pstBackGr
     
     if (HI_NULL == pstOpt)
     {
-        TDE_TRACE(TDE_KERN_INFO, "pstOpt can not be NULL in single source 2 operation!\n");
+        TDE_TRACE(TDE_KERN_INFO, "pstOpt can not be NULL in single source 2 operation!\n"); //4391
     
         return TDE_OPERATION_BUTT;
     }
@@ -4866,18 +4934,17 @@ STATIC HI_S32 TdeOsiConvertMbSurface(TDE2_MB_S* pstMB, TDE2_RECT_S  *pstMbRect, 
 
     if ((HI_NULL == pstMB) || (HI_NULL == pstMbRect))
     {
-        TDE_TRACE(TDE_KERN_INFO, "null ptr!\n");
+        TDE_TRACE(TDE_KERN_INFO, "null ptr!\n"); //4476
         return -1;
     }
 
     if (HI_NULL != pstDrvY)
     {
-        (HI_VOID)memset((HI_VOID*)pstDrvY, 0, sizeof(TDE_DRV_SURFACE_S));
+        //(HI_VOID)memset((HI_VOID*)pstDrvY, 0, sizeof(TDE_DRV_SURFACE_S));
         pstDrvY->enColorFmt = g_enTdeMbDrvColorFmt[pstMB->enMbFmt];
         pstDrvY->u32Width = pstMbRect->u32Width;
         pstDrvY->u32Xpos = (HI_U32)pstMbRect->s32Xpos;
-        pstDrvY->u32PhyAddr = (TDE_BOTTOM_FIELD_PIC_MODE == enPicMode) ? 
-                              (pstMB->u32YPhyAddr + pstMB->u32YStride) : (pstMB->u32YPhyAddr);
+        pstDrvY->u32PhyAddr = pstMB->u32YPhyAddr;
        
         if (TDE_FRAME_PIC_MODE == enPicMode)
         {
@@ -4887,9 +4954,7 @@ STATIC HI_S32 TdeOsiConvertMbSurface(TDE2_MB_S* pstMB, TDE2_RECT_S  *pstMbRect, 
         }
         else     
         {
-            pstDrvY->u32Height = (TDE_BOTTOM_FIELD_PIC_MODE == enPicMode) ? 
-                TDE_ADJ_B_FIELD_HEIGHT_BY_START(pstMbRect->s32Ypos, pstMbRect->u32Height) :
-                TDE_ADJ_FIELD_HEIGHT_BY_START(pstMbRect->s32Ypos, pstMbRect->u32Height);
+            pstDrvY->u32Height = TDE_ADJ_B_FIELD_HEIGHT_BY_START(pstMbRect->s32Ypos, pstMbRect->u32Height);
             pstDrvY->u32Pitch = pstMB->u32YStride * 2;
             pstDrvY->u32Ypos = ((HI_U32)(pstMbRect->s32Ypos / 2));
         }
@@ -4901,10 +4966,9 @@ STATIC HI_S32 TdeOsiConvertMbSurface(TDE2_MB_S* pstMB, TDE2_RECT_S  *pstMbRect, 
     }
 
     enAdjColorFmt = g_enTdeMbDrvColorFmt[pstMB->enMbFmt];
-    (HI_VOID)memset((HI_VOID*)pstDrvCbCr, 0, sizeof(TDE_DRV_SURFACE_S));
+    //(HI_VOID)memset((HI_VOID*)pstDrvCbCr, 0, sizeof(TDE_DRV_SURFACE_S));
     pstDrvCbCr->enColorFmt = g_enTdeMbDrvColorFmt[pstMB->enMbFmt];
-    pstDrvCbCr->u32PhyAddr = (TDE_BOTTOM_FIELD_PIC_MODE == enPicMode) ? 
-                             (pstMB->u32CbCrPhyAddr + pstMB->u32CbCrStride) : (pstMB->u32CbCrPhyAddr);
+    pstDrvCbCr->u32PhyAddr = pstMB->u32CbCrPhyAddr;
 
     if (bCbCr2Opt)
     {
@@ -4947,7 +5011,7 @@ STATIC HI_S32 TdeOsiConvertMbSurface(TDE2_MB_S* pstMB, TDE2_RECT_S  *pstMbRect, 
             pstDrvCbCr->u32Height =
                 TDE_ADJ_SIZE_BY_START_P(pstMbRect->s32Ypos, pstMbRect->u32Height);
             TDE_TRACE(TDE_KERN_DEBUG, "W:0x%x, H:0x%x\n", pstDrvCbCr->u32Width, 
-            pstDrvCbCr->u32Height);    
+            pstDrvCbCr->u32Height); //4551
         }
             break;
         case TDE_DRV_COLOR_FMT_YCbCr444MB:
@@ -4959,7 +5023,7 @@ STATIC HI_S32 TdeOsiConvertMbSurface(TDE2_MB_S* pstMB, TDE2_RECT_S  *pstMbRect, 
         }
             break;
         default:
-            TDE_TRACE(TDE_KERN_INFO, "Unspport color format!\n");
+            TDE_TRACE(TDE_KERN_INFO, "Unspport color format!\n"); //4563
             return -1;
         }
 
@@ -4979,9 +5043,7 @@ STATIC HI_S32 TdeOsiConvertMbSurface(TDE2_MB_S* pstMB, TDE2_RECT_S  *pstMbRect, 
         pstDrvCbCr->u32Ypos  = ((HI_U32)pstMbRect->s32Ypos / 2);
         pstDrvCbCr->u32Width =
             TDE_ADJ_SIZE_BY_START_P(pstMbRect->s32Xpos, pstMbRect->u32Width);
-        pstDrvCbCr->u32Height = (TDE_BOTTOM_FIELD_PIC_MODE == enPicMode) ?
-            TDE_ADJ_B_FIELD_HEIGHT_BY_START(pstMbRect->s32Ypos, pstMbRect->u32Height) :
-            TDE_ADJ_FIELD_HEIGHT_BY_START(pstMbRect->s32Ypos, pstMbRect->u32Height);
+        pstDrvCbCr->u32Height = TDE_ADJ_B_FIELD_HEIGHT_BY_START(pstMbRect->s32Ypos, pstMbRect->u32Height);
     }
         break;
     case TDE_DRV_COLOR_FMT_YCbCr422MBV:
@@ -4989,9 +5051,7 @@ STATIC HI_S32 TdeOsiConvertMbSurface(TDE2_MB_S* pstMB, TDE2_RECT_S  *pstMbRect, 
         pstDrvCbCr->u32Xpos   = (HI_U32)pstMbRect->s32Xpos;
         pstDrvCbCr->u32Ypos   = ((HI_U32)pstMbRect->s32Ypos / 4);
         pstDrvCbCr->u32Width  = pstMbRect->u32Width;
-        pstDrvCbCr->u32Height = (TDE_BOTTOM_FIELD_PIC_MODE == enPicMode) ?
-            TDE_ADJ_B_SIZE_BY_START_I(pstMbRect->s32Ypos, pstMbRect->u32Height) :
-            TDE_ADJ_SIZE_BY_START_I(pstMbRect->s32Ypos, pstMbRect->u32Height);
+        pstDrvCbCr->u32Height = TDE_ADJ_SIZE_BY_START_I(pstMbRect->s32Ypos, pstMbRect->u32Height);
     }
         break;
     case TDE_DRV_COLOR_FMT_YCbCr420MB:
@@ -5000,26 +5060,21 @@ STATIC HI_S32 TdeOsiConvertMbSurface(TDE2_MB_S* pstMB, TDE2_RECT_S  *pstMbRect, 
         pstDrvCbCr->u32Ypos  = ((HI_U32)pstMbRect->s32Ypos / 4);
         pstDrvCbCr->u32Width =
             TDE_ADJ_SIZE_BY_START_P(pstMbRect->s32Xpos, pstMbRect->u32Width);
-        pstDrvCbCr->u32Height = (TDE_BOTTOM_FIELD_PIC_MODE == enPicMode) ?
-            TDE_ADJ_B_SIZE_BY_START_I(pstMbRect->s32Ypos, pstMbRect->u32Height) :
-            TDE_ADJ_SIZE_BY_START_I(pstMbRect->s32Ypos, pstMbRect->u32Height);
+        pstDrvCbCr->u32Height = TDE_ADJ_SIZE_BY_START_I(pstMbRect->s32Ypos, pstMbRect->u32Height);
         TDE_TRACE(TDE_KERN_DEBUG, "W:0x%x, H:0x%x\n", pstDrvCbCr->u32Width, 
-        pstDrvCbCr->u32Height);    
+        pstDrvCbCr->u32Height); //4601
     }
         break;
     case TDE_DRV_COLOR_FMT_YCbCr444MB:
     {
         pstDrvCbCr->u32Xpos   = (HI_U32)pstMbRect->s32Xpos;
-        pstDrvCbCr->u32Ypos  = (TDE_BOTTOM_FIELD_PIC_MODE == enPicMode) ?
-                               ((HI_U32)(pstMbRect->s32Ypos / 2 + 1)) : ((HI_U32)pstMbRect->s32Ypos / 2);
+        pstDrvCbCr->u32Ypos  = ((HI_U32)pstMbRect->s32Ypos / 2);
         pstDrvCbCr->u32Width = pstMB->u32YWidth;
-        pstDrvCbCr->u32Height = (TDE_BOTTOM_FIELD_PIC_MODE == enPicMode) ?
-            TDE_ADJ_B_FIELD_HEIGHT_BY_START(pstMbRect->s32Ypos, pstMbRect->u32Height) :
-            TDE_ADJ_FIELD_HEIGHT_BY_START(pstMbRect->s32Ypos, pstMbRect->u32Height);
+        pstDrvCbCr->u32Height = TDE_ADJ_B_FIELD_HEIGHT_BY_START(pstMbRect->s32Ypos, pstMbRect->u32Height);
     }
         break;
     default:
-        TDE_TRACE(TDE_KERN_INFO, "Unspport color format!\n");
+        TDE_TRACE(TDE_KERN_INFO, "Unspport color format!\n"); //4613
         return -1;
     }
 
@@ -5050,10 +5105,10 @@ STATIC HI_S32 TdeOsiSetClipPara(TDE2_SURFACE_S * pstBackGround, TDE2_RECT_S *pst
     TDE_DRV_CLIP_CMD_S stClip = {0};
     TDE2_RECT_S stInterRect = {0};
     
-    TDE_ASSERT(NULL != pstForeGround);
-    TDE_ASSERT(NULL != pstDst);
-    TDE_ASSERT(NULL != pstOpt);
-    TDE_ASSERT(NULL != pstHwNode);
+    TDE_ASSERT(NULL != pstForeGround); //4645
+    TDE_ASSERT(NULL != pstDst); //4646
+    TDE_ASSERT(NULL != pstOpt); //4647
+    TDE_ASSERT(NULL != pstHwNode); //4648
 
     
     if ((TDE2_CLIPMODE_INSIDE == pstOpt->enClipMode) && (!pstOpt->bResize))
@@ -5061,7 +5116,7 @@ STATIC HI_S32 TdeOsiSetClipPara(TDE2_SURFACE_S * pstBackGround, TDE2_RECT_S *pst
        
         if (TdeOsiGetInterRect(pstDstRect, &pstOpt->stClipRect, &stInterRect) < 0)
         {
-            TDE_TRACE(TDE_KERN_INFO, "clip and operation area have no inrerrect!\n");
+            TDE_TRACE(TDE_KERN_INFO, "clip and operation area have no inrerrect!\n"); //4655
             return HI_ERR_TDE_CLIP_AREA;
         }
 
@@ -5088,7 +5143,7 @@ STATIC HI_S32 TdeOsiSetClipPara(TDE2_SURFACE_S * pstBackGround, TDE2_RECT_S *pst
         
         if (TdeOsiGetInterRect(pstDstRect, &pstOpt->stClipRect, &stInterRect) < 0)
         {
-            TDE_TRACE(TDE_KERN_INFO, "clip and operation area have no inter-rect!\n");
+            TDE_TRACE(TDE_KERN_INFO, "clip and operation area have no inter-rect!\n"); //4681
             return HI_ERR_TDE_CLIP_AREA;
         }
         
@@ -5099,13 +5154,16 @@ STATIC HI_S32 TdeOsiSetClipPara(TDE2_SURFACE_S * pstBackGround, TDE2_RECT_S *pst
         stClip.u16ClipEndY = pstOpt->stClipRect.s32Ypos + pstOpt->stClipRect.u32Height - 1;
 
         
-        TdeHalNodeSetClipping(pstHwNode, &stClip);
+        if (TdeHalNodeSetClipping(pstHwNode, &stClip) < 0)
+        {
+        	return 0xa064800b;
+        }
     }
     else if(TDE2_CLIPMODE_OUTSIDE == pstOpt->enClipMode) 
     {
         if (TdeOsiIsRect1InRect2(pstDstRect, &pstOpt->stClipRect))
         {
-            TDE_TRACE(TDE_KERN_INFO, "clip and operation area have no inter-rect!\n");
+            TDE_TRACE(TDE_KERN_INFO, "clip and operation area have no inter-rect!\n"); //4700
             return HI_ERR_TDE_CLIP_AREA;
         }
 
@@ -5121,12 +5179,14 @@ STATIC HI_S32 TdeOsiSetClipPara(TDE2_SURFACE_S * pstBackGround, TDE2_RECT_S *pst
         stClip.u16ClipEndX = pstOpt->stClipRect.s32Xpos + pstOpt->stClipRect.u32Width - 1;
         stClip.u16ClipEndY = pstOpt->stClipRect.s32Ypos + pstOpt->stClipRect.u32Height - 1;
 
-        
-        TdeHalNodeSetClipping(pstHwNode, &stClip);
+        if (TdeHalNodeSetClipping(pstHwNode, &stClip) < 0)
+        {
+        	return 0xa064800b;
+        }
     }
     else if(pstOpt->enClipMode >= TDE2_CLIPMODE_BUTT)
     {
-        TDE_TRACE(TDE_KERN_INFO, "error clip mode!\n");
+        TDE_TRACE(TDE_KERN_INFO, "error clip mode!\n"); //4723
         return HI_ERR_TDE_INVALID_PARA;
     }
 
@@ -5142,19 +5202,19 @@ STATIC HI_S32 TdeOsiSetPatternClipPara(TDE2_SURFACE_S * pstBackGround, TDE2_RECT
     TDE_DRV_CLIP_CMD_S stClip = {0};
     TDE2_RECT_S stInterRect = {0};
     
-    TDE_ASSERT(NULL != pstForeGround);
+    TDE_ASSERT(NULL != pstForeGround); //4739
     TDE_ASSERT(NULL != pstDst);
-    TDE_ASSERT(NULL != pstOpt);
+    TDE_ASSERT(NULL != pstOpt); //4741
     TDE_ASSERT(NULL != pstHwNode);
 
-    TDE_CHECK_CLIPMODE(pstOpt->enClipMode);
+    TDE_CHECK_CLIPMODE(pstOpt->enClipMode); //4744
   
     if (TDE2_CLIPMODE_INSIDE == pstOpt->enClipMode)
     {
         
         if (TdeOsiGetInterRect(pstDstRect, &pstOpt->stClipRect, &stInterRect) < 0)
         {
-            TDE_TRACE(TDE_KERN_INFO, "clip and operation area have no inrerrect!\n");
+            TDE_TRACE(TDE_KERN_INFO, "clip and operation area have no inrerrect!\n"); //4751
             return HI_ERR_TDE_CLIP_AREA;
         }
 
@@ -5183,7 +5243,10 @@ STATIC HI_S32 TdeOsiSetPatternClipPara(TDE2_SURFACE_S * pstBackGround, TDE2_RECT
             stClip.u16ClipEndY = pstOpt->stClipRect.s32Ypos + pstOpt->stClipRect.u32Height - 1;
     
             
-            TdeHalNodeSetClipping(pstHwNode, &stClip);
+            if (TdeHalNodeSetClipping(pstHwNode, &stClip) < 0)
+            {
+            	return 0xa064800b;
+            }
 #endif            
 
 
@@ -5193,7 +5256,7 @@ STATIC HI_S32 TdeOsiSetPatternClipPara(TDE2_SURFACE_S * pstBackGround, TDE2_RECT
     {
         if (TdeOsiIsRect1InRect2(pstDstRect, &pstOpt->stClipRect))
         {
-            TDE_TRACE(TDE_KERN_INFO, "clip and operation area have no inter-rect!\n");
+            TDE_TRACE(TDE_KERN_INFO, "clip and operation area have no inter-rect!\n"); //4769
             return HI_ERR_TDE_CLIP_AREA;
         }
 
@@ -5210,7 +5273,10 @@ STATIC HI_S32 TdeOsiSetPatternClipPara(TDE2_SURFACE_S * pstBackGround, TDE2_RECT
         stClip.u16ClipEndY = pstOpt->stClipRect.s32Ypos + pstOpt->stClipRect.u32Height - 1;
 
         
-        TdeHalNodeSetClipping(pstHwNode, &stClip);
+        if (TdeHalNodeSetClipping(pstHwNode, &stClip) < 0)
+        {
+        	return 0xa064800b;
+        }
     }
     else if(pstOpt->enClipMode >= TDE2_CLIPMODE_BUTT)
     {
@@ -5236,7 +5302,7 @@ STATIC HI_S32 TdeOsiMbSetClipPara(TDE2_RECT_S * pstDstRect, TDE2_MBOPT_S *pstMbO
 {
     TDE2_RECT_S stInterRect = {0};
     
-    TDE_ASSERT(NULL != pstDstRect);
+    TDE_ASSERT(NULL != pstDstRect); //4815
     TDE_ASSERT(NULL != pstMbOpt);
     TDE_ASSERT(NULL != pstHwNode);
 
@@ -5245,24 +5311,61 @@ STATIC HI_S32 TdeOsiMbSetClipPara(TDE2_RECT_S * pstDstRect, TDE2_MBOPT_S *pstMbO
        
         if (TdeOsiGetInterRect(pstDstRect, &pstMbOpt->stClipRect, &stInterRect) < 0)
         {
-            TDE_TRACE(TDE_KERN_INFO, "clip and operation area have no inter-rect!\n");
+            TDE_TRACE(TDE_KERN_INFO, "clip and operation area have no inter-rect!\n"); //4824
             return HI_ERR_TDE_CLIP_AREA;
         }
+#if 0
         TDE_SET_CLIP(pstHwNode, pstMbOpt);
+#else
+        if (TDE2_CLIPMODE_NONE != (pstMbOpt)->enClipMode)
+        {
+            TDE_DRV_CLIP_CMD_S stClipCmd;
+            stClipCmd.u16ClipStartX = (HI_U16)(pstMbOpt)->stClipRect.s32Xpos;
+            stClipCmd.u16ClipStartY = (HI_U16)(pstMbOpt)->stClipRect.s32Ypos;
+            stClipCmd.u16ClipEndX = ((pstMbOpt)->stClipRect.s32Xpos
+                                     + (pstMbOpt)->stClipRect.u32Width - 1);
+            stClipCmd.u16ClipEndY = (pstMbOpt)->stClipRect.s32Ypos
+                                    + (pstMbOpt)->stClipRect.u32Height - 1;
+            stClipCmd.bInsideClip = (TDE2_CLIPMODE_INSIDE == (pstMbOpt)->enClipMode)
+                                    ? HI_TRUE : HI_FALSE;
+            if (TdeHalNodeSetClipping(pstHwNode, &stClipCmd) < 0)
+            {
+            	return 0xa064800b;
+            }
+        }
+#endif
     }
     else if(TDE2_CLIPMODE_OUTSIDE == pstMbOpt->enClipMode) 
     {
         if (TdeOsiIsRect1InRect2(pstDstRect, &pstMbOpt->stClipRect))
         {
-            TDE_TRACE(TDE_KERN_INFO, "clip and operation area have no inter-rect!\n");
+            TDE_TRACE(TDE_KERN_INFO, "clip and operation area have no inter-rect!\n"); //4833
             return HI_ERR_TDE_CLIP_AREA;
         }
-        
+#if 0
         TDE_SET_CLIP(pstHwNode, pstMbOpt);
+#else
+        if (TDE2_CLIPMODE_NONE != (pstMbOpt)->enClipMode)
+        {
+            TDE_DRV_CLIP_CMD_S stClipCmd;
+            stClipCmd.u16ClipStartX = (HI_U16)(pstMbOpt)->stClipRect.s32Xpos;
+            stClipCmd.u16ClipStartY = (HI_U16)(pstMbOpt)->stClipRect.s32Ypos;
+            stClipCmd.u16ClipEndX = ((pstMbOpt)->stClipRect.s32Xpos
+                                     + (pstMbOpt)->stClipRect.u32Width - 1);
+            stClipCmd.u16ClipEndY = (pstMbOpt)->stClipRect.s32Ypos
+                                    + (pstMbOpt)->stClipRect.u32Height - 1;
+            stClipCmd.bInsideClip = (TDE2_CLIPMODE_INSIDE == (pstMbOpt)->enClipMode)
+                                    ? HI_TRUE : HI_FALSE;
+            if (TdeHalNodeSetClipping(pstHwNode, &stClipCmd) < 0)
+            {
+            	return 0xa064800b;
+            }
+        }
+#endif
     }
     else if(pstMbOpt->enClipMode >= TDE2_CLIPMODE_BUTT)
     {
-        TDE_TRACE(TDE_KERN_INFO, "error clip mode!\n");
+        TDE_TRACE(TDE_KERN_INFO, "error clip mode!\n"); //4841
         return HI_ERR_TDE_INVALID_PARA;
     }
     return 0;
@@ -5326,7 +5429,7 @@ STATIC INLINE HI_VOID TdeOsiSetExtAlpha(TDE2_SURFACE_S *pstBackGround, TDE2_SURF
 * Return:        none
 * Others:        none
 *****************************************************************************/
-STATIC HI_VOID TdeOsiSetBaseOptParaForBlit(TDE2_OPT_S * pstOpt, TDE2_SURFACE_S* pstSrc1, TDE2_SURFACE_S* pstSrc2,
+STATIC HI_S32 TdeOsiSetBaseOptParaForBlit(TDE2_OPT_S * pstOpt, TDE2_SURFACE_S* pstSrc1, TDE2_SURFACE_S* pstSrc2,
                                            TDE_OPERATION_CATEGORY_E enOptCategory, TDE_HWNode_S *pstHwNode)
 {
     TDE_DRV_BASEOPT_MODE_E enBaseOpt = {0};
@@ -5334,7 +5437,7 @@ STATIC HI_VOID TdeOsiSetBaseOptParaForBlit(TDE2_OPT_S * pstOpt, TDE2_SURFACE_S* 
 
     if ((HI_NULL == pstHwNode) || (HI_NULL == pstOpt))
     {
-        return;
+        return 0;
     }
 
     if ((HI_NULL != pstSrc1) && (HI_NULL != pstSrc2))
@@ -5352,7 +5455,10 @@ STATIC HI_VOID TdeOsiSetBaseOptParaForBlit(TDE2_OPT_S * pstOpt, TDE2_SURFACE_S* 
         enAlu = TDE_ALU_ROP;
         
        
-        TdeHalNodeSetRop(pstHwNode, pstOpt->enRopCode_Color, pstOpt->enRopCode_Alpha);
+        if (TdeHalNodeSetRop(pstHwNode, pstOpt->enRopCode_Color, pstOpt->enRopCode_Alpha) < 0)
+        {
+        	return 0xa064800b;
+        }
     }
     
     if (pstOpt->enAluCmd & TDE2_ALUCMD_BLEND)
@@ -5365,7 +5471,10 @@ STATIC HI_VOID TdeOsiSetBaseOptParaForBlit(TDE2_OPT_S * pstOpt, TDE2_SURFACE_S* 
             enAlu = TDE_ALU_BLEND_SRC2;
         }
 #else
-        TdeHalNodeSetBlend(pstHwNode, &pstOpt->stBlendOpt);
+        if (TdeHalNodeSetBlend(pstHwNode, &pstOpt->stBlendOpt) < 0)
+        {
+        	return 0xa064800b;
+        }
 #endif
 
         if (pstOpt->enAluCmd & TDE2_ALUCMD_ROP)
@@ -5376,7 +5485,10 @@ STATIC HI_VOID TdeOsiSetBaseOptParaForBlit(TDE2_OPT_S * pstOpt, TDE2_SURFACE_S* 
     
     if (pstOpt->enAluCmd & TDE2_ALUCMD_COLORIZE)
     {
-        TdeHalNodeSetColorize(pstHwNode, pstOpt->u32Colorize);
+        if (TdeHalNodeSetColorize(pstHwNode, pstOpt->u32Colorize) < 0)
+        {
+        	return 0xa064800b;
+        }
     }
 
     if (TDE_OPERATION_DOUBLE_SRC == enOptCategory)
@@ -5391,11 +5503,14 @@ STATIC HI_VOID TdeOsiSetBaseOptParaForBlit(TDE2_OPT_S * pstOpt, TDE2_SURFACE_S* 
     
     TdeHalNodeSetGlobalAlpha(pstHwNode, pstOpt->u8GlobalAlpha, pstOpt->stBlendOpt.bGlobalAlphaEnable);
     
-    TdeHalNodeSetBaseOperate(pstHwNode, enBaseOpt, enAlu, 0);
+    if (TdeHalNodeSetBaseOperate(pstHwNode, enBaseOpt, enAlu, 0) < 0)
+    {
+    	return 0xa064800b;
+    }
 
     TDeHalNodeSetCsc(pstHwNode, pstOpt->stCscOpt);	
 
-    return;
+    return 0;
 }
 
 /*****************************************************************************
@@ -5546,56 +5661,109 @@ STATIC HI_S32 TdeOsiAdjClipPara(TDE_HWNode_S* pHWNode)
 STATIC HI_S32 TdeOsiSetNodeFinish(TDE_HANDLE s32Handle, TDE_HWNode_S* pHWNode,
                                   HI_U32 u32WorkBufNum, TDE_NODE_SUBM_TYPE_E enSubmType)
 {
-    HI_U32 u32Size;
-    HI_VOID* pBuf = HI_NULL;
-    TDE_NODE_BUF_S stSwNode = {0};
+    //HI_U32 u32Size;
+    TDE_SWNODE_S* pstCmd = HI_NULL;
+    TDE_NODE_BUF_S * pSwNode;
+    HI_HANDLE_MGR *fp40 = 0;
+    TDE_SWJOB_S *pstJob;
     HI_S32 s32Ret;
 
     
     TdeOsiAdjClipPara(pHWNode);
 
-    u32Size = TdeHalNodeGetNdSize(pHWNode);
-    if (0 == u32Size)
+    if (HI_FALSE == query_handle(s32Handle, &fp40))
     {
-        TDE_TRACE(TDE_KERN_INFO, "error buffer size!\n");
-    
-        return HI_FAILURE;
+    	TDE_TRACE(TDE_KERN_INFO, "invalid handle %d!\n", s32Handle); //5105
+    	return 0xa0648005;
+    }
+    pstJob = (TDE_SWJOB_S *)(fp40->res);
+    if (pstJob->bSubmitted)
+    {
+    	TDE_TRACE(TDE_KERN_INFO, "job %d already submitted!\n", s32Handle); //5111
+    	return 0xa0648005;
+    }
+    pstCmd = (HI_VOID *)TDE_MALLOC(sizeof(TDE_SWNODE_S));
+    if (HI_NULL == pstCmd)
+    {
+    	TDE_TRACE(TDE_KERN_INFO, "malloc failed!\n"); //5117
+    	return HI_ERR_TDE_NO_MEM;
     }
 
-    tde_osr_disableirq();
-    pBuf = (HI_VOID *)TDE_MALLOC(u32Size + TDE_NODE_HEAD_BYTE + TDE_NODE_TAIL_BYTE);
-    tde_osr_enableirq();
-    if (HI_NULL == pBuf)
+    if (enSubmType != TDE_NODE_SUBM_CHILD)
     {
-        TDE_TRACE(TDE_KERN_INFO, "malloc (%d) failed, wgetfreenum(%d)!\n", (u32Size + TDE_NODE_HEAD_BYTE + TDE_NODE_TAIL_BYTE), wgetfreenum());
-        return HI_ERR_TDE_NO_MEM;
+		pstJob->u32CmdNum++;
+
+		if (1 == pstJob->u32CmdNum)
+		{
+			pstJob->pstFirstCmd = pstCmd;
+			INIT_LIST_HEAD(&pstCmd->stList);
+		}
+
+		pstJob->pstLastCmd = pstCmd;
     }
 
-    
-    if (TdeHalNodeMakeNd((HI_CHAR *)pBuf + TDE_NODE_HEAD_BYTE, pHWNode) < 0)
+    switch(enSubmType)
     {
-        TDE_TRACE(TDE_KERN_INFO, "TdeHalNodeMakeNd fail!\n");
-        TDE_FREE(pBuf);
-        return HI_ERR_TDE_INVALID_PARA;
+        case TDE_NODE_SUBM_PARENT:
+            pstJob->pstParentCmd = pstCmd;
+            pstCmd->pstParentNodeInCmd = HI_NULL;
+            break;
+        case TDE_NODE_SUBM_CHILD:
+            pstCmd->pstParentNodeInCmd = pstJob->pstParentCmd;
+            break;
+        case TDE_NODE_SUBM_ALONE:
+            pstCmd->pstParentNodeInCmd = HI_NULL;
+            break;
+        default:
+        	TDE_TRACE(TDE_KERN_INFO, "unkown SubmType!\n"); //5147
+        	return 0xa0648006;
     }
 
     TDEProcRecordNode(pHWNode);
-    
-    stSwNode.pBuf = pBuf;
-    stSwNode.u32NodeSz = u32Size;
-    stSwNode.u64Update = pHWNode->u64TDE_UPDATE;
-    stSwNode.u32PhyAddr = wgetphy(pBuf) + TDE_NODE_HEAD_BYTE;
 
-#if 1
-#warning TODO
-#else
-    if((s32Ret = TdeOsiListAddNode(s32Handle, &stSwNode, enSubmType, u32WorkBufNum)) < 0)
+    pSwNode = &pstCmd->stNodeBuf;
+    pSwNode->pBuf = container_of(pHWNode, TDE_HWNode_Outer_S, Data_16);
+    pSwNode->u32NodeSz = 168;
+    pSwNode->u64Update = 0x3FFFFFFFFFF;
+    pSwNode->u32PhyAddr = wgetphy(pSwNode->pBuf) + TDE_NODE_HEAD_BYTE;
+
+    if (HI_NULL != pstJob->pstTailNode)
     {
-        TDE_TRACE(TDE_KERN_INFO, "TdeOsiListAddNode fail!\n");
-        TDE_FREE(pBuf);
-        return s32Ret;
-    }
+       HI_U32 *pNextNodeAddr = (HI_U32 *)pstJob->pstTailNode->stNodeBuf.pBuf + (TDE_NODE_HEAD_BYTE >> 2) + ((pstJob->pstTailNode->stNodeBuf.u32NodeSz) >> 2);
+       HI_U64 *pNextNodeUpdate = pNextNodeAddr + 1;
+
+       *pNextNodeAddr = pSwNode->u32PhyAddr;
+
+#ifdef TDE_VERSION_MPW
+       *pNextNodeUpdate = pSwNode->u64Update & 0xffffffff;
+#else
+       //*pNextNodeUpdate++ = pSwNode->u64Update & 0xffffffff;
+       //*pNextNodeUpdate = (pSwNode->u64Update >> 32) & 0xffffffff;
+       *pNextNodeUpdate = pSwNode->u64Update;
 #endif
+    }
+
+    memcpy(&pstCmd->stNodeBuf, pSwNode, sizeof(*pSwNode));
+    //pstCmd->stNodeBuf = *pSwNode;
+
+    pstCmd->enNotiType = TDE_JOB_NONE_NOTIFY;
+    pstCmd->s32Handle = pstJob->s32Handle;
+    pstCmd->s32Index   = pstJob->u32CmdNum;
+    pstCmd->enSubmType = enSubmType;
+    pstCmd->u32PhyBuffNum = u32WorkBufNum;
+
+    *(((HI_U32 *)pstCmd->stNodeBuf.pBuf) + 1) = s32Handle;
+
+
+    list_add_tail(&pstCmd->stList, &pstJob->pstFirstCmd->stList);
+    pstJob->pstTailNode = pstCmd;
+    pstJob->u32NodeNum++;
+
+    if (pstCmd->u32PhyBuffNum != 0)
+    {
+        pstJob->bAqUseBuff = HI_TRUE;
+    }
+
     return HI_SUCCESS;
 }
 
@@ -5615,7 +5783,7 @@ HI_S32 TdeOsiBeginJob(TDE_HANDLE *ps32Handle)
 {
     if (NULL == ps32Handle)
     {
-        TDE_TRACE(TDE_KERN_INFO, "Null ptr!\n");
+        TDE_TRACE(TDE_KERN_INFO, "Null ptr!\n"); //5201
         return HI_ERR_TDE_NULL_PTR;
     }
 
@@ -5653,7 +5821,7 @@ HI_S32     TdeOsiEndJob(TDE_HANDLE s32Handle, HI_BOOL bBlock, HI_U32 u32TimeOut,
     {
         if(in_interrupt())
         {
-            TDE_TRACE(TDE_KERN_INFO, "can not be block in interrupt!\n");
+            TDE_TRACE(TDE_KERN_INFO, "can not be block in interrupt!\n"); //5231
             return HI_ERR_TDE_UNSUPPORTED_OPERATION;
         }
         enNotiType = TDE_JOB_WAKE_NOTIFY;
@@ -5694,7 +5862,7 @@ HI_S32 TdeOsiWaitForDone(TDE_HANDLE s32Handle, HI_U32 u32TimeOut)
 {
     if(in_interrupt())
     {
-        TDE_TRACE(TDE_KERN_INFO, "can not be block in interrupt!\n");
+        TDE_TRACE(TDE_KERN_INFO, "can not be block in interrupt!\n"); //5276
         return HI_ERR_TDE_UNSUPPORTED_OPERATION;
     }
 
@@ -5712,18 +5880,13 @@ EXPORT_SYMBOL(TdeOsiWaitForDone);
 *****************************************************************************/
 HI_S32 TdeOsiWaitAllDone(HI_BOOL bSync)
 {
-#if HI_TDE_SQ_SUPPORT
-    TDE_LIST_TYPE_E enListType = (bSync) ? (TDE_LIST_SQ) : (TDE_LIST_AQ);
-#else
-    TDE_LIST_TYPE_E enListType = TDE_LIST_AQ;
-#endif
     if(in_interrupt())
     {
-        TDE_TRACE(TDE_KERN_INFO, "can not wait in interrupt!\n");
+        TDE_TRACE(TDE_KERN_INFO, "can not wait in interrupt!\n"); //5296
         return HI_ERR_TDE_UNSUPPORTED_OPERATION;
     }
 
-    return TdeOsiListWaitAllDone(/*enListType*/);
+    return TdeOsiListWaitAllDone();
 }
 EXPORT_SYMBOL(TdeOsiWaitAllDone);
 
@@ -5822,7 +5985,8 @@ HI_S32     TdeOsiQuickBitblit(TDE_HANDLE s32Handle, TDE2_SURFACE_S* pstSrc, TDE2
 #endif
 
    
-    TdeHalNodeInitNd(&stHWNode, HI_FALSE);
+#warning TODO
+    TdeHalNodeInitNd(&stHWNode); //, HI_FALSE);
 
     stOpt.bResize = bResize;
     stOpt.enDeflickerMode = (bDeflicker)?TDE2_DEFLICKER_MODE_BOTH:TDE2_DEFLICKER_MODE_NONE;
@@ -5912,6 +6076,9 @@ HI_S32     TdeOsiQuickBitblit(TDE_HANDLE s32Handle, TDE2_SURFACE_S* pstSrc, TDE2
 HI_S32     TdeOsiQuickCopy(TDE_HANDLE s32Handle, TDE2_SURFACE_S* pstSrc, TDE2_RECT_S  *pstSrcRect,
                            TDE2_SURFACE_S* pstDst, TDE2_RECT_S *pstDstRect)
 {
+#if 1
+	return TdeOsiBlit(s32Handle, NULL, NULL, pstSrc, pstSrcRect, pstDst, pstDstRect, NULL);
+#else
     TDE_HWNode_S stHWNode = {0};
     TDE_DRV_SURFACE_S stSrcDrvSurface = {0};
     TDE_DRV_SURFACE_S stDstDrvSurface = {0};
@@ -5950,7 +6117,8 @@ HI_S32     TdeOsiQuickCopy(TDE_HANDLE s32Handle, TDE2_SURFACE_S* pstSrc, TDE2_RE
     TDE_UNIFY_RECT(pstSrcRect, pstDstRect);
 
    
-    TdeHalNodeInitNd(&stHWNode, HI_FALSE);
+#warning TODO
+    TdeHalNodeInitNd(&stHWNode); //, HI_FALSE);
 
     
     if (TdeOsiGetScanInfo(pstSrc, pstSrcRect, pstDst, pstDstRect, HI_NULL, &stSrcScanInfo,
@@ -5976,6 +6144,7 @@ HI_S32     TdeOsiQuickCopy(TDE_HANDLE s32Handle, TDE2_SURFACE_S* pstSrc, TDE2_RE
 
     
     return TdeOsiSetNodeFinish(s32Handle, &stHWNode, 0, TDE_NODE_SUBM_ALONE);
+#endif
 }
 EXPORT_SYMBOL(TdeOsiQuickCopy);
 
@@ -5996,7 +6165,9 @@ HI_S32     TdeOsiQuickResize(TDE_HANDLE s32Handle, TDE2_SURFACE_S* pstSrc, TDE2_
     TDE2_OPT_S stOpt = {0};
 
     stOpt.bResize = HI_TRUE;
-
+#if 1
+    if ((s32Ret = TdeOsiBlit(s32Handle, NULL, NULL, pstSrc, pstSrcRect, pstDst, pstDstRect, &stOpt)) < 0)
+#else
     if ((s32Ret = TdeOsiYC422TmpOpt(s32Handle, pstSrc, pstSrcRect,
                                     pstDst, pstDstRect, &stOpt)) < 0 )
     {
@@ -6005,6 +6176,7 @@ HI_S32     TdeOsiQuickResize(TDE_HANDLE s32Handle, TDE2_SURFACE_S* pstSrc, TDE2_
 		
     if ((s32Ret = TdeOsiQuickBitblit(s32Handle, pstSrc, pstSrcRect, 
                                      pstDst, pstDstRect, HI_FALSE)) < 0)
+#endif
     {
         return s32Ret;
     }
@@ -6030,7 +6202,11 @@ HI_S32     TdeOsiQuickFlicker(TDE_HANDLE s32Handle, TDE2_SURFACE_S* pstSrc, TDE2
     HI_BOOL bDeflicker;
 
     stOpt.enDeflickerMode = TDE2_DEFLICKER_MODE_BOTH;
+#if 1
+    stOpt.bResize = HI_TRUE;
 
+    if ((s32Ret = TdeOsiBlit(s32Handle, NULL, NULL, pstSrc, pstSrcRect, pstDst, pstDstRect, &stOpt)) < 0)
+#else
     if ((s32Ret = TdeOsiYC422TmpOpt(s32Handle, pstSrc, pstSrcRect,
                                     pstDst, pstDstRect, &stOpt)) < 0 )
     {
@@ -6041,6 +6217,7 @@ HI_S32     TdeOsiQuickFlicker(TDE_HANDLE s32Handle, TDE2_SURFACE_S* pstSrc, TDE2
 
     if ((s32Ret = TdeOsiQuickBitblit(s32Handle, pstSrc, pstSrcRect, 
                                      pstDst, pstDstRect, bDeflicker)) < 0)
+#endif
     {
         return s32Ret;
     }
@@ -6084,7 +6261,13 @@ EXPORT_SYMBOL(TdeOsiQuickFill);
 STATIC HI_S32 TdeOsiSingleSrc1Blit(TDE_HANDLE s32Handle, TDE2_SURFACE_S* pstBackGround, TDE2_RECT_S  *pstBackGroundRect,
                                    TDE2_SURFACE_S* pstDst, TDE2_RECT_S  *pstDstRect)
 {
+	HI_S32 s32Ret;
+	HI_U32 r3, r2;
+#if 0
     TDE_HWNode_S stHWNode = {0};
+#else
+    TDE_HWNode_S* stHWNode = 0;
+#endif
     TDE_DRV_SURFACE_S stSrcDrvSurface = {0};
     TDE_DRV_SURFACE_S stDstDrvSurface = {0};
     TDE_SCANDIRECTION_S stSrcScanInfo = {0};
@@ -6095,17 +6278,40 @@ STATIC HI_S32 TdeOsiSingleSrc1Blit(TDE_HANDLE s32Handle, TDE2_SURFACE_S* pstBack
     {
         return HI_ERR_TDE_NULL_PTR;
     }
-   
-    TdeHalNodeInitNd(&stHWNode, HI_FALSE);
+
+    r2 = pstBackGroundRect->u32Height;
+    r3 = pstDstRect->u32Height;
+    if (r2 != r3)
+    {
+    	if (r2 < r3) r3 = r2;
+    	pstBackGroundRect->u32Height = r3;
+    	pstDstRect->u32Height = r3;
+    }
+
+    r2 = pstBackGroundRect->u32Width;
+    r3 = pstDstRect->u32Width;
+    if (r2 != r3)
+    {
+    	if (r2 < r3) r3 = r2;
+    	pstBackGroundRect->u32Width = r3;
+    	pstDstRect->u32Width = r3;
+    }
+
+    TdeHalNodeInitNd(&stHWNode); //, HI_FALSE);
 
     
-    TdeHalNodeSetBaseOperate(&stHWNode, TDE_QUIKE_COPY, TDE_SRC1_BYPASS, 0);
+    if (TdeHalNodeSetBaseOperate(stHWNode, TDE_QUIKE_COPY, TDE_SRC1_BYPASS, 0) < 0)
+    {
+    	TdeHalFreeNodeBuf(stHWNode);
+    	return 0xa064800b;
+    }
 
     
     if (TdeOsiGetScanInfo(pstBackGround, pstBackGroundRect, pstDst, pstDstRect, HI_NULL,
                           &stSrcScanInfo,
                           &stDstScanInfo) < 0)
     {
+    	TdeHalFreeNodeBuf(stHWNode);
         return HI_ERR_TDE_INVALID_PARA;
     }
 
@@ -6113,18 +6319,23 @@ STATIC HI_S32 TdeOsiSingleSrc1Blit(TDE_HANDLE s32Handle, TDE2_SURFACE_S* pstBack
     TdeOsiConvertSurface(pstBackGround, pstBackGroundRect, &stSrcScanInfo, &stSrcDrvSurface, NULL);
 
    
-    TdeHalNodeSetSrc1(&stHWNode, &stSrcDrvSurface);
+    TdeHalNodeSetSrc1(stHWNode, &stSrcDrvSurface);
 
-    TdeOsiSetExtAlpha(pstBackGround, HI_NULL, &stHWNode); /* AI7D02681 */
+    TdeOsiSetExtAlpha(pstBackGround, HI_NULL, stHWNode); /* AI7D02681 */
 
     
     TdeOsiConvertSurface(pstDst, pstDstRect, &stDstScanInfo, &stDstDrvSurface, NULL);
 
     
-    TdeHalNodeSetTgt(&stHWNode, &stDstDrvSurface, TDE2_OUTALPHA_FROM_NORM);
+    TdeHalNodeSetTgt(stHWNode, &stDstDrvSurface, TDE2_OUTALPHA_FROM_NORM);
 
-    
-    return TdeOsiSetNodeFinish(s32Handle, &stHWNode, 0, TDE_NODE_SUBM_ALONE);
+    s32Ret = TdeOsiSetNodeFinish(s32Handle, stHWNode, 0, TDE_NODE_SUBM_ALONE);
+    if (s32Ret < 0)
+    {
+    	TdeHalFreeNodeBuf(stHWNode);
+    	return s32Ret;
+    }
+    return HI_SUCCESS;
 }
 
 /*****************************************************************************
@@ -6145,7 +6356,11 @@ STATIC HI_S32 TdeOsiSingleSrc2Blit(TDE_HANDLE s32Handle,
                                                                 TDE2_RECT_S  *pstDstRect,
                                                                 TDE2_OPT_S* pstOpt)
 {
+#if 0
     TDE_HWNode_S stHWNode = {0};
+#else
+    TDE_HWNode_S* stHWNode = 0;
+#endif
     TDE_DRV_SURFACE_S stSrcDrvSurface = {0};
     TDE_DRV_SURFACE_S stDstDrvSurface = {0};
     TDE_SCANDIRECTION_S stSrcScanInfo = {0};
@@ -6164,7 +6379,7 @@ STATIC HI_S32 TdeOsiSingleSrc2Blit(TDE_HANDLE s32Handle,
 #if defined (TDE_VERSION_PILOT) || defined (TDE_VERSION_FPGA) 
 	TDE2_SURFACE_S stTempForeGround;
 #endif
-    TDE_ASSERT(NULL != pstOpt);
+    TDE_ASSERT(NULL != pstOpt); //5522
 
     if ((NULL == pstDst) || (NULL == pstDstRect) || (NULL == pstOpt)
         || (NULL == pstForeGround) || (NULL == pstForeGroundRect))
@@ -6189,11 +6404,12 @@ STATIC HI_S32 TdeOsiSingleSrc2Blit(TDE_HANDLE s32Handle,
     memcpy(&stForeRect, pstForeGroundRect, sizeof(TDE2_RECT_S));
     memcpy(&stDstRect, pstDstRect, sizeof(TDE2_RECT_S));
    
-    TdeHalNodeInitNd(&stHWNode, HI_FALSE);
+    TdeHalNodeInitNd(&stHWNode); //, HI_FALSE);
 
     if(TdeOsiSetClipPara(NULL, NULL, pstForeGround, &stForeRect, pstDst,
-                      &stDstRect, pstOpt, &stHWNode) < 0)
+                      &stDstRect, pstOpt, stHWNode) < 0)
     {
+    	TdeHalFreeNodeBuf(stHWNode);
         return HI_ERR_TDE_CLIP_AREA;
     }
 
@@ -6201,6 +6417,7 @@ STATIC HI_S32 TdeOsiSingleSrc2Blit(TDE_HANDLE s32Handle,
     if (TdeOsiGetScanInfo(pstForeGround, &stForeRect, pstDst, &stDstRect, pstOpt,
                           &stSrcScanInfo, &stDstScanInfo) < 0)
     {
+    	TdeHalFreeNodeBuf(stHWNode);
         return HI_ERR_TDE_INVALID_PARA;
     }
 
@@ -6208,40 +6425,54 @@ STATIC HI_S32 TdeOsiSingleSrc2Blit(TDE_HANDLE s32Handle,
     TdeOsiConvertSurface(pstForeGround, &stForeRect, &stSrcScanInfo, &stSrcDrvSurface, &stFGOptArea);
 
    
-    TdeHalNodeSetSrc2(&stHWNode, &stSrcDrvSurface);
+    TdeHalNodeSetSrc2(stHWNode, &stSrcDrvSurface);
 
    
     TdeOsiConvertSurface(pstDst, &stDstRect, &stDstScanInfo, &stDstDrvSurface, &stDstOptArea);
 
-    
-    TDE_CHECK_OUTALPHAFROM(pstOpt->enOutAlphaFrom);
+#if 0
+    TDE_CHECK_OUTALPHAFROM(pstOpt->enOutAlphaFrom); //5575
+#else
+	if(TDE2_OUTALPHA_FROM_BUTT <= pstOpt->enOutAlphaFrom)
+	{
+		TDE_TRACE(TDE_KERN_INFO, "enOutAlphaFrom error!\n"); //5575
+    	TdeHalFreeNodeBuf(stHWNode);
+		return HI_ERR_TDE_INVALID_PARA;
+	}
+#endif
 
     if(TDE2_OUTALPHA_FROM_BACKGROUND == pstOpt->enOutAlphaFrom)
     {
-        TDE_TRACE(TDE_KERN_INFO, "enOutAlphaFrom error!\n");
+    	TdeHalFreeNodeBuf(stHWNode);
+        TDE_TRACE(TDE_KERN_INFO, "enOutAlphaFrom error!\n"); //5583
         return HI_ERR_TDE_INVALID_PARA;
         
     }
 
    
-    TdeHalNodeSetTgt(&stHWNode, &stDstDrvSurface, pstOpt->enOutAlphaFrom);
+    TdeHalNodeSetTgt(stHWNode, &stDstDrvSurface, pstOpt->enOutAlphaFrom);
 
    
     u16Code = TdeOsiSingleSrc2GetOptCode(pstForeGround->enColorFmt, pstDst->enColorFmt);
 
     TdeOsiGetConvbyCode(u16Code, &stConv);
 
-    TdeHalNodeSetColorConvert(&stHWNode, &stConv);
+    if (TdeHalNodeSetColorConvert(stHWNode, &stConv) < 0)
+    {
+    	TdeHalFreeNodeBuf(stHWNode);
+    	return 0xa064800b;
+    }
 
    
-    if((s32Ret = TdeOsiSetClutOpt(pstForeGround, pstDst, &enClutUsage, pstOpt->bClutReload, &stHWNode)) < 0)
+    if((s32Ret = TdeOsiSetClutOpt(pstForeGround, pstDst, &enClutUsage, pstOpt->bClutReload, stHWNode)) < 0)
     {
+        TdeHalFreeNodeBuf(stHWNode);
         return s32Ret;
     }
 
-    TdeOsiSetBaseOptParaForBlit(pstOpt, HI_NULL, pstForeGround,TDE_OPERATION_SINGLE_SRC2, &stHWNode);
+    TdeOsiSetBaseOptParaForBlit(pstOpt, HI_NULL, pstForeGround,TDE_OPERATION_SINGLE_SRC2, stHWNode);
 
-    TdeOsiSetExtAlpha(HI_NULL, pstForeGround, &stHWNode); /* AI7D02681 */
+    TdeOsiSetExtAlpha(HI_NULL, pstForeGround, stHWNode); /* AI7D02681 */
 
     if ((pstOpt->bResize) || (pstOpt->enDeflickerMode != TDE2_DEFLICKER_MODE_NONE))
     {
@@ -6266,18 +6497,32 @@ STATIC HI_S32 TdeOsiSingleSrc2Blit(TDE_HANDLE s32Handle,
 	}
 
         
-        return TdeOsiSetFilterNode(s32Handle, &stHWNode, &stTempForeGround, pstDst,
+        s32Ret = TdeOsiSetFilterNode(s32Handle, stHWNode, &stTempForeGround, pstDst,
                                    &stFGOptArea, &stDstOptArea, pstOpt->enDeflickerMode, &stFilterOpt);
+    	if (s32Ret < 0)
+    	{
+        	TdeHalFreeNodeBuf(stHWNode);
+    		return s32Ret;
+    	}
 #else
        
-        return TdeOsiSetFilterNode(s32Handle, &stHWNode, pstForeGround, pstDst,
+        s32Ret = TdeOsiSetFilterNode(s32Handle, &stHWNode, pstForeGround, pstDst,
                &stFGOptArea, &stDstOptArea, pstOpt->enDeflickerMode, &stFilterOpt);
+    	if (s32Ret < 0)
+    	{
+        	TdeHalFreeNodeBuf(stHWNode);
+    		return s32Ret;
+    	}
 #endif
     }
     else
     {
-       
-        return TdeOsiSetNodeFinish(s32Handle, &stHWNode, 0, TDE_NODE_SUBM_ALONE);
+    	s32Ret = TdeOsiSetNodeFinish(s32Handle, stHWNode, 0, TDE_NODE_SUBM_ALONE);
+    	if (s32Ret < 0)
+    	{
+        	TdeHalFreeNodeBuf(stHWNode);
+    		return s32Ret;
+    	}
     }
     return HI_SUCCESS;
 }
@@ -6302,7 +6547,13 @@ STATIC HI_S32 TdeOsiDoubleSrcBlit(TDE_HANDLE s32Handle, TDE2_SURFACE_S* pstBackG
                                   TDE2_RECT_S  *pstDstRect,
                                   TDE2_OPT_S* pstOpt)
 {
+#warning TODO
+
+#if 0
     TDE_HWNode_S stHWNode = {0};
+#else
+    TDE_HWNode_S* stHWNode = 0;
+#endif
     TDE_DRV_SURFACE_S stSrcDrvSurface = {0};
     TDE_DRV_SURFACE_S stDstDrvSurface = {0};
     TDE_SCANDIRECTION_S stSrcScanInfo = {0};
@@ -6351,6 +6602,7 @@ STATIC HI_S32 TdeOsiDoubleSrcBlit(TDE_HANDLE s32Handle, TDE2_SURFACE_S* pstBackG
         }
     }
 
+#if 0
      if (bTdeHalSwVersion()
         && (TDE2_COLOR_FMT_YCbCr888 <= pstBackGround->enColorFmt)
         && (pstBackGround->enColorFmt <= TDE2_COLOR_FMT_YCbCr422)
@@ -6385,14 +6637,15 @@ STATIC HI_S32 TdeOsiDoubleSrcBlit(TDE_HANDLE s32Handle, TDE2_SURFACE_S* pstBackG
             return s32Ret;
         }
     }
+#endif
     
-    
-    TdeHalNodeInitNd(&stHWNode, HI_FALSE);
+    TdeHalNodeInitNd(&stHWNode); //, HI_FALSE);
 
    
     if(TdeOsiSetClipPara(pstBackGround, &stBackRect, pstForeGround, &stForeRect, pstDst,
-                      &stDstRect, pstOpt, &stHWNode) < 0)
+                      &stDstRect, pstOpt, stHWNode) < 0)
     {
+    	TdeHalFreeNodeBuf(stHWNode);
         return HI_ERR_TDE_CLIP_AREA;
     }
 
@@ -6401,12 +6654,14 @@ STATIC HI_S32 TdeOsiDoubleSrcBlit(TDE_HANDLE s32Handle, TDE2_SURFACE_S* pstBackG
                           &stSrcScanInfo,
                           &stDstScanInfo) < 0)
     {
+    	TdeHalFreeNodeBuf(stHWNode);
         return HI_ERR_TDE_INVALID_PARA;
     }
 
    
     TdeOsiConvertSurface(pstBackGround, &stBackRect, &stSrcScanInfo, &stSrcDrvSurface, &stBGOptArea);
 
+#if 0
     if (bTdeHalSwVersion()
         && (TDE2_COLOR_FMT_YCbCr888 <= pstBackGround->enColorFmt)
         && (pstBackGround->enColorFmt <= TDE2_COLOR_FMT_YCbCr422)
@@ -6419,18 +6674,19 @@ STATIC HI_S32 TdeOsiDoubleSrcBlit(TDE_HANDLE s32Handle, TDE2_SURFACE_S* pstBackG
         TdeOsiConvertSurface(&stTempSur, &stBackRect, &stSrcScanInfo, &stSrcDrvSurface, &stBGOptArea);
     }
     else
+#else
     {
         memcpy(&stTempSur, pstBackGround, sizeof(TDE2_SURFACE_S));
     }
-
+#endif
     
-    TdeHalNodeSetSrc1(&stHWNode, &stSrcDrvSurface);
+    TdeHalNodeSetSrc1(stHWNode, &stSrcDrvSurface);
 
     
     TdeOsiConvertSurface(pstForeGround, &stForeRect, &stSrcScanInfo, &stSrcDrvSurface, &stFGOptArea);
 
    
-    TdeHalNodeSetSrc2(&stHWNode, &stSrcDrvSurface);
+    TdeHalNodeSetSrc2(stHWNode, &stSrcDrvSurface);
 
     
     TdeOsiConvertSurface(pstDst, &stDstRect, &stDstScanInfo, &stDstDrvSurface, &stDstOptArea);
@@ -6439,7 +6695,7 @@ STATIC HI_S32 TdeOsiDoubleSrcBlit(TDE_HANDLE s32Handle, TDE2_SURFACE_S* pstBackG
     TDE_CHECK_OUTALPHAFROM(pstOpt->enOutAlphaFrom);
 
     
-    TdeHalNodeSetTgt(&stHWNode, &stDstDrvSurface, pstOpt->enOutAlphaFrom);
+    TdeHalNodeSetTgt(stHWNode, &stDstDrvSurface, pstOpt->enOutAlphaFrom);
 
     
     u16Code = TdeOsiDoubleSrcGetOptCode(stTempSur.enColorFmt, pstForeGround->enColorFmt,
@@ -6448,11 +6704,16 @@ STATIC HI_S32 TdeOsiDoubleSrcBlit(TDE_HANDLE s32Handle, TDE2_SURFACE_S* pstBackG
     TdeOsiGetConvbyCode(u16Code, &stConv);
 
     
-    TdeHalNodeSetColorConvert(&stHWNode, &stConv);
+    if (TdeHalNodeSetColorConvert(stHWNode, &stConv) < 0)
+    {
+    	TdeHalFreeNodeBuf(stHWNode);
+    	return 0xa064800b;
+    }
 
     
-    if((s32Ret = TdeOsiSetClutOpt(pstForeGround, pstDst, &enClutUsage, pstOpt->bClutReload, &stHWNode)) < 0)
+    if((s32Ret = TdeOsiSetClutOpt(pstForeGround, pstDst, &enClutUsage, pstOpt->bClutReload, stHWNode)) < 0)
     {
+    	TdeHalFreeNodeBuf(stHWNode);
         return s32Ret;
     }
 
@@ -6472,11 +6733,16 @@ STATIC HI_S32 TdeOsiDoubleSrcBlit(TDE_HANDLE s32Handle, TDE2_SURFACE_S* pstBackG
             enFmtCategory = TdeOsiGetFmtCategory(pstBackGround->enColorFmt);
             if (enFmtCategory >= TDE_COLORFMT_CATEGORY_BUTT)
             {
-                TDE_TRACE(TDE_KERN_ERR, "Unknown fmt category!\n");
+                TDE_TRACE(TDE_KERN_ERR, "Unknown fmt category!\n"); //5793
+            	TdeHalFreeNodeBuf(stHWNode);
                 return HI_ERR_TDE_INVALID_PARA;
             }
             
-            TdeHalNodeSetColorKey(&stHWNode, enFmtCategory, &stColorkey);
+            if (TdeHalNodeSetColorKey(stHWNode, enFmtCategory, &stColorkey) < 0)
+            {
+            	TdeHalFreeNodeBuf(stHWNode);
+            	return 0xa064800b;
+            }
 
             break;
 
@@ -6496,21 +6762,27 @@ STATIC HI_S32 TdeOsiDoubleSrcBlit(TDE_HANDLE s32Handle, TDE2_SURFACE_S* pstBackG
             enFmtCategory = TdeOsiGetFmtCategory(pstForeGround->enColorFmt);
             if (enFmtCategory >= TDE_COLORFMT_CATEGORY_BUTT)
             {
-                TDE_TRACE(TDE_KERN_ERR, "Unknown fmt category!\n");
+                TDE_TRACE(TDE_KERN_ERR, "Unknown fmt category!\n"); //5822
+            	TdeHalFreeNodeBuf(stHWNode);
                 return HI_ERR_TDE_INVALID_PARA;
             }
 
-            TdeHalNodeSetColorKey(&stHWNode, enFmtCategory, &stColorkey);
+            if (TdeHalNodeSetColorKey(stHWNode, enFmtCategory, &stColorkey) < 0)
+            {
+            	TdeHalFreeNodeBuf(stHWNode);
+            	return 0xa064800b;
+            }
             break;
 
         default:
             TDE_TRACE(TDE_KERN_INFO, "\n");
+        	TdeHalFreeNodeBuf(stHWNode);
             return HI_ERR_TDE_INVALID_PARA;
         }
     }
 
-    TdeOsiSetBaseOptParaForBlit(pstOpt, &stTempSur, pstForeGround, TDE_OPERATION_DOUBLE_SRC, &stHWNode);
-    TdeOsiSetExtAlpha(&stTempSur, pstForeGround, &stHWNode);
+    TdeOsiSetBaseOptParaForBlit(pstOpt, &stTempSur, pstForeGround, TDE_OPERATION_DOUBLE_SRC, stHWNode);
+    TdeOsiSetExtAlpha(&stTempSur, pstForeGround, stHWNode);
     
     if ((pstOpt->bResize) || (TDE2_DEFLICKER_MODE_NONE != pstOpt->enDeflickerMode))
     {
@@ -6543,19 +6815,36 @@ STATIC HI_S32 TdeOsiDoubleSrcBlit(TDE_HANDLE s32Handle, TDE2_SURFACE_S* pstBackG
 	}
 	
         
-        return TdeOsiSetFilterNode(s32Handle, &stHWNode, &stTempForeGround, pstDst,
+		s32Ret = TdeOsiSetFilterNode(s32Handle, stHWNode, &stTempForeGround, pstDst,
                                    &stFGOptArea, &stDstOptArea, pstOpt->enDeflickerMode, &stFilterOpt);
+		if (s32Ret < 0)
+		{
+        	TdeHalFreeNodeBuf(stHWNode);
+			return s32Ret;
+		}
 #else
         
-        return TdeOsiSetFilterNode(s32Handle, &stHWNode, pstForeGround, pstDst,
+		s32Ret = TdeOsiSetFilterNode(s32Handle, stHWNode, pstForeGround, pstDst,
                &stFGOptArea, &stDstOptArea, pstOpt->enDeflickerMode, &stFilterOpt);
+		if (s32Ret < 0)
+		{
+        	TdeHalFreeNodeBuf(stHWNode);
+			return s32Ret;
+		}
 #endif
     }
     else
     {
        
-        return TdeOsiSetNodeFinish(s32Handle, &stHWNode, 0, TDE_NODE_SUBM_ALONE);
+    	s32Ret = TdeOsiSetNodeFinish(s32Handle, stHWNode, 0, TDE_NODE_SUBM_ALONE);
+		if (s32Ret < 0)
+		{
+        	TdeHalFreeNodeBuf(stHWNode);
+			return s32Ret;
+		}
     }
+
+    return HI_SUCCESS;
 }
 
 /*****************************************************************************
@@ -6695,11 +6984,13 @@ HI_S32     TdeOsiBlit(TDE_HANDLE s32Handle, TDE2_SURFACE_S* pstBackGround, TDE2_
     {
         if (NULL == pstBackGround)
         {
+#if 0
             if ((s32Ret = TdeOsiYC422TmpOpt(s32Handle, pstForeGround, pstForeGroundRect,
                                         pstDst, pstDstRect, pstOpt)) < 0)
             {
                 return s32Ret;
             }
+#endif
 
             if ((s32Ret = TdeOsiSingleSrc2Blit(s32Handle, pstForeGround, pstForeGroundRect,
                                         pstDst, pstDstRect, pstOpt)) < 0)
@@ -6709,11 +7000,13 @@ HI_S32     TdeOsiBlit(TDE_HANDLE s32Handle, TDE2_SURFACE_S* pstBackGround, TDE2_
         }
         else
         {
+#if 0
             if ((s32Ret = TdeOsiYC422TmpOpt(s32Handle, pstBackGround, pstBackGroundRect,
                                         pstDst, pstDstRect, pstOpt)) < 0 )
             {
                 return s32Ret;
             }
+#endif
 
             if ((s32Ret = TdeOsiSingleSrc2Blit(s32Handle, pstBackGround, pstBackGroundRect,
                                         pstDst, pstDstRect, pstOpt)) < 0 ) /*AI7D02940*/
@@ -6725,11 +7018,13 @@ HI_S32     TdeOsiBlit(TDE_HANDLE s32Handle, TDE2_SURFACE_S* pstBackGround, TDE2_
     }
     case TDE_OPERATION_DOUBLE_SRC:
     {
+#if 0
         if ((s32Ret = TdeOsiYC422TmpOpt(s32Handle, pstForeGround, pstForeGroundRect,
                                         pstDst, pstDstRect, pstOpt)) < 0)
         {
             return s32Ret;
         }
+#endif
         
         if ((s32Ret = TdeOsiDoubleSrcBlit(s32Handle, pstBackGround, pstBackGroundRect, pstForeGround, pstForeGroundRect,
                                    pstDst, pstDstRect, pstOpt)) < 0)
@@ -6761,28 +7056,19 @@ EXPORT_SYMBOL(TdeOsiBlit);
 HI_S32     TdeOsiMbBlit(TDE_HANDLE s32Handle, TDE2_MB_S* pstMB, TDE2_RECT_S  *pstMbRect,
                         TDE2_SURFACE_S* pstDst, TDE2_RECT_S  *pstDstRect, TDE2_MBOPT_S* pstMbOpt)
 {
-    TDE_HWNode_S stHwNode = {0};
+#warning TODO
+//    TDE_HWNode_S stHwNode = {0};
 
     if ((HI_NULL == pstMB) || (HI_NULL == pstMbRect) 
         || (HI_NULL == pstDst) || (HI_NULL == pstDstRect) || (HI_NULL == pstMbOpt))
     {
-        TDE_TRACE(TDE_KERN_INFO, "Contains NULL ptr!\n");
+        TDE_TRACE(TDE_KERN_INFO, "Contains NULL ptr!\n"); //5989
         return HI_ERR_TDE_NULL_PTR;
     }
 
-    
-    #if 0
-    if (TDE2_COLOR_FMT_YCbCr888 != pstDst->enColorFmt
-        && TDE2_COLOR_FMT_AYCbCr8888 != pstDst->enColorFmt
-        && TDE2_COLOR_FMT_YCbCr422 != pstDst->enColorFmt)
-    {
-        TDE_TRACE(TDE_KERN_INFO, "MacroBlock does not support CSC!\n");
-        return HI_ERR_TDE_INVALID_PARA;
-    }
-    #endif
 
-    TDE_CHECK_NOT_MB(pstDst->enColorFmt);
-    TDE_CHECK_MBCOLORFMT(pstMB->enMbFmt);
+    TDE_CHECK_NOT_MB(pstDst->enColorFmt); //5994
+    TDE_CHECK_MBCOLORFMT(pstMB->enMbFmt); //5995
     
     if (TdeOsiCheckSurface(pstDst, pstDstRect) < 0
         || TdeOsiCheckMbSurface(pstMB, pstMbRect) < 0)
@@ -6808,11 +7094,11 @@ HI_S32     TdeOsiMbBlit(TDE_HANDLE s32Handle, TDE2_MB_S* pstMB, TDE2_RECT_S  *ps
         return HI_ERR_TDE_MINIFICATION;
     }
 
-    return TdeOsiSetMbPara(s32Handle, &stHwNode, pstMB, pstMbRect,
+    return TdeOsiSetMbPara(s32Handle, /*&stHwNode,*/ pstMB, pstMbRect,
                            pstDst, pstDstRect, pstMbOpt);
 }
 EXPORT_SYMBOL(TdeOsiMbBlit);
-#if HI_TDE_BITMAPMASK_SUPPORT
+#if 1//HI_TDE_BITMAPMASK_SUPPORT
 /*****************************************************************************
 * Function:      TdeOsiBitmapMaskCheckPara
 * Description:   check for trinal source operate parameter
@@ -6841,15 +7127,15 @@ STATIC INLINE HI_S32 TdeOsiBitmapMaskCheckPara(TDE2_SURFACE_S* pstBackGround, TD
         || (NULL == pstForeGroundRect)
         || (NULL == pstMask) || (NULL == pstMaskRect) || (NULL == pstDst) || (NULL == pstDstRect))
     {
-        TDE_TRACE(TDE_KERN_INFO, "Contains NULL ptr!\n");
+        TDE_TRACE(TDE_KERN_INFO, "Contains NULL ptr!\n"); //6055
         return HI_ERR_TDE_NULL_PTR;
     }	
 
    
     TDE_CHECK_NOT_MB(pstForeGround->enColorFmt);
     TDE_CHECK_NOT_MB(pstBackGround->enColorFmt);
-    TDE_CHECK_NOT_MB(pstMask->enColorFmt);
-    TDE_CHECK_NOT_MB(pstDst->enColorFmt);
+    TDE_CHECK_NOT_MB(pstMask->enColorFmt); //6062
+    TDE_CHECK_NOT_MB(pstDst->enColorFmt); //6063
 
 #ifdef TDE_VERSION_MPW
     if(TDE2_COLOR_FMT_YCbCr422 == pstBackGround->enColorFmt)
@@ -6910,7 +7196,7 @@ STATIC INLINE HI_S32 TdeOsiBitmapMaskCheckPara(TDE2_SURFACE_S* pstBackGround, TD
         || (pstForeGroundRect->u32Height != pstMaskRect->u32Height)
         || (pstMaskRect->u32Height != pstDstRect->u32Height))
     {
-        TDE_TRACE(TDE_KERN_INFO, "Don't support scale!\n");
+        TDE_TRACE(TDE_KERN_INFO, "Don't support scale!\n"); //6108
         return HI_ERR_TDE_INVALID_PARA;
     }
 
@@ -6930,14 +7216,18 @@ STATIC INLINE HI_S32 TdeOsiBitmapMaskCheckPara(TDE2_SURFACE_S* pstBackGround, TD
 * Return:        none
 * Others:        none
 *****************************************************************************/
-HI_S32     TdeOsiBitmapMaskRop(TDE_HANDLE s32Handle, 
+HI_S32     TdeOsiBitmapMaskRop(TDE_HANDLE s32Handle,
                     TDE2_SURFACE_S* pstBackGround, TDE2_RECT_S  *pstBackGroundRect,
                     TDE2_SURFACE_S* pstForeGround, TDE2_RECT_S  *pstForeGroundRect,
                     TDE2_SURFACE_S* pstMask, TDE2_RECT_S  *pstMaskRect, 
                     TDE2_SURFACE_S* pstDst, TDE2_RECT_S  *pstDstRect,
                     TDE2_ROP_CODE_E enRopCode_Color, TDE2_ROP_CODE_E enRopCode_Alpha)
 {
+#if 0
     TDE_HWNode_S stHWNode = {0};
+#else
+    TDE_HWNode_S* stHWNode = 0; //fp48
+#endif
     TDE_DRV_SURFACE_S stSrcDrvSurface = {0};
     TDE_DRV_SURFACE_S stDstDrvSurface = {0};
     TDE_SCANDIRECTION_S stScanInfo= {0};
@@ -6958,7 +7248,7 @@ HI_S32     TdeOsiBitmapMaskRop(TDE_HANDLE s32Handle,
 
     if(!TdeOsiWhetherContainAlpha(pstForeGround->enColorFmt))
     {
-        TDE_TRACE(TDE_KERN_INFO, "ForeGround bitmap must contains alpha component!\n");
+        TDE_TRACE(TDE_KERN_INFO, "ForeGround bitmap must contains alpha component!\n"); //6157
         return HI_ERR_TDE_INVALID_PARA;
     }
 
@@ -6969,7 +7259,8 @@ HI_S32     TdeOsiBitmapMaskRop(TDE_HANDLE s32Handle,
     }
 
     
-    TdeHalNodeInitNd(&stHWNode, HI_FALSE);
+#warning TODO
+    TdeHalNodeInitNd(&stHWNode); //, HI_FALSE);
 
     
     stScanInfo.enHScan = TDE_SCAN_LEFT_RIGHT;
@@ -7020,7 +7311,8 @@ HI_S32     TdeOsiBitmapMaskRop(TDE_HANDLE s32Handle,
     }
 
     
-    TdeHalNodeInitNd(&stHWNode, HI_FALSE);
+#warning TODO
+    TdeHalNodeInitNd(&stHWNode); //, HI_FALSE);
 
     
     TdeOsiConvertSurface(pstBackGround, pstBackGroundRect, &stScanInfo, &stSrcDrvSurface, NULL);
@@ -7064,7 +7356,6 @@ HI_S32     TdeOsiBitmapMaskRop(TDE_HANDLE s32Handle,
     
     return HI_SUCCESS;
 }
-
 EXPORT_SYMBOL(TdeOsiBitmapMaskRop);
 
 /*****************************************************************************
@@ -7133,7 +7424,8 @@ HI_S32     TdeOsiBitmapMaskBlend(TDE_HANDLE s32Handle, TDE2_SURFACE_S* pstBackGr
     }
 
     	
-    TdeHalNodeInitNd(&stHWNode, HI_FALSE);
+#warning TODO
+    TdeHalNodeInitNd(&stHWNode); //, HI_FALSE);
 
     
     stScanInfo.enHScan = TDE_SCAN_LEFT_RIGHT;
@@ -7186,7 +7478,8 @@ HI_S32     TdeOsiBitmapMaskBlend(TDE_HANDLE s32Handle, TDE2_SURFACE_S* pstBackGr
     }
 
     
-    TdeHalNodeInitNd(&stHWNode, HI_FALSE);
+#warning TODO
+    TdeHalNodeInitNd(&stHWNode); //, HI_FALSE);
 
 
     
@@ -7821,7 +8114,8 @@ HI_S32 TdeOsiSingleSrcPatternFill(TDE_HANDLE s32Handle, TDE2_SURFACE_S *pstSrc,
         return HI_ERR_TDE_INVALID_PARA;
     }
     
-    TdeHalNodeInitNd(&stHWNode, HI_FALSE);
+#warning TODO
+    TdeHalNodeInitNd(&stHWNode); //, HI_FALSE);
 
     enBaseMode = TDE_SINGLE_SRC_PATTERN_FILL_OPT;
     enAluMode = TDE_ALU_NONE;
@@ -8009,7 +8303,8 @@ HI_S32 TdeOsiDoubleSrcPatternFill(TDE_HANDLE s32Handle, TDE2_SURFACE_S *pstBackG
     }
 
     
-    TdeHalNodeInitNd(&stHWNode, HI_FALSE);
+#warning TODO
+    TdeHalNodeInitNd(&stHWNode); //, HI_FALSE);
 
     if (pstOpt->enAluCmd & TDE2_ALUCMD_ROP)
     {

@@ -850,10 +850,12 @@ HI_BOOL TdeHalIsSqWork()
 * Return:        none
 * Others:        none
 *****************************************************************************/
-HI_VOID TdeHalNodeInitNd(TDE_HWNode_S* pHWNode, HI_BOOL bChild)
+HI_S32 TdeHalNodeInitNd(TDE_HWNode_S** pHWNode)
 {
+    TDE_HWNode_Outer_S* p;
     TDE_INS_U unIns;
 
+#if 0
     TDE_ASSERT(HI_NULL != pHWNode);
 
      /*it need set father's info and clear Update info when node is child*/
@@ -891,6 +893,23 @@ HI_VOID TdeHalNodeInitNd(TDE_HWNode_S* pHWNode, HI_BOOL bChild)
     unIns.stBits.u32AqIrqMask = TDE_AQ_SUSP_MASK_EN | TDE_AQ_COMP_LIST_MASK_EN;
     pHWNode->u32TDE_INS = unIns.u32All;
     TDE_SET_UPDATE(u32TDE_INS, pHWNode->u64TDE_UPDATE);
+#endif
+
+    p = wmalloc(sizeof(TDE_HWNode_Outer_S));
+    if (p == NULL)
+    {
+    	TDE_TRACE(TDE_KERN_INFO, "malloc (%d) failed, wgetfreenum(%d)!\n", sizeof(TDE_HWNode_Outer_S), wgetfreenum()); //784
+    	return 0xa0648004;
+    }
+
+    *pHWNode = &p->Data_16;
+
+    unIns.u32All = p->Data_16.u32TDE_INS;
+    //unIns.stBits.u32SqIrqMask = TDE_SQ_UPDATE_MASK_EN | TDE_SQ_COMP_LIST_MASK_EN | TDE_SQ_CUR_LINE_MASK_EN;
+    unIns.stBits.u32AqIrqMask = TDE_AQ_SUSP_MASK_EN | TDE_AQ_COMP_LIST_MASK_EN;
+    p->Data_16.u32TDE_INS = unIns.u32All;
+
+    return HI_SUCCESS;
 }
 
 /*modify bug*//*CNcomment: AE5D03390:������������clip bug */
@@ -1434,7 +1453,7 @@ HI_VOID TdeHalNodeSetTgt(TDE_HWNode_S* pHWNode, TDE_DRV_SURFACE_S* pDrvSurface, 
 * Return:        none
 * Others:        none
 *****************************************************************************/
-HI_VOID TdeHalNodeSetBaseOperate(TDE_HWNode_S* pHWNode, TDE_DRV_BASEOPT_MODE_E enMode,
+HI_S32 TdeHalNodeSetBaseOperate(TDE_HWNode_S* pHWNode, TDE_DRV_BASEOPT_MODE_E enMode,
                                  TDE_DRV_ALU_MODE_E enAlu, TDE_DRV_COLORFILL_S *pstColorFill)
 {
     TDE_ALU_U unAluMode;
@@ -1731,7 +1750,7 @@ HI_VOID TdeHalNodeSetAlphaBorder(TDE_HWNode_S* pHWNode, HI_BOOL bVEnable, HI_BOO
 * Return:        none
 * Others:        none
 *****************************************************************************/
-HI_VOID TdeHalNodeSetRop(TDE_HWNode_S* pHWNode, TDE2_ROP_CODE_E enRgbRop, TDE2_ROP_CODE_E enAlphaRop)
+HI_S32 TdeHalNodeSetRop(TDE_HWNode_S* pHWNode, TDE2_ROP_CODE_E enRgbRop, TDE2_ROP_CODE_E enAlphaRop)
 {
     TDE_ALU_U unAluMode;
     
@@ -1755,7 +1774,7 @@ HI_VOID TdeHalNodeSetRop(TDE_HWNode_S* pHWNode, TDE2_ROP_CODE_E enRgbRop, TDE2_R
 * Return:        none
 * Others:        none
 *****************************************************************************/
-HI_VOID TdeHalNodeSetBlend(TDE_HWNode_S *pHWNode, TDE2_BLEND_OPT_S *pstBlendOpt)
+HI_S32 TdeHalNodeSetBlend(TDE_HWNode_S *pHWNode, TDE2_BLEND_OPT_S *pstBlendOpt)
 {
 #if defined(TDE_VERSION_PILOT) || defined(TDE_VERSION_FPGA)
     TDE_ALPHA_BLEND_U unAlphaBlend;
@@ -1901,7 +1920,7 @@ HI_VOID TdeHalNodeSetBlend(TDE_HWNode_S *pHWNode, TDE2_BLEND_OPT_S *pstBlendOpt)
 * Return:        none
 * Others:        none
 *****************************************************************************/
-HI_VOID TdeHalNodeSetColorize(TDE_HWNode_S *pHWNode, HI_U32 u32Colorize)
+HI_S32 TdeHalNodeSetColorize(TDE_HWNode_S *pHWNode, HI_U32 u32Colorize)
 {
 #if defined(TDE_VERSION_PILOT) || defined(TDE_VERSION_FPGA)
     TDE_SRC_TYPE_U unSrcType;    
@@ -1946,7 +1965,7 @@ HI_VOID TdeHalNodeEnableAlphaRop(TDE_HWNode_S *pHWNode)
 * Return:        none
 * Others:        none
 *****************************************************************************/
-HI_VOID TdeHalNodeSetClutOpt(TDE_HWNode_S* pHWNode, TDE_DRV_CLUT_CMD_S* pClutCmd, HI_BOOL bReload)
+HI_S32 TdeHalNodeSetClutOpt(TDE_HWNode_S* pHWNode, TDE_DRV_CLUT_CMD_S* pClutCmd, HI_BOOL bReload)
 {
     TDE_INS_U unIns;
     TDE_COLOR_CONV_U unConv;
@@ -1982,7 +2001,7 @@ HI_VOID TdeHalNodeSetClutOpt(TDE_HWNode_S* pHWNode, TDE_DRV_CLUT_CMD_S* pClutCmd
 * Return:        none
 * Others:        none
 *****************************************************************************/
-HI_VOID TdeHalNodeSetColorKey(TDE_HWNode_S* pHWNode, TDE_COLORFMT_CATEGORY_E enFmtCat, 
+HI_S32 TdeHalNodeSetColorKey(TDE_HWNode_S* pHWNode, TDE_COLORFMT_CATEGORY_E enFmtCat,
                               TDE_DRV_COLORKEY_CMD_S* pColorKey)
 {
     TDE_INS_U unIns;
@@ -2207,7 +2226,7 @@ HI_VOID TdeHalNodeSetColorKey(TDE_HWNode_S* pHWNode, TDE_COLORFMT_CATEGORY_E enF
 * Return:        none
 * Others:        none
 *****************************************************************************/
-HI_VOID TdeHalNodeSetClipping(TDE_HWNode_S* pHWNode, TDE_DRV_CLIP_CMD_S* pClip)
+HI_S32 TdeHalNodeSetClipping(TDE_HWNode_S* pHWNode, TDE_DRV_CLIP_CMD_S* pClip)
 {
     TDE_INS_U unIns;
     TDE_SUR_SIZE_U unClipPos;
@@ -2340,7 +2359,7 @@ HI_VOID TdeHalNodeSetFlicker(TDE_HWNode_S* pHWNode, TDE_DRV_FLICKER_CMD_S* pFlic
 * Return:        none
 * Others:        none
 *****************************************************************************/
-HI_VOID TdeHalNodeSetResize(TDE_HWNode_S* pHWNode, TDE_DRV_RESIZE_CMD_S* pResize, 
+HI_S32 TdeHalNodeSetResize(TDE_HWNode_S* pHWNode, TDE_DRV_RESIZE_CMD_S* pResize,
 TDE_NODE_SUBM_TYPE_E enNodeType)
 {
     TDE_INS_U unIns;
@@ -2430,6 +2449,7 @@ TDE_NODE_SUBM_TYPE_E enNodeType)
 
     TDE_SET_UPDATE(u32TDE_2D_RSZ, pHWNode->u64TDE_UPDATE);
 
+#warning TODO
     return;
 }
 
@@ -2442,7 +2462,7 @@ TDE_NODE_SUBM_TYPE_E enNodeType)
 * Return:        none
 * Others:        none
 *****************************************************************************/
-HI_VOID TdeHalNodeSetColorConvert(TDE_HWNode_S* pHWNode, TDE_DRV_CONV_MODE_CMD_S* pConv)
+HI_S32 TdeHalNodeSetColorConvert(TDE_HWNode_S* pHWNode, TDE_DRV_CONV_MODE_CMD_S* pConv)
 {
     TDE_INS_U unIns;
     TDE_COLOR_CONV_U unConv;
@@ -3697,6 +3717,12 @@ HI_BOOL bTdeHalSwVersion(HI_VOID)
     u32Version = TDE_READ_REG(s_pu32BaseVirAddr, TDE_VER);
 
     return (u32Version == TDE_SWVERSION_NUM);
+}
+
+
+void TdeHalFreeNodeBuf(TDE_HWNode_S* pNode)
+{
+#warning TODO
 }
 
 #ifdef __cplusplus

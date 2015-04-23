@@ -153,9 +153,9 @@ typedef enum hiTDE_SLICE_TYPE_E
 typedef enum hiTDE_DRV_FILTER_MODE_E
 {
     TDE_DRV_FILTER_NONE = 0,    /* none filt*/
-    TDE_DRV_FILTER_COLOR,       /* filt on color parameter */
-    TDE_DRV_FILTER_ALPHA,       /* filt on Alpha value */
-    TDE_DRV_FILTER_ALL          /* filt on Alpha and color value */
+    TDE_DRV_FILTER_COLOR, //1      /* filt on color parameter */
+    TDE_DRV_FILTER_ALPHA, //2      /* filt on Alpha value */
+    TDE_DRV_FILTER_ALL //3         /* filt on Alpha and color value */
 } TDE_DRV_FILTER_MODE_E;
 
 /* Deflicker operate setting */
@@ -179,6 +179,7 @@ typedef struct hiTDE_DRV_FLICKER_CMD_S
     HI_U8            u8Threshold1;
     HI_U8            u8Threshold2;
     TDE2_DEFLICKER_MODE_E enDeflickerMode;
+    //28
 } TDE_DRV_FLICKER_CMD_S;
 
 
@@ -436,6 +437,14 @@ typedef struct hiTDE_HWNode_S
 #endif
     HI_U64 u64TDE_UPDATE; /* record update settings */
 } TDE_HWNode_S;
+
+typedef struct
+{
+	int fill_0[4]; //0
+	TDE_HWNode_S Data_16;
+	//int fill_192; //192?????
+	//196
+} TDE_HWNode_Outer_S;
 
 /* Zoom mode in subnode*/
 typedef enum hiTDE_CHILD_SCALE_MODE_E
@@ -760,7 +769,7 @@ HI_BOOL TdeHalIsSqWork(HI_VOID);
 * Return:        Mone
 * Others:        None
 *****************************************************************************/
-HI_VOID TdeHalNodeInitNd(TDE_HWNode_S* pHWNode, HI_BOOL bChild);
+HI_S32 TdeHalNodeInitNd(TDE_HWNode_S** pHWNode);
 
 HI_VOID TdeHalNodeInitChildNd(TDE_HWNode_S* pHWNode, HI_U32 u32TDE_CLIP_START, HI_U32 u32TDE_CLIP_STOP);
 
@@ -876,7 +885,7 @@ HI_VOID TdeHalNodeSetTgt(TDE_HWNode_S* pHWNode, TDE_DRV_SURFACE_S* pDrvSurface, 
 * Return:        None
 * Others:        None
 *****************************************************************************/
-HI_VOID TdeHalNodeSetBaseOperate(TDE_HWNode_S* pHWNode, TDE_DRV_BASEOPT_MODE_E enMode,
+HI_S32 TdeHalNodeSetBaseOperate(TDE_HWNode_S* pHWNode, TDE_DRV_BASEOPT_MODE_E enMode,
                                  TDE_DRV_ALU_MODE_E enAlu, TDE_DRV_COLORFILL_S *pstColorFill);
 
 /*****************************************************************************
@@ -921,7 +930,7 @@ HI_VOID TdeHalNodeSetAlphaBorder(TDE_HWNode_S* pHWNode, HI_BOOL bVEnable, HI_BOO
 * Return:        None
 * Others:        None
 *****************************************************************************/
-HI_VOID TdeHalNodeSetRop(TDE_HWNode_S* pHWNode, TDE2_ROP_CODE_E enRgbRop, TDE2_ROP_CODE_E enAlphaRop);
+HI_S32 TdeHalNodeSetRop(TDE_HWNode_S* pHWNode, TDE2_ROP_CODE_E enRgbRop, TDE2_ROP_CODE_E enAlphaRop);
 
 /*****************************************************************************
 * Function:      TdeHalNodeSetBlend
@@ -932,7 +941,7 @@ HI_VOID TdeHalNodeSetRop(TDE_HWNode_S* pHWNode, TDE2_ROP_CODE_E enRgbRop, TDE2_R
 * Return:        None
 * Others:        None
 *****************************************************************************/
-HI_VOID TdeHalNodeSetBlend(TDE_HWNode_S *pHWNode, TDE2_BLEND_OPT_S *pstBlendOpt);
+HI_S32 TdeHalNodeSetBlend(TDE_HWNode_S *pHWNode, TDE2_BLEND_OPT_S *pstBlendOpt);
 
 /*****************************************************************************
 * Function:      TdeHalNodeSetColorize
@@ -943,7 +952,7 @@ HI_VOID TdeHalNodeSetBlend(TDE_HWNode_S *pHWNode, TDE2_BLEND_OPT_S *pstBlendOpt)
 * Return:        None
 * Others:        None
 *****************************************************************************/
-HI_VOID TdeHalNodeSetColorize(TDE_HWNode_S *pHWNode, HI_U32 u32Colorize);
+HI_S32 TdeHalNodeSetColorize(TDE_HWNode_S *pHWNode, HI_U32 u32Colorize);
 
 /*****************************************************************************
 * Function:      TdeHalNodeEnableAlphaRop
@@ -964,7 +973,7 @@ HI_VOID TdeHalNodeEnableAlphaRop(TDE_HWNode_S *pHWNode);
 * Return:        None
 * Others:        None
 *****************************************************************************/
-HI_VOID TdeHalNodeSetClutOpt(TDE_HWNode_S* pHWNode, TDE_DRV_CLUT_CMD_S* pClutCmd, HI_BOOL bReload);
+HI_S32 TdeHalNodeSetClutOpt(TDE_HWNode_S* pHWNode, TDE_DRV_CLUT_CMD_S* pClutCmd, HI_BOOL bReload);
 
 /*****************************************************************************
 * Function:      TdeHalNodeSetColorKey
@@ -976,7 +985,7 @@ HI_VOID TdeHalNodeSetClutOpt(TDE_HWNode_S* pHWNode, TDE_DRV_CLUT_CMD_S* pClutCmd
 * Return:        None
 * Others:        None
 *****************************************************************************/
-HI_VOID TdeHalNodeSetColorKey(TDE_HWNode_S* pHWNode, TDE_COLORFMT_CATEGORY_E enFmtCat, 
+HI_S32 TdeHalNodeSetColorKey(TDE_HWNode_S* pHWNode, TDE_COLORFMT_CATEGORY_E enFmtCat,
                               TDE_DRV_COLORKEY_CMD_S* pColorKey);
 
 /*****************************************************************************
@@ -988,7 +997,7 @@ HI_VOID TdeHalNodeSetColorKey(TDE_HWNode_S* pHWNode, TDE_COLORFMT_CATEGORY_E enF
 * Return:        None
 * Others:        None
 *****************************************************************************/
-HI_VOID TdeHalNodeSetClipping(TDE_HWNode_S* pHWNode, TDE_DRV_CLIP_CMD_S* pClip);
+HI_S32 TdeHalNodeSetClipping(TDE_HWNode_S* pHWNode, TDE_DRV_CLIP_CMD_S* pClip);
 
 /*****************************************************************************
 * Function:      TdeHalNodeSetFlicker
@@ -1010,7 +1019,7 @@ HI_VOID TdeHalNodeSetFlicker(TDE_HWNode_S* pHWNode, TDE_DRV_FLICKER_CMD_S* pFlic
 * Return:        None
 * Others:        None
 *****************************************************************************/
-HI_VOID TdeHalNodeSetResize(TDE_HWNode_S* pHWNode, TDE_DRV_RESIZE_CMD_S* pResize,TDE_NODE_SUBM_TYPE_E enNodeType);
+HI_S32 TdeHalNodeSetResize(TDE_HWNode_S* pHWNode, TDE_DRV_RESIZE_CMD_S* pResize,TDE_NODE_SUBM_TYPE_E enNodeType);
 
 /*****************************************************************************
 * Function:      TdeHalNodeSetResize
@@ -1021,7 +1030,7 @@ HI_VOID TdeHalNodeSetResize(TDE_HWNode_S* pHWNode, TDE_DRV_RESIZE_CMD_S* pResize
 * Return:        None
 * Others:        None
 *****************************************************************************/
-HI_VOID TdeHalNodeSetColorConvert(TDE_HWNode_S* pHWNode, TDE_DRV_CONV_MODE_CMD_S* pConv);
+HI_S32 TdeHalNodeSetColorConvert(TDE_HWNode_S* pHWNode, TDE_DRV_CONV_MODE_CMD_S* pConv);
 
 /*****************************************************************************
 * Function:      TdeHalNodeAddChild
@@ -1167,6 +1176,9 @@ HI_VOID TdeHalResumeInit(HI_VOID);
 HI_VOID TdeHalSystemInit(HI_VOID);
 
 HI_BOOL bTdeHalSwVersion(HI_VOID);
+
+void TdeHalFreeNodeBuf(TDE_HWNode_S* pNode);
+
 
 #ifdef __cplusplus
  #if __cplusplus
