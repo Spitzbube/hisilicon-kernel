@@ -1008,7 +1008,7 @@ HI_S32 TdeHalNodeSetClipping(TDE_HWNode_S* pHWNode, TDE_DRV_CLIP_CMD_S* pClip);
 * Return:        None
 * Others:        None
 *****************************************************************************/
-HI_VOID TdeHalNodeSetFlicker(TDE_HWNode_S* pHWNode, TDE_DRV_FLICKER_CMD_S* pFlicker);
+HI_S32 TdeHalNodeSetFlicker(TDE_HWNode_S* pHWNode, TDE_DRV_FLICKER_CMD_S* pFlicker);
 
 /*****************************************************************************
 * Function:      TdeHalNodeSetResize
