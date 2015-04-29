@@ -17,6 +17,7 @@ obj-y += tde_osilist_k.o
 obj-y += tde_osictl_k.o
 obj-y += tde_proc_k.o
 obj-y += wmalloc_k.o
+obj-y += tde_adp.o
 
 
 
