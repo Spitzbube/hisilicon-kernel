@@ -362,30 +362,6 @@ typedef struct hiTDE_SLICE_INFO
     TDE_SLICE_TYPE_E enSliceType;
 } TDE_SLICE_INFO;
 
-typedef struct hiTDE_FILTER_OPT
-{
-    HI_U32  u32HStep;
-    HI_U32  u32VStep;
-    HI_S32  s32HOffset;
-    HI_S32  s32VOffset;
-    HI_U32  u32Bppi;
-    HI_U32  u32WorkBufNum; //20
-    HI_U32  bBadLastPix;        /* while blocking, last point of each block is if effective*/
-    HI_BOOL bVRing;
-    HI_BOOL bHRing;
-    HI_BOOL bEvenStartInX; //36     /* when input need up_sample, bEvenStartInX is set to HI_TRUE */
-    HI_BOOL bEvenStartOutX; //40    /* when input need drop_sample, bEvenStartInX is set to HI_TRUE */
-    HI_BOOL bCoefSym;           /* coefficient is if symmetrical, use filed ground */
-    HI_BOOL b2OptCbCr;
-    TDE_SCANDIRECTION_S stSrcDire;
-    TDE_SCANDIRECTION_S stDstDire;
-    TDE_MBSTART_ADJ_INFO_S stAdjInfo;
-    TDE_DOUBLESRC_ADJ_INFO_S stDSAdjInfo;
-    TDE_DRV_FILTER_MODE_E enFilterMode;
-    HI_BOOL bFirstLineOut;
-    HI_BOOL bLastLineOut;
-} TDE_FILTER_OPT;
-
 typedef enum hiTDE_OPERATION_CATEGORY_E
 {
     TDE_OPERATION_SINGLE_SRC1 = 0,
@@ -5267,7 +5243,6 @@ STATIC HI_S32 TdeOsiSetNodeFinish(TDE_HANDLE s32Handle, TDE_HWNode_S* pHWNode,
 
     pSwNode = &pstCmd->stNodeBuf;
     pSwNode->pBuf = (HI_VOID*)pHWNode-TDE_NODE_HEAD_BYTE;
-#warning TODO: sizeof(TDE_HWNode_S)
     pSwNode->u32NodeSz = sizeof(TDE_HWNode_S);
     pSwNode->u64Update = (0xffffffff)|((HI_U64)0x000003ff<<32);
     pSwNode->u32PhyAddr = wgetphy(pSwNode->pBuf) + TDE_NODE_HEAD_BYTE;

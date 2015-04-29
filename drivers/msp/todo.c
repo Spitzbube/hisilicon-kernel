@@ -14,4 +14,9 @@ void OPTM_ALG_CscCoefSet(void)
 
 
 
+void TdeHalGetCapability(void)
+{
+#warning TODO: TdeHalGetCapability
+	printk("TdeHalGetCapability: TODO\n");
 
+}

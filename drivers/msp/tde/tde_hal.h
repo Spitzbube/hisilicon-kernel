@@ -406,7 +406,7 @@ typedef struct hiTDE_HWNode_S
     HI_U32 u32TDE_2D_RSZ;
     HI_U32 u32TDE_HF_COEF_ADDR;
     HI_U32 u32TDE_VF_COEF_ADDR;
-#ifdef TDE_VERSION_MPW
+#if 1//def TDE_VERSION_MPW
     HI_U32 u32TDE_RSZ_STEP;
 #else
     HI_U32 u32TDE_RSZ_HSTEP;
@@ -435,16 +435,8 @@ typedef struct hiTDE_HWNode_S
     HI_U32 u32TDE_ICSC_ADDR;
     HI_U32 u32TDE_OCSC_ADDR;	
 #endif
-    HI_U64 u64TDE_UPDATE; /* record update settings */
+    //HI_U64 u64TDE_UPDATE; /* record update settings */
 } TDE_HWNode_S;
-
-typedef struct
-{
-	int fill_0[4]; //0
-	TDE_HWNode_S Data_16;
-	//int fill_192; //192?????
-	//196
-} TDE_HWNode_Outer_S;
 
 /* Zoom mode in subnode*/
 typedef enum hiTDE_CHILD_SCALE_MODE_E
@@ -533,6 +525,30 @@ typedef enum hiTDE_DRV_SRC_E
     TDE_DRV_SRC_S2 = 0x2,
     TDE_DRV_SRC_T = 0x4,
 }TDE_DRV_SRC_E;
+
+typedef struct hiTDE_FILTER_OPT
+{
+    HI_U32  u32HStep;
+    HI_U32  u32VStep;
+    HI_S32  s32HOffset;
+    HI_S32  s32VOffset;
+    HI_U32  u32Bppi;
+    HI_U32  u32WorkBufNum; //20
+    HI_U32  bBadLastPix;        /* while blocking, last point of each block is if effective*/
+    HI_BOOL bVRing;
+    HI_BOOL bHRing;
+    HI_BOOL bEvenStartInX; //36     /* when input need up_sample, bEvenStartInX is set to HI_TRUE */
+    HI_BOOL bEvenStartOutX; //40    /* when input need drop_sample, bEvenStartInX is set to HI_TRUE */
+    HI_BOOL bCoefSym;           /* coefficient is if symmetrical, use filed ground */
+    HI_BOOL b2OptCbCr;
+    TDE_SCANDIRECTION_S stSrcDire;
+    TDE_SCANDIRECTION_S stDstDire;
+    TDE_MBSTART_ADJ_INFO_S stAdjInfo;
+    TDE_DOUBLESRC_ADJ_INFO_S stDSAdjInfo;
+    TDE_DRV_FILTER_MODE_E enFilterMode;
+    HI_BOOL bFirstLineOut;
+    HI_BOOL bLastLineOut;
+} TDE_FILTER_OPT;
 
 /****************************************************************************/
 /*                             TDE register macro definition                            */
@@ -750,7 +766,7 @@ HI_VOID TdeHalCtlReset(HI_VOID);
 * Return:        None
 * Others:        None
 *****************************************************************************/
-HI_VOID TdeHalCtlIntClear(TDE_LIST_TYPE_E enListType, HI_U32 u32Stats);
+HI_VOID TdeHalCtlIntClear(HI_U32 u32Stats);
 
 /*****************************************************************************
 *Description: Query working queue if is synchronous or asynchronous  
@@ -814,8 +830,6 @@ HI_VOID TdeHalNodeEnableCompleteInt(HI_VOID* pBuf/*, TDE_LIST_TYPE_E enType*/);
 * Others:        None
 *****************************************************************************/
 HI_VOID TdeHalNodeComplteAqList(HI_VOID);
-
-HI_VOID TdeHalNodeComplteNd(TDE_LIST_TYPE_E enListType);
 
 /*****************************************************************************
 * Function:      TdeHalNodeSetSrc1
@@ -1019,7 +1033,7 @@ HI_S32 TdeHalNodeSetFlicker(TDE_HWNode_S* pHWNode, TDE_DRV_FLICKER_CMD_S* pFlick
 * Return:        None
 * Others:        None
 *****************************************************************************/
-HI_S32 TdeHalNodeSetResize(TDE_HWNode_S* pHWNode, TDE_DRV_RESIZE_CMD_S* pResize,TDE_NODE_SUBM_TYPE_E enNodeType);
+HI_S32 TdeHalNodeSetResize(TDE_HWNode_S* pHWNode, TDE_FILTER_OPT* pstFilterOpt,TDE_NODE_SUBM_TYPE_E enNodeType);
 
 /*****************************************************************************
 * Function:      TdeHalNodeSetResize

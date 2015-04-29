@@ -218,16 +218,6 @@ HI_VOID     TdeOsiListSqUpdateProc(HI_VOID);
 HI_VOID     TdeOsiListCompProc(/*TDE_LIST_TYPE_E enListType*/HI_VOID);
 
 /*****************************************************************************
-* Function:      TdeOsiAqSuspProc
-* Description:   Interrupt to handling current line in list is suspend
-* Input:         enListType: list type:Sq/Aq
-* Output:        none
-* Return:        task handle is created
-* Others:        none
-*****************************************************************************/
-HI_VOID     TdeOsiListSuspLineProc(TDE_LIST_TYPE_E enListType);
-
-/*****************************************************************************
 * Function:      TdeOsiNodeComp
 * Description:
 * Input:         TDE_LIST_TYPE_E enListType

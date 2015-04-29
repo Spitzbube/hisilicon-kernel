@@ -58,6 +58,7 @@ typedef enum hiTDE_NODE_SUBM_TYPE_E
     TDE_NODE_SUBM_CHILD = 2     /* current node submit as operated child node */
 }TDE_NODE_SUBM_TYPE_E;
 
+#if 0
 /* List type , synchronized list(SQ)/asynchroned list(AQ) */
 typedef enum hiTDE_LIST_TYPE_E
 {
@@ -67,6 +68,7 @@ typedef enum hiTDE_LIST_TYPE_E
 #endif    
     TDE_LIST_BUTT   
 } TDE_LIST_TYPE_E;
+#endif
 
 /* Operation setting information node */
 typedef struct hiTDE_NODE_BUF_S

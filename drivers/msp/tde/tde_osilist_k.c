@@ -1526,36 +1526,6 @@ HI_VOID TdeOsiListNodeComp(/*TDE_LIST_TYPE_E enListType*/HI_VOID)
 }
 
 /*****************************************************************************
- Function:      TdeOsiListSuspLineProc
- Description:   suspend for interrupt to handle in current line
- Input:         enListType: list type:Sq/Aq
- Output:        none
- Return:        created job handle
- Calls        :
- Called By    :
-
-  History        :
-  1.Date         : 2008/3/5
-    Author       : w54130
-    Modification : Created function
-
-*****************************************************************************/
-#if HI_TDE_SQ_SUPPORT
-HI_VOID TdeOsiListSuspLineProc(TDE_LIST_TYPE_E enListType)
-{
-    if (TDE_LIST_SQ == enListType)
-    {
-       
-        return;
-    }
-    else if (TDE_LIST_AQ == enListType)
-    {
-        
-        TdeHalNodeSuspend();
-    }
-}
-#endif
-/*****************************************************************************
 * Function:      TdeOsiListGetPhyBuff
 * Description:    get one physical buffer, to deflicker and zoom
 * Input:         

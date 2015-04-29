@@ -150,20 +150,24 @@ int tde_read_proc(struct seq_file *p, HI_VOID *v)
     p = wprintinfo(p+len);
      #ifndef CONFIG_TDE_STR_DISABLE
     /* print node information */
-    PROC_PRINT(p,"\n--------- Hisilicon TDE Node params Info ---------\n");
+    //PROC_PRINT(p,"\n--------- Hisilicon TDE Node params Info ---------\n");
 
     for (j = 0 ; j < g_stTdeProcInfo.u32CurNode; j++)
     {
-        if (0 != pstHwNode[j].u64TDE_UPDATE)
+        //if (0 != pstHwNode[j].u64TDE_UPDATE)
         {
+#if 0
             PROC_PRINT(p, "\n--- HWNode update: 0x%08x %08x ---\n", 
                 (HI_U32)(pstHwNode[j].u64TDE_UPDATE >> 32),
                 (HI_U32)pstHwNode[j].u64TDE_UPDATE);
-
+#endif
             pu32Cur = (HI_U32*)&pstHwNode[j];
-            for (i = 0; i < sizeof(TDE_HWNode_S) / 4 - 2; i++)
+            /* print node information */
+           PROC_PRINT(p,"\n--------- Hisilicon TDE Node params Info ---------\n");
+
+            for (i = 0; i < sizeof(TDE_HWNode_S) / 4/* - 2*/; i++)
             {
-                if (((pstHwNode[j].u64TDE_UPDATE >> i) & 1) != 0)
+                //if (((pstHwNode[j].u64TDE_UPDATE >> i) & 1) != 0)
                     PROC_PRINT(p, "(%s):\t0x%08x\n", chUpdate[i], *(pu32Cur + i));
             }
         }
