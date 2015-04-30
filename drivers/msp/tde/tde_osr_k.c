@@ -15,24 +15,22 @@
 #include <linux/poll.h>
 #include <linux/workqueue.h>
 #include <asm/io.h>
-
-#include "hi_module.h"
-#include "hi_drv_module.h"
-#include "hi_drv_mem.h"
 #include "drv_tde_ext.h"
-
 #include "hi_tde_type.h"
 #include "hi_drv_tde.h"
 #include "tde_osr.h"
 #include "tde_osictl.h"
 #include "tde_osilist.h"
 #include "tde_hal.h"
+#include "tde_handle.h"
 #include "wmalloc.h"
-#include "tde_config.h"
+#include "tde_adp.h"
 
 typedef unsigned long       HI_UL;
 
 #define TDE_NAME    "HI_TDE"
+
+STATIC spinlock_t s_taskletlock;
 
 STATIC int tde_osr_isr(int irq, void *dev_id);
 STATIC void tde_tasklet_func(unsigned long int_status);
@@ -40,19 +38,15 @@ STATIC void tde_tasklet_func(unsigned long int_status);
 /* TDE equipment quoted count */
 STATIC atomic_t g_TDECount = ATOMIC_INIT(0);
 
-
+#ifdef CONFIG_TDE_PM_ENABLE
+int tde_pm_suspend(PM_BASEDEV_S *pdev, pm_message_t state);
+int tde_pm_resume(PM_BASEDEV_S *pdev);
+#endif
 #ifdef TDE_TIME_COUNT
 TDE_timeval_s g_stTimeStart;
 TDE_timeval_s g_stTimeEnd;
 HI_U64 g_u64TimeDiff;
 #endif
-
-#ifdef TDE_USE_SPINLOCK
-static spinlock_t tde_lock;
-static unsigned long tde_lockflags;
-#endif
-static long disablecount = 0;
-
 
 DECLARE_TASKLET(tde_tasklet, tde_tasklet_func, 0);
 
@@ -74,7 +68,11 @@ static TDE_EXPORT_FUNC_S s_TdeExportFuncs =
     .pfnTdeSolidDraw        = TdeOsiSolidDraw,
     .pfnTdeSetDeflickerLevel        = TdeOsiSetDeflickerLevel,
     .pfnTdeEnableRegionDeflicker    = TdeOsiEnableRegionDeflicker,
-    .pfnTdeCalScaleRect     = TdeCalScaleRect
+    .pfnTdeCalScaleRect     = TdeCalScaleRect,
+	#ifdef CONFIG_TDE_PM_ENABLE
+	.pfnTdeSuspend			= tde_pm_suspend,
+	.pfnTdeResume			= tde_pm_resume,
+	#endif
 };
 
 HI_VOID tde_cleanup_module_k(HI_VOID);
@@ -105,8 +103,7 @@ HI_S32 tde_init_module_k(HI_VOID)
         tde_cleanup_module_k();
         return ret;
     }
-
-    spin_lock_init(&tde_lock);
+    spin_lock_init(&s_taskletlock);
     
     return 0;
 }
@@ -140,7 +137,7 @@ int tde_release(struct inode *finode, struct file  *ffile)
         //todo:
         //tasklet_kill(&tde_tasklet);
     }
-
+    TdeFreePendingJob();
     if ( atomic_read(&g_TDECount) < 0 )
     {
         atomic_set(&g_TDECount, 0);
@@ -333,7 +330,6 @@ long tde_ioctl(struct file  *ffile, unsigned int  cmd, unsigned long arg)
 
             return TdeOsiCancelJob(s32Handle);
         }
-#if HI_TDE_BITMAPMASK_SUPPORT
         case TDE_BITMAP_MASKROP:
         {
             TDE_BITMAP_MASKROP_CMD_S stBmpMaskRop;
@@ -361,7 +357,6 @@ long tde_ioctl(struct file  *ffile, unsigned int  cmd, unsigned long arg)
                         &stBmpMaskBlend.stForeGround, &stBmpMaskBlend.stForeGroundRect, &stBmpMaskBlend.stMask, &stBmpMaskBlend.stMaskRect, 
                         &stBmpMaskBlend.stDst, &stBmpMaskBlend.stDstRect, stBmpMaskBlend.u8Alpha, stBmpMaskBlend.enBlendMode);
         }
-#endif
         case TDE_SET_DEFLICKERLEVEL:
         {
             TDE_DEFLICKER_LEVEL_E eDeflickerLevel;
@@ -494,7 +489,6 @@ long tde_ioctl(struct file  *ffile, unsigned int  cmd, unsigned long arg)
 STATIC int tde_osr_isr(int irq, void *dev_id)
 {
     HI_U32 int_status;
-    
 #ifdef TDE_TIME_COUNT
     (HI_VOID)TDE_gettimeofday(&g_stTimeStart);
 #endif
@@ -503,12 +497,12 @@ STATIC int tde_osr_isr(int irq, void *dev_id)
     /* AI7D02547 Interrupt handling while suspend to die */
     if(int_status & 0x80000000)
     {
-        TDE_TRACE(TDE_KERN_DEBUG, "tde interrupts coredump!\n");
+        TDE_TRACE(TDE_KERN_DEBUG, "tde interrupts coredump!\n"); //484
         TdeHalCtlReset();
         return IRQ_HANDLED;
     }
     
-    TDE_TRACE(TDE_KERN_DEBUG, "tde register int status: 0x%x!\n", (HI_U32)int_status);
+    TDE_TRACE(TDE_KERN_DEBUG, "tde register int status: 0x%x!\n", (HI_U32)int_status); //489
 
     tde_tasklet.data = tde_tasklet.data |((HI_UL)int_status);
     
@@ -519,9 +513,10 @@ STATIC int tde_osr_isr(int irq, void *dev_id)
 
 STATIC void tde_tasklet_func(unsigned long int_status)
 {
-    tde_osr_disableirq();
+    HI_SIZE_T lockflags;
+    TDE_LOCK(&s_taskletlock,lockflags);
     tde_tasklet.data &= (~int_status);
-    tde_osr_enableirq();
+    TDE_UNLOCK(&s_taskletlock,lockflags);
 
 #ifdef TDE_TIME_COUNT
     (HI_VOID)TDE_gettimeofday(&g_stTimeEnd);
@@ -531,50 +526,21 @@ STATIC void tde_tasklet_func(unsigned long int_status)
     TDE_TRACE(TDE_KERN_DEBUG, "tde int status: 0x%x, g_u64TimeDiff:%d!\n", (HI_U32)int_status, (HI_U32)g_u64TimeDiff);
 #endif
 
-#if HI_TDE_SQ_SUPPORT
-    if(int_status&TDE_DRV_INT_SUSPEND_LINE_AQ)
-    {
-        TdeOsiListSuspLineProc(TDE_LIST_AQ);
-    }
-    
-    if(int_status&TDE_DRV_INT_SUSPEND_LINE_SQ)
-    {
-        TdeOsiListSuspLineProc(TDE_LIST_SQ);
-    }
-#endif
     if(int_status&TDE_DRV_INT_NODE_COMP_AQ)
     {
-        TdeOsiListNodeComp(/*TDE_LIST_AQ*/);
+        TdeOsiListNodeComp();
     }
-#if HI_TDE_SQ_SUPPORT
-    if(int_status&TDE_DRV_INT_HEAD_UPDATE_SQ) /*AI7D02874*/
-    {
-        TdeOsiListSqUpdateProc();
-    }
-    
-    if(int_status&TDE_DRV_INT_NODE_COMP_SQ)
-    {
-        TdeOsiListNodeComp(TDE_LIST_SQ);
-    }
-#endif
-    if(int_status&TDE_DRV_INT_lIST_COMP_AQ)
-    {
-        //TdeOsiListCompProc(TDE_LIST_AQ);
-    }
-#if HI_TDE_SQ_SUPPORT    
-    if(int_status&TDE_DRV_INT_lIST_COMP_SQ)
-    {
-        TdeOsiListCompProc(TDE_LIST_SQ);
-    }
-#endif
 }
 
+#ifdef CONFIG_TDE_PM_ENABLE
 /* tde wait for start  */
 int tde_pm_suspend(PM_BASEDEV_S *pdev, pm_message_t state)
 {
     TdeOsiWaitAllDone(HI_FALSE);
 
-    TDE_TRACE(TDE_KERN_INFO, "tde suspend!\n");
+	TdeHalSuspend();
+
+    HI_PRINT("TDE suspend OK\n");
 
     return 0;
 }
@@ -582,13 +548,13 @@ int tde_pm_suspend(PM_BASEDEV_S *pdev, pm_message_t state)
 /* wait for resume */
 int tde_pm_resume(PM_BASEDEV_S *pdev)
 {
-    TDE_TRACE(TDE_KERN_INFO, "tde resume!\n");
-
     TdeHalResumeInit();
+
+    HI_PRINT("TDE resume OK\n");
 
     return 0;
 }
-
+#endif
 
 /*****************************************************************************
  Prototype       : TdeOsiOpen
@@ -630,68 +596,8 @@ HI_S32 TdeOsiClose(HI_VOID)
     return tde_release(NULL, NULL);
 }
 
-void tde_osr_disableirq(void)
-{
-#ifdef TDE_USE_SPINLOCK
-    spin_lock_irqsave(&tde_lock, tde_lockflags);
-#else
-    tasklet_disable(&tde_tasklet);
-#endif
-    disablecount++;    
-    //printk(KERN_ERR "+++++++disable %d+++++++++++\n", disablecount);
-}
 
-void tde_osr_enableirq(void)
-{
-    disablecount--;    
-    //printk(KERN_ERR "--------enable %d--------\n", disablecount);    
-#ifdef TDE_USE_SPINLOCK
-    spin_unlock_irqrestore(&tde_lock, tde_lockflags);
-#else
-    tasklet_enable(&tde_tasklet);
-#endif
-}
 
-HI_BOOL tde_osr_isirqdisabled(void)
-{
-    return (disablecount > 0) ? HI_TRUE : HI_FALSE;
-}
-
-typedef HI_VOID (* TDE_WQ_CB) (HI_U32);
-
-typedef struct 
-{
-    HI_U32 Count;
-    TDE_WQ_CB pWQCB;
-    struct work_struct work;
-}TDEFREEWQ_S;
-
-void tde_osr_freevmem(struct work_struct *work)
-{
-    TDEFREEWQ_S *pWQueueInfo = container_of(work, TDEFREEWQ_S, work);
-    TDE_TRACE(TDE_KERN_DEBUG, "Count = %d\n", pWQueueInfo->Count);
-    pWQueueInfo->pWQCB(pWQueueInfo->Count);
-    tde_osr_disableirq();
-    TDE_FREE(pWQueueInfo);
-    tde_osr_enableirq();
-}
-
-void tde_osr_hsr(void* pstFunc, void* data)
-{
-    TDEFREEWQ_S *pstWQ = NULL;
-
-    pstWQ = TDE_MALLOC(sizeof(TDEFREEWQ_S));
-    if(HI_NULL == pstWQ)
-    {
-        TDE_TRACE(TDE_KERN_INFO, "Malloc TDEFREEWQ_S failed!\n");
-        return;
-    }
-    pstWQ->Count = (HI_U32)data;
-    pstWQ->pWQCB = (TDE_WQ_CB)pstFunc;
-    INIT_WORK(&pstWQ->work, tde_osr_freevmem);
-    schedule_work(&pstWQ->work);
-    return;
-}
 
 #ifndef MODULE
 EXPORT_SYMBOL(tde_pm_suspend);
@@ -699,8 +605,6 @@ EXPORT_SYMBOL(tde_pm_resume);
 #endif
 EXPORT_SYMBOL(TdeOsiOpen);
 EXPORT_SYMBOL(TdeOsiClose);
-EXPORT_SYMBOL(tde_osr_enableirq);
-EXPORT_SYMBOL(tde_osr_disableirq);
 EXPORT_SYMBOL(tde_ioctl);
 EXPORT_SYMBOL(tde_open);
 EXPORT_SYMBOL(tde_release);

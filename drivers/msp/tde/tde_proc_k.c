@@ -14,7 +14,11 @@ typedef struct _hiTDE_PROCINFO_S
     HI_BOOL         bTraceEnbale;
 }TDE_PROCINFO_S;
 
-TDE_PROCINFO_S g_stTdeProcInfo;
+TDE_PROCINFO_S g_stTdeProcInfo =
+{
+	.u32CurNode = 0,
+	.bProcEnable = HI_TRUE,
+};
 
 HI_VOID TDEProcEnable(HI_BOOL bEnable)
 {
@@ -34,18 +38,14 @@ HI_VOID TDEProcRecordNode(TDE_HWNode_S* pHWNode)
     g_stTdeProcInfo.u32CurNode = (g_stTdeProcInfo.u32CurNode)%TDE_MAX_PROC_NUM;
 }
 
+
+
+
 HI_VOID TDEProcClearNode(HI_VOID)
 {
     memset(&g_stTdeProcInfo.stTdeHwNode[0], 0, sizeof(g_stTdeProcInfo.stTdeHwNode));
     g_stTdeProcInfo.u32CurNode = 0;
 }
-
-
-HI_VOID TDEProcEnableTrace(HI_BOOL bEnable)
-{
-    g_stTdeProcInfo.bTraceEnbale = bEnable;
-}
-
 
 int tde_write_proc(struct file * file,
     const char __user * buf, size_t count, loff_t *ppos)  
@@ -54,27 +54,17 @@ int tde_write_proc(struct file * file,
 
     if(count > sizeof(buffer))
     {
-        TDE_TRACE(TDE_KERN_INFO, "The command string is out of buf space :%d bytes !\n", sizeof(buffer));
+        TDE_TRACE(TDE_KERN_INFO, "The command string is out of buf space :%d bytes !\n", sizeof(buffer)); //59
         return 0;
     }
-    
+
     if(copy_from_user(buffer, buf, count))
     {
         TDE_TRACE(TDE_KERN_INFO, "<%s> Line %d:copy_from_user failed!\n", __FUNCTION__, __LINE__);
         return 0;
     }
 
-    if (strstr(buffer, "trace on"))
-    {
-        TDEProcEnableTrace(HI_TRUE);
-        TDE_TRACE(TDE_KERN_INFO, "tde trace on\n");
-    }
-    else if (strstr(buffer, "trace off"))
-    {
-        TDEProcEnableTrace(HI_FALSE);
-        TDE_TRACE(TDE_KERN_INFO, "tde trace off\n");
-    }
-    else if (strstr(buffer, "proc on"))
+    if (strstr(buffer, "proc on"))
     {
         TDEProcEnable(HI_TRUE);
         TDE_TRACE(TDE_KERN_INFO, "tde proc on\n");
@@ -87,9 +77,8 @@ int tde_write_proc(struct file * file,
     else if (strstr(buffer, "node clear"))
     {
         TDEProcClearNode();
-        TDE_TRACE(TDE_KERN_INFO, "node buffer was cleared\n");
+        TDE_TRACE(TDE_KERN_INFO, "node buffer was cleared\n"); //82
     }
-
     return count;
 }
 
@@ -149,29 +138,19 @@ int tde_read_proc(struct seq_file *p, HI_VOID *v)
     TDE_HWNode_S *pstHwNode = g_stTdeProcInfo.stTdeHwNode;
     p = wprintinfo(p+len);
      #ifndef CONFIG_TDE_STR_DISABLE
-    /* print node information */
-    //PROC_PRINT(p,"\n--------- Hisilicon TDE Node params Info ---------\n");
 
     for (j = 0 ; j < g_stTdeProcInfo.u32CurNode; j++)
     {
-        //if (0 != pstHwNode[j].u64TDE_UPDATE)
-        {
-#if 0
-            PROC_PRINT(p, "\n--- HWNode update: 0x%08x %08x ---\n", 
-                (HI_U32)(pstHwNode[j].u64TDE_UPDATE >> 32),
-                (HI_U32)pstHwNode[j].u64TDE_UPDATE);
-#endif
-            pu32Cur = (HI_U32*)&pstHwNode[j];
-            /* print node information */
-           PROC_PRINT(p,"\n--------- Hisilicon TDE Node params Info ---------\n");
+		pu32Cur = (HI_U32*)&pstHwNode[j];
+		/* print node information */
+	   PROC_PRINT(p,"\n--------- Hisilicon TDE Node params Info ---------\n");
 
-            for (i = 0; i < sizeof(TDE_HWNode_S) / 4/* - 2*/; i++)
-            {
-                //if (((pstHwNode[j].u64TDE_UPDATE >> i) & 1) != 0)
-                    PROC_PRINT(p, "(%s):\t0x%08x\n", chUpdate[i], *(pu32Cur + i));
-            }
-        }
+		for (i = 0; i < sizeof(TDE_HWNode_S) / 4; i++)
+		{
+			PROC_PRINT(p, "(%s):\t0x%08x\n", chUpdate[i], *(pu32Cur + i));
+		}
     }
+
     #endif
     return 0;
 }

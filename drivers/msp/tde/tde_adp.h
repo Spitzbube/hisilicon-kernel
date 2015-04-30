@@ -17,6 +17,11 @@ extern "C"{
 #endif  /*__cplusplus*/
 #endif  /*__cplusplus*/
 
+//Some extracted defines from below....
+#define TDE_INTNUM  (91+32)
+#define TDE_REG_BASEADDR 0xff420000
+#define CONFIG_TDE_PM_ENABLE
+
 #if 0
 
 #if defined(CONFIG_GFX_STB_SDK)

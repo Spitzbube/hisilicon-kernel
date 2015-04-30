@@ -50,6 +50,7 @@
 #endif
 
 HI_VOID HifbSetLogoLayerEnable(HI_BOOL bEnable);
+HI_S32 HifbUpdatePqData(HI_VOID);
 
 static volatile HI_U32 *g_u32LogoCtrlReg = HI_NULL;
 static volatile HI_U32 *g_u32SDCtrlReg   = HI_NULL;
@@ -59,7 +60,7 @@ static volatile HI_U32 *g_u32Data_811437bc = HI_NULL;
 static HIFB_EXPORT_FUNC_S s_HifbExportFuncs =
 {
     .pfnHifbSetLogoLayerEnable             = HifbSetLogoLayerEnable,
-#warning TODO: HIFB_EXPORT_FUNC_S
+    .pfnHifbUpdatePqData                   = HifbUpdatePqData,
 };
 
 HI_VOID HifbSetLogoLayerEnable(HI_BOOL bEnable)
@@ -108,6 +109,11 @@ HI_VOID HifbSetLogoLayerEnable(HI_BOOL bEnable)
     }
 
     return;
+}
+
+HI_S32 HifbUpdatePqData(HI_VOID)
+{
+	return HI_SUCCESS;
 }
 
 HI_S32 hifb_init_module_k(HI_VOID)

@@ -54,27 +54,15 @@ typedef struct
 }TDEFREEWQ_S;
 
 
-typedef struct hiTDE_WAITALLDONE_S
-{
-    wait_queue_head_t stTdeWaitAllWq;
-    HI_BOOL bBegWait;
-    HI_BOOL bNodeComplete;
-}TDE_WAITALLDONE_S;
-
 /****************************************************************************/
 /*                   TDE osi list inner variable definition                 */
 /****************************************************************************/
-STATIC TDE_SWJOBLIST_S *s_pstTDEOsiJobList; //[TDE_LIST_BUTT] = {NULL}; /* global job list queue */
-//STATIC TDE_SWNODELIST_S *s_pstTDEOsiCmdList[TDE_LIST_BUTT] = {NULL}; /* global CMD list queue */
 STATIC wait_queue_head_t s_TdeBlockJobWq;     /* wait queue used to block */
-STATIC TDE_WAITALLDONE_S s_stTdeWaitAll;
-//STATIC TDE_SWNODE_S *s_pstParentSwNode = HI_NULL; /* save parent node address */
+STATIC TDE_SWJOBLIST_S *s_pstTDEOsiJobList; /* global job list queue */
 STATIC wait_queue_head_t s_TdeBeginJobWq;   /* block queue when task number achieve the limit */
 
 
-STATIC HI_DECLARE_MUTEX(g_TDEJobSubLock);  /* ensure command submit is mutex lock in order */
 STATIC HI_DECLARE_MUTEX(g_TDEHdMgrLock);
-STATIC HI_DECLARE_MUTEX(g_TDEWaitAllLock);
 
 
 /****************************************************************************/
@@ -83,11 +71,8 @@ STATIC HI_DECLARE_MUTEX(g_TDEWaitAllLock);
 STATIC HI_VOID     TdeOsiListDoFreePhyBuff(HI_U32 u32BuffNum);
 STATIC INLINE HI_VOID TdeOsiListSafeDestroyJob(TDE_SWJOB_S *pstJob);
 STATIC HI_VOID     TdeOsiListReleaseHandle(HI_HANDLE_MGR *pstJobHeader);
-//STATIC HI_VOID     TDEOsiListSubCmd(TDE_LIST_TYPE_E enListType);
-STATIC INLINE HI_VOID TdeOsiListAddJob(TDE_SWJOB_S *pstJob/*, TDE_LIST_TYPE_E enListType*/);
+STATIC INLINE HI_VOID TdeOsiListAddJob(TDE_SWJOB_S *pstJob);
 STATIC HI_VOID     TdeOsiListDestroyJob(TDE_SWJOB_S *pstJob);
-//STATIC HI_VOID     TDEOsiListSubCmd(TDE_LIST_TYPE_E enListType);
-STATIC INLINE HI_VOID list_join(struct list_head *list, struct list_head *head);
 
 
 /*****************************************************************************
@@ -176,11 +161,6 @@ HI_S32 TdeOsiListInit(HI_VOID)
 #ifndef TDE_BOOT
     init_waitqueue_head(&s_TdeBlockJobWq);
 #endif
-#if 0
-    init_waitqueue_head(&s_stTdeWaitAll.stTdeWaitAllWq);
-    s_stTdeWaitAll.bBegWait = HI_FALSE;
-    s_stTdeWaitAll.bNodeComplete = HI_FALSE;
-#endif
     init_waitqueue_head(&s_TdeBeginJobWq);
     
     if (!initial_handle())
@@ -188,23 +168,14 @@ HI_S32 TdeOsiListInit(HI_VOID)
         return HI_FAILURE;
     }
 
-    s_pstTDEOsiJobList/*[TDE_LIST_AQ]*/ = (TDE_SWJOBLIST_S *) TDE_MALLOC(sizeof(TDE_SWJOBLIST_S)/* * TDE_LIST_BUTT*/);
-    if (NULL == s_pstTDEOsiJobList/*[TDE_LIST_AQ]*/)
+    s_pstTDEOsiJobList = (TDE_SWJOBLIST_S *) TDE_MALLOC(sizeof(TDE_SWJOBLIST_S));
+    if (NULL == s_pstTDEOsiJobList)
     {        
         destroy_handle();
         return HI_FAILURE;
     }
 
-    //memset(s_pstTDEOsiJobList/*[TDE_LIST_AQ]*/, 0, sizeof(TDE_SWJOBLIST_S) * TDE_LIST_BUTT);
-#if HI_TDE_SQ_SUPPORT
-    s_pstTDEOsiJobList[TDE_LIST_SQ] = s_pstTDEOsiJobList/*[TDE_LIST_AQ]*/ + 1;
-#endif
-    
-    INIT_LIST_HEAD(&s_pstTDEOsiJobList/*[TDE_LIST_AQ]*/->stList);
-#if HI_TDE_SQ_SUPPORT
-    INIT_LIST_HEAD(&s_pstTDEOsiJobList[TDE_LIST_SQ]->stList);
-#endif
-
+    INIT_LIST_HEAD(&s_pstTDEOsiJobList->stList);
 #ifndef TDE_BOOT
     spin_lock_init(&s_pstTDEOsiJobList->lock);
     spin_lock_init(&s_TDEBuffLock);
@@ -288,33 +259,21 @@ HI_VOID TdeOsiListFreeSerialCmd(TDE_SWNODE_S *pstFstCmd, TDE_SWNODE_S *pstLastCm
 *****************************************************************************/
 HI_VOID TdeOsiListTerm(HI_VOID)
 {
-    //HI_S32 i;
     TDE_SWJOB_S *pstJob;
 
-    //TDE_DOWN_INTERRUPTIBLE(&g_TDEHdMgrLock);
-    //tde_osr_disableirq();
+	while (!list_empty(&s_pstTDEOsiJobList->stList))
+	{
+		pstJob = list_entry(s_pstTDEOsiJobList->stList.next, TDE_SWJOB_S, stList);
+		list_del_init(&pstJob->stList);
+		TdeOsiListDestroyJob(pstJob);
+	}
     
-    //for (i = 0; i < TDE_LIST_BUTT; i++)
-    {
-        
-        while (!list_empty(&s_pstTDEOsiJobList/*[i]*/->stList))
-        {
-            pstJob = list_entry(s_pstTDEOsiJobList/*[i]*/->stList.next, TDE_SWJOB_S, stList);
-            list_del_init(&pstJob->stList);
-            TdeOsiListDestroyJob(pstJob);
-        }
-    }
-    
-    TDE_FREE(s_pstTDEOsiJobList/*[TDE_LIST_AQ]*/);
-    s_pstTDEOsiJobList/*[TDE_LIST_AQ]*/ = NULL;
-#if HI_TDE_SQ_SUPPORT
-    s_pstTDEOsiJobList[TDE_LIST_SQ] = NULL;
-#endif    
+    TDE_FREE(s_pstTDEOsiJobList);
+    s_pstTDEOsiJobList = NULL;
    
     destroy_handle();
-    //tde_osr_enableirq();
-    //TDE_UP(&g_TDEHdMgrLock);
     
+
     return;
 }
 
@@ -380,17 +339,16 @@ HI_VOID TdeOsiListFlushJob(TDE_SWJOB_S *pstJob)
 * Function:      TdeOsiListAddJob
 * Description:   add task info to task list
 * Input:         pstJob: job struct
-*                enListType: submit type:Sq/Aq
 * Output:        none
 * Return:        none
 * Others:
 *****************************************************************************/
-STATIC INLINE HI_VOID TdeOsiListAddJob(TDE_SWJOB_S *pstJob/*, TDE_LIST_TYPE_E enListType*/)
+STATIC INLINE HI_VOID TdeOsiListAddJob(TDE_SWJOB_S *pstJob)
 {
-    list_add_tail(&pstJob->stList, &s_pstTDEOsiJobList/*[enListType]*/->stList);
-    s_pstTDEOsiJobList/*[enListType]*/->u32JobNum++;
-    s_pstTDEOsiJobList/*[enListType]*/->s32HandleLast = pstJob->s32Handle;
-    s_pstTDEOsiJobList/*[enListType]*/->pstJobLast = pstJob;
+    list_add_tail(&pstJob->stList, &s_pstTDEOsiJobList->stList);
+    s_pstTDEOsiJobList->u32JobNum++;
+    s_pstTDEOsiJobList->s32HandleLast = pstJob->s32Handle;
+    s_pstTDEOsiJobList->pstJobLast = pstJob;
 }
 
 /*****************************************************************************
@@ -414,16 +372,12 @@ HI_S32 TdeOsiListBeginJob(TDE_HANDLE *pHandle)
     TDE_SWJOB_S *pstJob;
     HI_S32 s32Ret = HI_SUCCESS;
     
-    //tde_osr_disableirq();
     pHandleMgr = (HI_HANDLE_MGR *) TDE_MALLOC(sizeof(HI_HANDLE_MGR) + sizeof(TDE_SWJOB_S));
     if (NULL == pHandleMgr)
     {
-        //tde_osr_enableirq();
         TDE_TRACE(TDE_KERN_INFO, "TDE BegJob Malloc Fail!\n"); //376
         return HI_ERR_TDE_NO_MEM;
     }
-
-    //memset(pHandleMgr, 0, sizeof(HI_HANDLE_MGR) + sizeof(TDE_SWJOB_S));
 
     TDE_DOWN_INTERRUPTIBLE(&g_TDEHdMgrLock);
     
@@ -433,7 +387,6 @@ HI_S32 TdeOsiListBeginJob(TDE_HANDLE *pHandle)
 
         TDE_TRACE(TDE_KERN_INFO, "Too Many TDE Jobs!\n"); //384
         TDE_UP(&g_TDEHdMgrLock);
-        //tde_osr_enableirq();
         
         s_s32HandleNum = get_handlenum();
 
@@ -444,11 +397,9 @@ HI_S32 TdeOsiListBeginJob(TDE_HANDLE *pHandle)
 		}
 
 		TDE_DOWN_INTERRUPTIBLE(&g_TDEHdMgrLock);
-		//tde_osr_disableirq();
     }
 
     TDE_UP(&g_TDEHdMgrLock);
-    //tde_osr_enableirq();
     pstJob = (TDE_SWJOB_S *)((HI_U8*)pHandleMgr + sizeof(HI_HANDLE_MGR));
     pHandleMgr->res = (HI_VOID*)pstJob;
 	#ifndef TDE_BOOT
@@ -550,162 +501,6 @@ HI_VOID  static TdeOsiListWaitTdeIdle(HI_VOID)
 }
 #endif
 
-#if 0
-/*****************************************************************************
- Prototype    : TdeOsiListAddNode
- Description  : add a command to assigned job
- Input        : s32Handle: job handle
-                pSwNode: node resource
-                enSubmType: node type
- Output       : NONE
- Return Value :
- Calls        :
- Called By    :
-
-  History        :
-  1.Date         : 2008/3/5
-    Author       : w54130
-    Modification : Created function
-
-*****************************************************************************/
-HI_S32 TdeOsiListAddNode(TDE_HANDLE s32Handle, TDE_NODE_BUF_S * pSwNode,
-                         TDE_NODE_SUBM_TYPE_E enSubmType, HI_U32 u32PhyBuffNumInNode)
-{
-    HI_HANDLE_MGR *pHandleMgr;
-    TDE_SWJOB_S *pstJob;
-    TDE_SWNODE_S *pstCmd;
-    HI_BOOL bValid;
-
-    TDE_DOWN_INTERRUPTIBLE(&g_TDEHdMgrLock);
-    tde_osr_disableirq();
-    bValid = query_handle(s32Handle, &pHandleMgr);
-    tde_osr_enableirq();
-
-    if (!bValid)
-    {
-        TDE_TRACE(TDE_KERN_INFO, "invalid handle %d!\n", s32Handle);
-        TDE_UP(&g_TDEHdMgrLock);
-        return HI_ERR_TDE_INVALID_HANDLE;
-    }
-    
-    pstJob = (TDE_SWJOB_S*)pHandleMgr->res;
-    if(pstJob->bSubmitted)
-    {
-        TDE_TRACE(TDE_KERN_INFO, "job %d already submitted!\n", s32Handle);
-        TDE_UP(&g_TDEHdMgrLock);
-        return HI_ERR_TDE_INVALID_HANDLE;
-    }
-
-    tde_osr_disableirq();
-    pstCmd = (TDE_SWNODE_S *) TDE_MALLOC(sizeof(TDE_SWNODE_S));
-    tde_osr_enableirq();
-    if (NULL == pstCmd)
-    {
-        TDE_TRACE(TDE_KERN_INFO, "malloc failed!\n");
-        TDE_UP(&g_TDEHdMgrLock);
-        return HI_ERR_TDE_NO_MEM;
-    }
-
-    if (enSubmType != TDE_NODE_SUBM_CHILD)
-    {
-        pstJob->u32CmdNum++;
-        
-        if (1 == pstJob->u32CmdNum)
-        {
-            pstJob->pstFirstCmd = pstCmd;
-           
-            INIT_LIST_HEAD(&pstCmd->stList);
-        }
-
-        pstJob->pstLastCmd = pstCmd;        
-    }
-
-    switch(enSubmType)
-    {
-        case TDE_NODE_SUBM_PARENT:
-            pstJob->pstParentCmd = pstCmd;
-            pstCmd->pstParentNodeInCmd = HI_NULL;
-            break;
-        case TDE_NODE_SUBM_CHILD:
-            pstCmd->pstParentNodeInCmd = pstJob->pstParentCmd;
-            break;
-        case TDE_NODE_SUBM_ALONE:
-            pstCmd->pstParentNodeInCmd = HI_NULL;
-            break;
-    }
-
-    if (HI_NULL != pstJob->pstTailNode)
-    {
-       HI_U32 *pNextNodeAddr = (HI_U32 *)pstJob->pstTailNode->stNodeBuf.pBuf + (TDE_NODE_HEAD_BYTE >> 2) + ((pstJob->pstTailNode->stNodeBuf.u32NodeSz) >> 2);
-       HI_U32 *pNextNodeUpdate = pNextNodeAddr + 1;
-
-       *pNextNodeAddr = pSwNode->u32PhyAddr;
-
-#ifdef TDE_VERSION_MPW
-       *pNextNodeUpdate = pSwNode->u64Update & 0xffffffff;
-#else
-       *pNextNodeUpdate++ = pSwNode->u64Update & 0xffffffff;
-       *pNextNodeUpdate = (pSwNode->u64Update >> 32) & 0xffffffff;
-#endif
-    }
-   
-    memcpy(&pstCmd->stNodeBuf, pSwNode, sizeof(*pSwNode));
-    pstCmd->enNotiType = TDE_JOB_NONE_NOTIFY;
-    pstCmd->s32Handle = pstJob->s32Handle;
-    pstCmd->s32Index   = pstJob->u32CmdNum;
-    pstCmd->enSubmType = enSubmType;
-    pstCmd->u32PhyBuffNum = u32PhyBuffNumInNode;
-   
-    //*(HI_U32 *)pstCmd->stNodeBuf.pBuf = (HI_U32)pstCmd;
-    *(((HI_U32 *)pstCmd->stNodeBuf.pBuf) + 1) = s32Handle;
-    
-    
-    list_add_tail(&pstCmd->stList, &pstJob->pstFirstCmd->stList);
-    pstJob->pstTailNode = pstCmd;
-    pstJob->u32NodeNum++;
-
-    if (pstCmd->u32PhyBuffNum != 0)
-    {
-        pstJob->bAqUseBuff = HI_TRUE;
-    }
-    
-    TDE_UP(&g_TDEHdMgrLock);
-
-    return HI_SUCCESS;
-}
-#endif
-
-/*****************************************************************************
- Prototype    : list_join
- Description  : add list to the tail of head, list has no head, head has head
- Input        : list: wait for add to list head
-                head: target list head
- Output       : NONE
- Return Value :
- Calls        :
- Called By    :
-
-  History        :
-  1.Date         : 2008/3/5
-    Author       : w54130
-    Modification : Created function
-
-*****************************************************************************/
-STATIC INLINE HI_VOID list_join(struct list_head *list, struct list_head *head)
-{
-    if(NULL != list)
-    {
-        struct list_head *last = list->prev;
-        struct list_head *at = head->prev;
-
-        list->prev = at;
-        at->next = list;
-
-        last->next = head;
-        head->prev = last;
-    }
-}
-
 /*****************************************************************************
  Prototype    : TdeOsiListSubmitJob
  Description  : when submit job handle by user, at first add job list to global list, and then handle with according by different situation
@@ -726,7 +521,7 @@ STATIC INLINE HI_VOID list_join(struct list_head *list, struct list_head *head)
     Modification : Created function
 
 *****************************************************************************/
-HI_S32 TdeOsiListSubmitJob(TDE_HANDLE s32Handle/*, TDE_LIST_TYPE_E enListType*/,
+HI_S32 TdeOsiListSubmitJob(TDE_HANDLE s32Handle,
                            HI_U32 u32TimeOut, TDE_FUNC_CB pFuncComplCB, HI_VOID *pFuncPara,
                            TDE_NOTIFY_MODE_E enNotiType)
 {
@@ -741,9 +536,7 @@ HI_S32 TdeOsiListSubmitJob(TDE_HANDLE s32Handle/*, TDE_LIST_TYPE_E enListType*/,
 	#endif
 	HI_BOOL asynflag = 0;
     TDE_DOWN_INTERRUPTIBLE(&g_TDEHdMgrLock);
-//    tde_osr_disableirq();
     bValid = query_handle(s32Handle, &pHandleMgr);
-//    tde_osr_enableirq();
     
     if (!bValid)
     {
@@ -764,9 +557,7 @@ HI_S32 TdeOsiListSubmitJob(TDE_HANDLE s32Handle/*, TDE_LIST_TYPE_E enListType*/,
     {
         TDE_TRACE(TDE_KERN_INFO, "no cmd !\n"); //545
        
-        //tde_osr_disableirq();
         TdeOsiListReleaseHandle(pHandleMgr);
-        //tde_osr_enableirq();
         TDE_UP(&g_TDEHdMgrLock);
         return HI_SUCCESS;
     }
@@ -784,44 +575,35 @@ HI_S32 TdeOsiListSubmitJob(TDE_HANDLE s32Handle/*, TDE_LIST_TYPE_E enListType*/,
     pstJob->pFuncPara = pFuncPara;
     TDE_LOCK(&s_pstTDEOsiJobList->lock,lockflags);
     /*If the job to commit is not null,join the current job to the tail node of the last job.*/
-    if (HI_NULL != s_pstTDEOsiJobList/*[enListType]*/->pstJobToCommit)
+    if (HI_NULL != s_pstTDEOsiJobList->pstJobToCommit)
     {
-        TDE_SWNODE_S *pstTailNodeInJobList = s_pstTDEOsiJobList/*[enListType]*/->pstJobLast->pstTailNode;
+        TDE_SWNODE_S *pstTailNodeInJobList = s_pstTDEOsiJobList->pstJobLast->pstTailNode;
         HI_U32 *pNextNodeAddr = (HI_U32 *)pstTailNodeInJobList->stNodeBuf.pBuf + (TDE_NODE_HEAD_BYTE >> 2) + ((pstTailNodeInJobList->stNodeBuf.u32NodeSz) >> 2);
-        //HI_U32 *pNextNodeUpdate = pNextNodeAddr + 1;
         HI_U64 *pNextNodeUpdate = (HI_U64 *)(pNextNodeAddr + 1);
 
         *pNextNodeAddr = pstJob->pstFirstCmd->stNodeBuf.u32PhyAddr;
-#if 0
-#ifdef TDE_VERSION_MPW
-        *pNextNodeUpdate = (HI_U32)(pstJob->pstFirstCmd->stNodeBuf.u64Update & 0xffffffff);
-#else
-        *pNextNodeUpdate = (HI_U32)(pstJob->pstFirstCmd->stNodeBuf.u64Update & 0xffffffff);
-        *(pNextNodeUpdate + 1) = (HI_U32)((pstJob->pstFirstCmd->stNodeBuf.u64Update >> 32) & 0xffffffff);        
-#endif
-#else
+
         *pNextNodeUpdate = pstJob->pstFirstCmd->stNodeBuf.u64Update;
-#endif
 
         if (pstJob->bAqUseBuff)
         {
-            s_pstTDEOsiJobList/*[enListType]*/->pstJobToCommit->bAqUseBuff = HI_TRUE;
+            s_pstTDEOsiJobList->pstJobToCommit->bAqUseBuff = HI_TRUE;
         }
 		#ifdef TDE_CACH_STRATEGY
 		/*将job中的对应的所有 hw 节点flush到内存，保证硬件能正确访问*/
-        TdeOsiListFlushJob(s_pstTDEOsiJobList/*[enListType]*/->pstJobLast);
+        TdeOsiListFlushJob(s_pstTDEOsiJobList->pstJobLast);
 		#endif
     }
     else
     {
-        s_pstTDEOsiJobList/*[enListType]*/->pstJobToCommit = pstJob;
+        s_pstTDEOsiJobList->pstJobToCommit = pstJob;
     }
 
 	#ifdef TDE_CACH_STRATEGY
 	/*将job中的对应的所有 hw 节点flush到内存，保证硬件能正确访问*/
     TdeOsiListFlushJob(pstJob);
 	#endif
-    TdeOsiListAddJob(pstJob/*, enListType*/);
+    TdeOsiListAddJob(pstJob);
 
     if(TDE_JOB_WAKE_NOTIFY != enNotiType)
     {
@@ -835,17 +617,16 @@ HI_S32 TdeOsiListSubmitJob(TDE_HANDLE s32Handle/*, TDE_LIST_TYPE_E enListType*/,
         }
     }
 
-    s32Ret = TdeHalNodeExecute(/*enListType,*/ s_pstTDEOsiJobList/*[enListType]*/->pstJobToCommit->pstFirstCmd->stNodeBuf.u32PhyAddr,
-    s_pstTDEOsiJobList/*[enListType]*/->pstJobToCommit->pstFirstCmd->stNodeBuf.u64Update, \
-    s_pstTDEOsiJobList/*[enListType]*/->pstJobToCommit->bAqUseBuff);
+    s32Ret = TdeHalNodeExecute(s_pstTDEOsiJobList->pstJobToCommit->pstFirstCmd->stNodeBuf.u32PhyAddr,
+    s_pstTDEOsiJobList->pstJobToCommit->pstFirstCmd->stNodeBuf.u64Update, \
+    s_pstTDEOsiJobList->pstJobToCommit->bAqUseBuff);
     if (s32Ret == HI_SUCCESS)
     {
-        s_pstTDEOsiJobList/*[enListType]*/->pstJobCommitted = s_pstTDEOsiJobList/*[enListType]*/->pstJobToCommit;
-        s_pstTDEOsiJobList/*[enListType]*/->pstJobToCommit = HI_NULL;
+        s_pstTDEOsiJobList->pstJobCommitted = s_pstTDEOsiJobList->pstJobToCommit;
+        s_pstTDEOsiJobList->pstJobToCommit = HI_NULL;
         s_pstTDEOsiJobList->pstJobFinished = HI_NULL;
     }
     
-    //tde_osr_enableirq();
     TDE_UP(&g_TDEHdMgrLock);
 
     pstJob->u8WaitForDoneCount++;
@@ -857,7 +638,6 @@ HI_S32 TdeOsiListSubmitJob(TDE_HANDLE s32Handle/*, TDE_LIST_TYPE_E enListType*/,
         s32Ret = wait_event_interruptible_timeout(s_TdeBlockJobWq, (TDE_JOB_NOTIFY_BUTT == pstJob->enNotiType), u32TimeOut);
 
         TDE_DOWN_INTERRUPTIBLE(&g_TDEHdMgrLock);
-        //tde_osr_disableirq();
 
         TDE_LOCK(&s_pstTDEOsiJobList->lock,lockflags);
         pstJob->u8WaitForDoneCount--;
@@ -872,14 +652,12 @@ HI_S32 TdeOsiListSubmitJob(TDE_HANDLE s32Handle/*, TDE_LIST_TYPE_E enListType*/,
                 TdeOsiListDestroyJob(pstJob);
             }
 //            TdeOsiListSafeDestroyJob(pstJob);
-            //tde_osr_enableirq();
             TDE_UP(&g_TDEHdMgrLock);
             return HI_SUCCESS;
         }
         else
         {
             pstJob->enNotiType = TDE_JOB_COMPL_NOTIFY;
-            //tde_osr_enableirq();
             TDE_UP(&g_TDEHdMgrLock);
 
             if ((-ERESTARTSYS) == s32Ret)
@@ -923,16 +701,6 @@ HI_S32 TdeOsiListSubmitJob(TDE_HANDLE s32Handle/*, TDE_LIST_TYPE_E enListType*/,
 HI_VOID TdeOsiListReset(HI_VOID)
 {
     TDE_SWJOB_S *pstDelJob;
-#if 0
-    HI_U32 i = 0;
-#if HI_TDE_SQ_SUPPORT
-    TDE_LIST_TYPE_E enListType[3] = {TDE_LIST_AQ, TDE_LIST_SQ, TDE_LIST_BUTT};
-#else
-    TDE_LIST_TYPE_E enListType[2] = {TDE_LIST_AQ, TDE_LIST_BUTT};
-#endif
-    TDE_DOWN_INTERRUPTIBLE(&g_TDEHdMgrLock);
-    tde_osr_disableirq();
-#endif
     HI_SIZE_T lockflags;
 
     while(1)
@@ -945,72 +713,41 @@ HI_VOID TdeOsiListReset(HI_VOID)
     }
     TDE_TRACE(TDE_KERN_DEBUG, "TDE reset successfully!\n"); //684
     TDE_LOCK(&s_pstTDEOsiJobList->lock,lockflags);
-    //for (i = 0; i < TDE_LIST_BUTT; i++)
-    {
-        while(!list_empty(&s_pstTDEOsiJobList/*[enListType[i]]*/->stList))
-        {
-            pstDelJob = list_entry(s_pstTDEOsiJobList/*[enListType[i]]*/->stList.next, TDE_SWJOB_S, stList);
-            s_pstTDEOsiJobList/*[enListType[i]]*/->u32JobNum--;
 
-            
-            list_del_init(&pstDelJob->stList);
+	while(!list_empty(&s_pstTDEOsiJobList->stList))
+	{
+		pstDelJob = list_entry(s_pstTDEOsiJobList->stList.next, TDE_SWJOB_S, stList);
+		s_pstTDEOsiJobList->u32JobNum--;
 
-            TDE_UNLOCK(&s_pstTDEOsiJobList->lock,lockflags);
 
-            if(TDE_JOB_WAKE_NOTIFY == pstDelJob->enNotiType)
-            {
-                TDE_TRACE(TDE_KERN_DEBUG, "reset free handle:%d!\n", pstDelJob->s32Handle); //696
-                
-                pstDelJob->enNotiType = TDE_JOB_NOTIFY_BUTT;
-                wake_up_interruptible(&s_TdeBlockJobWq);
-            }
-            else if (TDE_JOB_COMPL_NOTIFY == pstDelJob->enNotiType)
-            {
-                TDE_TRACE(TDE_KERN_DEBUG, "reset free handle:%d!\n", pstDelJob->s32Handle); //703
+		list_del_init(&pstDelJob->stList);
 
-                TdeOsiListSafeDestroyJob(pstDelJob);
-            }
-#if 0
-            if (s_stTdeWaitAll.bBegWait)
-            {
-                s_stTdeWaitAll.bNodeComplete = HI_TRUE;
-                wake_up_interruptible(&s_stTdeWaitAll.stTdeWaitAllWq);
-            }
-#endif
-            TDE_LOCK(&s_pstTDEOsiJobList->lock,lockflags);
+		TDE_UNLOCK(&s_pstTDEOsiJobList->lock,lockflags);
 
-            s_pstTDEOsiJobList->s32HandleFinished = -1;
-            s_pstTDEOsiJobList->s32HandleLast = -1;
+		if(TDE_JOB_WAKE_NOTIFY == pstDelJob->enNotiType)
+		{
+			TDE_TRACE(TDE_KERN_DEBUG, "reset free handle:%d!\n", pstDelJob->s32Handle); //696
 
-        	s_pstTDEOsiJobList->pstJobCommitted = HI_NULL;
-        	s_pstTDEOsiJobList->pstJobToCommit = HI_NULL;
-        	s_pstTDEOsiJobList->pstJobLast = HI_NULL;
-        }
-#if 0
-        //s_pstTDEOsiJobList/*[enListType[i]]*/->s32HandleToCommit = -1;
-        s_pstTDEOsiJobList/*[enListType[i]]*/->s32HandleFinished = -1;
-        s_pstTDEOsiJobList/*[enListType[i]]*/->s32HandleLast = -1;
-        //s_pstTDEOsiJobList/*[enListType[i]]*/->s32HandleCommitted = -1;
+			pstDelJob->enNotiType = TDE_JOB_NOTIFY_BUTT;
+			wake_up_interruptible(&s_TdeBlockJobWq);
+		}
+		else if (TDE_JOB_COMPL_NOTIFY == pstDelJob->enNotiType)
+		{
+			TDE_TRACE(TDE_KERN_DEBUG, "reset free handle:%d!\n", pstDelJob->s32Handle); //703
 
-        s_pstTDEOsiJobList/*[enListType[i]]*/->pstJobCommitted = HI_NULL;
-        s_pstTDEOsiJobList/*[enListType[i]]*/->pstJobToCommit = HI_NULL;
-        s_pstTDEOsiJobList/*[enListType[i]]*/->pstJobLast = HI_NULL;
-#endif
-    }
-#if 0
-    if (TdeHalCtlIsIdleSafely())
-    {
-        TDE_TRACE(TDE_KERN_DEBUG, "reset tde is IDLE\n");
-        TdeHalResetStatus();
-    }
-    else
-    {
-        TDE_TRACE(TDE_KERN_DEBUG, "reset tde is BUSY\n");
-    }
+			TdeOsiListSafeDestroyJob(pstDelJob);
+		}
 
-    tde_osr_enableirq();
-    TDE_UP(&g_TDEHdMgrLock);
-#endif
+		TDE_LOCK(&s_pstTDEOsiJobList->lock,lockflags);
+
+		s_pstTDEOsiJobList->s32HandleFinished = -1;
+		s_pstTDEOsiJobList->s32HandleLast = -1;
+
+		s_pstTDEOsiJobList->pstJobCommitted = HI_NULL;
+		s_pstTDEOsiJobList->pstJobToCommit = HI_NULL;
+		s_pstTDEOsiJobList->pstJobLast = HI_NULL;
+	}
+
     TDE_UNLOCK(&s_pstTDEOsiJobList->lock,lockflags);
     
     return;
@@ -1029,7 +766,7 @@ HI_VOID TdeOsiListReset(HI_VOID)
   1.Date         : 2008/3/5
 
 *****************************************************************************/
-HI_S32 TdeOsiListWaitAllDone(/*TDE_LIST_TYPE_E enListType*/HI_VOID)
+HI_S32 TdeOsiListWaitAllDone(HI_VOID)
 {
     TDE_HANDLE s32WaitHandle;
     HI_SIZE_T lockflags;
@@ -1043,35 +780,6 @@ HI_S32 TdeOsiListWaitAllDone(/*TDE_LIST_TYPE_E enListType*/HI_VOID)
     return TdeOsiListWaitForDone(s32WaitHandle,0);
 }
 
-#if 0
-/*****************************************************************************
- Prototype    : TdeOsiListIsCompleted
- Description  : query if one command is completed in job
- Input        : s32Handle: job handle
-                s32Id: command index
- Output       : NONE
- Return Value :
- Calls        :
- Called By    :
-
-  History        :
-  1.Date         : 2008/3/5
-    Author       : w54130
-    Modification : Created function
-
-*****************************************************************************/
-HI_BOOL TdeOsiListIsCompleted(TDE_HANDLE s32Handle, HI_U32 u32Id)
-{
-    HI_BOOL bValid;
-    HI_HANDLE_MGR *pHandleMgr;
-    
-    tde_osr_disableirq();
-    bValid = query_handle(s32Handle, &pHandleMgr);
-    tde_osr_enableirq();
-
-    return (HI_BOOL) !bValid;
-}
-#endif
 
 /*****************************************************************************
 * Function:      TdeOsiListWaitForDone
@@ -1089,25 +797,17 @@ HI_S32 TdeOsiListWaitForDone(TDE_HANDLE s32Handle, HI_U32 u32TimeOut)
     HI_S32 s32Ret;
     HI_BOOL bValid;
     HI_SIZE_T lockflags;
-    //TDE_LOCK(&s_pstTDEOsiJobList->lock,lockflags);
-    //TDE_DOWN_INTERRUPTIBLE(&g_TDEHdMgrLock);
-    //tde_osr_disableirq();
     bValid = query_handle(s32Handle, &pHandleMgr);
 
     if(!bValid)
     {
-        //tde_osr_enableirq();
-        //TDE_UP(&g_TDEHdMgrLock);
         return HI_SUCCESS;
     }
     /* AI7D02634 */
     pstJob = (TDE_SWJOB_S *)pHandleMgr->res;
-    //init_waitqueue_head(&pstJob->stQuery);
     TDE_LOCK(&s_pstTDEOsiJobList->lock,lockflags);
     pstJob->u8WaitForDoneCount++;
     pstJob->bInQuery = HI_TRUE;
-    //tde_osr_enableirq();
-    //TDE_UP(&g_TDEHdMgrLock);
     TDE_UNLOCK(&s_pstTDEOsiJobList->lock,lockflags);
 
     if(u32TimeOut)
@@ -1115,15 +815,11 @@ HI_S32 TdeOsiListWaitForDone(TDE_HANDLE s32Handle, HI_U32 u32TimeOut)
         s32Ret = wait_event_interruptible_timeout(pstJob->stQuery, (TDE_JOB_NOTIFY_BUTT == pstJob->enNotiType), u32TimeOut);
 
         TDE_LOCK(&s_pstTDEOsiJobList->lock,lockflags);
-        //TDE_DOWN_INTERRUPTIBLE(&g_TDEHdMgrLock);
-        //tde_osr_disableirq();
         pstJob->u8WaitForDoneCount--;
         
         if(TDE_JOB_NOTIFY_BUTT != pstJob->enNotiType)
         {
             pstJob->bInQuery = HI_FALSE;
-            //tde_osr_enableirq();
-            //TDE_UP(&g_TDEHdMgrLock);
             TDE_UNLOCK(&s_pstTDEOsiJobList->lock,lockflags);
             if ((-ERESTARTSYS) == s32Ret)
             {
@@ -1146,8 +842,6 @@ HI_S32 TdeOsiListWaitForDone(TDE_HANDLE s32Handle, HI_U32 u32TimeOut)
             TdeOsiListDestroyJob(pstJob);
         }
         
-        //tde_osr_enableirq();
-        //TDE_UP(&g_TDEHdMgrLock);
         return HI_SUCCESS;
     }
 
@@ -1161,94 +855,13 @@ HI_S32 TdeOsiListWaitForDone(TDE_HANDLE s32Handle, HI_U32 u32TimeOut)
     TDE_LOCK(&s_pstTDEOsiJobList->lock,lockflags);
     pstJob->u8WaitForDoneCount--;
     TDE_UNLOCK(&s_pstTDEOsiJobList->lock,lockflags);
-    //TDE_DOWN_INTERRUPTIBLE(&g_TDEHdMgrLock);
-    //tde_osr_disableirq();
     if (pstJob->u8WaitForDoneCount == 0) 
     {
         TdeOsiListDestroyJob(pstJob);
     } 
-    //tde_osr_enableirq();
-    //TDE_UP(&g_TDEHdMgrLock);
 
     return HI_SUCCESS;
 }
-
-/*****************************************************************************
- Prototype    : TdeOsiListSqUpdateProc
- Description  : sq can update interrupt service     CNcomment:ͬ������ɸ����жϷ������
- Input        : HI_VOID
- Output       : None
- Return Value :
- Calls        :
- Called By    :
-
-  History        :
-  1.Date         : 2008/3/5
-    Author       : w54130
-    Modification : Created function
-
-*****************************************************************************/
-#if 0
-HI_VOID TdeOsiListSqUpdateProc(HI_VOID)
-{
-    HI_VOID *pSuspendNode = HI_NULL;
-    TDE_SWNODE_S *pstSuspendNode = HI_NULL;
-    HI_S32 s32Ret;
-    
-    
-    TdeHalNodeUpdateSqList();
-    
-    TDEOsiListSubCmd(TDE_LIST_SQ);
-    
-
-    if (s_pstTDEOsiJobList[TDE_LIST_SQ]->pstJobToCommit != HI_NULL)
-    {
-        TdeHalNodeExecute(TDE_LIST_SQ, s_pstTDEOsiJobList[TDE_LIST_SQ]->pstJobToCommit->pstFirstCmd->stNodeBuf.u32PhyAddr
-                        , s_pstTDEOsiJobList[TDE_LIST_SQ]->pstJobToCommit->pstFirstCmd->stNodeBuf.u64Update, s_pstTDEOsiJobList[TDE_LIST_SQ]->bAqUseBuff);
-    }
-    else
-    {
-        TdeHalGetSuspendNode(&pSuspendNode);
-        if (HI_NULL == pSuspendNode)
-        {
-            return;
-        }
-        else
-        {
-            pstSuspendNode = (TDE_SWNODE_S *)pSuspendNode;
-            if(pstSuspendNode->enSubmType == TDE_NODE_SUBM_CHILD)
-            {
-                pstSuspendNode = pstSuspendNode->pstParentNodeInCmd;
-
-                s32Ret = TdeHalNodeExecute(TDE_LIST_AQ, pstSuspendNode->stNodeBuf.u32PhyAddr, 
-                    pstSuspendNode->stNodeBuf.u64Update, HI_FALSE);
-                if (s32Ret != HI_SUCCESS)
-                {
-                    return;
-                }
-            }
-            else
-            {
-                s32Ret = TdeHalRestoreAloneNode();
-                if (s32Ret != HI_SUCCESS)
-                {
-                    return;
-                }
-
-                s32Ret = TdeHalNodeExecute(TDE_LIST_AQ, pstSuspendNode->stNodeBuf.u32PhyAddr
-                    , pstSuspendNode->stNodeBuf.u64Update, HI_FALSE);
-                if (s32Ret != HI_SUCCESS)
-                {
-                    return;
-                }
-            }
-        }
-        
-        
-    }
-    return;
-}
-#endif
 
 /*****************************************************************************
  Prototype    : TdeOsiListCompProc
@@ -1265,87 +878,26 @@ HI_VOID TdeOsiListSqUpdateProc(HI_VOID)
     Modification : Created function
 
 *****************************************************************************/
-HI_VOID TdeOsiListCompProc(/*TDE_LIST_TYPE_E enListType*/HI_VOID)
+HI_VOID TdeOsiListCompProc()
 {
     HI_S32 s32Ret;
-#if HI_TDE_SQ_SUPPORT
-    HI_VOID *pSuspendNode = HI_NULL;
-    TDE_SWNODE_S *pstSuspendNode = HI_NULL;
-#endif
 
     HI_SIZE_T lockflags;
     TDE_LOCK(&s_pstTDEOsiJobList->lock,lockflags);
 
-#if HI_TDE_SQ_SUPPORT
-    if (TDE_LIST_SQ == enListType)
-    {
-        if (s_pstTDEOsiJobList[TDE_LIST_SQ]->pstJobToCommit != HI_NULL)
-        {
-            TdeHalNodeExecute(TDE_LIST_SQ, s_pstTDEOsiJobList[TDE_LIST_SQ]->pstJobToCommit->pstFirstCmd->stNodeBuf.u32PhyAddr
-                            , s_pstTDEOsiJobList[TDE_LIST_SQ]->pstJobToCommit->pstFirstCmd->stNodeBuf.u64Update, \
-                            s_pstTDEOsiJobList[TDE_LIST_SQ]->pstJobToCommit->bAqUseBuff);
-        }
-        else
-        {
-           
-            TdeHalGetSuspendNode(&pSuspendNode);
-            if (HI_NULL == pSuspendNode)
-            {
-                return;
-            }
-            
-                pstSuspendNode = (TDE_SWNODE_S *)pSuspendNode;
-                
-                if(pstSuspendNode->enSubmType == TDE_NODE_SUBM_CHILD)
-                {
-                    
-                    pstSuspendNode = pstSuspendNode->pstParentNodeInCmd;
+	if (s_pstTDEOsiJobList->pstJobToCommit != HI_NULL)
+	{
+		s32Ret = TdeHalNodeExecute(s_pstTDEOsiJobList->pstJobToCommit->pstFirstCmd->stNodeBuf.u32PhyAddr,
+		s_pstTDEOsiJobList->pstJobToCommit->pstFirstCmd->stNodeBuf.u64Update, \
+		s_pstTDEOsiJobList->pstJobToCommit->bAqUseBuff);
+		if (s32Ret == HI_SUCCESS)
+		{
+			s_pstTDEOsiJobList->pstJobCommitted = s_pstTDEOsiJobList->pstJobToCommit;
+			s_pstTDEOsiJobList->pstJobToCommit = HI_NULL;
+			s_pstTDEOsiJobList->pstJobFinished = HI_NULL;
+		}
+	}
 
-                    s32Ret = TdeHalNodeExecute(TDE_LIST_AQ, pstSuspendNode->stNodeBuf.u32PhyAddr, 
-                        pstSuspendNode->stNodeBuf.u64Update, HI_TRUE);
-                    if (s32Ret != HI_SUCCESS)
-                    {
-                        return;
-                    }
-                }
-                else
-                {
-                    s32Ret = TdeHalRestoreAloneNode();
-                    if (s32Ret != HI_SUCCESS)
-                    {
-                        return;
-                    }
-
-                    s32Ret = TdeHalNodeExecute(TDE_LIST_AQ, pstSuspendNode->stNodeBuf.u32PhyAddr
-                        , pstSuspendNode->stNodeBuf.u64Update, HI_FALSE);
-                    if (s32Ret != HI_SUCCESS)
-                    {
-                        return;
-                    }
-                }
-            
-            
-        }
-    }
-#endif
-
-    //tde_osr_disableirq();
-    //if (TDE_LIST_AQ == enListType)
-    {
-        if (s_pstTDEOsiJobList/*[enListType]*/->pstJobToCommit != HI_NULL)
-        {
-            s32Ret = TdeHalNodeExecute(/*enListType,*/ s_pstTDEOsiJobList/*[enListType]*/->pstJobToCommit->pstFirstCmd->stNodeBuf.u32PhyAddr,
-            s_pstTDEOsiJobList/*[enListType]*/->pstJobToCommit->pstFirstCmd->stNodeBuf.u64Update, \
-            s_pstTDEOsiJobList/*[enListType]*/->pstJobToCommit->bAqUseBuff);
-            if (s32Ret == HI_SUCCESS)
-            {
-                s_pstTDEOsiJobList/*[enListType]*/->pstJobCommitted = s_pstTDEOsiJobList/*[enListType]*/->pstJobToCommit;
-                s_pstTDEOsiJobList/*[enListType]*/->pstJobToCommit = HI_NULL;
-                s_pstTDEOsiJobList->pstJobFinished = HI_NULL;
-            }
-        }
-    }
-    //tde_osr_enableirq();
     TDE_UNLOCK(&s_pstTDEOsiJobList->lock,lockflags);
 
     return;    
@@ -1354,7 +906,7 @@ HI_VOID TdeOsiListCompProc(/*TDE_LIST_TYPE_E enListType*/HI_VOID)
 /*****************************************************************************
  Function:      TdeOsiListNodeComp
  Description:   node complete interrupt service, maily complete deleting node and resume suspending,free node 
- Input:         TDE_LIST_TYPE_E enListType  node complete interrupt type
+ Input:         none
  Output:        none
  Return:        create job handle
  Others:        none
@@ -1367,7 +919,7 @@ HI_VOID TdeOsiListCompProc(/*TDE_LIST_TYPE_E enListType*/HI_VOID)
     Modification : Created function
 
 *****************************************************************************/
-HI_VOID TdeOsiListNodeComp(/*TDE_LIST_TYPE_E enListType*/HI_VOID)
+HI_VOID TdeOsiListNodeComp()
 {
     HI_HANDLE_MGR *pHandleMgr;
     TDE_SWJOB_S *pstJob;
@@ -1375,27 +927,16 @@ HI_VOID TdeOsiListNodeComp(/*TDE_LIST_TYPE_E enListType*/HI_VOID)
     TDE_SWJOB_S *pstDelJob;
     TDE_HANDLE s32Delhandle;
     HI_U32 u32RunningSwNodeAddr;
-    //HI_BOOL bSqWork;
     HI_BOOL bWork = HI_TRUE;
     HI_U32 *pu32FinishHandle;
     HI_SIZE_T lockflags;
     TDE_LOCK(&s_pstTDEOsiJobList->lock,lockflags);
-#if 0
-    TdeHalNodeComplteNd(enListType);
-    bSqWork = TdeHalIsSqWork();
-#endif
     if (TdeHalCtlIsIdleSafely())
     {
         bWork = HI_FALSE;
     }
-#if HI_TDE_SQ_SUPPORT    
-    if ((bSqWork && (TDE_LIST_AQ == enListType)) || (!bSqWork && (TDE_LIST_SQ == enListType)))
-    {
-        bWork = HI_FALSE;
-    }
-#endif
     
-    u32RunningSwNodeAddr = TdeHalCurNode(/*enListType*/);
+    u32RunningSwNodeAddr = TdeHalCurNode();
     if (0 == u32RunningSwNodeAddr)
     {
         TDE_UNLOCK(&s_pstTDEOsiJobList->lock,lockflags);
@@ -1416,7 +957,7 @@ HI_VOID TdeOsiListNodeComp(/*TDE_LIST_TYPE_E enListType*/HI_VOID)
     }
     
     s32FinishedHandle = *pu32FinishHandle;
-    //tde_osr_disableirq();
+
     if (!bWork)
     {
         s_pstTDEOsiJobList->pstJobFinished = (HI_VOID *)u32RunningSwNodeAddr;
@@ -1426,18 +967,16 @@ HI_VOID TdeOsiListNodeComp(/*TDE_LIST_TYPE_E enListType*/HI_VOID)
         
         if(!query_handle(s32FinishedHandle, &pHandleMgr))
         {
-            //tde_osr_enableirq();
             TDE_UNLOCK(&s_pstTDEOsiJobList->lock,lockflags);
             return;
         }
         pstJob = (TDE_SWJOB_S *)pHandleMgr->res;
 
         
-        if (pstJob->stList.prev == &s_pstTDEOsiJobList/*[enListType]*/->stList)
+        if (pstJob->stList.prev == &s_pstTDEOsiJobList->stList)
         {
             TDE_TRACE(TDE_KERN_DEBUG, "No pre Job left, finishedhandle:%d\n", s32FinishedHandle); //934
             TDE_UNLOCK(&s_pstTDEOsiJobList->lock,lockflags);
-            //tde_osr_enableirq();
             return;
         }
 
@@ -1449,18 +988,17 @@ HI_VOID TdeOsiListNodeComp(/*TDE_LIST_TYPE_E enListType*/HI_VOID)
     if (!query_handle(s32FinishedHandle, &pHandleMgr))
     {
         TDE_TRACE(TDE_KERN_DEBUG, "handle %d already delete!\n", s32FinishedHandle); //946
-        //tde_osr_enableirq();
         TDE_UNLOCK(&s_pstTDEOsiJobList->lock,lockflags);
         return;
     }
 
-    s_pstTDEOsiJobList/*[enListType]*/->s32HandleFinished = s32FinishedHandle;
+    s_pstTDEOsiJobList->s32HandleFinished = s32FinishedHandle;
 
-    while(!list_empty(&s_pstTDEOsiJobList/*[enListType]*/->stList))
+    while(!list_empty(&s_pstTDEOsiJobList->stList))
     {
-        pstDelJob = list_entry(s_pstTDEOsiJobList/*[enListType]*/->stList.next, TDE_SWJOB_S, stList);
+        pstDelJob = list_entry(s_pstTDEOsiJobList->stList.next, TDE_SWJOB_S, stList);
         s32Delhandle = pstDelJob->s32Handle;
-        s_pstTDEOsiJobList/*[enListType]*/->u32JobNum--;
+        s_pstTDEOsiJobList->u32JobNum--;
 
         list_del_init(&pstDelJob->stList);
 
@@ -1474,9 +1012,7 @@ HI_VOID TdeOsiListNodeComp(/*TDE_LIST_TYPE_E enListType*/HI_VOID)
             if (NULL != pstDelJob->pFuncComplCB)
             {
                 TDE_TRACE(TDE_KERN_DEBUG, "handle:%d has callback func!\n", pstDelJob->s32Handle); //968
-                //TDE_UNLOCK(&s_pstTDEOsiJobList->lock,lockflags);
                 pstDelJob->pFuncComplCB(pstDelJob->pFuncPara, &(pstDelJob->s32Handle));
-                //TDE_LOCK(&s_pstTDEOsiJobList->lock,lockflags);
             }
             wake_up_interruptible(&s_TdeBlockJobWq);
         }
@@ -1487,33 +1023,21 @@ HI_VOID TdeOsiListNodeComp(/*TDE_LIST_TYPE_E enListType*/HI_VOID)
             if (NULL != pstDelJob->pFuncComplCB)
             {
                 TDE_TRACE(TDE_KERN_DEBUG, "handle:%d has callback func!\n", pstDelJob->s32Handle); //980
-                //TDE_UNLOCK(&s_pstTDEOsiJobList->lock,lockflags);
-                //tde_osr_enableirq();
                 pstDelJob->pFuncComplCB(pstDelJob->pFuncPara, &(pstDelJob->s32Handle));
-                //tde_osr_disableirq();
-                //TDE_LOCK(&s_pstTDEOsiJobList->lock,lockflags);
             }
 
             TdeOsiListSafeDestroyJob(pstDelJob);
         }
-#if 0
-        if (s_stTdeWaitAll.bBegWait)
-        {
-            s_stTdeWaitAll.bNodeComplete = HI_TRUE;
-            wake_up_interruptible(&s_stTdeWaitAll.stTdeWaitAllWq);
-        }
-#endif
+
         if(s32Delhandle == s32FinishedHandle)
         {
-            //tde_osr_enableirq();
             if (!bWork)
             {
                 if (TdeHalCtlIsIdleSafely())
                 {
-                	/*TdeHalSystemInit();*/
                 	TdeHalCtlIntStats();
 
-                	TdeOsiListCompProc(/*TDE_LIST_AQ*/);
+                	TdeOsiListCompProc();
                 }
             }
             return ;
@@ -1521,7 +1045,6 @@ HI_VOID TdeOsiListNodeComp(/*TDE_LIST_TYPE_E enListType*/HI_VOID)
         TDE_LOCK(&s_pstTDEOsiJobList->lock,lockflags);
     }
 
-    //tde_osr_enableirq();
     TDE_UNLOCK(&s_pstTDEOsiJobList->lock,lockflags);
 }
 
@@ -1584,7 +1107,6 @@ HI_VOID  TdeOsiListPutPhyBuff(HI_U32 u32BuffNum)
     {
         return;
     }
-    //tde_osr_hsr((HI_VOID *)TdeOsiListDoFreePhyBuff, (HI_VOID *)u32BuffNum);
 	#ifndef TDE_BOOT
 	TdeOsiListHsr((HI_VOID *)TdeOsiListDoFreePhyBuff, (HI_VOID *)u32BuffNum);
 	#else

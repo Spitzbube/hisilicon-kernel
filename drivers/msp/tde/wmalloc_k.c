@@ -130,7 +130,6 @@ HI_VOID *mallocUnit(UNIT_SIZE_E eUnitSize)
     pFree = pBlock->pStartAddr + pBlock->nFirst * pBlock->nUnitSize;
     pBlock->nFirst = *(HI_U16 *)pFree;
     pBlock->nFree--;
-    //memset(pFree, 0, pBlock->nUnitSize);
 #if HI_TDE_MEMCOUNT_SUPPORT    
     if((g_struMemBlock[eUnitSize].nMaxNum - pBlock->nFree) > g_struMemBlock[eUnitSize].nMaxUsed)
     {
@@ -214,7 +213,6 @@ HI_S32 freeUnit(UNIT_SIZE_E eUnitSize, HI_VOID *ptr)
     pBlock->nFree++;
     *(HI_U16*)ptr = pBlock->nFirst; /* point to next unit can be assigned */
     pBlock->nFirst = ((HI_U32)ptr - (HI_U32)pBlock->pStartAddr)/pBlock->nUnitSize;
-    //TDE_TRACE(TDE_KERN_DEBUG, "eUnitSize:%d,first free unit:%d\n", pBlock->nUnitSize, pBlock->nFirst);
     TDE_TRACE(TDE_KERN_DEBUG, "eUnitSize:%d,first free unit:%d, free units:%d\n", pBlock->nUnitSize, pBlock->nFirst, pBlock->nFree);
     TDE_UNLOCK(&s_MemLock,lockflags);
     return HI_SUCCESS;
@@ -242,7 +240,6 @@ HI_S32 wfree(HI_VOID *ptr)
 
 STATIC HI_U32 g_u32MemPoolPhyAddr; //81143878 +88
 STATIC HI_U32 g_u32MemPoolVrtAddr;
-//STATIC HI_U32 g_u32MemPoolSize;
 STATIC HI_U32 g_u32TdeBuf; //81143874 +84
 
 #define HI_TDE_CMD_NUM  (((g_u32TdeBuf)-(FILTER_SIZE)*2)/((CMD_SIZE)+(NODE_SIZE)+(JOB_SIZE)))
@@ -257,13 +254,6 @@ STATIC HI_U32 g_u32TdeBuf; //81143874 +84
 
 HI_S32 wmeminit(void)
 {
-    //TDE_NEW_MMB(g_pstruMemPool);
-    //if (HI_NULL == g_pstruMemPool)
-    //{
-    //    TDE_TRACE(TDE_KERN_ERR, "new MMB failed!\n");
-    //    return HI_FAILURE;
-    //}
-
     if(HI_TDE_BUFFER>TDE_MAX_BUFFER)
     {
         g_u32TdeBuf = TDE_MAX_BUFFER;
@@ -277,11 +267,10 @@ HI_S32 wmeminit(void)
         g_u32TdeBuf = HI_TDE_BUFFER;
     }
 
-    g_u32MemPoolPhyAddr = HI_GFX_AllocMem("TDE_MemPool",NULL,TDE_MEMPOOL_SIZE/* + 0x200000*/);
+    g_u32MemPoolPhyAddr = HI_GFX_AllocMem("TDE_MemPool",NULL,TDE_MEMPOOL_SIZE);
     if(0 == g_u32MemPoolPhyAddr)
     {
         TDE_TRACE(TDE_KERN_INFO, "malloc mempool buffer failed!\n"); //271
-        //HI_GFX_FreeMem(0);
         return HI_FAILURE;
     }
 	#ifdef TDE_CACH_STRATEGY
@@ -289,10 +278,6 @@ HI_S32 wmeminit(void)
 	#else
 	g_u32MemPoolVrtAddr = (HI_U32 )HI_GFX_Map(g_u32MemPoolPhyAddr);
 	#endif
-#if 0
-    g_u32MemPoolVrtAddr += 0x100000;
-    g_u32MemPoolPhyAddr += 0x100000;
-#endif
     MemoryBlockInit(UNIT_SIZE_CMD, HI_TDE_CMD_NUM, (HI_VOID *)(g_u32MemPoolVrtAddr));
     MemoryBlockInit(UNIT_SIZE_JOB, HI_TDE_JOB_NUM, (HI_VOID *)(g_u32MemPoolVrtAddr + TDE_JOB_OFFSET));
     MemoryBlockInit(UNIT_SIZE_NODE, HI_TDE_NODE_NUM, (HI_VOID *)(g_u32MemPoolVrtAddr + TDE_NODE_OFFSET));
@@ -300,7 +285,6 @@ HI_S32 wmeminit(void)
 	#ifndef TDE_BOOT
 	spin_lock_init(&s_MemLock);
 	#endif
-    //g_u32MemPoolSize = TDE_NODE_OFFSET + HI_TDE_NODE_NUM * 1024;
     PRINTMEMINFO(); //286
     
     return HI_SUCCESS;
@@ -309,12 +293,11 @@ HI_S32 wmeminit(void)
 HI_VOID wmemterm(void)
 {
     PRINTMEMINFO(); //293
-    HI_GFX_Unmap ((HI_VOID *)(g_u32MemPoolVrtAddr/* - 0x100000*/));
-    HI_GFX_FreeMem( g_u32MemPoolPhyAddr/* - 0x100000*/);
+    HI_GFX_Unmap ((HI_VOID *)(g_u32MemPoolVrtAddr));
+    HI_GFX_FreeMem( g_u32MemPoolPhyAddr);
 
     g_u32MemPoolPhyAddr = 0;
     g_u32MemPoolVrtAddr = 0;
-    //g_u32MemPoolSize = 0;
 }
 
 HI_U32 wgetphy(HI_VOID *ptr)

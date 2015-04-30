@@ -22,8 +22,6 @@ extern "C" {
  #endif /* __cplusplus */
 #endif  /* __cplusplus */
 
-#define TDE_INTNUM  123//68
-#define TDE_REG_BASEADDR 0xff420000 //0xf8c10000//0x10120000
 /****************************************************************************/
 /*                             TDE hal types define                         */
 /****************************************************************************/
@@ -1193,6 +1191,7 @@ HI_BOOL bTdeHalSwVersion(HI_VOID);
 
 void TdeHalFreeNodeBuf(TDE_HWNode_S* pNode);
 
+HI_VOID TdeHalSuspend(HI_VOID);
 
 #ifdef __cplusplus
  #if __cplusplus

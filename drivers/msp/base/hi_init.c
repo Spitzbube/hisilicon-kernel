@@ -31,9 +31,7 @@
 #include "drv_jpge_ext.h"
 #endif
 #include "drv_hifb_ext.h"
-#if 0
 #include "drv_tde_ext.h"
-#endif
 #include "drv_tuner_ext.h"
 #if 0
 #include "drv_png_ext.h"
@@ -80,9 +78,9 @@ HI_S32 HI_DRV_LoadModules(HI_VOID)
     HDMI_DRV_ModInit();
 
     VDP_DRV_ModInit();
+#endif
 
     TDE_DRV_ModInit();
-#endif
 
     HIFB_DRV_ModInit();
 

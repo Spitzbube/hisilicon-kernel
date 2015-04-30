@@ -10,11 +10,12 @@ extern "C"{
 #include "hi_type.h"
 
 typedef HI_VOID  (*FN_HIFB_SetLogoLayerEnable)(HI_BOOL);
-
+typedef HI_S32   (*FN_HIFB_UpdatePqData)(HI_VOID);
 
 typedef struct
 {
     FN_HIFB_SetLogoLayerEnable             pfnHifbSetLogoLayerEnable;
+    FN_HIFB_UpdatePqData                   pfnHifbUpdatePqData;
 } HIFB_EXPORT_FUNC_S;
 
 HI_S32 HIFB_DRV_ModInit(HI_VOID);

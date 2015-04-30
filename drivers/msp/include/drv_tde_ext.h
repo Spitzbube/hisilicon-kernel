@@ -4,6 +4,7 @@
 
 #include "hi_type.h"
 #include "hi_tde_type.h"
+#include "hi_drv_dev.h"
 
 typedef HI_S32  (*FN_TDE_Open)(HI_VOID);
 typedef HI_S32  (*FN_TDE_Close)(HI_VOID);
@@ -23,6 +24,8 @@ typedef HI_S32  (*FN_TDE_SolidDraw)(TDE_HANDLE, TDE2_SURFACE_S*, TDE2_RECT_S*, T
 typedef HI_S32  (*FN_TDE_SetDeflickerLevel)(TDE_DEFLICKER_LEVEL_E);
 typedef HI_S32  (*FN_TDE_EnableRegionDeflicker)(HI_BOOL);
 typedef HI_S32  (*FN_TDE_CalScaleRect)(const TDE2_RECT_S*, const TDE2_RECT_S*, TDE2_RECT_S*, TDE2_RECT_S*);
+typedef HI_S32  (*FN_TDE_Suspend)(PM_BASEDEV_S *, pm_message_t);
+typedef HI_S32  (*FN_TDE_Resume)(PM_BASEDEV_S *);
 
 
 typedef struct
@@ -44,6 +47,8 @@ typedef struct
     FN_TDE_SetDeflickerLevel        pfnTdeSetDeflickerLevel;
     FN_TDE_EnableRegionDeflicker    pfnTdeEnableRegionDeflicker;    
     FN_TDE_CalScaleRect     pfnTdeCalScaleRect;
+	FN_TDE_Suspend			pfnTdeSuspend;
+	FN_TDE_Resume			pfnTdeResume;
 } TDE_EXPORT_FUNC_S;
 
 HI_S32 TDE_DRV_ModInit(HI_VOID);

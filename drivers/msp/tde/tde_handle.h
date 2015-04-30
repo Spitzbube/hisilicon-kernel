@@ -78,6 +78,8 @@ typedef struct hiHandleMgr
 
 HI_S32 get_handlenum(HI_VOID);
 
+HI_VOID TdeFreePendingJob(HI_VOID);
+
 #ifdef __cplusplus
  #if __cplusplus
 }

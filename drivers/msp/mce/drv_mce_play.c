@@ -1678,14 +1678,14 @@ HI_S32 MCE_ModuleInit(HI_VOID)
         return Ret;
     }
 
-#if 0
     Ret = tde_init_module_k();
     if(HI_SUCCESS != Ret)
     {
-        HI_ERR_MCE("ERR: HI_DRV_TDE_Init!\n");
+        HI_ERR_MCE("ERR: HI_DRV_TDE_Init!\n"); //1689
         return Ret;
     } 
 
+#if 0
     Ret = HI_DRV_WIN_Init();
     if(HI_SUCCESS != Ret)
     {

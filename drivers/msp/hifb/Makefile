@@ -18,3 +18,4 @@ obj-y += adp/hifb_drv_adpt.o
 obj-y += hifb_comm.o
 obj-y += hifb_fence.o
 obj-y += hifb_main.o
+obj-y += hifb_main_k.o
