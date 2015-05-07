@@ -72,7 +72,7 @@
 #include "drv_global.h"
 #include "drv_hdmi_ioctl.h"
 
-HI_DECLARE_MUTEX(g_hdmiMutex);
+HI_DECLARE_MUTEX(g_hdmiMutex); //80fac650
 HI_U32 g_VirHDMI_PHY_BASE_ADDR = 0; //81130b04 +8
 
 HI_S32 HDMI_DRV_Init(HI_VOID);
@@ -90,21 +90,21 @@ HI_S32 HI_DRV_HDMI_Close(HI_UNF_HDMI_ID_E enHdmi);
 
 
 static HI_U32 g_u32CallbackAddr = 0;
-static HI_U32 FromUserSpaceFlag = HI_TRUE;
+static HI_U32 FromUserSpaceFlag = HI_TRUE; //80FAC64C
 static HI_U32  g_KernelProcID = HI_INVALID_HANDLE;
 
 
 
 
 
-HI_U32 g_u32ProcHandle = HI_INVALID_HANDLE;
+HI_U32 g_u32ProcHandle = HI_INVALID_HANDLE; //80fac648
 
 
 
 
 
 
-static HI_U32 HDMIStandbySetupFlag =  HI_FALSE;
+static HI_U32 HDMIStandbySetupFlag =  HI_FALSE; //81130afc
 
 
 //-------------------------------------------------------------------
@@ -197,7 +197,7 @@ HI_S32 hdmi_Close(struct inode *inode, struct file *filp)
     HI_U32 u32Index;
     HDMI_PROC_EVENT_S *pEventList =  DRV_Get_EventList(HI_UNF_HDMI_ID_0);
     
-    HI_INFO_HDMI("\ncome to hdmi_Close\n");
+    HI_INFO_HDMI("\ncome to hdmi_Close\n"); //200
     //printk("-------->>>>procID:0x%x\n",filp);
     
     for(u32Index = 0; u32Index < MAX_PROCESS_NUM; u32Index++)
@@ -216,26 +216,9 @@ HI_S32 hdmi_Close(struct inode *inode, struct file *filp)
         DRV_Set_ThreadStop(HI_FALSE);
     }
     
-  #if 0  
-    // init num == 1 kernel + 1 proc = 2
-    // ctrl+c times > 6 times
-    // in some times,it will also overflow.then print error hint In hi_unf_hdmi_init
-    if((DRV_HDMI_ProcNum(0) >= 8) && (DRV_HDMI_InitNum(0) <= 2))
-    {
-        HI_S32 index;
-        for(index = 0;index < MAX_PROCESS_NUM;index++)
-        {
-            if(index != g_KernelProcID)
-            {
-                DRV_HDMI_ReleaseProcID(0,index);
-            }
-        }
-    }
-    #endif
-    
     DRV_HDMI_DeInit(HI_TRUE);
 
-    if(DRV_HDMI_InitNum(HI_UNF_HDMI_ID_0) == 0)
+    if(DRV_HDMI_GetInitNum(HI_UNF_HDMI_ID_0) == 0)
     {
         HDMIStandbySetupFlag = HI_FALSE;
     }
@@ -247,6 +230,7 @@ unsigned int suspend_flag = 0;
 unsigned int start_flag = 0;
 extern HDMI_CHN_ATTR_S  *DRV_Get_Glb_Param(void);
 
+extern HI_VOID HDMI_PinConfig(HI_VOID);
 
 HI_S32 hdmi_Suspend(PM_BASEDEV_S *pdev, pm_message_t state)
 {
@@ -259,13 +243,13 @@ HI_S32 hdmi_Suspend(PM_BASEDEV_S *pdev, pm_message_t state)
 
     if (HI_FALSE == HDMIStandbySetupFlag)
     {
-    	HI_FATAL_HDMI("HDMI Do not setup before\n");
+    	HI_FATAL_HDMI("HDMI Do not setup before\n"); //244
     	return 0;
     }
     
     //g_stHdmiChnParam_ptr = DRV_Get_ChnAttr();
     suspend_flag = 1;
-    HI_FATAL_HDMI("HDMI Suspend\n");
+    //HI_FATAL_HDMI("HDMI Suspend\n");
 
     SI_SendCP_Packet(ON);
     SI_SetHdmiVideo(HI_FALSE);
@@ -276,7 +260,7 @@ HI_S32 hdmi_Suspend(PM_BASEDEV_S *pdev, pm_message_t state)
 #if defined (HDCP_SUPPORT)
     SI_WriteByteEEPROM(EE_TX_HDCP, 0x00);
     SI_SetEncryption(OFF);
-    udelay(100);
+    DelayMS(1); //udelay(100);
 #endif
     SI_DisableHdmiDevice();
     SI_CloseHdmiDevice();
@@ -287,41 +271,19 @@ HI_S32 hdmi_Suspend(PM_BASEDEV_S *pdev, pm_message_t state)
     pstChnAttr[HI_UNF_HDMI_ID_0].u8CECCheckCount = 0;
     memset(&(pstChnAttr[HI_UNF_HDMI_ID_0].stCECStatus), 0, sizeof(HI_UNF_HDMI_CEC_STATUS_S));    
 #endif
-//    SI_SW_ResetHDMITX();
-//    SI_HW_ResetHDMITX();
-//    udelay(1000);    
     
     SI_PowerDownHdmiTx();
-    //It will power down the whole HDMI IP.
+
     SI_PoweDownHdmiDevice();
 
     SI_HW_ResetCtrl(1);
     DelayMS(1);
     SI_HW_ResetPhy(1);
     DelayMS(1);
-    //SI_HdmiHardwareReset(1);
-    #if 0
-    udelay(500);
-    tmp = *pulArgs;
-    tmp |= 0x1;
-    *pulArgs = tmp;      
-    udelay(100);
 
-    tmp = *pulArgs;
-    tmp &= 0xfffffcff;
-    *pulArgs = tmp;      
-    udelay(100);
-    #endif 
-
-    HI_FATAL_HDMI("finish HDMI Suspend\n");
+    HI_PRINT("HDMI suspend OK\n");
     return 0;
 }
-extern HI_VOID HDMI_PinConfig(HI_VOID);
-#if 0 /*--NO MODIFY : COMMENT BY CODINGPARTNER--*/
-extern void reset_hdcp_counter(void);
-#endif /*--NO MODIFY : COMMENT BY CODINGPARTNER--*/
-
-
 
 HI_S32 hdmi_Resume(PM_BASEDEV_S *pdev)
 {
@@ -330,7 +292,7 @@ HI_S32 hdmi_Resume(PM_BASEDEV_S *pdev)
 	    return 0;
     }    
 
-    HI_FATAL_HDMI("HDMI Resume\n");
+    //HI_FATAL_HDMI("HDMI Resume\n");
 #if defined (HDCP_SUPPORT)
     //SI_WriteByteEEPROM(EE_TX_HDCP, 0xFF); 
     //set hdcp enable in setAttr In hotplug 
@@ -339,7 +301,8 @@ HI_S32 hdmi_Resume(PM_BASEDEV_S *pdev)
     //init
     HDMI_PinConfig();
     SI_HW_ResetHDMITX();
-    SI_DisableHdmiDevice();
+    SI_SW_ResetHDMITX();
+    //SI_DisableHdmiDevice();
 #if 0 /*--NO MODIFY : COMMENT BY CODINGPARTNER--*/
     SI_WriteDefaultConfigToEEPROM();
     WriteByteHDMITXP0(HDMI_INT_ADDR, CLR_MASK);
@@ -380,7 +343,7 @@ HI_S32 hdmi_Resume(PM_BASEDEV_S *pdev)
     SI_EnableInfoFrame(AUD_TYPE);
 #endif /*--NO MODIFY : COMMENT BY CODINGPARTNER--*/
     
-    HI_FATAL_HDMI("finish DRV_HDMI_Init\n");
+    HI_PRINT("HDMI resume OK\n");
     suspend_flag = 0;
     return 0;
 }
@@ -406,7 +369,7 @@ static HI_S32 hdmi_ProcessCmd(unsigned int cmd, HI_VOID *arg, HI_BOOL bUser)
             {
                 u32Ret = DRV_HDMI_DeInit(bUser);
                 
-                if(DRV_HDMI_InitNum(HI_UNF_HDMI_ID_0) == 0)
+                if(DRV_HDMI_GetInitNum(HI_UNF_HDMI_ID_0) == 0)
                 {
                     HDMIStandbySetupFlag = HI_FALSE;
                 }
@@ -569,11 +532,13 @@ static HI_S32 hdmi_ProcessCmd(unsigned int cmd, HI_VOID *arg, HI_BOOL bUser)
             {
                 HDMI_CEC_S *pCECCmd;
 
+#if 0
                 if(!cec_enable_flag){
                     HI_ERR_HDMI("cec disabled, can't set cec cmd.\n");
                     u32Ret = -1;
                     break;
                 }
+#endif
                 pCECCmd = (HDMI_CEC_S*)arg;
                 u32Ret = DRV_HDMI_SetCECCommand(pCECCmd->enHdmi, &(pCECCmd->CECCmd));
                 break;
@@ -581,25 +546,29 @@ static HI_S32 hdmi_ProcessCmd(unsigned int cmd, HI_VOID *arg, HI_BOOL bUser)
         case CMD_HDMI_GET_CEC:
             {
                 HDMI_CEC_S *pCECCmd;
+#if 0
                 if(!cec_enable_flag){
                     HI_ERR_HDMI("cec disabled, can't get cec cmd.\n");
                     u32Ret = -1;
                     break;
                 }
+#endif
 
                 pCECCmd = (HDMI_CEC_S*)arg;
                 u32Ret = DRV_HDMI_GetCECCommand(pCECCmd->enHdmi, &(pCECCmd->CECCmd), pCECCmd->timeout);
-                u32Ret = (u32Ret == 0)?HI_FAILURE:HI_SUCCESS;
+                //u32Ret = (u32Ret == 0)?HI_FAILURE:HI_SUCCESS;
                 break;
             }
         case CMD_HDMI_CECSTATUS:
             {
                 HDMI_CEC_STATUS *pCECStatus;
+#if 0
                 if(!cec_enable_flag){
                     HI_ERR_HDMI("cec disabled, can't get cec status.\n");
                     u32Ret = -1;
                     break;
                 }
+#endif
 
                 pCECStatus = (HDMI_CEC_STATUS*)arg;
                 u32Ret = DRV_HDMI_CECStatus(pCECStatus->enHdmi, &(pCECStatus->stStatus));
@@ -607,13 +576,22 @@ static HI_S32 hdmi_ProcessCmd(unsigned int cmd, HI_VOID *arg, HI_BOOL bUser)
             }
         case CMD_HDMI_CEC_ENABLE:
             {
-                cec_enable_flag = 1;
+                //cec_enable_flag = 1;
+                SI_CEC_SetUp();
+                DRV_Set_CECEnable(HI_UNF_HDMI_ID_0,HI_TRUE);
                 u32Ret = HI_SUCCESS;
                 break;
             }
         case CMD_HDMI_CEC_DISABLE:
             {
-                cec_enable_flag = 0;
+                HDMI_CHN_ATTR_S *pstChnAttr = DRV_Get_ChnAttr();
+                //cec_enable_flag = 0;
+                DRV_Set_CECEnable(HI_UNF_HDMI_ID_0,HI_FALSE);
+                DRV_Set_CECStart(HI_UNF_HDMI_ID_0,HI_FALSE);
+                pstChnAttr[HI_UNF_HDMI_ID_0].u8CECCheckCount = 0;
+                memset(&(pstChnAttr[HI_UNF_HDMI_ID_0].stCECStatus), 0, sizeof(HI_UNF_HDMI_CEC_STATUS_S));
+                SI_CEC_Close();
+
                 u32Ret = HI_SUCCESS;
                 break;
             }
@@ -678,9 +656,32 @@ static HI_S32 hdmi_ProcessCmd(unsigned int cmd, HI_VOID *arg, HI_BOOL bUser)
                 u32Ret = DRV_HDMI_AudioChange(pstGetAOAttr->enHdmi, &pstGetAOAttr->stAudAttr);
                 break;
             }
+        case CMD_HDMI_GET_STATUS:
+        {
+            HDMI_STATUS_S *pstStatus;
+            pstStatus = (HDMI_STATUS_S *)arg;
+            u32Ret = DRV_HDMI_GetStatus(pstStatus->enHdmi,&pstStatus->stStatus);
+            break;
+        }
+        case CMD_HDMI_GET_DELAY:
+        {
+            HDMI_DELAY_S *pstDelay;
+            pstDelay = (HDMI_DELAY_S *)arg;
+            DRV_HDMI_GetDelay(pstDelay->enHdmi,&pstDelay->stDelay);
+            u32Ret = HI_SUCCESS;
+            break;
+        }
+        case CMD_HDMI_SET_DELAY:
+        {
+            HDMI_DELAY_S *pstDelay;
+            pstDelay = (HDMI_DELAY_S *)arg;
+            DRV_HDMI_SetDelay(pstDelay->enHdmi,&pstDelay->stDelay);
+            u32Ret = HI_SUCCESS;
+            break;
+        }
         default:
             {
-                HI_ERR_HDMI("unkonw cmd:0x%x\n", cmd);
+                HI_ERR_HDMI("unkonw cmd:0x%x\n", cmd); //680
                 return -ENOIOCTLCMD;
             }
     }
@@ -721,27 +722,6 @@ HI_VOID  HDMI_DRV_EXIT(HI_VOID)
 }
 
 
-#ifndef MODULE
-
-EXPORT_SYMBOL(HDMI_DRV_Init);
-EXPORT_SYMBOL(HDMI_DRV_EXIT);
-EXPORT_SYMBOL(hdmi_Open);
-EXPORT_SYMBOL(hdmi_Close);
-EXPORT_SYMBOL(hdmi_Suspend);
-EXPORT_SYMBOL(hdmi_Resume);
-EXPORT_SYMBOL(hdmi_Ioctl);
-EXPORT_SYMBOL(DRV_HDMI_GetAttr);
-//EXPORT_SYMBOL(DRV_ReadByte_8BA);
-EXPORT_SYMBOL(DRV_HDMI_GetSinkCapability);
-EXPORT_SYMBOL(SI_Proc_ReadEDIDBlock);
-
-#if defined (CEC_SUPPORT)
-EXPORT_SYMBOL(DRV_HDMI_CECStatus);
-EXPORT_SYMBOL(HI_DRV_HDMI_Open);
-EXPORT_SYMBOL(HI_DRV_HDMI_Close);
-#endif
-#endif
-
 /****************************************************************/
 HI_S32 hdmi_ExtIoctl(unsigned int cmd, void *argp)
 {
@@ -757,13 +737,33 @@ void hdmi_MCE_ProcHotPlug(HI_HANDLE hHdmi)
 {
     HI_S32          ret = HI_SUCCESS;
     //HI_UNF_HDMI_ATTR_S             stHdmiAttr;
-    HDMI_SINK_CAPABILITY_S stSinkCap;
+    //HDMI_SINK_CAPABILITY_S stSinkCap;
+    HI_UNF_EDID_BASE_INFO_S *pSinkCap = DRV_Get_SinkCap(HI_UNF_HDMI_ID_0);
     HDMI_PORT_ATTR_S stHDMIPortAttr;
     HDMI_APP_ATTR_S *pstAppAttr;
     HDMI_START_S stHDMIStart;
+    HDMI_STATUS_S stHdmiStatus;
 
     DEBUG_PRINTK("\n---HDMI kernel event(no UserCallBack): HOTPLUG. --- \n"); 
 
+    memset(&stHdmiStatus,0,sizeof(HDMI_STATUS_S));
+    stHdmiStatus.enHdmi = hHdmi;
+    ret = hdmi_ExtIoctl(CMD_HDMI_GET_STATUS, &stHdmiStatus);
+    if (ret != HI_SUCCESS)
+    {
+        HI_ERR_HDMI("Get HDMI Status err!\n"); //759
+	    return ;
+    }
+
+    if (HI_FALSE == stHdmiStatus.stStatus.bConnected)
+    {
+       HI_ERR_HDMI("No Connect!\n");
+       return;
+    }
+
+    HI_INFO_HDMI("Connect !\n"); //769
+
+#if 0
     memset(&stSinkCap,0,sizeof(HDMI_SINK_CAPABILITY_S));
     stSinkCap.enHdmi = hHdmi;
 
@@ -783,6 +783,7 @@ void hdmi_MCE_ProcHotPlug(HI_HANDLE hHdmi)
     }
 
     HI_INFO_HDMI("Connect !\n");
+#endif
 
     memset(&stHDMIPortAttr, 0, sizeof(HDMI_PORT_ATTR_S));
     stHDMIPortAttr.enHdmi = hHdmi;
@@ -792,18 +793,21 @@ void hdmi_MCE_ProcHotPlug(HI_HANDLE hHdmi)
 	    HI_ERR_HDMI("Get hdmi attr err!\n");
 	    return ;
     }
-    HI_INFO_HDMI("hdmi_ExtIoctl CMD_HDMI_GET_ATTR ok! \n");
+    HI_INFO_HDMI("hdmi_ExtIoctl CMD_HDMI_GET_ATTR ok! \n"); //799
 
 
     pstAppAttr = &stHDMIPortAttr.stHdmiAppAttr;
 
-    if(HI_TRUE == stSinkCap.SinkCap.bIsRealEDID)
+//    if(HI_TRUE == stSinkCap.SinkCap.bIsRealEDID)
+    if(DRV_Get_IsValidSinkCap(HI_UNF_HDMI_ID_0))
     {
         //stHdmiAttr.enVidOutMode = HI_UNF_HDMI_VIDEO_MODE_YCBCR444;
-        if(HI_TRUE == stSinkCap.SinkCap.bSupportHdmi)
+//        if(HI_TRUE == stSinkCap.SinkCap.bSupportHdmi)
+        if(HI_TRUE == pSinkCap->bSupportHdmi)
         {
             pstAppAttr->bEnableHdmi = HI_TRUE;
-            if(HI_TRUE != stSinkCap.SinkCap.bSupportYCbCr)
+//            if(HI_TRUE != stSinkCap.SinkCap.bSupportYCbCr)
+            if(HI_TRUE != pSinkCap->stColorSpace.bYCbCr444)
             {
                 pstAppAttr->enVidOutMode = HI_UNF_HDMI_VIDEO_MODE_RGB444;
             }
@@ -813,6 +817,17 @@ void hdmi_MCE_ProcHotPlug(HI_HANDLE hHdmi)
             pstAppAttr->enVidOutMode = HI_UNF_HDMI_VIDEO_MODE_RGB444;
             //��ȡ����edid�����Ҳ�֧��hdmi�����dviģʽ
             //read real edid ok && sink not support hdmi,then we run in dvi mode
+            pstAppAttr->bEnableHdmi = HI_FALSE;
+        }
+    }
+    else
+    {
+        if(DRV_Get_DefaultOutputMode(HI_UNF_HDMI_ID_0) != HI_UNF_HDMI_DEFAULT_ACTION_DVI)
+        {
+            pstAppAttr->bEnableHdmi = HI_TRUE;
+        }
+        else
+        {
             pstAppAttr->bEnableHdmi = HI_FALSE;
         }
     }
@@ -830,6 +845,7 @@ void hdmi_MCE_ProcHotPlug(HI_HANDLE hHdmi)
         pstAppAttr->bEnableVideo = HI_TRUE;
         pstAppAttr->bEnableAudInfoFrame = HI_FALSE;
         pstAppAttr->bEnableAviInfoFrame = HI_FALSE;
+        pstAppAttr->enVidOutMode = HI_UNF_HDMI_VIDEO_MODE_RGB444;
     }
 
 
@@ -838,7 +854,7 @@ void hdmi_MCE_ProcHotPlug(HI_HANDLE hHdmi)
     {
 	    HI_ERR_HDMI("set attr err!:0x%x\n", ret);
     }
-    HI_INFO_HDMI("hdmi_ExtIoctl CMD_HDMI_SET_ATTR ok! \n");
+    HI_INFO_HDMI("hdmi_ExtIoctl CMD_HDMI_SET_ATTR ok! \n"); //857
 
     // 9
     memset(&stHDMIStart, 0, sizeof(HDMI_START_S));
@@ -849,375 +865,42 @@ void hdmi_MCE_ProcHotPlug(HI_HANDLE hHdmi)
 	    HI_ERR_HDMI("hdmi startup  err!:0x%x\n",ret);
 	    return ;
     }
-    HI_INFO_HDMI("hdmi_ExtIoctl CMD_HDMI_START ok! \n");
+    HI_INFO_HDMI("hdmi_ExtIoctl CMD_HDMI_START ok! \n"); //868
     return;
 }
 
-
-#if 0
-void hdmi_MCE_ProcHotPlug(HI_HANDLE hHdmi)
+//for O5
+HI_S32 HI_DRV_HDMI_ExtIoctl(unsigned int cmd, void *argp)
 {
-    HI_S32 ret = HI_SUCCESS;
-    HDMI_PORT_ATTR_S stHDMIPortAttr;
-	HDMI_ATTR_S stHDMIAttr;
-    DISP_FORMAT_S dispFmt;
-    HDMI_START_S stHDMIStart;
-    HDMI_INFORFRAME_S stInfoFrame;
-    HDMI_SINK_CAPABILITY_S stSinkCap;
-    HI_UNF_HDMI_ASPECT_RATIO_E  enAspectRate;
-    HI_UNF_HDMI_VIDEO_MODE_E  enVidOutMode;
-    HI_UNF_HDMI_COLORSPACE_E  enColorimetry;
-    HI_UNF_HDMI_AVI_INFOFRAME_VER2_S *pstAVIInfoframe;
-    HI_UNF_HDMI_AUD_INFOFRAME_VER1_S *pstAUDInfoframe;
-    static HI_BOOL OuptutAlready = HI_FALSE;
-    HI_BOOL     bHDMIMode = HI_TRUE;
-    
-    if (HI_FALSE == OuptutAlready)
-        OuptutAlready = HI_TRUE;
-    else
-        HI_INFO_HDMI("Output already\n");
-
-
-
-    DEBUG_PRINTK("\n ---HDMI kernel event(no UserCallBack): HOTPLUG. --- \n"); 
-
-    memset(&stSinkCap,0,sizeof(HDMI_SINK_CAPABILITY_S));
-    stSinkCap.enHdmi = hHdmi;
-
-    ret = hdmi_ExtIoctl(CMD_HDMI_SINK_CAPABILITY, &stSinkCap);
-    if (ret != HI_SUCCESS)
-    {
-        HI_ERR_HDMI("Get SINK_CAPABILITY err!\n");
-	    return ;
-    }
-
-    HI_INFO_HDMI("hdmi_ExtIoctl CMD_HDMI_SINK_CAPABILITY ok! \n");
-
-    if (HI_FALSE == stSinkCap.SinkCap.bConnected)
-    {
-       HI_ERR_HDMI("No Connect!\n");
-       return;
-    }
-
-    HI_INFO_HDMI("Connect !\n");
-
-    memset(&stHDMIPortAttr, 0, sizeof(HDMI_ATTR_S));
-    stHDMIPortAttr.enHdmi = hHdmi;
-    ret = hdmi_ExtIoctl(CMD_HDMI_GET_ATTR, &stHDMIPortAttr);
-    if (ret != HI_SUCCESS)
-    {
-	    HI_ERR_HDMI("Get hdmi attr err!\n");
-	    return ;
-    }
-    HI_INFO_HDMI("hdmi_ExtIoctl CMD_HDMI_GET_ATTR ok! \n");
-
-	
-	stHDMIAttr = stHDMIPortAttr.stHDMIAttr;
-
-    dispFmt.enDisp = HI_UNF_DISPLAY1;
-    
-    //printk("====> before get Fmt %d \n",dispFmt.enFormat);
-    if(disp_func_ops && disp_func_ops->pfnDispGetFormat)
-    {
-        disp_func_ops->pfnDispGetFormat(HI_UNF_DISPLAY1, &dispFmt.enFormat);
-        //printk("====> getting Fmt %d \n",dispFmt.enFormat);
-    }
-    else
-    {
-        HI_ERR_HDMI("Can't get disp fmt!\n");
-	    return;
-    }
-
-    if(dispFmt.enFormat == HI_DRV_DISP_FMT_1440x480i_60)
-    {
-        dispFmt.enFormat = HI_DRV_DISP_FMT_NTSC;
-    }
-    else if(dispFmt.enFormat == HI_DRV_DISP_FMT_1440x576i_50)
-    {
-        dispFmt.enFormat = HI_DRV_DISP_FMT_PAL;
-    }
-    else if(dispFmt.enFormat == HI_DRV_DISP_FMT_1080P_24_FP)
-    {
-        dispFmt.enFormat = HI_DRV_DISP_FMT_1080P_24;
-        stHDMIAttr.stVideoAttr.b3DEnable = HI_TRUE;
-        stHDMIAttr.stVideoAttr.u83DParam = HI_UNF_3D_FRAME_PACKETING;
-    }
-    else if(dispFmt.enFormat == HI_DRV_DISP_FMT_720P_60_FP)
-    {
-        dispFmt.enFormat = HI_DRV_DISP_FMT_720P_60;
-        stHDMIAttr.stVideoAttr.b3DEnable = HI_TRUE;
-        stHDMIAttr.stVideoAttr.u83DParam = HI_UNF_3D_FRAME_PACKETING;
-    }
-    else if(dispFmt.enFormat == HI_DRV_DISP_FMT_720P_50_FP)
-    {
-        dispFmt.enFormat = HI_DRV_DISP_FMT_720P_50;
-        stHDMIAttr.stVideoAttr.b3DEnable = HI_TRUE;
-        stHDMIAttr.stVideoAttr.u83DParam = HI_UNF_3D_FRAME_PACKETING;
-    }
-    //printk("====> after get Fmt %d \n",dispFmt.enFormat);
-
-#if 0 /*--NO MODIFY : COMMENT BY CODINGPARTNER--*/
-    //printk("===>hdmi fmt : %d    ===>disp fmt %d \n",stHDMIPortAttr.stHDMIAttr.stAttr.enVideoFmt,dispFmt.enFormat);
-    if((stHDMIPortAttr.stHDMIAttr.stAttr.enVideoFmt == dispFmt.enFormat) && bOpenFirstTime)
-    {
-        //printk("@@@@@@@@@  open smooth @@@@@@@@\n");
-        return;
-    }
-#endif /*--NO MODIFY : COMMENT BY CODINGPARTNER--*/
-   
-    if (HI_TRUE != stSinkCap.SinkCap.bVideoFmtSupported[hdmi_Disp2EncFmt(dispFmt.enFormat)])
-    {
-	    DEBUG_PRINTK("\nWarrring:From EDID, Sink CAN NOT receive this format:%d***\n", dispFmt.enFormat);
-    }
-    // 4 
-    if (HI_TRUE == stSinkCap.SinkCap.bSupportYCbCr)
-    {
-	    enVidOutMode = HI_UNF_HDMI_VIDEO_MODE_YCBCR444;
-    }
-    else
-    {
-	    enVidOutMode = HI_UNF_HDMI_VIDEO_MODE_RGB444;
-    }
-    // 5
-    enColorimetry = HDMI_COLORIMETRY_ITU709;
-    enAspectRate  = HI_UNF_HDMI_ASPECT_RATIO_16TO9;
-    if (HI_TRUE == stSinkCap.SinkCap.bSupportHdmi)
-    {
-	    // 5.1.1 New function to set AVI Infoframe 
-	    memset(&stInfoFrame, 0, sizeof(HDMI_INFORFRAME_S));
-	    stInfoFrame.enHdmi = hHdmi;
-	    stInfoFrame.enInfoFrameType = HI_INFOFRAME_TYPE_AVI;
-	    ret = hdmi_ExtIoctl(CMD_HDMI_GET_INFORFRAME, &stInfoFrame);
-	    if (ret != HI_SUCCESS)
-	    {
-		    HI_ERR_HDMI("Get infoframe err!\n");
-		    return ;
-	    }
-	    HI_INFO_HDMI("hdmi_ExtIoctl CMD_DISP_GET_FORMAT ok! \n");
-	    stInfoFrame.InfoFrame.enInfoFrameType = HI_INFOFRAME_TYPE_AVI;
-	    // 5.1.2 
-	    pstAVIInfoframe = (HI_UNF_HDMI_AVI_INFOFRAME_VER2_S *)&(stInfoFrame.InfoFrame.unInforUnit.stAVIInfoFrame);
-
-	    pstAVIInfoframe->u32PixelRepetition      = HI_FALSE;
-	    if(HI_DRV_DISP_FMT_1080P_60 == dispFmt.enFormat)
-	    {
-		    pstAVIInfoframe->enTimingMode = hdmi_Disp2EncFmt(dispFmt.enFormat);
-	    }
-	    else if(HI_DRV_DISP_FMT_1080P_50 == dispFmt.enFormat)
-	    {
-		    pstAVIInfoframe->enTimingMode = hdmi_Disp2EncFmt(dispFmt.enFormat);
-	    }
-	    else if(HI_DRV_DISP_FMT_1080P_30 == dispFmt.enFormat)
-	    {
-		    pstAVIInfoframe->enTimingMode = hdmi_Disp2EncFmt(dispFmt.enFormat);
-	    }
-	    else if(HI_DRV_DISP_FMT_1080P_25 == dispFmt.enFormat)
-	    {
-		    pstAVIInfoframe->enTimingMode = hdmi_Disp2EncFmt(dispFmt.enFormat);
-	    }
-	    else if(HI_DRV_DISP_FMT_1080P_24 == dispFmt.enFormat)
-	    {
-		    pstAVIInfoframe->enTimingMode = hdmi_Disp2EncFmt(dispFmt.enFormat);
-	    }
-	    else if(HI_DRV_DISP_FMT_1080i_60 == dispFmt.enFormat)
-	    {
-		    pstAVIInfoframe->enTimingMode = hdmi_Disp2EncFmt(dispFmt.enFormat);
-	    }
-	    else if(HI_DRV_DISP_FMT_1080i_50 == dispFmt.enFormat)
-	    {
-		    pstAVIInfoframe->enTimingMode = hdmi_Disp2EncFmt(dispFmt.enFormat);
-	    }
-	    else if(HI_DRV_DISP_FMT_720P_60 == dispFmt.enFormat)
-	    {
-		    pstAVIInfoframe->enTimingMode = hdmi_Disp2EncFmt(dispFmt.enFormat);
-	    }
-	    else if(HI_DRV_DISP_FMT_720P_50 == dispFmt.enFormat)
-	    {
-		    pstAVIInfoframe->enTimingMode = hdmi_Disp2EncFmt(dispFmt.enFormat);
-	    }
-	    else if(HI_DRV_DISP_FMT_576P_50 == dispFmt.enFormat)
-	    {
-		    pstAVIInfoframe->enTimingMode = hdmi_Disp2EncFmt(dispFmt.enFormat);
-		    enColorimetry = HDMI_COLORIMETRY_ITU601;
-		    enAspectRate  = HI_UNF_HDMI_ASPECT_RATIO_4TO3; 
-		    if (pstAVIInfoframe->enAspectRatio == HI_UNF_HDMI_ASPECT_RATIO_16TO9)
-		    {
-			    enAspectRate = HI_UNF_HDMI_ASPECT_RATIO_16TO9;
-		    }
-	    }
-	    else if(HI_DRV_DISP_FMT_480P_60 == dispFmt.enFormat)
-	    {
-		    pstAVIInfoframe->enTimingMode = hdmi_Disp2EncFmt(dispFmt.enFormat);
-		    enColorimetry = HDMI_COLORIMETRY_ITU601;
-		    enAspectRate  = HI_UNF_HDMI_ASPECT_RATIO_4TO3;
-		    if (pstAVIInfoframe->enAspectRatio == HI_UNF_HDMI_ASPECT_RATIO_16TO9)
-		    {
-			    enAspectRate = HI_UNF_HDMI_ASPECT_RATIO_16TO9;
-		    }
-	    }
-	    else if((HI_DRV_DISP_FMT_PAL == dispFmt.enFormat)||
-	            (HI_DRV_DISP_FMT_PAL_Nc == dispFmt.enFormat)||
-		    (HI_DRV_DISP_FMT_PAL_N == dispFmt.enFormat)||
-		    (HI_DRV_DISP_FMT_SECAM_SIN == dispFmt.enFormat)||
-		    (HI_DRV_DISP_FMT_SECAM_COS == dispFmt.enFormat)
-		   )
-	    {
-		    pstAVIInfoframe->enTimingMode = hdmi_Disp2EncFmt(dispFmt.enFormat);
-		    enColorimetry = HDMI_COLORIMETRY_ITU601;
-		    enAspectRate  = HI_UNF_HDMI_ASPECT_RATIO_4TO3;
-		    if (pstAVIInfoframe->enAspectRatio == HI_UNF_HDMI_ASPECT_RATIO_16TO9)
-		    {
-			    /*the ratio mustn't force to change when setting 576p_50 16:9 before hotplug *//*CNcomment:�Ȳ����ǰ���õ���576p_50 16:9��ģʽ������Ҫǿ�Ƹı� */
-			    enAspectRate = HI_UNF_HDMI_ASPECT_RATIO_16TO9;
-		    }
-		    pstAVIInfoframe->u32PixelRepetition      = HI_TRUE;
-	    }
-	    else if((HI_DRV_DISP_FMT_NTSC == dispFmt.enFormat)||
-		    (HI_DRV_DISP_FMT_NTSC_J == dispFmt.enFormat)||
-		    (HI_DRV_DISP_FMT_NTSC_443 == dispFmt.enFormat))
-	    {
-		    pstAVIInfoframe->enTimingMode = hdmi_Disp2EncFmt(dispFmt.enFormat);
-		    enColorimetry = HDMI_COLORIMETRY_ITU601;
-		    enAspectRate  = HI_UNF_HDMI_ASPECT_RATIO_4TO3; 
-		    if (pstAVIInfoframe->enAspectRatio == HI_UNF_HDMI_ASPECT_RATIO_16TO9)
-		    {
-			    enAspectRate = HI_UNF_HDMI_ASPECT_RATIO_16TO9;
-		    }
-		    pstAVIInfoframe->u32PixelRepetition      = HI_TRUE;
-	    }
-	    else if(HI_DRV_DISP_FMT_861D_640X480_60 == dispFmt.enFormat)
-	    {
-		    pstAVIInfoframe->enTimingMode = hdmi_Disp2EncFmt(dispFmt.enFormat);
-		    enColorimetry = HDMI_COLORIMETRY_ITU601;
-		    enAspectRate  = HI_UNF_HDMI_ASPECT_RATIO_4TO3;
-	    }
-#if defined (DVI_SUPPORT)
-	    else if ((HI_DRV_DISP_FMT_VESA_800X600_60 <= dispFmt.enFormat) && (HI_DRV_DISP_FMT_BUTT > dispFmt.enFormat))
-	    {
-		    DEBUG_PRINTK("Warring:DVI timing mode enTimingMode:0x%x\n", pstAVIInfoframe->enTimingMode);
-		    pstAVIInfoframe->enTimingMode = hdmi_Disp2EncFmt(HI_DRV_DISP_FMT_861D_640X480_60); //AVI is useless in DVI format
-		    enColorimetry = HDMI_COLORIMETRY_ITU601;
-		    enAspectRate  = HI_UNF_HDMI_ASPECT_RATIO_4TO3;
-		    enVidOutMode  = HI_UNF_HDMI_VIDEO_MODE_RGB444;
-		    //bHDMIMode     = HI_FALSE;
-	    }
-#endif
-	    else{
-		    DEBUG_PRINTK("***Error: Unsupport Video timing:0x%x\n***", dispFmt.enFormat);
-	    }
-
-	    // 5.1.3 Deal with xvYCC MODE
-	    if (HI_TRUE == stHDMIAttr.stVideoAttr.bxvYCCMode)
-	    {
-		    if (HDMI_COLORIMETRY_ITU601 == enColorimetry)
-		    {
-			    enColorimetry = HDMI_COLORIMETRY_XVYCC_601;
-		    }
-		    else if (HDMI_COLORIMETRY_ITU709 == enColorimetry)
-		    {
-			    enColorimetry = HDMI_COLORIMETRY_XVYCC_709;
-		    }
-	    }
-	    // 5.1.4
-	    pstAVIInfoframe->enOutputType            = enVidOutMode;
-	    pstAVIInfoframe->bActive_Infor_Present   = HI_TRUE;
-	    pstAVIInfoframe->enBarInfo               = HDMI_BAR_INFO_NOT_VALID;
-	    pstAVIInfoframe->enScanInfo              = HDMI_SCAN_INFO_NO_DATA;//HDMI_SCAN_INFO_OVERSCANNED;
-	    pstAVIInfoframe->enColorimetry           = enColorimetry;
-	    pstAVIInfoframe->enAspectRatio           = enAspectRate;
-	    pstAVIInfoframe->enActiveAspectRatio     = enAspectRate;
-	    pstAVIInfoframe->enPictureScaling        = HDMI_PICTURE_NON_UNIFORM_SCALING;
-	    pstAVIInfoframe->enRGBQuantization       = HDMI_RGB_QUANTIZATION_DEFAULT_RANGE;
-	    pstAVIInfoframe->bIsITContent            = HI_FALSE;
-	    pstAVIInfoframe->u32LineNEndofTopBar     = 0;  /* We can determine it in hi_unf_hdmi.c */
-	    pstAVIInfoframe->u32LineNStartofBotBar   = 0;  /* We can determine it in hi_unf_hdmi.c */
-	    pstAVIInfoframe->u32PixelNEndofLeftBar   = 0;  /* We can determine it in hi_unf_hdmi.c */
-	    pstAVIInfoframe->u32PixelNStartofRightBar= 0;  /* We can determine it in hi_unf_hdmi.c */
-	    // 5.1.5
-
-	    ret = hdmi_ExtIoctl(CMD_HDMI_SET_INFORFRAME, &stInfoFrame);
-	    if (ret != HI_SUCCESS)
-	    {
-		    HI_ERR_HDMI("set infoframe err!:0x%x\n",ret);
-		    return ;
-	    }
-	    HI_INFO_HDMI("hdmi_ExtIoctl CMD_HDMI_SET_INFORFRAME ok! \n");
-	    // 5.1.6 audio
-	    memset(&stInfoFrame, 0, sizeof(HDMI_INFORFRAME_S));
-	    stInfoFrame.enHdmi                    = hHdmi;
-	    stInfoFrame.enInfoFrameType           = HI_INFOFRAME_TYPE_AUDIO;
-	    stInfoFrame.InfoFrame.enInfoFrameType = HI_INFOFRAME_TYPE_AUDIO;
-	    pstAUDInfoframe = (HI_UNF_HDMI_AUD_INFOFRAME_VER1_S *)&(stInfoFrame.InfoFrame.unInforUnit.stAUDInfoFrame);
-	    pstAUDInfoframe->u32ChannelCount      = 2;
-	    pstAUDInfoframe->enCodingType         = HDMI_AUDIO_CODING_REFER_STREAM_HEAD;
-	    pstAUDInfoframe->u32SampleSize        = HI_UNF_HDMI_DEFAULT_SETTING;
-	    pstAUDInfoframe->u32SamplingFrequency = HI_UNF_HDMI_DEFAULT_SETTING;
-	    pstAUDInfoframe->u32ChannelAlloc      = 0;
-	    pstAUDInfoframe->u32LevelShift        = 0;
-	    pstAUDInfoframe->u32DownmixInhibit    = HI_FALSE;
-	    // 5.1.7
-        
-	    ret = hdmi_ExtIoctl(CMD_HDMI_SET_INFORFRAME, &stInfoFrame);
-	    if (ret != HI_SUCCESS)
-	    {
-		    HI_ERR_HDMI("set infoframe err!:0x%x\n", ret);
-	    }
-	    HI_INFO_HDMI("hdmi_ExtIoctl CMD_HDMI_SET_INFORFRAME ok! \n");
-	    // 5.1.8
-	    stHDMIAttr.stVideoAttr.bEnableHdmi         = bHDMIMode;
-	    stHDMIAttr.stVideoAttr.bEnableAviInfoFrame = HI_TRUE;
-	    stHDMIAttr.stAudioAttr.bEnableAudInfoFrame = HI_TRUE;
-	    // Default we set audio below parm 
-	    stHDMIAttr.stVideoAttr.bEnableVideo       = HI_TRUE;
-	    stHDMIAttr.stAudioAttr.bEnableAudio       = HI_TRUE;
-	    stHDMIAttr.stAudioAttr.bIsMultiChannel    = HI_FALSE;
-	    stHDMIAttr.stAudioAttr.enSampleRate       = HI_UNF_SAMPLE_RATE_48K;
-	    stHDMIAttr.stAudioAttr.enBitDepth         = 16;
-	    stHDMIAttr.stAudioAttr.enSoundIntf        = HDMI_AUDIO_INTERFACE_I2S;
-	    stHDMIAttr.stAudioAttr.u8I2SCtlVbit       = HI_FALSE;
-    }
-    else
-    {
-	    stHDMIAttr.stVideoAttr.bEnableHdmi         = HI_FALSE;
-	    stHDMIAttr.stVideoAttr.bEnableVideo        = HI_TRUE;
-	    stHDMIAttr.stAudioAttr.bEnableAudio        = HI_FALSE;
-	    stHDMIAttr.stVideoAttr.bEnableAviInfoFrame = HI_FALSE;
-	    stHDMIAttr.stAudioAttr.bEnableAudInfoFrame = HI_FALSE;
-	    DEBUG_PRINTK("DVI output CSC:RGB444 \n");
-	    enVidOutMode = HI_UNF_HDMI_VIDEO_MODE_RGB444;
-    }
-
-    // 6 Default we set video below parm 
-    stHDMIAttr.stVideoAttr.enVideoFmt         = dispFmt.enFormat;
-    stHDMIAttr.stVideoAttr.enVidOutMode       = enVidOutMode;
-    stHDMIAttr.stVideoAttr.enDeepColorMode    = HI_UNF_HDMI_DEEP_COLOR_OFF;
-    // 7 Other inforframe Flag 
-    stHDMIAttr.stVideoAttr.bEnableSpdInfoFrame = HI_FALSE;
-    stHDMIAttr.stVideoAttr.bEnableMpegInfoFrame= HI_FALSE;
-    stHDMIAttr.stVideoAttr.bDebugFlag          = HI_FALSE;
-    stHDMIAttr.stVideoAttr.bHDCPEnable= HI_FALSE;
-	stHDMIPortAttr.stHDMIAttr = stHDMIAttr;
-    // 8  setAttr must before start
-    
-    ret = hdmi_ExtIoctl(CMD_HDMI_SET_ATTR, &stHDMIPortAttr);
-    if (ret != HI_SUCCESS)
-    {
-	    HI_ERR_HDMI("set attr err!:0x%x\n", ret);
-    }
-    HI_INFO_HDMI("hdmi_ExtIoctl CMD_HDMI_SET_ATTR ok! \n");
-    // 9
-    memset(&stHDMIStart, 0, sizeof(HDMI_START_S));
-    stHDMIStart.enHdmi = hHdmi;
-    ret = hdmi_ExtIoctl(CMD_HDMI_START, &stHDMIStart);
-    if (ret != HI_SUCCESS)
-    {
-	    HI_ERR_HDMI("hdmi startup  err!:0x%x\n",ret);
-	    return ;
-    }
-    HI_INFO_HDMI("hdmi_ExtIoctl CMD_HDMI_START ok! \n");
-    return;
+    HI_S32 s32Ret = HI_SUCCESS;
+    s32Ret = hdmi_ExtIoctl(cmd, argp);
+    return s32Ret;
 }
-#endif
+//for 05
+HI_S32  HI_DRV_HDMI_GetCECAddr(HI_U32 *pcec_addr)
+{
+    HI_UNF_HDMI_CEC_STATUS_S     *pstCECStatus;
+    HDMI_CHN_ATTR_S *pstHdmiChnParam;
+    pstHdmiChnParam = DRV_Get_ChnAttr();
+    if (pstHdmiChnParam[0].bCECStart == HI_FALSE)
+        return HI_FAILURE;
+
+    pstCECStatus = &(pstHdmiChnParam[0].stCECStatus);
+    *pcec_addr = pstCECStatus->u8LogicalAddr;
+
+    return HI_SUCCESS;
+}
+//for 05
+HI_VOID HI_DRV_HDMI_ProcHotPlug(HI_HANDLE hHdmi)
+{
+    hdmi_MCE_ProcHotPlug(hHdmi);
+}
+//for 05
+HI_S32 HI_DRV_HDMI_GetBinInfoFrame(HI_UNF_HDMI_INFOFRAME_TYPE_E enInfoFrameType,void *infor_ptr)
+{
+    DRV_O5_HDMI_GetBinInfoFrame(enInfoFrameType,infor_ptr);
+    return 0;
+}
 
 
 HI_S32 HI_DRV_HDMI_Open(HI_UNF_HDMI_ID_E enHdmi)
@@ -1234,17 +917,17 @@ HI_S32 HI_DRV_HDMI_Open(HI_UNF_HDMI_ID_E enHdmi)
     ret = hdmi_ExtIoctl(CMD_HDMI_INIT, &stHDMIInit);
     if (ret != HI_SUCCESS)
     {
-	    HI_ERR_HDMI("hdmi init err!:0x%x\n",ret);
+	    HI_ERR_HDMI("hdmi init err!:0x%x\n",ret); //920
 	    return HI_FAILURE;
     }
-    HI_INFO_HDMI("hdmi_ExtIoctl CMD_HDMI_INIT ok! \n");
+    HI_INFO_HDMI("hdmi_ExtIoctl CMD_HDMI_INIT ok! \n"); //923
 
     if(g_KernelProcID == HI_INVALID_HANDLE)
     {
         ret = hdmi_ExtIoctl(CMD_HDMI_GET_PROCID, &stHDMIProcIDOpen);
         if (ret != HI_SUCCESS)
         {
-    	    HI_ERR_HDMI("Error:HDMI Process is full,can't get process ID:0x%x\n",ret);
+    	    HI_ERR_HDMI("Error:HDMI Process is full,can't get process ID:0x%x\n",ret); //930
     	    return HI_FAILURE;
         }
         g_KernelProcID = stHDMIProcIDOpen.u32ProcID;      
@@ -1259,10 +942,10 @@ HI_S32 HI_DRV_HDMI_Open(HI_UNF_HDMI_ID_E enHdmi)
     ret = hdmi_ExtIoctl(CMD_HDMI_OPEN, &stHDMIOpen);
     if (ret != HI_SUCCESS)
     {
-	    HI_ERR_HDMI("hdmi open err!:0x%x\n",ret);
+	    HI_ERR_HDMI("hdmi open err!:0x%x\n",ret); //945
 	    return HI_FAILURE;
     }
-    HI_INFO_HDMI("hdmi_ExtIoctl CMD_HDMI_OPEN ok! \n");
+    HI_INFO_HDMI("hdmi_ExtIoctl CMD_HDMI_OPEN ok! \n"); //948
 
     return HI_SUCCESS;   
 }
@@ -1281,7 +964,7 @@ HI_S32 HI_DRV_HDMI_Close(HI_UNF_HDMI_ID_E enHdmi)
     ret = hdmi_ExtIoctl(CMD_HDMI_STOP, &stHDMIStop);
     if (ret != HI_SUCCESS)
     {
-       HI_ERR_HDMI("hdmi stop err!:0x%x\n",ret);
+       HI_ERR_HDMI("hdmi stop err!:0x%x\n",ret); //967
        return HI_FAILURE;
     }
     HI_INFO_HDMI("hdmi_ExtIoctl CMD_HDMI_STOP ok! \n");
@@ -1292,7 +975,7 @@ HI_S32 HI_DRV_HDMI_Close(HI_UNF_HDMI_ID_E enHdmi)
     ret = hdmi_ExtIoctl(CMD_HDMI_CLOSE, &stHDMIClose);
     if (ret != HI_SUCCESS)
     {
-       HI_ERR_HDMI("hdmi close err!:0x%x\n",ret);
+       HI_ERR_HDMI("hdmi close err!:0x%x\n",ret); //978
        return HI_FAILURE;
     }
     HI_INFO_HDMI("hdmi_ExtIoctl CMD_HDMI_CLOSE ok! \n");
@@ -1302,7 +985,7 @@ HI_S32 HI_DRV_HDMI_Close(HI_UNF_HDMI_ID_E enHdmi)
     ret = hdmi_ExtIoctl(CMD_HDMI_DEINIT, &stHDMIDeinit);
     if (ret != HI_SUCCESS)
     {
-       HI_ERR_HDMI("hdmi deinit err!:0x%x\n",ret);
+       HI_ERR_HDMI("hdmi deinit err!:0x%x\n",ret); //988
        return HI_FAILURE;
     }
     HI_INFO_HDMI("hdmi_ExtIoctl CMD_HDMI_DEINIT ok! \n");
@@ -1313,11 +996,11 @@ HI_S32 HI_DRV_HDMI_Close(HI_UNF_HDMI_ID_E enHdmi)
     ret = hdmi_ExtIoctl(CMD_HDMI_RELEASE_PROCID, &stHDMIProcIDRelease);
     if (ret != HI_SUCCESS)
     {
-        HI_ERR_HDMI("hdmi release proc id err!:0x%x\n",ret);
+        HI_ERR_HDMI("hdmi release proc id err!:0x%x\n",ret); //999
         return HI_FAILURE;
     }
     g_KernelProcID = HI_INVALID_HANDLE;
-    HI_INFO_HDMI("hdmi_ExtIoctl CMD_HDMI_RELEASE_PROCID ok! \n");
+    HI_INFO_HDMI("hdmi_ExtIoctl CMD_HDMI_RELEASE_PROCID ok! \n"); //1003
     
     return HI_SUCCESS; 
 }
@@ -1366,8 +1049,9 @@ HI_S32 HI_DRV_AO_HDMI_GetAttr(HI_UNF_HDMI_ID_E enHdmi, HDMI_AUDIO_ATTR_S *pstHDM
     return s32Ret;
 }
 
-HI_S32 HI_DRV_HDMI_GetSinkCapability(HI_UNF_HDMI_ID_E enHdmi, HI_UNF_HDMI_SINK_CAPABILITY_S *pstSinkCap)
+HI_S32 HI_DRV_HDMI_GetSinkCapability(HI_UNF_HDMI_ID_E enHdmi, /*HI_UNF_HDMI_SINK_CAPABILITY_S*/HI_UNF_EDID_BASE_INFO_S *pstSinkCap)
 {
+#if 0
     HI_S32   s32Ret = HI_SUCCESS;
     HDMI_SINK_CAPABILITY_S stSinkcap;
     memset(&stSinkcap,0,sizeof(HDMI_SINK_CAPABILITY_S));
@@ -1375,10 +1059,25 @@ HI_S32 HI_DRV_HDMI_GetSinkCapability(HI_UNF_HDMI_ID_E enHdmi, HI_UNF_HDMI_SINK_C
     s32Ret = hdmi_ExtIoctl(CMD_HDMI_SINK_CAPABILITY, &stSinkcap);
     *pstSinkCap = stSinkcap.SinkCap;
     return s32Ret;
+#endif
+
+    HI_UNF_EDID_BASE_INFO_S *pSinkCap = DRV_Get_SinkCap(HI_UNF_HDMI_ID_0);
+    memcpy(pstSinkCap,pSinkCap,sizeof(HI_UNF_EDID_BASE_INFO_S));
+
+    if(!DRV_Get_IsValidSinkCap(HI_UNF_HDMI_ID_0))
+    {
+    	HI_INFO_HDMI("Invalid Sink capability \n"); //1069
+        return HI_FAILURE;
+    }
+    else
+    {
+        return HI_SUCCESS;
+    }
 }
 
-HI_S32 HI_DRV_HDMI_GetAudioCapability(HI_UNF_HDMI_ID_E enHdmi, HDMI_AUDIO_CAPABILITY_S *pstAudCap)
+HI_S32 HI_DRV_HDMI_GetAudioCapability(HI_UNF_HDMI_ID_E enHdmi, /*HDMI_AUDIO_CAPABILITY_S*/HI_DRV_HDMI_AUDIO_CAPABILITY_S *pstAudCap)
 {
+#if 0
     HI_S32   s32Ret = HI_SUCCESS;
     HI_UNF_HDMI_SINK_CAPABILITY_S stSinkCap;
     
@@ -1397,6 +1096,18 @@ HI_S32 HI_DRV_HDMI_GetAudioCapability(HI_UNF_HDMI_ID_E enHdmi, HDMI_AUDIO_CAPABI
     pstAudCap->u8Audio_Latency = stSinkCap.u8Audio_Latency;
            
     return s32Ret;
+#endif
+    HI_DRV_HDMI_AUDIO_CAPABILITY_S *pOldAudioCap = DRV_Get_OldAudioCap();
+
+    if(DRV_Get_IsValidSinkCap(enHdmi))
+    {
+        memcpy(pstAudCap,pOldAudioCap,sizeof(HI_DRV_HDMI_AUDIO_CAPABILITY_S));
+        return HI_SUCCESS;
+    }
+    else
+    {
+        return HI_FAILURE;
+    }
 }
 
 HI_S32 HI_DRV_HDMI_AudioChange(HI_UNF_HDMI_ID_E enHdmi, HDMI_AUDIO_ATTR_S *pstHDMIAOAttr)
@@ -1436,6 +1147,26 @@ HI_S32 HI_DRV_HDMI_SetFormat(HI_UNF_HDMI_ID_E enHdmi, HI_DRV_DISP_FMT_E enFmt, H
     return s32Ret;
 }
 
+HI_S32 HI_DRV_HDMI_Detach(HI_UNF_HDMI_ID_E enHdmi)
+{
+    HI_S32 s32Ret = HI_SUCCESS;
+
+    DRV_Set_ThreadStop(HI_TRUE);
+    s32Ret = HI_DRV_HDMI_PreFormat(enHdmi,HI_DRV_DISP_FMT_BUTT);
+
+    return s32Ret;
+}
+
+HI_S32 HI_DRV_HDMI_Attach(HI_UNF_HDMI_ID_E enHdmi,HI_DRV_DISP_FMT_E enFmt, HI_DRV_DISP_STEREO_E enStereo)
+{
+    HI_S32 s32Ret = HI_SUCCESS;
+
+    s32Ret = HI_DRV_HDMI_SetFormat(enHdmi,enFmt,enStereo);
+    DRV_Set_ThreadStop(HI_FALSE);
+
+    return s32Ret;
+}
+
 HI_S32 HI_DRV_HDMI_GetAttr(HI_UNF_HDMI_ID_E enHdmi, HDMI_APP_ATTR_S *pstAttr)
 {
     HI_S32 s32Ret = HI_SUCCESS;
@@ -1459,19 +1190,29 @@ HI_S32 HI_DRV_HDMI_SetAttr(HI_UNF_HDMI_ID_E enHdmi, HDMI_APP_ATTR_S *pstAttr)
     return s32Ret;
 }
 
-HI_S32 HI_DRV_HDMI_Detach()
-{
-#warning TODO: HI_DRV_HDMI_Detach
+//#ifndef MODULE
 
-	printk("HI_DRV_HDMI_Detach: TODO\n");
-}
-
-HI_S32 HI_DRV_HDMI_Attach()
-{
-#warning TODO: HI_DRV_HDMI_Attach
-
-	printk("HI_DRV_HDMI_Attach: TODO\n");
-}
+EXPORT_SYMBOL(HDMI_DRV_Init);
+EXPORT_SYMBOL(HDMI_DRV_EXIT);
+EXPORT_SYMBOL(hdmi_Open);
+EXPORT_SYMBOL(hdmi_Close);
+EXPORT_SYMBOL(hdmi_Suspend);
+EXPORT_SYMBOL(hdmi_Resume);
+EXPORT_SYMBOL(hdmi_Ioctl);
+EXPORT_SYMBOL(DRV_HDMI_GetAttr);
+//EXPORT_SYMBOL(DRV_ReadByte_8BA);
+EXPORT_SYMBOL(DRV_HDMI_GetSinkCapability);
+EXPORT_SYMBOL(SI_Proc_ReadEDIDBlock);
+EXPORT_SYMBOL(HI_DRV_HDMI_ExtIoctl);
+EXPORT_SYMBOL(HI_DRV_HDMI_GetCECAddr);
+EXPORT_SYMBOL(HI_DRV_HDMI_ProcHotPlug);
+EXPORT_SYMBOL(HI_DRV_HDMI_GetBinInfoFrame);
+#if defined (CEC_SUPPORT)
+EXPORT_SYMBOL(DRV_HDMI_CECStatus);
+EXPORT_SYMBOL(HI_DRV_HDMI_Open);
+EXPORT_SYMBOL(HI_DRV_HDMI_Close);
+#endif
+//#endif
 
 #if 0 /*--NO MODIFY : COMMENT BY CODINGPARTNER--*/
 //������Ҫ��ģ��һ��ע��

@@ -63,7 +63,7 @@ HI_S32 DRV_HDMI_AudioChange(HI_UNF_HDMI_ID_E enHdmi, HDMI_AUDIO_ATTR_S *pstHDMIA
 HI_S32 DRV_HDMI_GetAOAttr(HI_UNF_HDMI_ID_E enHdmi, HDMI_AUDIO_ATTR_S *pstHDMIAOAttr);
 //HI_S32 DRV_HDMI_AdjustInfoFrame(HI_UNF_HDMI_ID_E enHdmi,HI_UNF_HDMI_INFOFRAME_S *pstInfoFrame);
 
-HI_S32 DRV_HDMI_InitNum(HI_UNF_HDMI_ID_E enHdmi);
+HI_S32 DRV_HDMI_GetInitNum(HI_UNF_HDMI_ID_E enHdmi);
 HI_S32 DRV_HDMI_ProcNum(HI_UNF_HDMI_ID_E enHdmi);
 
 HI_S32 DRV_HDMI_SetAPPAttr(HI_UNF_HDMI_ID_E enHdmi,HDMI_APP_ATTR_S *pstHDMIAppAttr,HI_BOOL UpdateFlag);
@@ -71,6 +71,11 @@ HI_S32 DRV_HDMI_SetAOAttr(HI_UNF_HDMI_ID_E enHdmi,HDMI_AUDIO_ATTR_S *pstHDMIAOAt
 HI_S32 DRV_HDMI_SetVOAttr(HI_UNF_HDMI_ID_E enHdmi,HDMI_VIDEO_ATTR_S *pstHDMIVOAttr,HI_BOOL UpdateFlag);
 //HI_S32 DRV_HDMI_SetHDMIAttr(HI_UNF_HDMI_ID_E enHdmi,HI_UNF_HDMI_ATTR_S *pstHDMIAttr);
 //HI_S32 DRV_HDMI_ConfigAttr(HI_UNF_HDMI_ID_E enHdmi);
+HI_S32 DRV_HDMI_GetStatus(HI_UNF_HDMI_ID_E enHdmi, HI_UNF_HDMI_STATUS_S *pHdmiStatus);
+HI_S32 DRV_HDMI_GetDelay(HI_UNF_HDMI_ID_E enHdmi, HI_UNF_HDMI_DELAY_S *pHdmiDelay);
+HI_S32 DRV_HDMI_SetDelay(HI_UNF_HDMI_ID_E enHdmi, HI_UNF_HDMI_DELAY_S *pHdmiDelay);
+HI_VOID DRV_O5_HDMI_PutBinInfoFrame(HI_UNF_HDMI_INFOFRAME_TYPE_E enInfoFrameType,HI_VOID* infor_ptr);
+HI_VOID DRV_O5_HDMI_GetBinInfoFrame(HI_UNF_HDMI_INFOFRAME_TYPE_E enInfoFrameType, HI_VOID *infor_ptr);
 
 HI_UNF_ENC_FMT_E hdmi_Disp2EncFmt(HI_DRV_DISP_FMT_E SrcFmt);
 HI_DRV_DISP_FMT_E hdmi_ENC2DispFmt(HI_UNF_ENC_FMT_E SrcFmt);
@@ -86,9 +91,9 @@ HI_S32 DRV_HDMI_UnRegister(HI_VOID);
 
 typedef enum VIDEO_SAMPLE_TYPE_E_S
 {
-    VIDEO_SAMPLE_TYPE_UNKNOWN,                  /**<Unknown*/ /**<CNcomment: Î´Öª²ÉÑù·½Ê½*/
-    VIDEO_SAMPLE_TYPE_PROGRESSIVE,              /**<Progressive*/ /**<CNcomment: ²ÉÑù·½Ê½ÎªÖðÐÐ*/
-    VIDEO_SAMPLE_TYPE_INTERLACE,                /**<Interlaced*/ /**<CNcomment: ²ÉÑù·½Ê½Îª¸ôÐÐ*/
+    VIDEO_SAMPLE_TYPE_UNKNOWN,                  /**<Unknown*/ /**<CNcomment: Î´Öªï¿½ï¿½ï¿½ï¿½Ê½*/
+    VIDEO_SAMPLE_TYPE_PROGRESSIVE,              /**<Progressive*/ /**<CNcomment: ï¿½ï¿½ï¿½ï¿½Ê½Îªï¿½ï¿½ï¿½ï¿½*/
+    VIDEO_SAMPLE_TYPE_INTERLACE,                /**<Interlaced*/ /**<CNcomment: ï¿½ï¿½ï¿½ï¿½Ê½Îªï¿½ï¿½ï¿½ï¿½*/
     VIDEO_SAMPLE_TYPE_BUTT
 }VIDEO_SAMPLE_TYPE_E;
 
@@ -117,7 +122,7 @@ typedef struct
     HI_BOOL            bStart;
     HDMI_PROC_EVENT_S  eventList[MAX_PROCESS_NUM];
     //HI_U32           Event[5];        /*Current Event Array, sequence will be change */
-    HDMI_ATTR_S        stHDMIAttr;          /*HDMI implement parameter*//*CNcomment:HDMI ÔËÐÐ²ÎÊý */
+    HDMI_ATTR_S        stHDMIAttr;          /*HDMI implement parameter*//*CNcomment:HDMI ï¿½ï¿½ï¿½Ð²ï¿½ï¿½ï¿½ */
     HI_UNF_HDMI_AVI_INFOFRAME_VER2_S   stAVIInfoFrame;
     HI_UNF_HDMI_AUD_INFOFRAME_VER1_S   stAUDInfoFrame;
 

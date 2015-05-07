@@ -20,15 +20,15 @@ typedef HI_S32  (*FN_HDMI_Close)(HI_UNF_HDMI_ID_E enHdmi);
 
 typedef HI_S32  (*FN_HDMI_GetPlayStus)(HI_UNF_HDMI_ID_E enHdmi, HI_U32 *pu32Stutus);
 typedef HI_S32  (*FN_HDMI_GetAoAttr)(HI_UNF_HDMI_ID_E enHdmi, HDMI_AUDIO_ATTR_S *pstHDMIAOAttr);
-typedef HI_S32  (*FN_HDMI_GetSinkCapability)(HI_UNF_HDMI_ID_E enHdmi, HI_UNF_HDMI_SINK_CAPABILITY_S *pstSinkCap);
-typedef HI_S32  (*FN_HDMI_GetAudioCapability)(HI_UNF_HDMI_ID_E enHdmi, HDMI_AUDIO_CAPABILITY_S *pstAudCap);
+typedef HI_S32  (*FN_HDMI_GetSinkCapability)(HI_UNF_HDMI_ID_E enHdmi, /*HI_UNF_HDMI_SINK_CAPABILITY_S*/HI_UNF_EDID_BASE_INFO_S *pstSinkCap);
+typedef HI_S32  (*FN_HDMI_GetAudioCapability)(HI_UNF_HDMI_ID_E enHdmi, /*HDMI_AUDIO_CAPABILITY_S*/HI_DRV_HDMI_AUDIO_CAPABILITY_S *pstAudCap);
 typedef HI_S32  (*FN_HDMI_AudioChange)(HI_UNF_HDMI_ID_E enHdmi, HDMI_AUDIO_ATTR_S *pstHDMIAOAttr);
 
 typedef HI_S32  (*FN_HDMI_PreFormat)(HI_UNF_HDMI_ID_E enHdmi, HI_DRV_DISP_FMT_E enEncodingFormat);
 typedef HI_S32  (*FN_HDMI_SetFormat)(HI_UNF_HDMI_ID_E enHdmi, HI_DRV_DISP_FMT_E enFmt, HI_DRV_DISP_STEREO_E enStereo);
 //typedef HI_S32  (*FN_HDMI_Set3DMode)(HI_UNF_HDMI_ID_E enHdmi, HI_BOOL b3DEnable,HI_U8 u83Dmode);
-typedef HI_S32  (*FN_HDMI_Detach)(HI_VOID);
-typedef HI_S32  (*FN_HDMI_Attach)(HI_VOID);
+typedef HI_S32  (*FN_HDMI_Detach)(HI_UNF_HDMI_ID_E enHdmi);
+typedef HI_S32  (*FN_HDMI_Attach)(HI_UNF_HDMI_ID_E enHdmi,HI_DRV_DISP_FMT_E enFmt, HI_DRV_DISP_STEREO_E enStereo);
 
 
 typedef struct

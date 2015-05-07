@@ -787,7 +787,7 @@ static HI_S32 hdmi_Proc(struct seq_file *p, HI_VOID *v)
             }
         }      
 
-        p += PROC_PRINT(p, "InitNum        : %d \n", DRV_HDMI_InitNum(0));
+        p += PROC_PRINT(p, "InitNum        : %d \n", DRV_HDMI_GetInitNum(0));
         p += PROC_PRINT(p, "ProcNum        : %d \n", DRV_HDMI_ProcNum(0));
 
         u32Reg = DRV_ReadByte_8BA(0, TX_SLV1, 0x48);
@@ -2532,7 +2532,7 @@ extern HI_VOID  HDMI_DRV_EXIT(HI_VOID);
 void HDMI_DRV_ModExit(void)
 {
     HI_U32 hdmiStatus;
-    hdmiStatus = DRV_HDMI_InitNum(HI_UNF_HDMI_ID_0);
+    hdmiStatus = DRV_HDMI_GetInitNum(HI_UNF_HDMI_ID_0);
     if(hdmiStatus > 0)
     {
         HI_DRV_HDMI_Close(HI_UNF_HDMI_ID_0);

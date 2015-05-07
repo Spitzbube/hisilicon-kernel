@@ -141,7 +141,11 @@ typedef struct hiHDMI_AUDIO_CAPABILITY_S
     HI_U8               u8Audio_Latency;          /**<the latency of audio*//**<CNcomment:��Ƶ��ʱ */
 }HDMI_AUDIO_CAPABILITY_S;
 
-
+typedef struct hiHI_DRV_HDMI_AUDIO_CAPABILITY_S
+{
+	int fill[24]; //
+	//96
+}HI_DRV_HDMI_AUDIO_CAPABILITY_S;
 
 HI_S32  HI_DRV_HDMI_Init(HI_VOID);
 HI_VOID  HI_DRV_HDMI_Deinit(HI_VOID);
@@ -150,15 +154,15 @@ HI_S32 HI_DRV_HDMI_Close(HI_UNF_HDMI_ID_E enHdmi);
 
 HI_S32 HI_DRV_HDMI_PlayStus(HI_UNF_HDMI_ID_E enHdmi, HI_U32 *pu32Stutus);
 HI_S32 HI_DRV_AO_HDMI_GetAttr(HI_UNF_HDMI_ID_E enHdmi, HDMI_AUDIO_ATTR_S *pstHDMIAOAttr);
-HI_S32 HI_DRV_HDMI_GetSinkCapability(HI_UNF_HDMI_ID_E enHdmi, HI_UNF_HDMI_SINK_CAPABILITY_S *pstSinkCap);
-HI_S32 HI_DRV_HDMI_GetAudioCapability(HI_UNF_HDMI_ID_E enHdmi, HDMI_AUDIO_CAPABILITY_S *pstAudCap);
+HI_S32 HI_DRV_HDMI_GetSinkCapability(HI_UNF_HDMI_ID_E enHdmi, /*HI_UNF_HDMI_SINK_CAPABILITY_S*/HI_UNF_EDID_BASE_INFO_S *pstSinkCap);
+HI_S32 HI_DRV_HDMI_GetAudioCapability(HI_UNF_HDMI_ID_E enHdmi, /*HDMI_AUDIO_CAPABILITY_S*/HI_DRV_HDMI_AUDIO_CAPABILITY_S *pstAudCap);
 HI_S32 HI_DRV_HDMI_AudioChange(HI_UNF_HDMI_ID_E enHdmi, HDMI_AUDIO_ATTR_S *pstHDMIAOAttr);
 
 HI_S32 HI_DRV_HDMI_PreFormat(HI_UNF_HDMI_ID_E enHdmi, HI_DRV_DISP_FMT_E enEncodingFormat);
 HI_S32 HI_DRV_HDMI_SetFormat(HI_UNF_HDMI_ID_E enHdmi, HI_DRV_DISP_FMT_E enFmt, HI_DRV_DISP_STEREO_E enStereo);
 //HI_S32 HI_DRV_HDMI_Set3DMode(HI_UNF_HDMI_ID_E enHdmi, HI_BOOL b3DEnable,HI_U8 u83Dmode);
-HI_S32 HI_DRV_HDMI_Detach(HI_VOID);
-HI_S32 HI_DRV_HDMI_Attach(HI_VOID);
+HI_S32 HI_DRV_HDMI_Detach(HI_UNF_HDMI_ID_E enHdmi);
+HI_S32 HI_DRV_HDMI_Attach(HI_UNF_HDMI_ID_E enHdmi,HI_DRV_DISP_FMT_E enFmt, HI_DRV_DISP_STEREO_E enStereo);
 
 
 #ifdef __cplusplus

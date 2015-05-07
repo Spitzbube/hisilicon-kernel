@@ -1,6 +1,8 @@
 
 ccflags-y += -DCHIP_TYPE_hi3798cv100
 ccflags-y += -DDVI_SUPPORT
+ccflags-y += -DCEC_SUPPORT 
+ccflags-y += -DHDCP_SUPPORT
 
 ccflags-y += -Idrivers/msp/include
 ccflags-y += -Idrivers/msp/hdmi
@@ -15,6 +17,7 @@ obj-y += drv_reg_proc.o
 obj-y += drv_compatibility.o
 obj-y += hdmi_drv/si_hdmitx.o
 obj-y += hdmi_drv/drv_hlviic.o
+obj-y += hdmi_drv/si_cec.o
 obj-y += hdmi_drv/si_phy.o
 obj-y += hdmi_drv/si_eeprom.o
 obj-y += hdmi_drv/si_timer.o
@@ -32,23 +35,5 @@ obj-y += hdmi_drv/si_audio.o
 obj-y += hdmi_drv/si_mddc.o
 obj-y += hdmi_drv/si_delay.o
 obj-y += hdmi_drv/si_hdcp.o
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+obj-y += hdmi_drv/si_regio.o
+obj-y += hdmi_drv/si_ucec.o

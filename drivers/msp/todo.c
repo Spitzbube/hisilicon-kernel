@@ -12,5 +12,10 @@ void OPTM_ALG_CscCoefSet(void)
 
 }
 
+void SI_SHAHandler()
+{
+#warning TODO: SI_SHAHandler
 
+	printk("SI_SHAHandler: TODO\n");
+}
 

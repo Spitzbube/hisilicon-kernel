@@ -1025,18 +1025,18 @@ HI_U32 DRV_HDMI_Init(HI_U32 FromUserSpace)
          else 
         {
             HI_U32 bHdmiMode;
-            /*if fastboot is TV format,setting VGA format *//*CNcomment:fastboot ÊÇtv£¬ ½«ÒªÉèÖÃÎªvga*/
+            /*if fastboot is TV format,setting VGA format *//*CNcomment:fastboot ï¿½ï¿½tvï¿½ï¿½ ï¿½ï¿½Òªï¿½ï¿½ï¿½ï¿½Îªvga*/
             bHdmiMode = SI_TX_IsHDMImode();//DRV_HDMI_ReadRegister((HI_U32)0x101704BC, &u32Value);
             if (bHdmiMode && (HI_DRV_DISP_FMT_861D_640X480_60 < enEncFmt))
             {
                 bOpenAlready = HI_FALSE;
             }
-            else if (!bHdmiMode /*if fastboot is VGA format, setting TV format*//*CNcomment:fastboot ÊÇvga£¬ ½«ÒªÉèÖÃÎªtv*/
+            else if (!bHdmiMode /*if fastboot is VGA format, setting TV format*//*CNcomment:fastboot ï¿½ï¿½vgaï¿½ï¿½ ï¿½ï¿½Òªï¿½ï¿½ï¿½ï¿½Îªtv*/
                     &&(HI_DRV_DISP_FMT_861D_640X480_60 >= enEncFmt))            
             {
                 bOpenAlready = HI_FALSE;
             }
-            else if (!bHdmiMode /*if fastboot is VGA format, setting VGA format *//*CNcomment:fastboot ÊÇvga£¬ ½«ÒªÉèÖÃÎªvga*/
+            else if (!bHdmiMode /*if fastboot is VGA format, setting VGA format *//*CNcomment:fastboot ï¿½ï¿½vgaï¿½ï¿½ ï¿½ï¿½Òªï¿½ï¿½ï¿½ï¿½Îªvga*/
                     &&(HI_DRV_DISP_FMT_861D_640X480_60 < enEncFmt))
             {
                 bOpenAlready = HI_TRUE;
@@ -1094,7 +1094,7 @@ HI_U32 DRV_HDMI_Init(HI_U32 FromUserSpace)
 #endif /*--NO MODIFY : COMMENT BY CODINGPARTNER--*/
     }
     
-    if(DRV_HDMI_InitNum(HI_UNF_HDMI_ID_0) == 0)
+    if(DRV_HDMI_GetInitNum(HI_UNF_HDMI_ID_0) == 0)
     {
     
 #if 0 /*--NO MODIFY : COMMENT BY CODINGPARTNER--*/
@@ -1196,7 +1196,7 @@ HI_U32 DRV_HDMI_DeInit(HI_U32 FromUserSpace)
 #endif
 
     HI_INFO_HDMI("Enter DRV_HDMI_DeInit g_HDMIUserInitNum:0x%x\n", g_HDMIUserInitNum);
-    if (DRV_HDMI_InitNum(HI_UNF_HDMI_ID_0) == 0)
+    if (DRV_HDMI_GetInitNum(HI_UNF_HDMI_ID_0) == 0)
     {
         HI_INFO_HDMI("HDMI has been deInited!\n");
         return HI_SUCCESS;
@@ -1235,7 +1235,7 @@ HI_U32 DRV_HDMI_DeInit(HI_U32 FromUserSpace)
         return HI_SUCCESS;
     }
 #endif /*--NO MODIFY : COMMENT BY CODINGPARTNER--*/
-    if(DRV_HDMI_InitNum(HI_UNF_HDMI_ID_0) != 0)
+    if(DRV_HDMI_GetInitNum(HI_UNF_HDMI_ID_0) != 0)
     {
         HI_INFO_HDMI("\n ignore DeInit \n");
         return HI_SUCCESS;
@@ -1301,7 +1301,7 @@ HI_VOID hdmi_OpenNotify(HI_U32 u32ProcID,HI_UNF_HDMI_EVENT_TYPE_E event)
 
 #if defined (CEC_SUPPORT)
             /* Enable CEC_SETUP */
-#if 0 /*--·â×°µ½SI_CEC_SetUp--*/
+#if 0 /*--ï¿½ï¿½×°ï¿½ï¿½SI_CEC_SetUp--*/
             HI_INFO_HDMI("set CEC_SETUP\n");
             WriteByteHDMICEC(0X8E, 0x04);
 #endif /*--NO MODIFY : COMMENT BY CODINGPARTNER--*/
@@ -1444,7 +1444,7 @@ HI_U32 DRV_HDMI_Open(HI_UNF_HDMI_ID_E enHdmi, HDMI_OPEN_S *pOpen, HI_U32 FromUse
         }
     }
   
-    //// Ö»µÚÒ»´Î×ö ////
+    //// Ö»ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ ////
     // Enable Interrupts: VSync, Ri check, HotPlug
     WriteByteHDMITXP0( HDMI_INT_ADDR, CLR_MASK);
     WriteByteHDMITXP0( HDMI_INT_MASK_ADDR, CLR_MASK);
@@ -1880,7 +1880,7 @@ static HI_U32 hdmi_Create_AVI_Infoframe(HI_UNF_HDMI_AVI_INFOFRAME_VER2_S *punAVI
     /*
        A0 Active Format Information Present
        0        No Data
-       1      Active Format(R0¡­R3) Information valid
+       1      Active Format(R0ï¿½ï¿½R3) Information valid
        */
     if (punAVIInfoFrame->bActive_Infor_Present)
     {
@@ -2789,7 +2789,7 @@ static void hdmi_ProcEvent(HI_UNF_HDMI_EVENT_TYPE_E event,HI_U32 procID)
         }
 #endif
         #else
-        //Ô­ÓÐ·½°¸£¬¶à½ø³Ì¶àÏß³ÌÏÂ£¬Event[0]Î»ÖÃ Ê±²»Ê±¶ªÊ§ÏûÏ¢
+        //Ô­ï¿½Ð·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ì¶ï¿½ï¿½ß³ï¿½ï¿½Â£ï¿½Event[0]Î»ï¿½ï¿½ Ê±ï¿½ï¿½Ê±ï¿½ï¿½Ê§ï¿½ï¿½Ï¢
         if(event == HI_UNF_HDMI_EVENT_RSEN_CONNECT)
         {
             g_stHdmiChnParam[HI_UNF_HDMI_ID_0].eventList[procID].Event[1] = event;
@@ -3059,11 +3059,11 @@ HI_U32 DRV_HDMI_Stop(HI_UNF_HDMI_ID_E enHdmi)
 {
     HI_INFO_HDMI("Enter DRV_HDMI_Stop\n");
     HDMI_CHECK_ID(enHdmi);
-    //Ö»ÓÐInit numµÈÓÚ1Ê±²Å¿ÉÒÔ¹Ø±ÕhdmiÊä³ö
+    //Ö»ï¿½ï¿½Init numï¿½ï¿½ï¿½ï¿½1Ê±ï¿½Å¿ï¿½ï¿½Ô¹Ø±ï¿½hdmiï¿½ï¿½ï¿½
     HI_INFO_HDMI("Enter DRV_HDMI_Stop\n");
-    if(DRV_HDMI_InitNum(enHdmi) != 1)
+    if(DRV_HDMI_GetInitNum(enHdmi) != 1)
     {
-        HI_INFO_HDMI("DRV_HDMI_InitNum != 1 return \n");
+        HI_INFO_HDMI("DRV_HDMI_GetInitNum != 1 return \n");
         return HI_SUCCESS;
     }
     
@@ -3543,7 +3543,7 @@ HI_U32 DRV_HDMI_SetFormat(HI_UNF_HDMI_ID_E enHdmi, HI_DRV_DISP_FMT_E enFmt, HI_D
     
 #if 0 /*--NO MODIFY : COMMENT BY CODINGPARTNER--*/
 #if defined (HDCP_SUPPORT)
-    //Çå³ýhdcpÊÚÈ¨×´Ì¬
+    //ï¿½ï¿½ï¿½hdcpï¿½ï¿½È¨×´Ì¬
     SI_SetDefaultAuthStatus();
 #endif
 #endif /*--NO MODIFY : COMMENT BY CODINGPARTNER--*/
@@ -3752,8 +3752,8 @@ HI_S32 DRV_HDMI_GetProcID(HI_UNF_HDMI_ID_E enHdmi, HI_U32 *pu32ProcID)
     HDMI_PROC_EVENT_S *pEventList = DRV_Get_EventList(HI_UNF_HDMI_ID_0);
     HI_INFO_HDMI("DRV_HDMI_GetProcID\n");
     //printk("\nDRV_HDMI_GetProcID\n");
-    //´ý²âÊÔ
-    //Ã»ÅäÖÃÍ¨µÀID
+    //ï¿½ï¿½ï¿½ï¿½ï¿½
+    //Ã»ï¿½ï¿½ï¿½ï¿½Í¨ï¿½ï¿½ID
     //HDMI_CHECK_ID(enHdmi);
 
     if(pu32ProcID == NULL)
@@ -3788,7 +3788,7 @@ HI_S32 DRV_HDMI_ReleaseProcID(HI_UNF_HDMI_ID_E enHdmi, HI_U32 u32ProcID)
     //printk("DRV_HDMI_ReleaseProcID %d\n",u32ProcID);
     HI_INFO_HDMI("DRV_HDMI_ReleaseProcID %d\n",u32ProcID);
     
-    //´ý²âÊÔ
+    //ï¿½ï¿½ï¿½ï¿½ï¿½
     //HDMI_CHECK_ID(enHdmi);
 
     if(u32ProcID >= MAX_PROCESS_NUM)
@@ -4000,7 +4000,7 @@ HI_S32 DRV_HDMI_GetAOAttr(HI_UNF_HDMI_ID_E enHdmi, HDMI_AUDIO_ATTR_S *pstHDMIAOA
     return Ret;
 }
 
-//ÐèÒª¸ù¾Ýedid²¹³äÍêÉÆ
+//ï¿½ï¿½Òªï¿½ï¿½ï¿½edidï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 static HI_U32 hdmi_AdjustAVIInfoFrame(HI_UNF_HDMI_ID_E enHdmi)
 {
     HI_U32 Ret = HI_SUCCESS; 
@@ -4239,7 +4239,7 @@ static HI_U32 hdmi_AdjustAUDInfoFrame(HI_UNF_HDMI_ID_E enHdmi)
     return HI_SUCCESS;
 }
 
-HI_S32 DRV_HDMI_InitNum(HI_UNF_HDMI_ID_E enHdmi)
+HI_S32 DRV_HDMI_GetInitNum(HI_UNF_HDMI_ID_E enHdmi)
 {
     return (g_HDMIKernelInitNum + g_HDMIUserInitNum);
 }
@@ -4381,7 +4381,7 @@ HI_S32 DRV_HDMI_SetAOAttr(HI_UNF_HDMI_ID_E enHdmi,HDMI_AUDIO_ATTR_S *pstHDMIAOAt
 #if 0 /*--NO MODIFY : COMMENT BY CODINGPARTNER--*/
     if(VUpdate == HI_TRUE)
     {
-        //ÊÓÆµÏà¹ØµÄhdmi mode£¬3d£¬deep color£¬timing¶¼»áÓ°ÏìÒôÆµÐÅºÅ£¬×îºÃÖØÐÂÅäÖÃ
+        //ï¿½ï¿½Æµï¿½ï¿½Øµï¿½hdmi modeï¿½ï¿½3dï¿½ï¿½deep colorï¿½ï¿½timingï¿½ï¿½ï¿½ï¿½Ó°ï¿½ï¿½ï¿½ï¿½Æµï¿½ÅºÅ£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         // video attr(hdmi mode,3d,deep color,timing etc.) will affect 
         AUpdate = HI_TRUE;
     }
@@ -4989,4 +4989,74 @@ HI_S32 DRV_HDMI_SetVOAttr(HI_UNF_HDMI_ID_E enHdmi,HDMI_VIDEO_ATTR_S *pstHDMIVOAt
 
     return Ret;
 }
+
+HI_S32 DRV_HDMI_GetStatus(HI_UNF_HDMI_ID_E enHdmi, HI_UNF_HDMI_STATUS_S *pHdmiStatus)
+{
+    HDMI_CHECK_ID(enHdmi);
+    HDMI_CheckChnOpen(enHdmi);
+    HDMI_CHECK_NULL_PTR(pHdmiStatus);
+
+#warning TODO: DRV_HDMI_GetStatus
+    pHdmiStatus->bConnected = SI_HPD_Status();
+    pHdmiStatus->bSinkPowerOn = SI_RSEN_Status();
+
+    return HI_SUCCESS;
+}
+
+HI_S32 DRV_HDMI_GetDelay(HI_UNF_HDMI_ID_E enHdmi, HI_UNF_HDMI_DELAY_S *pHdmiDelay)
+{
+    HDMI_CHECK_ID(enHdmi);
+    //HDMI_CheckChnOpen(enHdmi);
+    HDMI_CHECK_NULL_PTR(pHdmiDelay);
+
+#if 1
+#warning TODO: DRV_HDMI_GetDelay
+#else
+    pHdmiDelay->bForceFmtDelay = IsForceFmtDelay();
+    pHdmiDelay->bForceMuteDelay = IsForceMuteDelay();
+    pHdmiDelay->u32FmtDelay = GetGlobalFmtDelay();
+    pHdmiDelay->u32MuteDelay = GetGlobalsMuteDelay();
+#endif
+    return HI_SUCCESS;
+}
+
+HI_S32 DRV_HDMI_SetDelay(HI_UNF_HDMI_ID_E enHdmi, HI_UNF_HDMI_DELAY_S *pHdmiDelay)
+{
+    HDMI_CHECK_ID(enHdmi);
+    //HDMI_CheckChnOpen(enHdmi);
+    HDMI_CHECK_NULL_PTR(pHdmiDelay);
+
+#if 1
+#warning TODO: DRV_HDMI_SetDelay
+#else
+    SetForceDelayMode(pHdmiDelay->bForceFmtDelay,pHdmiDelay->bForceMuteDelay);
+    SetGlobalFmtDelay(pHdmiDelay->u32FmtDelay);
+    SetGlobalMuteDelay(pHdmiDelay->u32MuteDelay);
+#endif
+    return HI_SUCCESS;
+}
+HI_U8 g_avi_info[13] = {0};
+HI_U8 g_audio_info[13] = {0};
+
+HI_VOID DRV_O5_HDMI_PutBinInfoFrame(HI_UNF_HDMI_INFOFRAME_TYPE_E enInfoFrameType,HI_VOID* infor_ptr)
+{
+#warning TODO: DRV_O5_HDMI_PutBinInfoFrame
+    if(enInfoFrameType == HI_INFOFRAME_TYPE_AVI)
+        memcpy(g_avi_info, infor_ptr,13);
+    else if(enInfoFrameType == HI_INFOFRAME_TYPE_AUDIO)
+        memcpy(g_audio_info, infor_ptr,5);
+    return ;
+}
+
+HI_VOID DRV_O5_HDMI_GetBinInfoFrame(HI_UNF_HDMI_INFOFRAME_TYPE_E enInfoFrameType, HI_VOID *infor_ptr)
+{
+#warning TODO: DRV_O5_HDMI_GetBinInfoFrame
+    if (enInfoFrameType == HI_INFOFRAME_TYPE_AVI)
+        memcpy(infor_ptr, g_avi_info,13);
+    else if (enInfoFrameType == HI_INFOFRAME_TYPE_AUDIO)
+        memcpy(infor_ptr, g_audio_info,5);
+}
+
+
+
 

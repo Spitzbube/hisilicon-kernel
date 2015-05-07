@@ -38,18 +38,27 @@ typedef struct
     //HI_BOOL     bOnlySetAttr;             /*boot => mce : we only need set default param to attr(no config) and create thread*/
     HI_BOOL     bOpenedInBoot;             /*boot => mce : we only need set default param to attr(no config) and create thread*/
     //HI_BOOL     bReadEDIDOk;
-    HI_U32      enDefaultMode;            /*init parameter*//*CNcomment: ³õÊ¼»¯²ÎÊý */
-    struct task_struct  *kThreadTimer;    /*timer thread*//*CNcomment:¶¨Ê±Æ÷Ïß³Ì */
+    HI_U32      enDefaultMode;            /*init parameter*//*CNcomment: ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ */
+    struct task_struct  *kThreadTimer;    /*timer thread*//*CNcomment:ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ß³ï¿½ */
     HI_BOOL     kThreadTimerStop;
-    struct task_struct  *kCECRouter;      /*CEC thread*//*CNcomment: CECÏß³Ì */
+    struct task_struct  *kCECRouter;      /*CEC thread*//*CNcomment: CECï¿½ß³ï¿½ */
 #if 0 /*--NO MODIFY : COMMENT BY CODINGPARTNER--*/
-    HI_BOOL     bHdmiStarted;             /*HDMI Start Flag*//*CNcomment:HDMI ½Ó¿ÚÊÇ·ñÆô¶¯±êÖ¾ */
-    HI_BOOL     bHdmiExit;                /*HDMI exit flag*//*CNcomment:HDMI Ä£¿éÍË³ö±êÖ¾ */
+    HI_BOOL     bHdmiStarted;             /*HDMI Start Flag*//*CNcomment:HDMI ï¿½Ó¿ï¿½ï¿½Ç·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¾ */
+    HI_BOOL     bHdmiExit;                /*HDMI exit flag*//*CNcomment:HDMI Ä£ï¿½ï¿½ï¿½Ë³ï¿½ï¿½ï¿½Ö¾ */
 #endif /*--NO MODIFY : COMMENT BY CODINGPARTNER--*/
-    HI_UNF_HDMI_VIDEO_MODE_E enVidInMode; /*reservation,please setting VIDEO_MODE_YCBCR422 mode*//*CNcomment:±£Áô£¬ÇëÅäÖÃÎªVIDEO_MODE_YCBCR422 */
+    HI_UNF_HDMI_VIDEO_MODE_E enVidInMode; /*reservation,please setting VIDEO_MODE_YCBCR422 mode*//*CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÎªVIDEO_MODE_YCBCR422 */
 }HDMI_COMM_ATTR_S;
 
-//void DRV_Get_CommAttr(HDMI_COMM_ATTR_S **pstCommAttr);
+/** VSDB Mode */
+typedef enum
+{
+    VSDB_MODE_NONE = 0x00,
+    VSDB_MODE_3D ,
+    VSDB_MODE_4K ,
+    VSDB_MODE_BUTT
+}VSDB_MODE_E;
+
+
 HDMI_COMM_ATTR_S *DRV_Get_CommAttr(HI_VOID);
 
 
@@ -90,17 +99,24 @@ typedef struct
 {
     HI_BOOL            bOpen;
     HI_BOOL            bStart;
+    HI_BOOL            bValidSinkCap; //????
     HDMI_PROC_EVENT_S  eventList[MAX_PROCESS_NUM];
     //HI_U32           Event[5];        /*Current Event Array, sequence will be change */
-    HDMI_ATTR_S        stHDMIAttr;          /*HDMI implement parameter*//*CNcomment:HDMI ÔËÐÐ²ÎÊý */
+    HDMI_ATTR_S        stHDMIAttr;          /*HDMI implement parameter*//*CNcomment:HDMI ï¿½ï¿½ï¿½Ð²ï¿½ï¿½ï¿½ */
     HI_BOOL            ForceUpdateFlag;
     HI_BOOL            partUpdateFlag;
+
+    VSDB_MODE_E        enVSDBMode; //???
     HI_UNF_HDMI_AVI_INFOFRAME_VER2_S   stAVIInfoFrame;
     HI_UNF_HDMI_AUD_INFOFRAME_VER1_S   stAUDInfoFrame;
 
-    HI_BOOL                            bCECStart;
-    HI_U8                              u8CECCheckCount;
-    HI_UNF_HDMI_CEC_STATUS_S           stCECStatus;
+    HI_BOOL                            bCECEnable; //???
+    HI_BOOL                            bCECStart; //536
+    HI_U8                              u8CECCheckCount; //540
+    HI_UNF_HDMI_CEC_STATUS_S           stCECStatus; //544
+
+    HI_UNF_HDMI_DEFAULT_ACTION_E       enDefaultMode; //???
+    //???
 }HDMI_CHN_ATTR_S;
 #endif /*--NO MODIFY : COMMENT BY CODINGPARTNER--*/
 
@@ -111,6 +127,7 @@ HDMI_ATTR_S *DRV_Get_HDMIAttr(HI_UNF_HDMI_ID_E enHdmi);
 HDMI_APP_ATTR_S   *DRV_Get_AppAttr(HI_UNF_HDMI_ID_E enHdmi);
 HDMI_VIDEO_ATTR_S *DRV_Get_VideoAttr(HI_UNF_HDMI_ID_E enHdmi);
 HDMI_AUDIO_ATTR_S *DRV_Get_AudioAttr(HI_UNF_HDMI_ID_E enHdmi);
+HI_UNF_EDID_BASE_INFO_S *DRV_Get_SinkCap(HI_UNF_HDMI_ID_E enHdmi);
 
 HI_BOOL DRV_Get_IsNeedForceUpdate(HI_UNF_HDMI_ID_E enHdmi);
 void DRV_Set_ForceUpdateFlag(HI_UNF_HDMI_ID_E enHdmi,HI_BOOL bupdate);
@@ -130,10 +147,16 @@ void DRV_Set_ChnOpen(HI_UNF_HDMI_ID_E enHdmi,HI_BOOL bChnOpen);
 HI_BOOL DRV_Get_IsChnStart(HI_UNF_HDMI_ID_E enHdmi);
 void DRV_Set_ChnStart(HI_UNF_HDMI_ID_E enHdmi,HI_BOOL bChnStart);
 
+void DRV_Set_CECEnable(HI_UNF_HDMI_ID_E enHdmi,HI_BOOL bCecEnable);
+
 HI_BOOL DRV_Get_IsCECStart(HI_UNF_HDMI_ID_E enHdmi);
 void DRV_Set_CECStart(HI_UNF_HDMI_ID_E enHdmi,HI_BOOL bCecStart);
 
+HI_UNF_HDMI_DEFAULT_ACTION_E DRV_Get_DefaultOutputMode(HI_UNF_HDMI_ID_E enHdmi);
 
+HI_BOOL DRV_Get_IsValidSinkCap(HI_UNF_HDMI_ID_E enHdmi);
+
+HI_DRV_HDMI_AUDIO_CAPABILITY_S *DRV_Get_OldAudioCap(void);
 
 #ifdef __cplusplus
  #if __cplusplus

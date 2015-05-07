@@ -33,6 +33,17 @@ void DRV_Get_CommAttr(HDMI_COMM_ATTR_S **pstCommAttr)
 }
 #endif /*--NO MODIFY : COMMENT BY CODINGPARTNER--*/
 
+HI_DRV_HDMI_AUDIO_CAPABILITY_S *DRV_Get_OldAudioCap()
+{
+#if 1
+#warning TODO: DRV_Get_OldAudioCap
+	return 0;
+#else
+    return &g_stHdmiOldAudio;
+#endif
+}
+
+
 HDMI_COMM_ATTR_S *DRV_Get_CommAttr()
 {
     HI_INFO_HDMI("Get_CommAttr \n");
@@ -186,6 +197,13 @@ HDMI_AUDIO_ATTR_S *DRV_Get_AudioAttr(HI_UNF_HDMI_ID_E enHdmi)
     return &g_stHdmiChnParam[enHdmi].stHDMIAttr.stAudioAttr;
 }
 
+HI_UNF_EDID_BASE_INFO_S *DRV_Get_SinkCap(HI_UNF_HDMI_ID_E enHdmi)
+{
+#warning TODO: DRV_Get_SinkCap
+    return 0; //&g_stEdidInfo[enHdmi];
+}
+
+
 HI_BOOL DRV_Get_IsNeedForceUpdate(HI_UNF_HDMI_ID_E enHdmi)
 {
     return g_stHdmiChnParam[enHdmi].ForceUpdateFlag;
@@ -250,6 +268,15 @@ void DRV_Set_ChnStart(HI_UNF_HDMI_ID_E enHdmi,HI_BOOL bChnStart)
     g_stHdmiChnParam[enHdmi].bStart = bChnStart;
 }
 
+void DRV_Set_CECEnable(HI_UNF_HDMI_ID_E enHdmi,HI_BOOL bCecEnable)
+{
+#if 1
+#warning DRV_Set_CECEnable: TODO
+#else
+    g_stHdmiChnParam[enHdmi].bCECEnable = bCecEnable;
+#endif
+}
+
 HI_BOOL DRV_Get_IsCECStart(HI_UNF_HDMI_ID_E enHdmi)
 {
     return g_stHdmiChnParam[enHdmi].bCECStart;
@@ -258,5 +285,20 @@ HI_BOOL DRV_Get_IsCECStart(HI_UNF_HDMI_ID_E enHdmi)
 void DRV_Set_CECStart(HI_UNF_HDMI_ID_E enHdmi,HI_BOOL bCecStart)
 {
     g_stHdmiChnParam[enHdmi].bCECStart = bCecStart;
+}
+
+HI_UNF_HDMI_DEFAULT_ACTION_E DRV_Get_DefaultOutputMode(HI_UNF_HDMI_ID_E enHdmi)
+{
+    return g_stHdmiChnParam[enHdmi].enDefaultMode;
+}
+
+
+HI_BOOL DRV_Get_IsValidSinkCap(HI_UNF_HDMI_ID_E enHdmi)
+{
+#if 1
+#warning TODO: DRV_Get_IsValidSinkCap
+#else
+    return g_stHdmiChnParam[enHdmi].bValidSinkCap;
+#endif
 }
 
