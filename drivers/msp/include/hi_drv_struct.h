@@ -174,7 +174,7 @@ extern "C"{
 #define HI_MOD_HDMI                  "hdmi"
 #define UMAP_DEVNAME_HDMI            UMAP_NAME HI_MOD_HDMI
 #define UMAP_DEV_NUM_HDMI            1
-#define UMAP_MIN_MINOR_HDMI          (UMAP_MAX_MINOR_PVR + 1)
+#define UMAP_MIN_MINOR_HDMI          (UMAP_MAX_MINOR_PVR + 1) //30
 #define UMAP_MAX_MINOR_HDMI          (UMAP_MIN_MINOR_HDMI + UMAP_DEV_NUM_HDMI -1)
 
 

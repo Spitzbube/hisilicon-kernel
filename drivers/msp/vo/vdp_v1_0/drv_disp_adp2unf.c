@@ -283,7 +283,7 @@ HI_DRV_DISP_FMT_E DISP_Disp0FmtRevise_Attach(HI_DRV_DISP_FMT_E U)
         case HI_DRV_DISP_FMT_576P_50:
         case HI_DRV_DISP_FMT_720P_50_FP:
         case HI_DRV_DISP_FMT_1440x576i_50:
-        case HI_DRV_DISP_FMT_62:
+        case HI_DRV_DISP_FMT_3840X2160_25:
             return HI_DRV_DISP_FMT_PAL;
         case HI_DRV_DISP_FMT_1080P_60:
         case HI_DRV_DISP_FMT_1080P_30:

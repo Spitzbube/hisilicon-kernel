@@ -30,6 +30,10 @@ extern "C" {
 #include "hi_unf_hdmi.h"
 #include "drv_hdmi.h"
 
+
+#define DEF_FILE_NAMELENGTH 32
+
+
 //g_stHdmiCommParam  
 
 typedef struct
@@ -120,6 +124,12 @@ typedef struct
 }HDMI_CHN_ATTR_S;
 #endif /*--NO MODIFY : COMMENT BY CODINGPARTNER--*/
 
+typedef struct
+{
+    HI_U32      bEdidLen;
+    HI_U8      *u8Edid;
+}HDMI_Test_EDID_S;
+
 HDMI_CHN_ATTR_S *DRV_Get_ChnAttr(HI_VOID);
 
 HI_U32 DRV_HDMI_SetDefaultAttr(HI_VOID);
@@ -157,6 +167,25 @@ HI_UNF_HDMI_DEFAULT_ACTION_E DRV_Get_DefaultOutputMode(HI_UNF_HDMI_ID_E enHdmi);
 HI_BOOL DRV_Get_IsValidSinkCap(HI_UNF_HDMI_ID_E enHdmi);
 
 HI_DRV_HDMI_AUDIO_CAPABILITY_S *DRV_Get_OldAudioCap(void);
+
+void DRV_Set_DDCSpeed(HI_U32 delayCount);
+
+void DRV_Set_UserEdid(HI_UNF_HDMI_ID_E enHdmi,HDMI_EDID_S *pEDID);
+
+
+HI_BOOL DRV_Get_IsUserEdid(HI_UNF_HDMI_ID_E enHdmi);
+void DRV_Set_UserEdidMode(HI_UNF_HDMI_ID_E enHdmi,HI_BOOL bUserEdid);
+
+//
+HI_U32 DRV_Get_DebugEdidNum(void);
+HDMI_Test_EDID_S *DRV_Get_DebugEdid(HI_U32 u32Num);
+
+
+void DRV_Set_ForceOutputMode(HI_BOOL bForce);
+
+
+void DRV_Set_ForcePowerState(HI_BOOL bForce);
+
 
 #ifdef __cplusplus
  #if __cplusplus

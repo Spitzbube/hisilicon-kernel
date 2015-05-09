@@ -11958,10 +11958,10 @@ HI_VOID VDP_DATE_ResetFmt(DISP_VENC_E eDate, HI_DRV_DISP_FMT_E enFmt)
                 VDP_RegWrite1((HI_U32)(&(pVdpReg->DHD0_SYNC_INV.u32)), 0x06000ul);
                 VDP_DATE_SetSrcCoef(eDate, u32aDATESrc13Coef[DISP_DATE_SRC_COEF_INDEX_480P]); //1
                 break;
-            case HI_DRV_DISP_FMT_61: //61
-            case HI_DRV_DISP_FMT_62: //62
-            case HI_DRV_DISP_FMT_63: //63
-            case HI_DRV_DISP_FMT_64: //64
+            case HI_DRV_DISP_FMT_3840X2160_24: //61
+            case HI_DRV_DISP_FMT_3840X2160_25: //62
+            case HI_DRV_DISP_FMT_3840X2160_30: //63
+            case HI_DRV_DISP_FMT_4096X2160_24: //64
                 HDATE_VIDEO_FORMAT.u32 = 0x00000000;
             	break;
             default :

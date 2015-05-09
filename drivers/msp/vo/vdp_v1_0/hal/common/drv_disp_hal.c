@@ -159,13 +159,13 @@ HI_S32 DispHalGetEnFmtIndex(HI_DRV_DISP_FMT_E eFmt)
             return 39;
         case HI_DRV_DISP_FMT_1440x480i_60:
             return 40;
-        case HI_DRV_DISP_FMT_61:
+        case HI_DRV_DISP_FMT_3840X2160_24: //61
         	return 41;
-        case HI_DRV_DISP_FMT_62:
+        case HI_DRV_DISP_FMT_3840X2160_25: //62
         	return 42;
-        case HI_DRV_DISP_FMT_63:
+        case HI_DRV_DISP_FMT_3840X2160_30: //63
         	return 43;
-        case HI_DRV_DISP_FMT_64:
+        case HI_DRV_DISP_FMT_4096X2160_24: //64
         	return 44;
         default :
             return 0;

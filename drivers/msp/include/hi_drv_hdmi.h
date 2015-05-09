@@ -143,6 +143,9 @@ typedef struct hiHDMI_AUDIO_CAPABILITY_S
 
 typedef struct hiHI_DRV_HDMI_AUDIO_CAPABILITY_S
 {
+	HI_BOOL bAudioFmtSupported[HI_UNF_HDMI_MAX_AUDIO_CAP_COUNT]; //???
+	HI_U32 u32AudioSampleRateSupported[HI_UNF_HDMI_MAX_AUDIO_SMPRATE_COUNT]; //60
+	HI_U32 u32MaxPcmChannels; //???
 	int fill[24]; //
 	//96
 }HI_DRV_HDMI_AUDIO_CAPABILITY_S;

@@ -302,3 +302,95 @@ HI_BOOL DRV_Get_IsValidSinkCap(HI_UNF_HDMI_ID_E enHdmi)
 #endif
 }
 
+
+void DRV_Set_DDCSpeed(HI_U32 delayCount)
+{
+#if 1
+#warning TODO: DRV_Set_DDCSpeed
+#else
+    g_u32DDCDelayCount = delayCount;
+#endif
+}
+
+
+
+void DRV_Set_UserEdid(HI_UNF_HDMI_ID_E enHdmi,HDMI_EDID_S *pEDID)
+{
+#if 1
+#warning TODO: DRV_Set_UserEdid
+#else
+    //only memset one ExtEdid,NOt All
+    memset(&g_ExtEdid[enHdmi],0,sizeof(HDMI_EDID_S));
+
+    memcpy(&g_ExtEdid[enHdmi],pEDID,sizeof(HDMI_EDID_S));
+#endif
+}
+
+HI_BOOL DRV_Get_IsUserEdid(HI_UNF_HDMI_ID_E enHdmi)
+{
+#if 1
+#warning TODO: DRV_Get_IsUserEdid
+#else
+    return g_bExtEdid[enHdmi];
+#endif
+}
+
+void DRV_Set_UserEdidMode(HI_UNF_HDMI_ID_E enHdmi,HI_BOOL bUserEdid)
+{
+#if 1
+#warning TODO: DRV_Set_UserEdidMode
+#else
+    g_bExtEdid[enHdmi] = bUserEdid;
+#endif
+}
+
+HI_U32 DRV_Get_DebugEdidNum(void)
+{
+    HI_U32 index;
+
+#if 1
+#warning TODO: DRV_Get_DebugEdidNum
+#else
+    //calc edid list number
+    for (index = 0; EDID_List[index] != NULL; index++)
+    {
+        continue;
+    }
+
+    COM_INFO("%d EDID in list \n",index);
+#endif
+    return index;
+}
+
+//param start frome 1,not 0
+HDMI_Test_EDID_S *DRV_Get_DebugEdid(HI_U32 u32Num)
+{
+#if 1
+#warning TODO: DRV_Get_DebugEdid
+#else
+    return EDID_List[u32Num-1];
+#endif
+}
+
+#if 0
+void DRV_Set_ForceOutputMode(HI_BOOL bForce)
+{
+#if 1
+#warning TODO: DRV_Set_ForceOutputMode
+#else
+    //g_stHdmiChnParam[enHdmi].bForceOutput = bForce;
+    bForceOutput = bForce;
+#endif
+}
+
+void DRV_Set_ForcePowerState(HI_BOOL bForce)
+{
+#if 1
+#warning TODO: DRV_Set_ForcePowerState
+#else
+    //g_stHdmiChnParam[enHdmi].bForceOutput = bForce;
+    bForcePowerON = bForce;
+#endif
+}
+#endif
+

@@ -22,6 +22,8 @@ History       :
 #include "hi_drv_hdmi.h"
 #endif
 
+#include "hi_drv_dev.h"
+
 #ifdef HI_DISP_BUILD_FULL
 #include "drv_disp_isr.h"
 #include "drv_disp_ua.h"

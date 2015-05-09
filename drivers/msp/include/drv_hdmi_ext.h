@@ -29,6 +29,8 @@ typedef HI_S32  (*FN_HDMI_SetFormat)(HI_UNF_HDMI_ID_E enHdmi, HI_DRV_DISP_FMT_E 
 //typedef HI_S32  (*FN_HDMI_Set3DMode)(HI_UNF_HDMI_ID_E enHdmi, HI_BOOL b3DEnable,HI_U8 u83Dmode);
 typedef HI_S32  (*FN_HDMI_Detach)(HI_UNF_HDMI_ID_E enHdmi);
 typedef HI_S32  (*FN_HDMI_Attach)(HI_UNF_HDMI_ID_E enHdmi,HI_DRV_DISP_FMT_E enFmt, HI_DRV_DISP_STEREO_E enStereo);
+typedef HI_S32  (*FN_HDMI_Resume)(PM_BASEDEV_S *pdev);
+typedef HI_S32  (*FN_HDMI_Suspend)(PM_BASEDEV_S *pdev, pm_message_t state);
 
 
 typedef struct
@@ -48,6 +50,8 @@ typedef struct
     FN_HDMI_Attach              pfnHdmiAttach; //48
 //  FN_HDMI_Set3DMode           pfnHdmiSet3DMode;
     //52
+    FN_HDMI_Resume              pfnHdmiResume;
+    FN_HDMI_Suspend             pfnHdmiSuspend;
 }HDMI_EXPORT_FUNC_S;
 
 

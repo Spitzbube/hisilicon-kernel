@@ -255,17 +255,104 @@ typedef struct hiUNF_HDMI_SINK_CAPABILITY_S
     HI_U8               u8Interlaced_Audio_Latency;/**<the latency of interlaced audio mode*//**<CNcomment:������Ƶģʽ�µ���Ƶ��ʱ */
 } HI_UNF_HDMI_SINK_CAPABILITY_S;
 
+#if 1
+#warning TODO
+#define MAX_SAMPE_RATE_NUM 8
+#define HI_UNF_EDID_MAX_AUDIO_CAP_COUNT 16
+#define HI_UNF_EDID_AUDIO_SPEAKER_BUTT 11
+#define HI_UNF_EDID_AUDIO_FORMAT_CODE_BUTT 15
+
+#define HI_UNF_EDID_3D_FRAME_PACKETING 0
+#define HI_UNF_EDID_3D_TOP_AND_BOTTOM 6
+#define HI_UNF_EDID_3D_SIDE_BY_SIDE_HALF 8
+#define HI_UNF_EDID_3D_BUTT 9
+#endif
+
 typedef struct hiHI_UNF_EDID_BASE_INFO_S
 {
 #warning TODO: HI_UNF_EDID_BASE_INFO_S
 
 	HI_BOOL bSupportHdmi; //0
-	int fill_4[282]; //4
+	HI_U32 enNativeFormat; //4
+	HI_BOOL bSupportFormat[HI_UNF_ENC_FMT_BUTT]; //8
+	struct st3DInfo
+	{
+		HI_BOOL bSupport3D; //1048
+		HI_BOOL bSupport3DType[10/*HI_UNF_EDID_3D_BUTT*/]; //1052
+	} st3DInfo; //1048
+	//???
+	struct stDeepColor
+	{
+		HI_BOOL bDeepColor30Bit; //1092
+		HI_BOOL bDeepColor36Bit; //1096
+		HI_BOOL bDeepColor48Bit; //1100
+	} stDeepColor;
+	struct stColorMetry
+	{
+		HI_BOOL bxvYCC601; //1104
+		HI_BOOL bxvYCC709; //1108
+	} stColorMetry;
+	int fill_1112[4]; //1112
 	struct
 	{
+		HI_BOOL bYCbCr422; //1128
 		HI_BOOL bYCbCr444; //1132
 	} stColorSpace; //???
-	int fill[343]; //???
+	struct stAudioInfo
+	{
+		HI_U32 enAudFmtCode; //1136 = 0
+		HI_U32/*HI_UNF_SAMPLE_RATE_E???*/ enSupportSampleRate[MAX_SAMPE_RATE_NUM]; //1140 = 4
+		int fill_1172; //1172
+		HI_U8 u8AudChannel; //1176
+		int fill_1180[8]; //1180 = 44
+		//76
+	} stAudioInfo[HI_UNF_EDID_MAX_AUDIO_CAP_COUNT];
+	HI_U32 u32AudioInfoNum; //2352
+	HI_BOOL bSupportAudioSpeaker[HI_UNF_EDID_AUDIO_SPEAKER_BUTT]; //2356
+	HI_U8 u8ExtBlockNum; //2400
+	HI_U8 u8Version; //2401
+	HI_U8 u8Revision; //2402
+	struct hiHI_UNF_EDID_MANUFACTURE_INFO_S
+	{
+		HI_U8 u8MfrsName[4]; //2404
+		HI_U32 u32ProductCode; //2408
+		HI_U32 u32SerialNumber; //2412
+		HI_U32 u32Week; //2416
+		HI_U32 u32Year; //2420
+		//20
+	} stMfrsInfo; //2404
+	struct stCECAddr
+	{
+		HI_BOOL bPhyAddrValid; //2424
+		HI_U8 u8PhyAddrA; //2428
+		HI_U8 u8PhyAddrB;
+		HI_U8 u8PhyAddrC;
+		HI_U8 u8PhyAddrD;
+		//8
+	} stCECAddr; //2424
+	HI_BOOL bSupportDVIDual; //2432
+	HI_BOOL bSupportsAI; //2436
+	struct stPerferTiming
+	{
+		HI_U32 u32VFB; //2440
+		HI_U32 u32VBB; //2444
+		HI_U32 u32VACT; //2448
+		HI_U32 u32HFB; //2452
+		HI_U32 u32HBB; //2456
+		HI_U32 u32HACT; //2460
+		HI_U32 u32VPW; //2464
+		HI_U32 u32HPW; //2468
+		HI_BOOL bIDV; //2472
+		HI_BOOL bIHS; //2476
+		HI_BOOL bIVS; //2480
+		HI_U32 u32ImageWidth; //2484
+		HI_U32 u32ImageHeight; //2488
+		int fill_2492; //2492
+		int fill_2496; //2496
+		HI_BOOL bInterlace; //2500
+		HI_U32 u32PixelClk; //2504
+		//68
+	} stPerferTiming; //2440
 	//2508	; 0x9cc
 }HI_UNF_EDID_BASE_INFO_S;
 
@@ -816,6 +903,7 @@ typedef struct hiHI_UNF_HDMI_STATUS_S
 {
 	HI_BOOL bConnected; //???
 	HI_BOOL bSinkPowerOn; //???
+	int fill[3];
 	//???
 }HI_UNF_HDMI_STATUS_S;
 

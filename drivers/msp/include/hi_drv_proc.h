@@ -48,7 +48,7 @@ typedef struct struCMPI_PROC_ITEM
     HI_CHAR entry_name[MAX_ENTRY_NAME_LEN+1];
     struct proc_dir_entry *entry;
     DRV_PROC_READ_FN read;
-    DRV_PROC_WRITE_FN write;
+    DRV_PROC_WRITE_FN write; //40
     DRV_PROC_IOCTL_FN ioctl;
     HI_VOID *data;
 }DRV_PROC_ITEM_S;

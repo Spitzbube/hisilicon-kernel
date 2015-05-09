@@ -3,6 +3,8 @@ ccflags-y += -DCHIP_TYPE_hi3798cv100
 ccflags-y += -DDVI_SUPPORT
 ccflags-y += -DCEC_SUPPORT 
 ccflags-y += -DHDCP_SUPPORT
+ccflags-y += -DANDROID_SUPPORT
+ccflags-y += -DHI_PROC_SUPPORT=1
 
 ccflags-y += -Idrivers/msp/include
 ccflags-y += -Idrivers/msp/hdmi

@@ -92,868 +92,6 @@ HI_S32 DRV_HDMI_ReadPhy(void)
     return u32Ret;
 }
 
-//extern HI_U8 OutputState;
-//extern HI_U8 AuthState;
-
-extern HI_U32 unStableTimes;
-
-/*****************************************************************************
- Prototype    : hdmi_Proc
- Description  : HDMI status in /proc/msp/hdmi
- Input        : None
- Output       : None
- Return Value :
- Calls        :
-*****************************************************************************/
-
-//HI_U32 setAttrChkCnt = 0;
-#if 0 /*--NO MODIFY : COMMENT BY CODINGPARTNER--*/
-static HI_S32 hdmi_Proc(struct seq_file *p, HI_VOID *v)
-{
-    HI_U32 Ret;
-    HI_U32 u32Reg, index, offset;
-    HI_UNF_HDMI_SINK_CAPABILITY_S sinkCap;
-	HDMI_ATTR_S			          stHDMIAttr; 
-    HDMI_VIDEO_ATTR_S            *pstVideoAttr;
-    HDMI_AUDIO_ATTR_S            *pstAudioAttr;
-    HDMI_APP_ATTR_S            *pstAppAttr;
-#if defined (CEC_SUPPORT) 	
-    HI_UNF_HDMI_CEC_STATUS_S      CECStatus;
-#endif
-    HI_U32 u32DefHDMIMode;
-
-    memset(&sinkCap,0,sizeof(HI_UNF_HDMI_SINK_CAPABILITY_S));
-
-    p += PROC_PRINT(p, "\n########### Hisi HDMI Dev Stat ###########\n");
-    
-    Ret = DRV_HDMI_GetAttr(HI_UNF_HDMI_ID_0, &stHDMIAttr);
-    if(Ret != HI_SUCCESS)
-    {
-        p += PROC_PRINT(p, "HDMI driver do not Open\n" );
-        p += PROC_PRINT(p, "\n#################### END ##################\n");
-        return HI_SUCCESS;
-    }
-    pstVideoAttr = &stHDMIAttr.stVideoAttr;
-    pstAudioAttr = &stHDMIAttr.stAudioAttr;
-    pstAppAttr = &stHDMIAttr.stAppAttr;
-    /* HPD Status */
-    u32Reg = DRV_ReadByte_8BA(0, TX_SLV0, 0x09);// 0x72:0x09
-    if ((u32Reg & 0x02) != 0x02)
-    {
-        p += PROC_PRINT(p, "HPD Status : Out\n");
-    }
-    else
-    {
-        p += PROC_PRINT(p, "HPD Status : IN\n");
-    }
-    /* HDMI Start mode */
-    u32Reg = DRV_ReadByte_8BA(0, TX_SLV0, 0x08);// 0x72:0x08
-    if ((u32Reg & 0x01) != 0x01)
-    {
-        p += PROC_PRINT(p, "HDMI do not Start!\n");
-    }
-    else
-    {        
-        /* HDMI Status */
-        DRV_HDMI_GetSinkCapability(HI_UNF_HDMI_ID_0, &sinkCap);
-        if (sinkCap.bIsSinkPowerOn == HI_TRUE)
-        {
-            p += PROC_PRINT(p, "TV : Power On\n");
-        }
-        else
-        {
-            p += PROC_PRINT(p, "TV : Power Off\n");
-        }
-
-
-        DRV_HDMI_GetPlayStatus(0,&u32Reg);
-        if(u32Reg == HI_TRUE)
-        {
-            p += PROC_PRINT(p, "Play Status    : Start  \n");            
-        }
-        else
-        {
-            p += PROC_PRINT(p, "Play Status    : STOP  \n");
-        }
-        
-        if (sinkCap.bIsRealEDID == HI_TRUE)
-        {
-            p += PROC_PRINT(p, "EDID Parse Status: Ok\n");
-        }
-        else
-        {
-            p += PROC_PRINT(p, "EDID Parse Status: Fail\n");
-        }
-        
-        p += PROC_PRINT(p, "TV ManufactureName: %s\n", sinkCap.u8IDManufactureName);
-
-        p += PROC_PRINT(p, "HDMI Sink video capability :\n");        
-        for (index = 0; index < HI_DRV_DISP_FMT_BUTT; index++)
-        {
-            if(HI_TRUE == sinkCap.bVideoFmtSupported[hdmi_Disp2EncFmt(index)])
-            {
-                if (index == HI_DRV_DISP_FMT_1080P_60)
-                {
-                    p += PROC_PRINT(p, "Fmt: 1080P_60\n");
-                }
-                if (index == HI_DRV_DISP_FMT_1080P_50)
-                {
-                    p += PROC_PRINT(p, "Fmt: 1080P_50\n");
-                }
-                if (index == HI_DRV_DISP_FMT_1080P_30)
-                {
-                    p += PROC_PRINT(p, "Fmt: 1080P_30\n");
-                }
-                if (index == HI_DRV_DISP_FMT_1080P_25)
-                {
-                    p += PROC_PRINT(p, "Fmt: 1080P_25\n");
-                }
-                if (index == HI_DRV_DISP_FMT_1080P_24)
-                {
-                    p += PROC_PRINT(p, "Fmt: 1080P_24\n");
-                }
-                if (index == HI_DRV_DISP_FMT_1080i_60)
-                {
-                    p += PROC_PRINT(p, "Fmt: 1080i_60\n");
-                }
-                if (index == HI_DRV_DISP_FMT_1080i_50)
-                {
-                    p += PROC_PRINT(p, "Fmt: 1080i_50\n");
-                }
-                if (index == HI_DRV_DISP_FMT_720P_60)
-                {
-                    p += PROC_PRINT(p, "Fmt: 720P_60\n");
-                }
-                if (index == HI_DRV_DISP_FMT_720P_50)
-                {
-                    p += PROC_PRINT(p, "Fmt: 720P_50\n");
-                }
-                if (index == HI_DRV_DISP_FMT_576P_50)
-                {
-                    p += PROC_PRINT(p, "Fmt: 576P_50\n");
-                }
-                if (index == HI_DRV_DISP_FMT_480P_60)
-                {
-                    p += PROC_PRINT(p, "Fmt: 480P_60\n");
-                }
-                if (index == HI_DRV_DISP_FMT_PAL)
-                {
-                    p += PROC_PRINT(p, "Fmt: 576i_50\n");
-                }
-                if (index == HI_DRV_DISP_FMT_NTSC)
-                {
-                    p += PROC_PRINT(p, "Fmt: 480i_60\n");
-                }
-                if (index == HI_DRV_DISP_FMT_861D_640X480_60)
-                {
-                    p += PROC_PRINT(p, "Fmt: 640X480_60\n");
-                }
-#if defined (DVI_SUPPORT)
-                if (index == HI_DRV_DISP_FMT_VESA_800X600_60)
-                    p += PROC_PRINT(p, "Fmt: 800X600_60\n");
-
-                if (index == HI_DRV_DISP_FMT_VESA_1024X768_60)
-                    p += PROC_PRINT(p, "Fmt: 1024X768_60\n");
-
-                if (index == HI_DRV_DISP_FMT_VESA_1366X768_60)
-                    p += PROC_PRINT(p, "Fmt: 1366X768_60\n");
-
-                if (index == HI_DRV_DISP_FMT_VESA_1440X900_60)
-                    p += PROC_PRINT(p, "Fmt: 1400X900_60\n");
-
-                if (index == HI_DRV_DISP_FMT_VESA_1440X900_60_RB)
-                    p += PROC_PRINT(p, "Fmt: 1400X900_60_RB\n");
-
-                if (index == HI_DRV_DISP_FMT_VESA_1600X1200_60)
-                    p += PROC_PRINT(p, "Fmt: 1600X1200_60\n");
-
-                 if (index == HI_DRV_DISP_FMT_VESA_1680X1050_60)
-                    p += PROC_PRINT(p, "Fmt: 1680X1050_60\n");
-
-                  if (index == HI_DRV_DISP_FMT_VESA_1680X1050_60_RB)
-                    p += PROC_PRINT(p, "Fmt: 1680X1050_60_RB\n");
-
-                  if (index == HI_DRV_DISP_FMT_VESA_1920X1200_60)
-                    p += PROC_PRINT(p, "Fmt: 1920X1200_60\n");
-
-                if (index == HI_DRV_DISP_FMT_VESA_1920X1080_60)
-                    p += PROC_PRINT(p, "Fmt: 1920X1080_60\n");
-                
-                 if (index == HI_DRV_DISP_FMT_VESA_1920X1440_60)
-                    p += PROC_PRINT(p, "Fmt: 1920X1440_60\n");
-
-                if (index == HI_DRV_DISP_FMT_VESA_2048X1152_60)
-                    p += PROC_PRINT(p, "Fmt: 2048X1152_60\n");
-                
-                if (index == HI_DRV_DISP_FMT_VESA_2560X1440_60_RB)
-                    p += seq_printf(p, "Fmt: 2560X1440_60_RB\n");
-                
-                if (index == HI_DRV_DISP_FMT_VESA_2560X1600_60_RB)
-                    p += seq_printf(p, "Fmt: 2560X1600_60_RB\n");
-#endif
-
-#if 0
-                if(sinkCap.aspect_ratio[index][0] == 1)
-                    p += PROC_PRINT(p, "aspect ratio:         4:3 \n");
-                else if(sinkCap.aspect_ratio[index][1] == 2)
-                    p += PROC_PRINT(p, "aspect ratio:               16:9\n");
-#endif
-            }
-        }
-        
-        p += PROC_PRINT(p, "HDMI Sink Audio capability \n");    
-        p += PROC_PRINT(p, "Audio Fmt support : ");    
-        for (index = 0; index < HI_UNF_HDMI_MAX_AUDIO_CAP_COUNT; index++)
-        {
-            if (sinkCap.bAudioFmtSupported[index] == HI_TRUE)
-            {
-                 switch (index)
-                {
-                case 1:
-                    p += PROC_PRINT(p, "LiniarPCM ");
-                    break;
-                case 2:
-                    p += PROC_PRINT(p, "AC3 ");
-                    break;
-                case 3:
-                    p += PROC_PRINT(p, "MPEG1 ");
-                    break;
-                case 4:
-                    p += PROC_PRINT(p, "MP3 ");
-                    break;
-                case 5:
-                    p += PROC_PRINT(p, "MPEG2 ");
-                    break;
-                case 6:
-                    p += PROC_PRINT(p, "ACC ");
-                    break;
-                case 7:
-                    p += PROC_PRINT(p, "DTS ");
-                    break;
-                case 8:
-                    p += PROC_PRINT(p, "ATRAC ");
-                    break;
-                case 9:
-                    p += PROC_PRINT(p, "OneBitAudio ");
-                    break;
-                case 10:
-                    p += PROC_PRINT(p, "DD+ ");
-                    break;
-                case 11:
-                    p += PROC_PRINT(p, "DTS_HD ");
-                    break;
-                case 12:
-                    p += PROC_PRINT(p, "MAT ");
-                    break;
-                case 13:
-                    p += PROC_PRINT(p, "DST ");
-                    break;
-                case 14:
-                    p += PROC_PRINT(p, "WMA ");
-                    break;
-                default:
-                    p += PROC_PRINT(p, "reserved "); 
-                    break;
-                }
-            }
-        }
-        p += PROC_PRINT(p, "\n");
-
-        p += PROC_PRINT(p, "Max Audio PCM channels: %d\n", sinkCap.u32MaxPcmChannels);
-        p += PROC_PRINT(p, "Support Audio Sample Rates:");
-        for (index = 0; index < HI_UNF_HDMI_MAX_AUDIO_SMPRATE_COUNT; index++)
-        {
-            if(sinkCap.u32AudioSampleRateSupported[index] != 0)
-            {
-                p += PROC_PRINT(p, " %d ", sinkCap.u32AudioSampleRateSupported[index]);
-            }
-        }
-        p += PROC_PRINT(p, "\n");
-        if(sinkCap.u8Speaker != HI_NULL)
-        {
-            p += PROC_PRINT(p, "Support Audio channels:");
-            if(sinkCap.u8Speaker & 0x01)
-                p += PROC_PRINT(p, " FL/FR ");
-            if(sinkCap.u8Speaker & 0x02)
-                p += PROC_PRINT(p, " LFE ");
-            if(sinkCap.u8Speaker & 0x04)
-                p += PROC_PRINT(p, " FC ");
-            if(sinkCap.u8Speaker & 0x08)
-                p += PROC_PRINT(p, " RL/RR ");
-            if(sinkCap.u8Speaker & 0x10)
-                p += PROC_PRINT(p, " RC ");
-            if(sinkCap.u8Speaker & 0x20)
-                p += PROC_PRINT(p, " FLC/FRC ");
-            if(sinkCap.u8Speaker & 0x40)
-                p += PROC_PRINT(p, " RLC/RRC ");    
-            p += PROC_PRINT(p, "\n");
-        }
-     
-        
-#if defined (CEC_SUPPORT)    
-        DRV_HDMI_CECStatus(HI_UNF_HDMI_ID_0, &CECStatus);
-        if(CECStatus.bEnable == HI_TRUE)
-        {
-            p += PROC_PRINT(p, "CEC Status     : ON\n");
-            p += PROC_PRINT(p, "CEC Phy Add    : %01d.%01d.%01d.%01d\n", CECStatus.u8PhysicalAddr[0],
-                    CECStatus.u8PhysicalAddr[1], CECStatus.u8PhysicalAddr[2], CECStatus.u8PhysicalAddr[3]);
-            p += PROC_PRINT(p, "CEC Logical Add: %01d\n", CECStatus.u8LogicalAddr);
-        }
-        else
-        {
-            p += PROC_PRINT(p, "CEC Status     : OFF\n");
-        }
-#endif
-#if defined (HDCP_SUPPORT)       
-        p += PROC_PRINT(p, "HDMI Output Attribute:\n");
-        u32Reg = DRV_ReadByte_8BA(0, TX_SLV0, 0x0F);  // 0x72:0x0F  
-        if (0X01 == (u32Reg & 0X01))
-        {
-            p += PROC_PRINT(p, "HDCP Encryption: ON\n");
-        }
-        else
-        {
-            p += PROC_PRINT(p, "HDCP Encryption: OFF\n");
-        }
-
-        if(pstAppAttr->bHDCPEnable == HI_TRUE)
-        {
-            p += PROC_PRINT(p, "HDCP Enable: ON\n");
-        }
-        else 
-        {
-            p += PROC_PRINT(p, "HDCP Enable: OFF\n");
-        }
-#endif
-
-        p += PROC_PRINT(p, "PHY Output     : ");
-        if (HI_TRUE == DRV_HDMI_ReadPhy())
-        {
-            p += PROC_PRINT(p, "Enable\n");
-        }
-        else
-        {
-            p += PROC_PRINT(p, "Disable\n");
-            p += PROC_PRINT(p, "***HDMI is abnormal, You can not get HDMI Output***\n");
-        }
-                
-        //DRV_HDMI_GetAttr(HI_UNF_HDMI_ID_0, &stHDMIAttr);
-        
-        if (pstAppAttr->bEnableVideo == HI_TRUE)
-        {
-            p += PROC_PRINT(p, "Video Output: Enable\n");
-        }
-        else
-        {
-            p += PROC_PRINT(p, "Video Output: Disable\n");
-        }
-        
-        p+= PROC_PRINT(p, "Current Fmt    : ");
-        if (pstVideoAttr->enVideoFmt == HI_DRV_DISP_FMT_1080P_60)
-        {
-            p += PROC_PRINT(p, "1080P_60\n");
-        }
-        else if (pstVideoAttr->enVideoFmt == HI_DRV_DISP_FMT_1080P_50)
-        {
-            p += PROC_PRINT(p, "1080P_50\n");
-        }
-        else if (pstVideoAttr->enVideoFmt == HI_DRV_DISP_FMT_1080P_30)
-        {
-            p += PROC_PRINT(p, "1080P_30\n");
-        }
-        else if (pstVideoAttr->enVideoFmt == HI_DRV_DISP_FMT_1080P_25)
-        {
-            p += PROC_PRINT(p, "1080P_25\n");
-        }
-        else if (pstVideoAttr->enVideoFmt == HI_DRV_DISP_FMT_1080P_24)
-        {
-            p += PROC_PRINT(p, "1080P_24\n");
-        }
-        else if (pstVideoAttr->enVideoFmt == HI_DRV_DISP_FMT_1080i_60)
-        {
-            p += PROC_PRINT(p, "1080i_60\n");
-        }
-        else if (pstVideoAttr->enVideoFmt == HI_DRV_DISP_FMT_1080i_50)
-        {
-            p += PROC_PRINT(p, "1080i_50\n");
-        }
-        else if (pstVideoAttr->enVideoFmt == HI_DRV_DISP_FMT_720P_60)
-        {
-            p += PROC_PRINT(p, "720P_60\n");
-        }
-        else if (pstVideoAttr->enVideoFmt == HI_DRV_DISP_FMT_720P_50)
-        {
-            p += PROC_PRINT(p, "720P_50\n");
-        }
-        else if (pstVideoAttr->enVideoFmt == HI_DRV_DISP_FMT_576P_50)
-        {
-            p += PROC_PRINT(p, "576P_50\n");
-        }
-        else if (pstVideoAttr->enVideoFmt == HI_DRV_DISP_FMT_480P_60)
-        {
-            p += PROC_PRINT(p, "480P_60\n");
-        }
-        else if (pstVideoAttr->enVideoFmt == HI_DRV_DISP_FMT_PAL)
-        {
-            p += PROC_PRINT(p, "576i_50\n");
-        }
-        else if (pstVideoAttr->enVideoFmt == HI_DRV_DISP_FMT_NTSC)
-        {
-            p += PROC_PRINT(p, "480i_60\n");
-        }
-        else if (pstVideoAttr->enVideoFmt == HI_DRV_DISP_FMT_861D_640X480_60)
-        {
-            p += PROC_PRINT(p, "640X480_60\n");
-        }
-#if defined (DVI_SUPPORT)
-        else if (pstVideoAttr->enVideoFmt == HI_DRV_DISP_FMT_VESA_800X600_60)
-        {
-            p += PROC_PRINT(p, "800X600_60\n");
-        }
-        else if (pstVideoAttr->enVideoFmt == HI_DRV_DISP_FMT_VESA_1024X768_60)
-        {
-            p += PROC_PRINT(p, "1024X768_60\n");
-        }
-        else if (pstVideoAttr->enVideoFmt == HI_DRV_DISP_FMT_VESA_1280X1024_60)
-        {
-            p += PROC_PRINT(p, "1280X1024_60\n");
-        }
-        else if (pstVideoAttr->enVideoFmt == HI_DRV_DISP_FMT_VESA_1366X768_60)
-        {
-            p += PROC_PRINT(p, "1366X768_60\n");
-        }
-        else if (pstVideoAttr->enVideoFmt == HI_DRV_DISP_FMT_VESA_1440X900_60)
-        {
-            p += PROC_PRINT(p, "1440X900_60\n");
-        }
-        else if (pstVideoAttr->enVideoFmt == HI_DRV_DISP_FMT_VESA_1440X900_60_RB)
-        {
-            p += PROC_PRINT(p, "1440X900_60_RB\n");
-        }
-        else if (pstVideoAttr->enVideoFmt == HI_DRV_DISP_FMT_VESA_1600X1200_60)
-        {
-            p += PROC_PRINT(p, "1600X1200_60\n");
-        }
-        else if (pstVideoAttr->enVideoFmt == HI_DRV_DISP_FMT_VESA_1920X1200_60)
-        {
-            p += PROC_PRINT(p, "1920X1200_60\n");
-        }
-        else if (pstVideoAttr->enVideoFmt == HI_DRV_DISP_FMT_VESA_2048X1152_60)
-        {
-            p += PROC_PRINT(p, "2048X1152_60\n");
-        }
-#endif
-        else
-        {
-            p += PROC_PRINT(p, "Unknown:%d\n", pstVideoAttr->enVideoFmt);
-        }
-        
-        p += PROC_PRINT(p, "Color Space    : ");
-        if (pstAppAttr->enVidOutMode == HI_UNF_HDMI_VIDEO_MODE_RGB444)
-        {
-            p += PROC_PRINT(p, "RGB444\n");
-        }
-        else if (pstAppAttr->enVidOutMode == HI_UNF_HDMI_VIDEO_MODE_YCBCR422)
-        {
-            p += PROC_PRINT(p, "YCbCr422\n");
-        }
-        else if (pstAppAttr->enVidOutMode == HI_UNF_HDMI_VIDEO_MODE_YCBCR444)
-        {
-            p += PROC_PRINT(p, "YCbCr444\n");
-        }
-        else 
-		{
-            p += PROC_PRINT(p, "Unknown:%d\n", pstAppAttr->enVidOutMode);
-        }
-        
-        p += PROC_PRINT(p, "DeepColor      : ");
-        if (pstAppAttr->enDeepColorMode == HI_UNF_HDMI_DEEP_COLOR_30BIT)
-        {
-            p += PROC_PRINT(p, "30bit\n");
-        }
-        else if (pstAppAttr->enDeepColorMode == HI_UNF_HDMI_DEEP_COLOR_36BIT)
-        {
-            p += PROC_PRINT(p, "36bit\n");
-        }
-        else
-        {
-            p += PROC_PRINT(p, "24bit\n");
-        }
-                
-        p += PROC_PRINT(p, "AUD Output  : ");
-        if (pstAppAttr->bEnableAudio == HI_TRUE)
-        {
-            p += PROC_PRINT(p, "Enable\n");
-        }
-        else
-        {
-            p += PROC_PRINT(p, "Disable\n");
-        }
-        
-        p += PROC_PRINT(p, "AUD Input Type : ");
-        if (pstAudioAttr->enSoundIntf == HDMI_AUDIO_INTERFACE_I2S)
-        {
-            p += PROC_PRINT(p, "I2S\n");
-        }
-        else if (pstAudioAttr->enSoundIntf == HDMI_AUDIO_INTERFACE_SPDIF)
-        {
-            p += PROC_PRINT(p, "SPDIF\n");
-        }
-        else if (pstAudioAttr->enSoundIntf == HDMI_AUDIO_INTERFACE_HBR)
-        {
-            p += PROC_PRINT(p, "HighBitRate\n");
-        }
-        else
-        {
-            p += PROC_PRINT(p, "Unknown:%d\n", pstAudioAttr->enSoundIntf);
-        }
-        p += PROC_PRINT(p, "AUD Sample Rate: %dHz\n", pstAudioAttr->enSampleRate);
-        p += PROC_PRINT(p, "AUD Bit Depth  : %dbit\n", pstAudioAttr->enBitDepth);
-        if(pstAudioAttr->bIsMultiChannel == HI_FALSE)
-        {
-           p += PROC_PRINT(p, "Aud Trace Mode: Stereo\n");
-        }
-        else
-        {
-           p += PROC_PRINT(p, "Aud Trace Mode: Multichannel(8)\n");
-        }
-
-        u32Reg = ReadByteHDMITXP1(0x05);  // 0x7A:0x05
-        u32Reg = (u32Reg<<8) | ReadByteHDMITXP1(0x04);  // 0x7A:0x04
-        u32Reg = (u32Reg<<8) | ReadByteHDMITXP1(0x03);  // 0x7A:0x03
-
-        p += PROC_PRINT(p, "HDMI AUDIO N   : 0x%x(%d)\n",u32Reg,u32Reg);
-
-        u32Reg = ReadByteHDMITXP1(0x0b);  // 0x7A:0x0b
-        u32Reg = (u32Reg<<8) | ReadByteHDMITXP1(0x0a);  // 0x7A:0x0a
-        u32Reg = (u32Reg<<8) | ReadByteHDMITXP1(0x09);  // 0x7A:0x09
-
-        p += PROC_PRINT(p, "HDMI AUDIO CTS : 0x%x(%d)\n",u32Reg,u32Reg);
-
-        u32Reg = ReadByteHDMITXP1(AUD_MODE_ADDR);
-        p += PROC_PRINT(p, "AUD Mode       : 0x%02x\n",u32Reg);
-
-		u32DefHDMIMode = DRV_Get_DefHDMIMode();
-		if(HI_UNF_HDMI_DEFAULT_ACTION_HDMI == u32DefHDMIMode)
-		{
-			p += PROC_PRINT(p, "Default HDMI Mode: HDMI\n");
-		}
-		else if(HI_UNF_HDMI_DEFAULT_ACTION_DVI == u32DefHDMIMode)
-		{
-			p += PROC_PRINT(p, "Default HDMI Mode: DVI\n");
-		}
-		else if(HI_UNF_HDMI_DEFAULT_ACTION_NULL == u32DefHDMIMode)
-		{
-			p += PROC_PRINT(p, "Default HDMI Mode: NULL\n");
-		}
-		else
-		{
-    		p += PROC_PRINT(p, "Default HDMI Mode: Unknow\n");
-		}
-        
-        /* HDMI Mode */
-        p += PROC_PRINT(p, "Output Mode    : ");
-        u32Reg = ReadByteHDMITXP1(0x2F);  // 0x7A:0x2F
-        if ((u32Reg & 0x01) != 0x01)
-        {
-            p += PROC_PRINT(p, "DVI\n");
-        }
-        else
-        {
-            HI_BOOL VendorSpecInfoFlag = HI_FALSE;
-            
-            p += PROC_PRINT(p, "HDMI\n");
-            
-            u32Reg = DRV_ReadByte_8BA(0, TX_SLV1, 0x3E);  // 0x7A:0x3E
-            if ( 0x03 == (u32Reg & 0x03))
-            {
-                p += PROC_PRINT(p, "AVI Infoframe  : Enable\n");
-            }
-            else
-            {
-                p += PROC_PRINT(p, "AVI Infoframe  : Disable\n");
-            }
-            
-            if ( 0x30 == (u32Reg & 0x30))
-            {
-                p += PROC_PRINT(p, "AUD Infoframe  : Enable\n");
-            }
-            else
-            {
-                p += PROC_PRINT(p, "AUD Infoframe  : Disable\n");
-            }
-            
-            if ( 0xc0 == (u32Reg & 0xc0))
-            {
-                p += PROC_PRINT(p, "MPG/VendorSpec Infoframe: Enable\n");
-                VendorSpecInfoFlag = HI_TRUE;
-            }
-            else
-            {
-                p += PROC_PRINT(p, "MPG/VendorSpec Infoframe: Disable\n");
-                VendorSpecInfoFlag = HI_FALSE;
-            }
-            
-            u32Reg = DRV_ReadByte_8BA(0, TX_SLV1, 0x3F);  // 0x7A:0x3F
-            if ( 0xC0 == (u32Reg & 0xC0))
-            {
-                p += PROC_PRINT(p, "Gamut Metadata Packet: Enable\n");
-            }
-            else
-            {
-                p += PROC_PRINT(p, "Gamut Metadata Packet: Disable\n");
-            }
-            if ( 0x03 == (u32Reg & 0x03))
-            {
-                p += PROC_PRINT(p, "Generic Packet Packet: Enable\n");
-            }
-            else
-            {
-                p += PROC_PRINT(p, "Generic Packet Packet: Disable\n");
-            }
-            
-            u32Reg = DRV_ReadByte_8BA(0, TX_SLV1, 0xDF);  // 0x7A:0xDF
-            if ( 0x10 == (u32Reg & 0x10))
-            {
-                p += PROC_PRINT(p, "AVMUTE         : Disable\n");
-            }
-            else if ( 0x01 == (u32Reg & 0x01))
-            {
-                p += PROC_PRINT(p, "AVMUTE         : Enable\n");
-            }
-            else
-            {
-                p += PROC_PRINT(p, "AVMUTE         : Unknown:%d\n", u32Reg);
-            }
-
-            /* AVI InfoFrame */
-            p += PROC_PRINT(p, "AVI Inforframe:\n");
-            for(index = 0; index < 17; index ++)
-            {
-                offset = 0x40 + index;//0x7A:0x40
-                u32Reg = DRV_ReadByte_8BA(0, TX_SLV1, offset);
-                p += PROC_PRINT(p, "0x%02x,", u32Reg);
-            }
-            p += PROC_PRINT(p, "\n");
-            /* AUD InforFrame */
-            p += PROC_PRINT(p, "AUD Inforframe:\n");
-            for(index = 0; index < 9; index ++)
-            {
-                offset = 0x80 + index;//0x7A:0x80
-                u32Reg = DRV_ReadByte_8BA(0, TX_SLV1, offset);
-                p += PROC_PRINT(p, "0x%02x,", u32Reg);
-            }
-            p += PROC_PRINT(p, "\n");
-            if (VendorSpecInfoFlag == HI_TRUE)
-            {
-                HI_U8 Packettype = 0, VideoFormat = 0, _3Dtype = 0;
-                /* MPg/VendorSpec InforFrame */
-                p += PROC_PRINT(p, "MPg/VendorSpec Inforframe:\n");
-                for(index = 0; index < 12; index ++)
-                {
-                    offset = 0xa0 + index;//0x7A:0xA0
-                    u32Reg = DRV_ReadByte_8BA(0, TX_SLV1, offset);
-                    p += PROC_PRINT(p, "0x%02x,", u32Reg);
-                    if (index == 0)
-                    {
-                        Packettype = u32Reg;
-                    }
-                    else if (index == 7)
-                    {
-                        VideoFormat = (u32Reg & 0xe0) >> 5;
-                    }
-                    else if (index == 8)
-                    {
-                        _3Dtype = (u32Reg & 0xf0) >> 4;
-                    }
-                }
-                if ((Packettype == 0x81) && (VideoFormat == 0x02))
-                {
-                    //3D format
-                    switch (_3Dtype)
-                    {
-                    case 0:
-                        p += PROC_PRINT(p, " (3D:FramePacking) ");
-                        break;
-                    case 6:
-                        p += PROC_PRINT(p, " (3D:Top-and-Bottom) ");
-                        break;
-                    case 8:
-                        p += PROC_PRINT(p, " (3D:Side-By-Side half) ");
-                        break;
-                    }
-                }
-                p += PROC_PRINT(p, "\n");                
-            }
-        }      
-
-        p += PROC_PRINT(p, "InitNum        : %d \n", DRV_HDMI_GetInitNum(0));
-        p += PROC_PRINT(p, "ProcNum        : %d \n", DRV_HDMI_ProcNum(0));
-
-        u32Reg = DRV_ReadByte_8BA(0, TX_SLV1, 0x48);
-        u32Reg = u32Reg & 0x0f;
-        if(u32Reg != 0x00)
-        {
-            p += PROC_PRINT(p, "Pixel Repeat   : 2x \n");
-        }
-        else
-        {
-            p += PROC_PRINT(p, "Pixel Repeat   : 1x(No repeat) \n");
-        }
-
-        u32Reg = ReadByteHDMITXP0(TX_STAT_ADDR);
-
-        if((u32Reg & BIT_HDMI_PSTABLE)!=0)
-        {
-            p += PROC_PRINT(p, "Pixel Clk      : stable \n");            
-        }
-        else
-        {
-            p += PROC_PRINT(p, "Pixel Clk      : !!Warnning!! Clock Unstable\n");
-        }     
-        
-        p += PROC_PRINT(p, "Unstable Times : %d \n",unStableTimes);
-
-        u32Reg = ReadByteHDMITXP0(0x3b);
-        u32Reg = (u32Reg << 8) | ReadByteHDMITXP0(0x3a);        
-        p += PROC_PRINT(p, "H Total        : %d ( 0x%x )\n",u32Reg,u32Reg);
-
-        u32Reg = ReadByteHDMITXP0(0x3d);
-        u32Reg = (u32Reg << 8) | ReadByteHDMITXP0(0x3c);
-        
-        p += PROC_PRINT(p, "V Total        : %d ( 0x%x )\n",u32Reg,u32Reg);
-
-        u32Reg = ReadByteHDMITXP0(INTERLACE_POL_DETECT);
-        if((u32Reg & BIT_I_DETECTR)!=0)
-        {
-            p += PROC_PRINT(p, "InterlaceDetect: interlace\n");
-        }
-        else
-        {
-            p += PROC_PRINT(p, "InterlaceDetect: progress\n");
-        }
-
-        u32Reg = ReadByteHDMITXP1(DIAG_PD_ADDR);
-
-        p += PROC_PRINT(p, "Power State    : 0x%02x\n",u32Reg);
-
-        if(sinkCap.bHDMI_Video_Present == HI_TRUE)
-        {
-            p += PROC_PRINT(p, "sink 3D support: support \n");
-        }
-        else
-        {
-            p += PROC_PRINT(p, "sink 3D support: not support \n");
-        }
-
-        u32Reg = ReadByteHDMITXP0(0xf6);
-        p += PROC_PRINT(p, "DDC Delay Count: 0x%02x(%d)\n",u32Reg,u32Reg);
-
-        //60Mhz osc clk
-        p += PROC_PRINT(p, "DDC Speed      : %dHz\n",(60000000 / (u32Reg * 30)));
-	/* print EDID data */
-        if (sinkCap.bIsRealEDID == HI_TRUE)
-        {
-            HI_U32 index,u32EdidLegth = 0;
-            HI_U8  Data[512];
-
-            p += PROC_PRINT(p, "EDID Raw Data:\n");
-            memset(Data, 0, 512);
-            u32EdidLegth = 128*(sinkCap.u8EDIDExternBlockNum + 1);
-
-            if(u32EdidLegth > 512)
-            {
-                u32EdidLegth = 512;
-            }
-            
-            SI_Proc_ReadEDIDBlock(Data, u32EdidLegth);
-            for (index = 0; index < u32EdidLegth; index ++)
-            {
-                p += PROC_PRINT(p, "%02x ", Data[index]);
-                if (0 == ((index + 1) % 16))
-                {
-                    p += PROC_PRINT(p, "\n");
-                }
-            }
-            
-        }
-    }
-    //p += PROC_PRINT(p, "setAttrChkCnt : %d \n",setAttrChkCnt);
-    //p += PROC_PRINT(p, "OutputState : %d \n",OutputState);
-    //p += PROC_PRINT(p, "AuthState : %d \n",AuthState);
-    p += PROC_PRINT(p, "\n#################### END ##################\n" );
-    return HI_SUCCESS;
-}
-#endif /*--NO MODIFY : COMMENT BY CODINGPARTNER--*/
-
-#define DEF_FILE_NAMELENGTH 20
-
-HI_S32 hdmi_GetProcArg(HI_CHAR*  chCmd,HI_CHAR*  chArg,HI_U32 u32ArgIdx)
-{
-    HI_U32 u32Count;
-    HI_U32 u32CmdCount;
-    HI_U32 u32LogCount;
-    HI_U32 u32NewFlag;
-    HI_CHAR chArg1[DEF_FILE_NAMELENGTH] = {0};
-    HI_CHAR chArg2[DEF_FILE_NAMELENGTH] = {0};
-    u32CmdCount = 0;
-
-    /*���ǰ��Ŀո�*/
-    u32Count = 0;
-    u32CmdCount = 0;
-    u32LogCount = 1;
-    u32NewFlag = 0;
-    while(chCmd[u32Count] != 0 && chCmd[u32Count] != '\n' )
-    {
-        if (chCmd[u32Count] != ' ')
-        {
-            u32NewFlag = 1;
-        }
-        else
-        {
-            if(u32NewFlag == 1)
-            {
-                u32LogCount++;
-                u32CmdCount= 0;
-                u32NewFlag = 0;
-            }
-        }
-        
-        if (u32NewFlag == 1)
-        {
-            switch(u32LogCount)
-            {
-                case 1:
-                    chArg1[u32CmdCount] = chCmd[u32Count];
-                    u32CmdCount++;
-                    break;
-                case 2:
-                    chArg2[u32CmdCount] = chCmd[u32Count];
-                    u32CmdCount++;
-                    break;
-                default:
-                    break;
-            }
-            
-        }
-        u32Count++;
-    }
-    
-    switch(u32ArgIdx)
-    {
-        case 1:
-            memcpy(chArg,chArg1,sizeof(HI_CHAR)*DEF_FILE_NAMELENGTH);
-            break;
-        case 2:
-            memcpy(chArg,chArg2,sizeof(HI_CHAR)*DEF_FILE_NAMELENGTH);
-            break;
-        default:
-            break;
-    }
-    return HI_SUCCESS;
-}
-
-
 
 extern HI_S32 hdmi_Open(struct inode *inode, struct file *filp);
 extern HI_S32 hdmi_Close(struct inode *inode, struct file *filp);
@@ -977,6 +115,8 @@ static HDMI_EXPORT_FUNC_S s_stHdmiExportFuncs = { //80fac664
     .pfnHdmiDetach = HI_DRV_HDMI_Detach,
     .pfnHdmiAttach = HI_DRV_HDMI_Attach,
 //  .pfnHdmiSet3DMode = HI_DRV_HDMI_Set3DMode,
+    .pfnHdmiResume = hdmi_Resume,
+    .pfnHdmiSuspend = hdmi_Suspend,
 };
 
 static long  hdmi_Drv_Ioctl(struct file *file,unsigned int cmd, unsigned long arg) 
@@ -1005,145 +145,18 @@ static /*struct*/ PM_BASEOPS_S  hdmi_DRVOPS = {
 };
 
 static UMAP_DEVICE_S   g_hdmiRegisterData;
+
+
 static HI_U8 *g_pDefHDMIMode[] = {"NULL","HDMI","DVI","BUTT"};
 
-static HI_U8 *g_pDispFmtString[] = 
-{
-    "1080P60", 
-    "1080P50", 
-    "1080P30", 
-    "1080P25",
-    "1080P24",        
-    "1080i60",        
-    "1080i50",        
-    "720P60",         
-    "720P50",         
 
-    "576P50",         
-    "480P60",         
-
-    "PAL",
-    "PAL_B",
-    "PAL_B1",
-    "PAL_D",
-    "PAL_D1",
-    "PAL_G", 
-    "PAL_H",
-    "PAL_K",
-    "PAL_I",
-    "PAL_N",
-    "PAL_Nc",
-    "PAL_M",
-    "PAL_60",
-
-    "NTSC",
-    "NTSC_J",
-    "NTSC_443",
-
-    "SECAM_SIN",
-    "SECAM_COS", 
-    "SECAM_L",      
-    "SECAM_B",      
-    "SECAM_G",      
-    "SECAM_D",      
-    "SECAM_K",      
-    "SECAM_H",      
-                                        
-    "1440x576i_50",                        
-    "1440x480i_60",                        
-                                     
-    "1080P_24_FP",                         
-    "720P_60_FP",                          
-    "720P_50_FP",                          
-                                         
-    "640X480_60",                     
-    "800X600_60",                     
-    "1024X768_60",                    
-    "1280X720_60",                    
-    "1280X800_60",                    
-    "1280X1024_60",         
-    "1360X768_60",          
-    "1366X768_60",          
-    "1400X1050_60",         
-    "1440X900_60",          
-    "1440X900_60_RB",       
-    "1600X900_60_RB",       
-    "1600X1200_60",         
-    "1680X1050_60",         
-    "1680X1050_60_RB",      
-    "1920X1080_60",                   
-    "1920X1200_60",                   
-    "1920X1440_60",                   
-    "2048X1152_60",                   
-    "2560X1440_60_RB",                
-    "2560X1600_60_RB",                
-                        
-    "Customer Timing" 
-};
-
-static HI_U8 *g_pUnfFmtString[] = 
-{
-    "1080P60", 
-    "1080P50", 
-    "1080P30", 
-    "1080P25",
-    "1080P24",        
-    "1080i60",        
-    "1080i50",        
-    "720P60",         
-    "720P50",         
-
-    "576P50",         
-    "480P60",         
-
-    "PAL",
-    "PAL_N",
-    "PAL_Nc",
-
-    "NTSC",
-    "NTSC_J",
-    "NTSC_PAL_M",
-
-    "SECAM_SIN",
-    "SECAM_COS",
-  
-    "1080P24_FP",
-    "720P60_FP",
-    "720P50_FP",
-
-    "640x480", 
-    "800x600", 
-    "1024x768", 
-    "1280x720",
-    "1280x800",
-    "1280x1024",
-    "1360x768",
-    "1366x768",
-    "1400x1050",
-    "1440x900",        
-    "1440x900_RB",
-
-    "1600x900_RB",
-    "1600x1200",
-    "1680x1050",
-    "1680x1050_RB",
-    "1920x1080",
-    "1920x1200",
-    "1920x1440",
-    "2048x1152",
-    "2560x1440_RB",
-    "2560x1600_RB",
-    "CustomerTiming"
-};
-
-#if 0 /*--NO MODIFY : COMMENT BY CODINGPARTNER--*/
 static HI_U8 *g_pAudioFmtCode[]= 
 {
     "Reserved", "PCM",  "AC3",     "MPEG1", "MP3",   "MPEG2", "AAC",
     "DTS",     "ATRAC", "ONE_BIT", "DDP",   "DTS_HD", "MAT",  "DST",
     "WMA_PRO"
 };
-#endif /*--NO MODIFY : COMMENT BY CODINGPARTNER--*/
+
 #if 0 /*--NO MODIFY : COMMENT BY CODINGPARTNER--*/
 static HI_U8 *g_pSampleRate[] = 
 {
@@ -1160,8 +173,9 @@ static HI_U8 *g_pSpeaker[] =
 static HI_U8 *g_pAudInputType[] = { "I2S","SPDIF","HBR","BUTT"};
 static HI_U8 *g_pColorSpace[] = {"RGB444","YCbCr422","YCbCr444","Future"};
 static HI_U8 *g_pDeepColor[] = {"24bit","30bit","36bit","OFF","BUTT"};
-#if 0 /*-- no used now--*/
+
 static HI_U8 *g_p3DMode[] = {
+#if 0
     "2D", 
     "FPK", 
     "SBS_HALF",
@@ -1171,25 +185,247 @@ static HI_U8 *g_p3DMode[] = {
     "SBS_FULL", 
     "L_DEPTH",
     "L_DEPTH_G_DEPTH",
+#endif
+    "FPK", //HI_UNF_EDID_3D_FRAME_PACKETING
+    "FILED_ALTER",
+    "LINE_ALTE",
+    "SBS_FULL",
+    "L_DEPTH",
+    "L_DEPTH_G_DEPTH",
+    "TAB", //HI_UNF_EDID_3D_TOP_AND_BOTTOM
+    "", //0x07 unknown
+    "SBS_HALF", //HI_UNF_EDID_3D_SIDE_BY_SIDE_HALF
 };
-#endif /*--NO MODIFY : COMMENT BY CODINGPARTNER--*/
+
+
 static HI_U8 *g_pScanInfo[] = {"No Data","OverScan","UnderScan","Future"};
 static HI_U8 *g_pPixelRep[] = {"1x(No Repeat)","2x","3x","4x","5x","6x","7x","8x","9x","10x","Reserved"};
 
+static HI_U8 g_pDispFmtString[HI_DRV_DISP_FMT_BUTT+1][DEF_FILE_NAMELENGTH];
+
+static HI_U8 g_pUnfFmtString[HI_UNF_ENC_FMT_BUTT+1][DEF_FILE_NAMELENGTH];
+
+void hdmi_InitFmtArray(void)
+{
+    HI_U32 i = 0;
+
+    for(i = 0; i < HI_UNF_ENC_FMT_BUTT+1;i++)
+    {
+        memset(g_pUnfFmtString[i] , 0 ,sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+        HI_OSAL_Strncpy(g_pUnfFmtString[i] , "unknown" , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+    }
+
+    HI_OSAL_Strncpy(g_pUnfFmtString[HI_UNF_ENC_FMT_1080P_60              ], "1080P60"      , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+    HI_OSAL_Strncpy(g_pUnfFmtString[HI_UNF_ENC_FMT_1080P_60              ], "1080P60"      , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+    HI_OSAL_Strncpy(g_pUnfFmtString[HI_UNF_ENC_FMT_1080P_50              ], "1080P50"      , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+    HI_OSAL_Strncpy(g_pUnfFmtString[HI_UNF_ENC_FMT_1080P_30              ], "1080P30"      , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+    HI_OSAL_Strncpy(g_pUnfFmtString[HI_UNF_ENC_FMT_1080P_25              ], "1080P25"      , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+    HI_OSAL_Strncpy(g_pUnfFmtString[HI_UNF_ENC_FMT_1080P_24              ], "1080P24"      , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+
+    HI_OSAL_Strncpy(g_pUnfFmtString[HI_UNF_ENC_FMT_1080i_60              ], "1080i60"      , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+    HI_OSAL_Strncpy(g_pUnfFmtString[HI_UNF_ENC_FMT_1080i_50              ], "1080i50"      , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+
+    HI_OSAL_Strncpy(g_pUnfFmtString[HI_UNF_ENC_FMT_720P_60               ], "720P60"       , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+    HI_OSAL_Strncpy(g_pUnfFmtString[HI_UNF_ENC_FMT_720P_50               ], "720P50"       , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+
+    HI_OSAL_Strncpy(g_pUnfFmtString[HI_UNF_ENC_FMT_576P_50               ], "576P50"       , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+    HI_OSAL_Strncpy(g_pUnfFmtString[HI_UNF_ENC_FMT_480P_60               ], "480P60"       , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+
+    HI_OSAL_Strncpy(g_pUnfFmtString[HI_UNF_ENC_FMT_PAL                   ], "PAL"          , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+    HI_OSAL_Strncpy(g_pUnfFmtString[HI_UNF_ENC_FMT_PAL_N                 ], "PAL_N"        , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+    HI_OSAL_Strncpy(g_pUnfFmtString[HI_UNF_ENC_FMT_PAL_Nc                ], "PAL_Nc"       , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+
+    HI_OSAL_Strncpy(g_pUnfFmtString[HI_UNF_ENC_FMT_NTSC                  ], "NTSC"         , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+    HI_OSAL_Strncpy(g_pUnfFmtString[HI_UNF_ENC_FMT_NTSC_J                ], "NTSC_J"       , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+    HI_OSAL_Strncpy(g_pUnfFmtString[HI_UNF_ENC_FMT_NTSC_PAL_M            ], "NTSC_PAL_M"   , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+
+    HI_OSAL_Strncpy(g_pUnfFmtString[HI_UNF_ENC_FMT_SECAM_SIN             ], "SECAM_SIN"    , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+    HI_OSAL_Strncpy(g_pUnfFmtString[HI_UNF_ENC_FMT_SECAM_COS             ], "SECAM_COS"    , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+
+    HI_OSAL_Strncpy(g_pUnfFmtString[HI_UNF_ENC_FMT_1080P_24_FRAME_PACKING], "1080P24_FP"   , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+    HI_OSAL_Strncpy(g_pUnfFmtString[HI_UNF_ENC_FMT_720P_60_FRAME_PACKING ], "720P60_FP"    , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+    HI_OSAL_Strncpy(g_pUnfFmtString[HI_UNF_ENC_FMT_720P_50_FRAME_PACKING ], "720P50_FP"    , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+
+    HI_OSAL_Strncpy(g_pUnfFmtString[HI_UNF_ENC_FMT_861D_640X480_60       ], "640x480"      , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+    HI_OSAL_Strncpy(g_pUnfFmtString[HI_UNF_ENC_FMT_VESA_800X600_60       ], "800x600"      , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+    HI_OSAL_Strncpy(g_pUnfFmtString[HI_UNF_ENC_FMT_VESA_1024X768_60      ], "1024x768"     , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+    HI_OSAL_Strncpy(g_pUnfFmtString[HI_UNF_ENC_FMT_VESA_1280X720_60      ], "1280x720"     , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+    HI_OSAL_Strncpy(g_pUnfFmtString[HI_UNF_ENC_FMT_VESA_1280X800_60      ], "1280x800"     , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+    HI_OSAL_Strncpy(g_pUnfFmtString[HI_UNF_ENC_FMT_VESA_1280X1024_60     ], "1280x1024"    , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+    HI_OSAL_Strncpy(g_pUnfFmtString[HI_UNF_ENC_FMT_VESA_1360X768_60      ], "1360x768"     , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+    HI_OSAL_Strncpy(g_pUnfFmtString[HI_UNF_ENC_FMT_VESA_1366X768_60      ], "1366x768"     , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+    HI_OSAL_Strncpy(g_pUnfFmtString[HI_UNF_ENC_FMT_VESA_1400X1050_60     ], "1400x1050"    , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+    HI_OSAL_Strncpy(g_pUnfFmtString[HI_UNF_ENC_FMT_VESA_1440X900_60      ], "1440x900"     , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+    HI_OSAL_Strncpy(g_pUnfFmtString[HI_UNF_ENC_FMT_VESA_1440X900_60_RB   ], "1440x900_RB"  , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+    HI_OSAL_Strncpy(g_pUnfFmtString[HI_UNF_ENC_FMT_VESA_1600X900_60_RB   ], "1600x900_RB"  , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+    HI_OSAL_Strncpy(g_pUnfFmtString[HI_UNF_ENC_FMT_VESA_1600X1200_60     ], "1600x1200"    , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+    HI_OSAL_Strncpy(g_pUnfFmtString[HI_UNF_ENC_FMT_VESA_1680X1050_60     ], "1680x1050"    , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+    HI_OSAL_Strncpy(g_pUnfFmtString[HI_UNF_ENC_FMT_VESA_1680X1050_60_RB  ], "1680x1050_RB" , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+    HI_OSAL_Strncpy(g_pUnfFmtString[HI_UNF_ENC_FMT_VESA_1920X1080_60     ], "1920x1080"    , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+    HI_OSAL_Strncpy(g_pUnfFmtString[HI_UNF_ENC_FMT_VESA_1920X1200_60     ], "1920x1200"    , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+    HI_OSAL_Strncpy(g_pUnfFmtString[HI_UNF_ENC_FMT_VESA_1920X1440_60     ], "1920x1440"    , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+    HI_OSAL_Strncpy(g_pUnfFmtString[HI_UNF_ENC_FMT_VESA_2048X1152_60     ], "2048x1152 "   , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+    HI_OSAL_Strncpy(g_pUnfFmtString[HI_UNF_ENC_FMT_VESA_2560X1440_60_RB  ], "2560x1440 _RB", sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+    HI_OSAL_Strncpy(g_pUnfFmtString[HI_UNF_ENC_FMT_VESA_2560X1600_60_RB  ], "2560x1600 _RB", sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+
+    HI_OSAL_Strncpy(g_pUnfFmtString[HI_UNF_ENC_FMT_3840X2160_24          ], "3840X2160_24" , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+    HI_OSAL_Strncpy(g_pUnfFmtString[HI_UNF_ENC_FMT_3840X2160_25          ], "3840X2160_25" , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+    HI_OSAL_Strncpy(g_pUnfFmtString[HI_UNF_ENC_FMT_3840X2160_30          ], "3840X2160_30" , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+    HI_OSAL_Strncpy(g_pUnfFmtString[HI_UNF_ENC_FMT_4096X2160_24          ], "4096X2160_24" , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+
+    HI_OSAL_Strncpy(g_pUnfFmtString[HI_UNF_ENC_FMT_BUTT                  ], "BUTT"         , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+
+    for(i = 0; i < HI_DRV_DISP_FMT_BUTT;i++)
+    {
+        memset(g_pDispFmtString[i] , 0 ,sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+        HI_OSAL_Strncpy(g_pDispFmtString[i] , "unknown" , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+    }
+
+    HI_OSAL_Strncpy(g_pDispFmtString[HI_DRV_DISP_FMT_1080P_60             ], "1080P60"        , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+    HI_OSAL_Strncpy(g_pDispFmtString[HI_DRV_DISP_FMT_1080P_50             ], "1080P50"        , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+    HI_OSAL_Strncpy(g_pDispFmtString[HI_DRV_DISP_FMT_1080P_30             ], "1080P30"        , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+    HI_OSAL_Strncpy(g_pDispFmtString[HI_DRV_DISP_FMT_1080P_25             ], "1080P25"        , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+    HI_OSAL_Strncpy(g_pDispFmtString[HI_DRV_DISP_FMT_1080P_24             ], "1080P24"        , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+
+    HI_OSAL_Strncpy(g_pDispFmtString[HI_DRV_DISP_FMT_1080i_60             ], "1080i60"        , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+    HI_OSAL_Strncpy(g_pDispFmtString[HI_DRV_DISP_FMT_1080i_50             ], "1080i50"        , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+
+    HI_OSAL_Strncpy(g_pDispFmtString[HI_DRV_DISP_FMT_720P_60              ], "720P60"         , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+    HI_OSAL_Strncpy(g_pDispFmtString[HI_DRV_DISP_FMT_720P_50              ], "720P50"         , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+
+    HI_OSAL_Strncpy(g_pDispFmtString[HI_DRV_DISP_FMT_576P_50              ], "576P50"         , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+    HI_OSAL_Strncpy(g_pDispFmtString[HI_DRV_DISP_FMT_480P_60              ], "480P60"         , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+
+    HI_OSAL_Strncpy(g_pDispFmtString[HI_DRV_DISP_FMT_PAL                  ], "PAL"            , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+    HI_OSAL_Strncpy(g_pDispFmtString[HI_DRV_DISP_FMT_PAL_B                ], "PAL_B"          , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+    HI_OSAL_Strncpy(g_pDispFmtString[HI_DRV_DISP_FMT_PAL_B1               ], "PAL_B1"         , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+    HI_OSAL_Strncpy(g_pDispFmtString[HI_DRV_DISP_FMT_PAL_D                ], "PAL_D"          , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+    HI_OSAL_Strncpy(g_pDispFmtString[HI_DRV_DISP_FMT_PAL_D1               ], "PAL_D1"         , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+    HI_OSAL_Strncpy(g_pDispFmtString[HI_DRV_DISP_FMT_PAL_G                ], "PAL_G"          , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+    HI_OSAL_Strncpy(g_pDispFmtString[HI_DRV_DISP_FMT_PAL_H                ], "PAL_H"          , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+    HI_OSAL_Strncpy(g_pDispFmtString[HI_DRV_DISP_FMT_PAL_K                ], "PAL_K"          , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+    HI_OSAL_Strncpy(g_pDispFmtString[HI_DRV_DISP_FMT_PAL_I                ], "PAL_I"          , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+    HI_OSAL_Strncpy(g_pDispFmtString[HI_DRV_DISP_FMT_PAL_N                ], "PAL_N"          , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+    HI_OSAL_Strncpy(g_pDispFmtString[HI_DRV_DISP_FMT_PAL_Nc               ], "PAL_Nc"         , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+    HI_OSAL_Strncpy(g_pDispFmtString[HI_DRV_DISP_FMT_PAL_M                ], "PAL_M"          , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+    HI_OSAL_Strncpy(g_pDispFmtString[HI_DRV_DISP_FMT_PAL_60               ], "PAL_60"         , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+
+    HI_OSAL_Strncpy(g_pDispFmtString[HI_DRV_DISP_FMT_NTSC                 ], "NTSC"           , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+    HI_OSAL_Strncpy(g_pDispFmtString[HI_DRV_DISP_FMT_NTSC_J               ], "NTSC_J"         , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+    HI_OSAL_Strncpy(g_pDispFmtString[HI_DRV_DISP_FMT_NTSC_443             ], "NTSC_443"       , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+
+    HI_OSAL_Strncpy(g_pDispFmtString[HI_DRV_DISP_FMT_SECAM_SIN            ], "SECAM_SIN"      , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+    HI_OSAL_Strncpy(g_pDispFmtString[HI_DRV_DISP_FMT_SECAM_COS            ], "SECAM_COS"      , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+    HI_OSAL_Strncpy(g_pDispFmtString[HI_DRV_DISP_FMT_SECAM_L              ], "SECAM_L"        , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+    HI_OSAL_Strncpy(g_pDispFmtString[HI_DRV_DISP_FMT_SECAM_B              ], "SECAM_B"        , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+    HI_OSAL_Strncpy(g_pDispFmtString[HI_DRV_DISP_FMT_SECAM_G              ], "SECAM_G"        , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+    HI_OSAL_Strncpy(g_pDispFmtString[HI_DRV_DISP_FMT_SECAM_D              ], "SECAM_D"        , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+    HI_OSAL_Strncpy(g_pDispFmtString[HI_DRV_DISP_FMT_SECAM_K              ], "SECAM_K"        , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+    HI_OSAL_Strncpy(g_pDispFmtString[HI_DRV_DISP_FMT_SECAM_H              ], "SECAM_H"        , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+
+    HI_OSAL_Strncpy(g_pDispFmtString[HI_DRV_DISP_FMT_1440x576i_50         ], "1440x576i_50"   , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+    HI_OSAL_Strncpy(g_pDispFmtString[HI_DRV_DISP_FMT_1440x480i_60         ], "1440x480i_60"   , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+
+    HI_OSAL_Strncpy(g_pDispFmtString[HI_DRV_DISP_FMT_1080P_24_FP          ], "1080P_24_FP"    , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+    HI_OSAL_Strncpy(g_pDispFmtString[HI_DRV_DISP_FMT_720P_60_FP           ], "720P_60_FP"     , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+    HI_OSAL_Strncpy(g_pDispFmtString[HI_DRV_DISP_FMT_720P_50_FP           ], "720P_50_FP"     , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+
+    HI_OSAL_Strncpy(g_pDispFmtString[HI_DRV_DISP_FMT_861D_640X480_60      ], "640X480_60"     , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+    HI_OSAL_Strncpy(g_pDispFmtString[HI_DRV_DISP_FMT_VESA_800X600_60      ], "800X600_60"     , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+    HI_OSAL_Strncpy(g_pDispFmtString[HI_DRV_DISP_FMT_VESA_1024X768_60     ], "1024X768_60"    , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+    HI_OSAL_Strncpy(g_pDispFmtString[HI_DRV_DISP_FMT_VESA_1280X720_60     ], "1280X720_60"    , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+    HI_OSAL_Strncpy(g_pDispFmtString[HI_DRV_DISP_FMT_VESA_1280X800_60     ], "1280X800_60"    , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+    HI_OSAL_Strncpy(g_pDispFmtString[HI_DRV_DISP_FMT_VESA_1280X1024_60    ], "1280X1024_60"   , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+    HI_OSAL_Strncpy(g_pDispFmtString[HI_DRV_DISP_FMT_VESA_1360X768_60     ], "1360X768_60"    , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+    HI_OSAL_Strncpy(g_pDispFmtString[HI_DRV_DISP_FMT_VESA_1366X768_60     ], "1366X768_60"    , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+    HI_OSAL_Strncpy(g_pDispFmtString[HI_DRV_DISP_FMT_VESA_1400X1050_60    ], "1400X1050_60"   , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+    HI_OSAL_Strncpy(g_pDispFmtString[HI_DRV_DISP_FMT_VESA_1440X900_60     ], "1440X900_60"    , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+    HI_OSAL_Strncpy(g_pDispFmtString[HI_DRV_DISP_FMT_VESA_1440X900_60_RB  ], "1440X900_60_RB" , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+    HI_OSAL_Strncpy(g_pDispFmtString[HI_DRV_DISP_FMT_VESA_1600X900_60_RB  ], "1600X900_60_RB" , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+    HI_OSAL_Strncpy(g_pDispFmtString[HI_DRV_DISP_FMT_VESA_1600X1200_60    ], "1600X1200_60"   , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+    HI_OSAL_Strncpy(g_pDispFmtString[HI_DRV_DISP_FMT_VESA_1680X1050_60    ], "1680X1050_60"   , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+    HI_OSAL_Strncpy(g_pDispFmtString[HI_DRV_DISP_FMT_VESA_1680X1050_60_RB ], "1680X1050_60_RB", sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+    HI_OSAL_Strncpy(g_pDispFmtString[HI_DRV_DISP_FMT_VESA_1920X1080_60    ], "1920X1080_60"   , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+    HI_OSAL_Strncpy(g_pDispFmtString[HI_DRV_DISP_FMT_VESA_1920X1200_60    ], "1920X1200_60"   , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+    HI_OSAL_Strncpy(g_pDispFmtString[HI_DRV_DISP_FMT_VESA_1920X1440_60    ], "1920X1440_60"   , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+    HI_OSAL_Strncpy(g_pDispFmtString[HI_DRV_DISP_FMT_VESA_2048X1152_60    ], "2048X1152_60"   , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+    HI_OSAL_Strncpy(g_pDispFmtString[HI_DRV_DISP_FMT_VESA_2560X1440_60_RB ], "2560X1440_60_RB", sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+    HI_OSAL_Strncpy(g_pDispFmtString[HI_DRV_DISP_FMT_VESA_2560X1600_60_RB ], "2560X1600_60_RB", sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+
+    HI_OSAL_Strncpy(g_pDispFmtString[HI_DRV_DISP_FMT_3840X2160_24         ], "3840X2160_24"   , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+    HI_OSAL_Strncpy(g_pDispFmtString[HI_DRV_DISP_FMT_3840X2160_25         ], "3840X2160_25"   , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+    HI_OSAL_Strncpy(g_pDispFmtString[HI_DRV_DISP_FMT_3840X2160_30         ], "3840X2160_30"   , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+    HI_OSAL_Strncpy(g_pDispFmtString[HI_DRV_DISP_FMT_4096X2160_24         ], "4096X2160_24"   , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+
+    HI_OSAL_Strncpy(g_pDispFmtString[HI_DRV_DISP_FMT_CUSTOM               ], "Customer Timing", sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+    HI_OSAL_Strncpy(g_pDispFmtString[HI_DRV_DISP_FMT_BUTT                 ], "BUTT"           , sizeof(HI_U8)*DEF_FILE_NAMELENGTH);
+}
+
+
+HI_CHAR *hdmi_GetProcArg(HI_CHAR *chCmd, HI_CHAR *chArg, HI_U32 u32ArgBufSize)
+{
+    HI_CHAR *chSrc = chCmd;
+    HI_U32 i = 0;
+
+
+    if(NULL == chCmd || NULL == chArg)
+    {
+        return NULL;
+    }
+
+     /* clear ' ' and '\n' */
+    while(' ' == *chSrc || '\n' == *chSrc)
+    {
+        chSrc++;
+    }
+
+    /* copy char to dest */
+    while('\0' != *chSrc && ' ' != *chSrc && '\n' != *chSrc)
+    {
+        *chArg++ = *chSrc++;
+        if(i++ >= u32ArgBufSize)
+        {
+        	HI_ERR_HDMI("Error : The arg size is larger than the buffer size.\n"); //384
+            return NULL;
+        }
+    }
+    *chArg= '\0';
+
+    return chSrc;
+}
+
+
+
+/*****************************************************************************
+ Prototype    : hdmi_Proc
+ Description  : HDMI status in /proc/msp/hdmi0
+ Input        : None
+ Output       : None
+ Return Value :
+ Calls        :
+*****************************************************************************/
 static HI_S32 HDMI0_Proc(struct seq_file *p, HI_VOID *v)
 {
-    HI_U32 u32Reg, index, offset,Ret,u32DefHDMIMode;
+#if 1
+#warning TODO
+	extern HI_BOOL IsForceFmtDelay(void);
+	extern HI_BOOL IsForceMuteDelay(void);
+	extern HI_U32 GetGlobalFmtDelay(void);
+	extern HI_U32 GetGlobalsMuteDelay(void);
+#endif
+    HI_U32 u32Reg, index, offset,u32DefHDMIMode;
 	HDMI_ATTR_S			          stHDMIAttr; 
     HDMI_VIDEO_ATTR_S            *pstVideoAttr;
     HDMI_AUDIO_ATTR_S            *pstAudioAttr;
     HDMI_APP_ATTR_S              *pstAppAttr;
-    HI_UNF_HDMI_SINK_CAPABILITY_S sinkCap;
+    //HI_UNF_HDMI_SINK_CAPABILITY_S sinkCap;
+    HI_UNF_HDMI_STATUS_S          stHdmiStatus;
     HI_UNF_HDMI_CEC_STATUS_S      CECStatus;
     HI_U32                        u32PlayStatus = 0;
-    HI_S32 s32Temp;
+    HI_S32 s32Temp, Ret = HI_SUCCESS;;
 
-    memset(&sinkCap,0,sizeof(HI_UNF_HDMI_SINK_CAPABILITY_S));
-   // memset(u8DefHDMI, 0, sizeof(u8DefHDMI));
+    //hdmi_InitFmtArray();
+
     p += PROC_PRINT(p, "--------------------------------- Hisi HDMI Dev Stat --------------------------------\n");
     Ret = DRV_HDMI_GetAttr(HI_UNF_HDMI_ID_0, &stHDMIAttr);
     if(Ret != HI_SUCCESS)
@@ -1208,10 +444,13 @@ static HI_S32 HDMI0_Proc(struct seq_file *p, HI_VOID *v)
     pstVideoAttr = &stHDMIAttr.stVideoAttr;
     pstAudioAttr = &stHDMIAttr.stAudioAttr;
     pstAppAttr = &stHDMIAttr.stAppAttr;
-    DRV_HDMI_GetSinkCapability(HI_UNF_HDMI_ID_0, &sinkCap);
+    //DRV_HDMI_GetSinkCapability(HI_UNF_HDMI_ID_0, &sinkCap);
+    DRV_HDMI_GetStatus(HI_UNF_HDMI_ID_0,&stHdmiStatus);
+
     p += PROC_PRINT(p, "%-20s: ","Hotplug");
-    u32Reg = DRV_ReadByte_8BA(0, TX_SLV0, 0x09);
-    if(0x02&u32Reg)
+    //u32Reg = DRV_ReadByte_8BA(0, TX_SLV0, 0x09);
+    //if(0x02&u32Reg)
+    if(stHdmiStatus.bConnected)
     {
         p += PROC_PRINT(p, "%-20s| ", "Enable");
     }
@@ -1220,7 +459,8 @@ static HI_S32 HDMI0_Proc(struct seq_file *p, HI_VOID *v)
         p += PROC_PRINT(p, "%-20s| ", "Disable");
     }
     p += PROC_PRINT(p, "%-20s: ","Thread");
-    s32Temp = DRV_Get_IsThreadStoped();
+    //s32Temp = DRV_Get_IsThreadStoped();
+    s32Temp = (DRV_Get_IsChnOpened(HI_UNF_HDMI_ID_0) && !DRV_Get_IsThreadStoped() && !SI_IsHDMIResetting()) ;
     if(s32Temp)
     {
         p += PROC_PRINT(p, "%s\n", "Enable");
@@ -1231,7 +471,8 @@ static HI_S32 HDMI0_Proc(struct seq_file *p, HI_VOID *v)
     }
     
     p += PROC_PRINT(p, "%-20s: ","Sink");
-    if(sinkCap.bIsSinkPowerOn)
+    //if(sinkCap.bIsSinkPowerOn)
+    if(stHdmiStatus.bSinkPowerOn)
     {
         p += PROC_PRINT(p, "%-20s| ", "Active");
     }
@@ -1296,13 +537,14 @@ static HI_S32 HDMI0_Proc(struct seq_file *p, HI_VOID *v)
 
     p += PROC_PRINT(p, "%-20s: ","EDID Status");
     //s32Temp = DRV_HDMI_ReadPhy();
-    if(sinkCap.bIsRealEDID)
+    //if(sinkCap.bIsRealEDID)
+    if(DRV_Get_IsValidSinkCap(HI_UNF_HDMI_ID_0))
     {
-        p += PROC_PRINT(p, "%-20s| ", "OK");
+        p += PROC_PRINT(p, "%-20s| ", "Valid");
     }
     else
     {
-        p += PROC_PRINT(p, "%-20s| ", "NO");
+        p += PROC_PRINT(p, "%-20s| ", "Unvalid");
     }
     p += PROC_PRINT(p, "%-20s: ","CEC Phy Addr");
    
@@ -1311,7 +553,8 @@ static HI_S32 HDMI0_Proc(struct seq_file *p, HI_VOID *v)
 
 
     p += PROC_PRINT(p, "%-20s: ","Default Mode");
-    u32DefHDMIMode = DRV_Get_DefHDMIMode();
+    //u32DefHDMIMode = DRV_Get_DefHDMIMode();
+    u32DefHDMIMode = DRV_Get_DefaultOutputMode(HI_UNF_HDMI_ID_0);
     p += PROC_PRINT(p, "%-20s| ", g_pDefHDMIMode[u32DefHDMIMode]);
     p += PROC_PRINT(p, "%-20s: ","CEC Logical Addr");
     p += PROC_PRINT(p, "%d\n", CECStatus.u8LogicalAddr);
@@ -1327,8 +570,45 @@ static HI_S32 HDMI0_Proc(struct seq_file *p, HI_VOID *v)
     {
         p += PROC_PRINT(p, "%-20s| ", "DVI");
     }
+
+    p += PROC_PRINT(p, "%-20s: ","AVMUTE");
+    u32Reg = DRV_ReadByte_8BA(0, TX_SLV1, 0xDF);  // 0x7A:0xDF
+    if ( 0x10 == (u32Reg & 0x10))
+    {
+        p += PROC_PRINT(p, "%s ", "Disable");
+    }
+    else if ( 0x01 == (u32Reg & 0x01))
+    {
+        p += PROC_PRINT(p, "%s ", "Enable");
+    }
+    else
+    {
+        p += PROC_PRINT(p, "%s ", "Unknown");
+    }
     p += PROC_PRINT(p, "\n");
-    
+
+
+    p += PROC_PRINT(p, "%-20s: ","Force SetFmt Delay");
+    if(IsForceFmtDelay())
+    {
+        p += PROC_PRINT(p, "%-20s| ", "Force");
+    }
+    else
+    {
+        p += PROC_PRINT(p, "%-20s| ", "Default");
+    }
+
+    p += PROC_PRINT(p, "%-20s: ","Force Mute Delay");
+    if (IsForceMuteDelay())
+    {
+        p += PROC_PRINT(p, "%s ", "Force");
+    }
+    else
+    {
+        p += PROC_PRINT(p, "%s ", "Default");
+    }
+    p += PROC_PRINT(p, "\n");
+
     p += PROC_PRINT(p, "---------------- Video -------------------|---------------- Audio -------------------\n");
     
     p += PROC_PRINT(p, "%-20s: ","Video Output ");
@@ -1351,7 +631,16 @@ static HI_S32 HDMI0_Proc(struct seq_file *p, HI_VOID *v)
     }
 
     p += PROC_PRINT(p, "%-20s: ","Current Fmt");
-    p += PROC_PRINT(p, "%-20s| ", g_pDispFmtString[pstVideoAttr->enVideoFmt]);
+    if(pstVideoAttr->enVideoFmt < HI_DRV_DISP_FMT_BUTT)
+    {
+        p += PROC_PRINT(p, "%-20s| ", g_pDispFmtString[pstVideoAttr->enVideoFmt]);
+    }
+    else
+    {
+        p += PROC_PRINT(p, "err-%-16d| ", pstVideoAttr->enVideoFmt);
+    }
+
+
     p += PROC_PRINT(p, "%-20s: ","Input Type");
     p += PROC_PRINT(p, "%s\n", g_pAudInputType[pstAudioAttr->enSoundIntf]);
 
@@ -1385,9 +674,7 @@ static HI_S32 HDMI0_Proc(struct seq_file *p, HI_VOID *v)
         p += PROC_PRINT(p, "%s\n", "Stereo");
     }
     
-  //  pstVideoAttr->u83DParam = 0;
     p += PROC_PRINT(p, "%-20s: ","3D Mode");
-   // p += PROC_PRINT(p, "%-20s| ", g_p3DMode[pstVideoAttr->u83DParam]);
     if(0 == pstVideoAttr->u83DParam)
     {
         p += PROC_PRINT(p, "%-20s| ", "FPK");
@@ -1411,26 +698,20 @@ static HI_S32 HDMI0_Proc(struct seq_file *p, HI_VOID *v)
     u32Reg = (u32Reg<<8) | ReadByteHDMITXP1(0x03);  // 0x7A:0x03
     p += PROC_PRINT(p, "0x%x(%d)\n",u32Reg,u32Reg);
     
-    p += PROC_PRINT(p, "%-20s: ","AVMUTE");
-    u32Reg = DRV_ReadByte_8BA(0, TX_SLV1, 0xDF);  // 0x7A:0xDF
-    if ( 0x10 == (u32Reg & 0x10))
-    {
-        p += PROC_PRINT(p, "%-20s| ", "Disable");
-    }
-    else if ( 0x01 == (u32Reg & 0x01))
-    {
-        p += PROC_PRINT(p, "%-20s| ", "Enable");
-    }
-    else
-    {
-        p += PROC_PRINT(p, "%-20s| ", "Unknown");
-    }
+    p += PROC_PRINT(p, "%-20s: ","Global SetFmt Delay");
+    p += PROC_PRINT(p, "%-20d| ", GetGlobalFmtDelay());
+
+
     p += PROC_PRINT(p, "%-20s: ","CTS");
     u32Reg = ReadByteHDMITXP1(0x0b);  // 0x7A:0x0b
     u32Reg = (u32Reg<<8) | ReadByteHDMITXP1(0x0a);  // 0x7A:0x0a
     u32Reg = (u32Reg<<8) | ReadByteHDMITXP1(0x09);  // 0x7A:0x09
     p += PROC_PRINT(p, "0x%x(%d)\n",u32Reg,u32Reg);
     
+    p += PROC_PRINT(p, "%-20s: ","Global Mute Delay");
+    p += PROC_PRINT(p, "%-20d| ",GetGlobalsMuteDelay());
+    p += PROC_PRINT(p, "\n");
+
     p += PROC_PRINT(p, "---------------------------------- Info Frame status --------------------------------\n");
     p += PROC_PRINT(p, "%-25s: ","AVI InfoFrame");
     u32Reg = DRV_ReadByte_8BA(0, TX_SLV1, 0x3E);  // 0x7A:0x3E
@@ -1585,6 +866,8 @@ static HI_S32 HDMI0_Proc(struct seq_file *p, HI_VOID *v)
         p += PROC_PRINT(p, "%s\n", "Future");
     }
  
+    p += PROC_PRINT(p, "--------------------------------- Debug Command -------------------------------------\n");
+    p += PROC_PRINT(p, "type 'echo help > /proc/msp/hdmi0' to get help informatin \n");
     p += PROC_PRINT(p, "---------------------------------------- END ----------------------------------------\n");
   
     return HI_SUCCESS;
@@ -1592,16 +875,16 @@ static HI_S32 HDMI0_Proc(struct seq_file *p, HI_VOID *v)
 
 static HI_S32 HDMI0_Sink_Proc(struct seq_file *p, HI_VOID *v)
 {
-    HI_UNF_HDMI_SINK_CAPABILITY_S sinkCap;
-    HI_U32 u32Index,u32Count;
+    HI_UNF_EDID_BASE_INFO_S *pSinkCap = DRV_Get_SinkCap(HI_UNF_HDMI_ID_0);
+    HI_DRV_HDMI_AUDIO_CAPABILITY_S *pOldAudioCap = DRV_Get_OldAudioCap();
+    HI_U32 i,j;
 
-    memset(&sinkCap,0,sizeof(HI_UNF_HDMI_SINK_CAPABILITY_S));
+    //hdmi_InitFmtArray();
+
     p += PROC_PRINT(p, "--------------------------------- Hisi HDMI Sink Capability -------------------------\n");
-    
-    DRV_HDMI_GetSinkCapability(HI_UNF_HDMI_ID_0, &sinkCap);
-    
+
     p += PROC_PRINT(p, "%-20s: ","EDID Status");
-    if(sinkCap.bIsRealEDID)
+    if(DRV_Get_IsValidSinkCap(HI_UNF_HDMI_ID_0))
     {
         p += PROC_PRINT(p, "%-20s| ", "OK");
     }
@@ -1610,15 +893,24 @@ static HI_S32 HDMI0_Sink_Proc(struct seq_file *p, HI_VOID *v)
         p += PROC_PRINT(p, "%-20s| ", "Failed");
     }
     p += PROC_PRINT(p, "%-20s: ","TV Manufacture Name");
-    p += PROC_PRINT(p, "%s\n", sinkCap.u8IDManufactureName);
+    p += PROC_PRINT(p, "%s\n", pSinkCap->stMfrsInfo.u8MfrsName);
 
-    p += PROC_PRINT(p, "%-22s","");
-    p += PROC_PRINT(p, "%-20s| ","");
+    p += PROC_PRINT(p, "%-20s: ","Source of EDID");
+
+    if(DRV_Get_IsUserEdid(HI_UNF_HDMI_ID_0))
+    {
+        p += PROC_PRINT(p, "%-20s| ","User Setting");
+    }
+    else
+    {
+        p += PROC_PRINT(p, "%-20s| ","From Sink");
+    }
+
     p += PROC_PRINT(p, "%-20s: ","ProductCode");
-    p += PROC_PRINT(p, "%d\n", sinkCap.u32IDProductCode);
+    p += PROC_PRINT(p, "%d\n", pSinkCap->stMfrsInfo.u32ProductCode);
 
     p += PROC_PRINT(p, "%-20s: ","Hdmi Support");
-    if(sinkCap.bIsRealEDID)
+    if(pSinkCap->bSupportHdmi)
     {
         p += PROC_PRINT(p, "%-20s| ", "TRUE");
     }
@@ -1627,20 +919,20 @@ static HI_S32 HDMI0_Sink_Proc(struct seq_file *p, HI_VOID *v)
         p += PROC_PRINT(p, "%-20s| ", "FALSE");
     }
     p += PROC_PRINT(p, "%-20s: ","SerialNumber");
-    p += PROC_PRINT(p, "%d\n", sinkCap.u32IDSerialNumber);
+    p += PROC_PRINT(p, "%d\n", pSinkCap->stMfrsInfo.u32SerialNumber);
 
     p += PROC_PRINT(p, "%-20s: ","EDID Version");
-    p += PROC_PRINT(p, "%d.%-18d| ", sinkCap.u8Version,sinkCap.u8Revision);
+    p += PROC_PRINT(p, "%d.%-18d| ", pSinkCap->u8Version,pSinkCap->u8Revision);
     p += PROC_PRINT(p, "%-20s: ","Week Of Manufacture");
-    p += PROC_PRINT(p, "%d\n", sinkCap.u32WeekOfManufacture);
+    p += PROC_PRINT(p, "%d\n", pSinkCap->stMfrsInfo.u32Week);
 
     p += PROC_PRINT(p, "%-20s: ","Extend Block Num");
-    p += PROC_PRINT(p, "%-20d| ", sinkCap.u8EDIDExternBlockNum);
+    p += PROC_PRINT(p, "%-20d| ", pSinkCap->u8ExtBlockNum);
     p += PROC_PRINT(p, "%-20s: ","Year Of Manufacture");
-    p += PROC_PRINT(p, "%d\n", sinkCap.u32YearOfManufacture);
+    p += PROC_PRINT(p, "%d\n", pSinkCap->stMfrsInfo.u32Year);
 
     p += PROC_PRINT(p, "%-20s: ","DVI Dual");
-    if(sinkCap.bSupportDVIDual)
+    if(pSinkCap->bSupportDVIDual)
     {
         p += PROC_PRINT(p, "%-20s| ", "TRUE");
     }
@@ -1649,7 +941,7 @@ static HI_S32 HDMI0_Sink_Proc(struct seq_file *p, HI_VOID *v)
         p += PROC_PRINT(p, "%-20s| ", "FALSE");
     }
     p += PROC_PRINT(p, "%-20s: ","CEC PhyAddr Valid");
-    if(sinkCap.bIsPhyAddrValid)
+    if(pSinkCap->stCECAddr.bPhyAddrValid)
     {
         p += PROC_PRINT(p, "%s\n", "TRUE");
     }
@@ -1659,7 +951,7 @@ static HI_S32 HDMI0_Sink_Proc(struct seq_file *p, HI_VOID *v)
     }
 
     p += PROC_PRINT(p, "%-20s: ","Supports AI");
-    if(sinkCap.bSupportAI)
+    if(pSinkCap->bSupportsAI)
     {
         p += PROC_PRINT(p, "%-20s| ", "TRUE");
     }
@@ -1668,17 +960,17 @@ static HI_S32 HDMI0_Sink_Proc(struct seq_file *p, HI_VOID *v)
         p += PROC_PRINT(p, "%-20s| ", "FALSE");
     }
     p += PROC_PRINT(p, "%-20s: ","CEC Phy Add");
-    p += PROC_PRINT(p, "%02x.%02x.%02x.%02x\n", sinkCap.u8PhyAddr_A, 
-        sinkCap.u8PhyAddr_B, sinkCap.u8PhyAddr_C, sinkCap.u8PhyAddr_D);
+    p += PROC_PRINT(p, "%02x.%02x.%02x.%02x\n", pSinkCap->stCECAddr.u8PhyAddrA,
+        pSinkCap->stCECAddr.u8PhyAddrB, pSinkCap->stCECAddr.u8PhyAddrC, pSinkCap->stCECAddr.u8PhyAddrD);
     p += PROC_PRINT(p, "-------------------------------------- Video ----------------------------------------\n");
     p += PROC_PRINT(p, "%-20s: ","Video Timing");
-    for(u32Index = 0,u32Count = 0; u32Index < HI_UNF_ENC_FMT_BUTT; u32Index++)
+    for(i = 0,j = 0; i < HI_UNF_ENC_FMT_BUTT; i++)
     {
-        if(sinkCap.bVideoFmtSupported[u32Index])
+        if(pSinkCap->bSupportFormat[i])
         {
-            p += PROC_PRINT(p, "%s / ", g_pUnfFmtString[u32Index]);
-            u32Count++;
-            if(0 == u32Count%6)
+            p += PROC_PRINT(p, "%s / ", g_pUnfFmtString[i]);
+            j++;
+            if(0 == j%6)
             {
                 p += PROC_PRINT(p, "\n%-22s","");
             }
@@ -1686,65 +978,121 @@ static HI_S32 HDMI0_Sink_Proc(struct seq_file *p, HI_VOID *v)
     }
     p += PROC_PRINT(p, "\n");
     p += PROC_PRINT(p, "%-20s: ","Native Format");
-    p += PROC_PRINT(p, "%s\n", g_pUnfFmtString[sinkCap.enNativeVideoFormat]);
+    p += PROC_PRINT(p, "%s\n", g_pUnfFmtString[pSinkCap->enNativeFormat]);
     p += PROC_PRINT(p, "%-20s: ","Colorimetry");
-    if(sinkCap.bSupportxvYCC601)
+    if(pSinkCap->stColorMetry.bxvYCC601)
     {
-        p += PROC_PRINT(p, " / %s", "xvYCC601");
+        p += PROC_PRINT(p, "%s", "xvYCC601 / ");
     }
-    if(sinkCap.bSupportxvYCC709)
+    if(pSinkCap->stColorMetry.bxvYCC709)
     {
-        p += PROC_PRINT(p, " / %s", "xvYCC709");
+        p += PROC_PRINT(p, "%s", "xvYCC709 / ");
     }
     p += PROC_PRINT(p, "\n");
-    
+
     p += PROC_PRINT(p, "%-20s: ","Color Space");
-    p += PROC_PRINT(p, "%s", "RGB");
-    if(sinkCap.bSupportYCbCr)
+    p += PROC_PRINT(p, "%s", "RGB444");
+    if(pSinkCap->stColorSpace.bYCbCr444)
     {
-        p += PROC_PRINT(p, " / %s", "YCbCr");
+        p += PROC_PRINT(p, " / %s", "YCbCr444");
     }
+
+    if(pSinkCap->stColorSpace.bYCbCr422)
+    {
+        p += PROC_PRINT(p, " / %s", "YCbCr422");
+    }
+
     p += PROC_PRINT(p, "\n");
 
     p += PROC_PRINT(p, "%-20s: ","Deep Color");
     p += PROC_PRINT(p, "%s", "24");
-    if(sinkCap.bSupportDeepColor30Bit)
+    if(pSinkCap->stDeepColor.bDeepColor30Bit)
     {
         p += PROC_PRINT(p, " / %s", "30");
     }
-    if(sinkCap.bSupportDeepColor30Bit)
+    if(pSinkCap->stDeepColor.bDeepColor36Bit)
     {
         p += PROC_PRINT(p, " / %s", "36");
     }
-    if(sinkCap.bSupportDeepColor48Bit)
+    if(pSinkCap->stDeepColor.bDeepColor48Bit)
     {
         p += PROC_PRINT(p, " / %s", "48");
     }
     p += PROC_PRINT(p, "bit\n");
-    
+
     p += PROC_PRINT(p, "%-20s: ","3D Support");
-    if(sinkCap.bHDMI_Video_Present)
+    if(pSinkCap->st3DInfo.bSupport3D)
     {
         p += PROC_PRINT(p, "%s\n","Support");
+        p += PROC_PRINT(p, "%-20s: ","3D Type");
+        for(i = 0;i < HI_UNF_EDID_3D_BUTT;i++)
+        {
+            if(pSinkCap->st3DInfo.bSupport3DType[i])
+            {
+                p += PROC_PRINT(p, "%s / ",g_p3DMode[i]);
+            }
+        }
     }
     else
     {
         p += PROC_PRINT(p, "%s\n","Not Support");
+        p += PROC_PRINT(p, "%-20s: None","3D Type");
     }
 
-    p += PROC_PRINT(p, "%-20s: ","3D Type");
-    p += PROC_PRINT(p, "%s\n","None");
+    p += PROC_PRINT(p, "\n");
 
     p += PROC_PRINT(p, "-------------------------------------- Audio ----------------------------------------\n");
-    p += PROC_PRINT(p, "Audio Fmt support : ");    
-    for (u32Index = 0; u32Index < HI_UNF_HDMI_MAX_AUDIO_CAP_COUNT; u32Index++)
+
+    p += PROC_PRINT(p, "%-16s| ","Audio Fmt");
+    p += PROC_PRINT(p, "%-15s| ","Chn");
+    p += PROC_PRINT(p, "%-25s","samplerate");
+    //p += PROC_PRINT(p, "%-10s","Extend");
+    p += PROC_PRINT(p, "\n");
+
+    for(i = 0; i < HI_UNF_EDID_MAX_AUDIO_CAP_COUNT; i++)
     {
-        if (sinkCap.bAudioFmtSupported[u32Index] == HI_TRUE)
+        if(pSinkCap->stAudioInfo[i].enAudFmtCode)
         {
-             switch (u32Index)
+            p += PROC_PRINT(p, "%-3d %-12s| ",pSinkCap->stAudioInfo[i].enAudFmtCode, g_pAudioFmtCode[pSinkCap->stAudioInfo[i].enAudFmtCode]);
+            p += PROC_PRINT(p, "%-15d| ",pSinkCap->stAudioInfo[i].u8AudChannel);
+
+            for (j = 0; j < MAX_SAMPE_RATE_NUM; j++)
+            {
+                if(pSinkCap->stAudioInfo[i].enSupportSampleRate[j] != 0)
+                {
+                    p += PROC_PRINT(p, "%d ", (pSinkCap->stAudioInfo[i].enSupportSampleRate[j]));
+                }
+            }
+            p += PROC_PRINT(p, "Hz");
+
+            p += PROC_PRINT(p, "\n");
+        }
+    }
+
+    p += PROC_PRINT(p, "\n%-10s : %d \n","Audio Info Num",pSinkCap->u32AudioInfoNum);
+    p += PROC_PRINT(p, "\n%-10s : ","Speaker");
+
+
+    for(i = 0; i < HI_UNF_EDID_AUDIO_SPEAKER_BUTT; i++)
+    {
+        if(pSinkCap->bSupportAudioSpeaker[i])
+        {
+            p += PROC_PRINT(p, "%s ",g_pSpeaker[i]);
+        }
+    }
+
+    p += PROC_PRINT(p, "\n");
+
+    p += PROC_PRINT(p, "------------------------------------ Old Audio --------------------------------------\n");
+    p += PROC_PRINT(p, "Audio Fmt support : ");
+    for (i = 0; i < HI_UNF_EDID_AUDIO_FORMAT_CODE_BUTT; i++)
+    {
+        if (pOldAudioCap->bAudioFmtSupported[i] == HI_TRUE)
+        {
+             switch (i)
             {
             case 1:
-                p += PROC_PRINT(p, "PCM ");
+                p += PROC_PRINT(p, "LiniarPCM ");
                 break;
             case 2:
                 p += PROC_PRINT(p, "AC3 ");
@@ -1786,54 +1134,123 @@ static HI_S32 HDMI0_Sink_Proc(struct seq_file *p, HI_VOID *v)
                 p += PROC_PRINT(p, "WMA ");
                 break;
             default:
-                p += PROC_PRINT(p, "reserved "); 
+                p += PROC_PRINT(p, "reserved ");
                 break;
             }
         }
     }
     p += PROC_PRINT(p, "\n");
 
-    p += PROC_PRINT(p, "Max Audio PCM channels: %d\n", sinkCap.u32MaxPcmChannels);
+    p += PROC_PRINT(p, "Max Audio PCM channels: %d\n", pOldAudioCap->u32MaxPcmChannels);
     p += PROC_PRINT(p, "Support Audio Sample Rates:");
-    for (u32Index = 0; u32Index < HI_UNF_HDMI_MAX_AUDIO_SMPRATE_COUNT; u32Index++)
+    for (i = 0; i < MAX_SAMPE_RATE_NUM; i++)
     {
-        if(sinkCap.u32AudioSampleRateSupported[u32Index] != 0)
+        if(pOldAudioCap->u32AudioSampleRateSupported[i] != 0)
         {
-            p += PROC_PRINT(p, " %d ", sinkCap.u32AudioSampleRateSupported[u32Index]);
+            p += PROC_PRINT(p, " %d ", pOldAudioCap->u32AudioSampleRateSupported[i]);
         }
     }
     p += PROC_PRINT(p, "\n");
 
-    if(sinkCap.u8Speaker != 0x00)
-    {
-        p += PROC_PRINT(p, "\n%-10s : ","Speaker");        
+    p += PROC_PRINT(p, "------------------------------ Custom Perfer Timing ---------------------------------\n");
 
-        for(u32Index = 0; u32Index < 8; u32Index++)
-        {
-            if(sinkCap.u8Speaker & 0x1)
-            {
-                p += PROC_PRINT(p, "%s ",g_pSpeaker[u32Index]);
-            }
-            sinkCap.u8Speaker >>= 1;
-        }
-                
-        p += PROC_PRINT(p, "\n");
+    p += PROC_PRINT(p, "%-20s: ","VFB");
+    p += PROC_PRINT(p, "%-20d| ", pSinkCap->stPerferTiming.u32VFB);
+
+    p += PROC_PRINT(p, "%-20s: ","HFB");
+    p += PROC_PRINT(p, "%d\n",  pSinkCap->stPerferTiming.u32HFB);
+
+    p += PROC_PRINT(p, "%-20s: ","VBB");
+    p += PROC_PRINT(p, "%-20d| ", pSinkCap->stPerferTiming.u32VBB);
+
+    p += PROC_PRINT(p, "%-20s: ","HBB");
+    p += PROC_PRINT(p, "%d\n",  pSinkCap->stPerferTiming.u32HBB);
+
+    p += PROC_PRINT(p, "%-20s: ","VACT");
+    p += PROC_PRINT(p, "%-20d| ", pSinkCap->stPerferTiming.u32VACT);
+
+    p += PROC_PRINT(p, "%-20s: ","HACT");
+    p += PROC_PRINT(p, "%d\n",  pSinkCap->stPerferTiming.u32HACT);
+
+    p += PROC_PRINT(p, "%-20s: ","VPW");
+    p += PROC_PRINT(p, "%-20d| ", pSinkCap->stPerferTiming.u32VPW);
+
+    p += PROC_PRINT(p, "%-20s: ","HPW");
+    p += PROC_PRINT(p, "%d\n",  pSinkCap->stPerferTiming.u32HPW);
+
+
+    p += PROC_PRINT(p, "%-20s: ","IDV");
+    if(pSinkCap->stPerferTiming.bIDV)
+    {
+        p += PROC_PRINT(p, "%-20s| ", "TRUE");
+    }
+    else
+    {
+        p += PROC_PRINT(p, "%-20s| ", "FALSE");
     }
 
+    p += PROC_PRINT(p, "%-20s: ","IHS");
+    if(pSinkCap->stPerferTiming.bIHS)
+    {
+        p += PROC_PRINT(p, "%s\n", "TRUE");
+    }
+    else
+    {
+        p += PROC_PRINT(p, "%s\n", "FALSE");
+    }
+
+
+    p += PROC_PRINT(p, "%-20s: ","IVS");
+    if(pSinkCap->stPerferTiming.bIVS)
+    {
+        p += PROC_PRINT(p, "%-20s| \n", "TRUE");
+    }
+    else
+    {
+        p += PROC_PRINT(p, "%-20s| \n", "FALSE");
+    }
+
+
+    p += PROC_PRINT(p, "%-20s: ","Image Width");
+    p += PROC_PRINT(p, "%-20d| ", pSinkCap->stPerferTiming.u32ImageWidth);
+
+    p += PROC_PRINT(p, "%-20s: ","Image Height");
+    p += PROC_PRINT(p, "%d\n",  pSinkCap->stPerferTiming.u32ImageHeight);
+
+
+    p += PROC_PRINT(p, "%-20s: ","Interlace");
+
+    if(pSinkCap->stPerferTiming.bInterlace)
+    {
+        p += PROC_PRINT(p, "%-20s| ", "TRUE");
+    }
+    else
+    {
+        p += PROC_PRINT(p, "%-20s| ", "FALSE");
+    }
+
+    p += PROC_PRINT(p, "%-20s: ","Pixel Clock");
+    p += PROC_PRINT(p, "%d\n",  pSinkCap->stPerferTiming.u32PixelClk);
+
     p += PROC_PRINT(p, "------------------------------------ EDID Raw Data ---------------------------------- \n");
-    if (sinkCap.bIsRealEDID == HI_TRUE)
+
+    if(!DRV_Get_IsValidSinkCap(HI_UNF_HDMI_ID_0))
+    {
+        p += PROC_PRINT(p, "!! Data unbelievably !! \n");
+    }
+    //no else
     {
         HI_U32 index,u32EdidLegth = 0;
         HI_U8  Data[512];
 
         memset(Data, 0, 512);
-        u32EdidLegth = 128*(sinkCap.u8EDIDExternBlockNum + 1);
+        u32EdidLegth = 128*(pSinkCap->u8ExtBlockNum + 1);
 
         if(u32EdidLegth > 512)
         {
             u32EdidLegth = 512;
         }
-        
+
         SI_Proc_ReadEDIDBlock(Data, u32EdidLegth);
         for (index = 0; index < u32EdidLegth; index ++)
         {
@@ -1843,131 +1260,168 @@ static HI_S32 HDMI0_Sink_Proc(struct seq_file *p, HI_VOID *v)
                 p += PROC_PRINT(p, "\n");
             }
         }
-        
     }
-    
+
     p += PROC_PRINT(p, "---------------------------------------- END ----------------------------------------\n");
-       
+
     return HI_SUCCESS;
 }
 
 extern HI_U32 unStableTimes;
 
+#define VDP_DHD_0_CTRL 0xff12c000
+
 HI_S32 hdmi_ProcWrite(struct file * file,
     const char __user * buf, size_t count, loff_t *ppos)
 {
+#if 1
+#warning TODO
+	extern void SI_CEC_Close(void);
+	extern void SI_CEC_SetUp(void);
+	extern void SetForceDelayMode(HI_BOOL, HI_BOOL);
+	extern void SetGlobalMuteDelay(int a);
+	extern void SetGlobalFmtDelay(int a);
+	extern HI_BOOL IsForceFmtDelay(void);
+	extern HI_BOOL IsForceMuteDelay(void);
+#endif
+
+#ifndef HI_ADVCA_FUNCTION_RELEASE
     //struct seq_file   *p = file->private_data;
     //DRV_PROC_ITEM_S  *pProcItem = s->private;
     HI_CHAR  chCmd[60] = {0};
     HI_CHAR  chArg1[DEF_FILE_NAMELENGTH] = {0};
     HI_CHAR  chArg2[DEF_FILE_NAMELENGTH] = {0};
 
-    
+#ifdef HDMI_DEBUG
+    HI_CHAR  chArg3[DEF_FILE_NAMELENGTH] = {0};  //Â·¾¶
+#endif
+
+    HI_CHAR  *chPtr = NULL;
+
     if(count > 40)
-    {   
-        printk("Error:Echo too long.\n");
+    {
+        HI_DRV_PROC_EchoHelper("Error:Echo too long.\n");
         return HI_FAILURE;
     }
-    
+
     if(copy_from_user(chCmd,buf,count))
     {
-        printk("copy from user failed\n");
+        HI_DRV_PROC_EchoHelper("copy from user failed\n");
         return HI_FAILURE;
     }
 
-    hdmi_GetProcArg(chCmd, chArg1, 1);
-    hdmi_GetProcArg(chCmd, chArg2, 2);
+
+    chPtr = hdmi_GetProcArg(chCmd, chArg1, DEF_FILE_NAMELENGTH - 1);
+    chPtr = hdmi_GetProcArg(chPtr, chArg2, DEF_FILE_NAMELENGTH - 1);
+
+
+#ifdef HDMI_DEBUG
+    chPtr = hdmi_GetProcArg(chPtr, chArg3, DEF_FILE_NAMELENGTH - 1);
+#endif
+#if 0 /*--NO MODIFY : COMMENT BY CODINGPARTNER--*/
+    if(chPtr[0] != ' ' && chPtr != NULL)
+    {
+        //for avoid TQE:unused val 'chPtr';
+        HI_DRV_PROC_EchoHelper("Exist unused param \n");
+    }
+#endif /*--NO MODIFY : COMMENT BY CODINGPARTNER--*/
+    if(chPtr == NULL)
+    {
+        //for avoid TQE:unused val 'chPtr';
+        HI_DRV_PROC_EchoHelper("param len over Max namelen \n");
+    }
+
 
     //sw reset
-    if(!strcmp(chArg1,"swrst"))
+    if(!HI_OSAL_Strncmp(chArg1,"swrst",DEF_FILE_NAMELENGTH))
     {
-        printk("hdmi resetting... ... ... \n");
+        HI_DRV_PROC_EchoHelper("hdmi resetting... ... ... \n");
         SI_SW_ResetHDMITX();
     }
     //invert tmds clock
-    else if(!strcmp(chArg1,"tclk"))
+    else if(!HI_OSAL_Strncmp(chArg1,"tclk",DEF_FILE_NAMELENGTH))
     {
         if(chArg2[0] == '1')
         {
-            printk("hdmi TmdsClk invert...  \n");
+            HI_DRV_PROC_EchoHelper("hdmi TmdsClk invert...  \n");
             WriteByteHDMITXP1(0x3d,0x1f);
         }
         else if(chArg2[0] == '0')
         {
-            printk("hdmi TmdsClk not invert... \n");
+            HI_DRV_PROC_EchoHelper("hdmi TmdsClk not invert... \n");
             WriteByteHDMITXP1(0x3d,0x17);
         }
     }
-    else if(!strcmp(chArg1,"mute"))
+    else if(!HI_OSAL_Strncmp(chArg1,"mute",DEF_FILE_NAMELENGTH))
     {
         if(chArg2[0] == '1')
         {
-            printk("mute...  \n");
+            HI_DRV_PROC_EchoHelper("mute...  \n");
             DRV_HDMI_SetAVMute(0,HI_TRUE);
             //WriteByteHDMITXP1(0x3d,0x1f);
         }
         else if(chArg2[0] == '0')
         {
-            printk("unmute... \n");
+            HI_DRV_PROC_EchoHelper("unmute... \n");
             DRV_HDMI_SetAVMute(0,HI_FALSE);
             //WriteByteHDMITXP1(0x3d,0x17);
         }
     }
     //else if(chArg1[0] == '3'&& chArg1[1] == 'd')
-    else if(!strcmp(chArg1,"3d"))
+    else if(!HI_OSAL_Strncmp(chArg1,"3d",DEF_FILE_NAMELENGTH))
     {
         HDMI_ATTR_S stAttr;
         DRV_HDMI_GetAttr(0,&stAttr);
         if(chArg2[0] == '0')
         {
-            printk("3d mode disable...  \n");
+            HI_DRV_PROC_EchoHelper("3d mode disable...  \n");
             //HI_DRV_HDMI_Set3DMode(0,HI_FALSE,HI_UNF_3D_MAX_BUTT);
             stAttr.stVideoAttr.b3DEnable = HI_FALSE;
-            stAttr.stVideoAttr.u83DParam = HI_UNF_3D_MAX_BUTT;
+            stAttr.stVideoAttr.u83DParam = HI_UNF_EDID_3D_BUTT;
             //WriteByteHDMITXP1(0x3d,0x1f);
         }
-        else if(!strcmp(chArg2,"fp"))
+        else if(!HI_OSAL_Strncmp(chArg2,"fp",DEF_FILE_NAMELENGTH))
         {
-            printk("Frame Packing... \n");
+            HI_DRV_PROC_EchoHelper("Frame Packing... \n");
             //HI_DRV_HDMI_Set3DMode(0,HI_TRUE,HI_UNF_3D_FRAME_PACKETING);
             stAttr.stVideoAttr.b3DEnable = HI_TRUE;
-            stAttr.stVideoAttr.u83DParam = HI_UNF_3D_FRAME_PACKETING;
+            stAttr.stVideoAttr.u83DParam = HI_UNF_EDID_3D_FRAME_PACKETING;
             //WriteByteHDMITXP1(0x3d,0x17);
         }
-        else if(!strcmp(chArg2,"sbs"))
+        else if(!HI_OSAL_Strncmp(chArg2,"sbs",DEF_FILE_NAMELENGTH))
         {
-            printk("Side by side(half)... \n");
+            HI_DRV_PROC_EchoHelper("Side by side(half)... \n");
             //HI_DRV_HDMI_Set3DMode(0,HI_TRUE,HI_UNF_3D_SIDE_BY_SIDE_HALF);
             stAttr.stVideoAttr.b3DEnable = HI_TRUE;
-            stAttr.stVideoAttr.u83DParam = HI_UNF_3D_SIDE_BY_SIDE_HALF;
+            stAttr.stVideoAttr.u83DParam = HI_UNF_EDID_3D_SIDE_BY_SIDE_HALF;
             //WriteByteHDMITXP1(0x3d,0x17);
         }
-        else if(!strcmp(chArg2,"tab"))
+        else if(!HI_OSAL_Strncmp(chArg2,"tab",DEF_FILE_NAMELENGTH))
         {
-            printk("Top and bottom... \n");
+            HI_DRV_PROC_EchoHelper("Top and bottom... \n");
             //HI_DRV_HDMI_Set3DMode(0,HI_TRUE,HI_UNF_3D_TOP_AND_BOTTOM);
             stAttr.stVideoAttr.b3DEnable = HI_TRUE;
-            stAttr.stVideoAttr.u83DParam = HI_UNF_3D_TOP_AND_BOTTOM;
+            stAttr.stVideoAttr.u83DParam = HI_UNF_EDID_3D_TOP_AND_BOTTOM;
             //WriteByteHDMITXP1(0x3d,0x17);
         }
         DRV_HDMI_SetAttr(0,&stAttr);
     }
-    else if(!strcmp(chArg1,"cbar"))
+    else if(!HI_OSAL_Strncmp(chArg1,"cbar",DEF_FILE_NAMELENGTH))
     {
         HI_U32 u32Reg = 0;
         if(chArg2[0] == '0')
         {
-            printk("colorbar disable...  \n");
-            DRV_HDMI_ReadRegister(0xf8ccc000,&u32Reg);
+            HI_DRV_PROC_EchoHelper("colorbar disable...  \n");
+            DRV_HDMI_ReadRegister(VDP_DHD_0_CTRL,&u32Reg);
             u32Reg = u32Reg & (~0x70000000);
-            DRV_HDMI_WriteRegister(0xf8ccc000,(u32Reg | 0x1));
+            DRV_HDMI_WriteRegister(VDP_DHD_0_CTRL,(u32Reg | 0x1));
         }
         else if(chArg2[0] == '1')
         {
-            printk("colorbar enable.. \n");
-            DRV_HDMI_ReadRegister(0xf8ccc000,&u32Reg);
+            HI_DRV_PROC_EchoHelper("colorbar enable.. \n");
+            DRV_HDMI_ReadRegister(VDP_DHD_0_CTRL,&u32Reg);
             u32Reg = u32Reg | 0x70000000;
-            DRV_HDMI_WriteRegister(0xf8ccc000,(u32Reg | 0x1));
+            DRV_HDMI_WriteRegister(VDP_DHD_0_CTRL,(u32Reg | 0x1));
         }
     }
     // 0x00 0xff 0xff yellow
@@ -1975,455 +1429,785 @@ HI_S32 hdmi_ProcWrite(struct file * file,
     // 0xff 0x00 0x00 blue
     // 0x00 0x00 0xff red
     // 0x80 0x10 0x80 black
-    //  white
-    else if(!strcmp(chArg1,"vblank"))
+    // white
+    else if(!HI_OSAL_Strncmp(chArg1,"vblank",DEF_FILE_NAMELENGTH))
     {
         if(chArg2[0] == '0')
         {
-            printk("vblank disable...  \n");
+            HI_DRV_PROC_EchoHelper("vblank disable...  \n");
             WriteByteHDMITXP0(0x0d,0x00);
         }
-        else if(!strcmp(chArg2,"black"))
+        else if(!HI_OSAL_Strncmp(chArg2,"black",DEF_FILE_NAMELENGTH))
         {
-            printk("vblank black.. \n");
+            HI_DRV_PROC_EchoHelper("vblank black.. \n");
             WriteByteHDMITXP0(0x0d,0x04);
             WriteByteHDMITXP0(0x4b,0x80);
             WriteByteHDMITXP0(0x4c,0x10);
             WriteByteHDMITXP0(0x4d,0x80);
         }
-        else if(!strcmp(chArg2,"red"))
+        else if(!HI_OSAL_Strncmp(chArg2,"red",DEF_FILE_NAMELENGTH))
         {
-            printk("vblank red.. \n");
+            HI_DRV_PROC_EchoHelper("vblank red.. \n");
             WriteByteHDMITXP0(0x0d,0x04);
             WriteByteHDMITXP0(0x4b,0x00);
             WriteByteHDMITXP0(0x4c,0x00);
             WriteByteHDMITXP0(0x4d,0xff);
         }
-        else if(!strcmp(chArg2,"green"))
+        else if(!HI_OSAL_Strncmp(chArg2,"green",DEF_FILE_NAMELENGTH))
         {
-            printk("vblank green.. \n");
+            HI_DRV_PROC_EchoHelper("vblank green.. \n");
             WriteByteHDMITXP0(0x0d,0x04);
             WriteByteHDMITXP0(0x4b,0x00);
             WriteByteHDMITXP0(0x4c,0xff);
             WriteByteHDMITXP0(0x4d,0x00);
         }
-        else if(!strcmp(chArg2,"blue"))
+        else if(!HI_OSAL_Strncmp(chArg2,"blue",DEF_FILE_NAMELENGTH))
         {
-            printk("vblank blue.. \n");
+            HI_DRV_PROC_EchoHelper("vblank blue.. \n");
             WriteByteHDMITXP0(0x0d,0x04);
             WriteByteHDMITXP0(0x4b,0xff);
             WriteByteHDMITXP0(0x4c,0x00);
             WriteByteHDMITXP0(0x4d,0x00);
         }
     }
-    else if(!strcmp(chArg1,"enc"))
+    else if(!HI_OSAL_Strncmp(chArg1,"enc",DEF_FILE_NAMELENGTH))
     {
-        if(!strcmp(chArg2,"phy"))
+        if(!HI_OSAL_Strncmp(chArg2,"phy",DEF_FILE_NAMELENGTH))
         {
-            printk("encode by phy \n");
+            HI_DRV_PROC_EchoHelper("encode by phy \n");
             WriteByteHDMITXP1(0x3c,0x08);
             SI_TX_PHY_WriteRegister(0x0d,0x00);
         }
-        else if(!strcmp(chArg2,"ctrl"))
+        else if(!HI_OSAL_Strncmp(chArg2,"ctrl",DEF_FILE_NAMELENGTH))
         {
-            printk("encode by ctrl \n");
+            HI_DRV_PROC_EchoHelper("encode by ctrl \n");
             WriteByteHDMITXP1(0x3c,0x00);
             SI_TX_PHY_WriteRegister(0x0d,0x01);
         }
     }
-    else if(!strcmp(chArg1,"pclk"))
+    else if(!HI_OSAL_Strncmp(chArg1,"pclk",DEF_FILE_NAMELENGTH))
     {
         if(chArg2[0] == '0')
         {
-            printk("pclk nobypass \n");
+            HI_DRV_PROC_EchoHelper("pclk nobypass \n");
             WriteByteHDMITXP1(0x3c,0x08);
         }
         else if(chArg2[0] == '1')
         {
-            printk("pclk bypass \n");
+            HI_DRV_PROC_EchoHelper("pclk bypass \n");
             WriteByteHDMITXP1(0x3c,0x28);
         }
-    }    
-    else if(!strcmp(chArg1,"audio"))
+    }
+    else if(!HI_OSAL_Strncmp(chArg1,"audio",DEF_FILE_NAMELENGTH))
     {
         HDMI_AUDIO_ATTR_S stHDMIAOAttr;
         memset((void*)&stHDMIAOAttr, 0, sizeof(HDMI_AUDIO_ATTR_S));
         DRV_HDMI_GetAOAttr(0,&stHDMIAOAttr);
-        
+
         if(chArg2[0] == '0')
         {
-            printk("audio I2S \n");
+            HI_DRV_PROC_EchoHelper("audio I2S \n");
             stHDMIAOAttr.enSoundIntf = HDMI_AUDIO_INTERFACE_I2S;
             DRV_HDMI_AudioChange(0,&stHDMIAOAttr);
         }
         else if(chArg2[0] == '1')
         {
-            printk("audio SPDIF \n");
+            HI_DRV_PROC_EchoHelper("audio SPDIF \n");
             stHDMIAOAttr.enSoundIntf = HDMI_AUDIO_INTERFACE_SPDIF;
             DRV_HDMI_AudioChange(0,&stHDMIAOAttr);
         }
         else if(chArg2[0] == '2')
         {
-            printk("audio HBR \n");
+            HI_DRV_PROC_EchoHelper("audio HBR \n");
             stHDMIAOAttr.enSoundIntf = HDMI_AUDIO_INTERFACE_HBR;
+            DRV_HDMI_AudioChange(0,&stHDMIAOAttr);
+        }
+        else if(chArg2[0] == '3')
+        {
+            HI_DRV_PROC_EchoHelper("audio pcm 8ch 192Khz \n");
+            stHDMIAOAttr.enSoundIntf = HDMI_AUDIO_INTERFACE_I2S;
+            stHDMIAOAttr.bIsMultiChannel = HI_TRUE;
+            stHDMIAOAttr.u32Channels = 8;
+            stHDMIAOAttr.enSampleRate = HI_UNF_SAMPLE_RATE_192K;
             DRV_HDMI_AudioChange(0,&stHDMIAOAttr);
         }
         else
         {
-            printk("not supported \n");
+            HI_DRV_PROC_EchoHelper("not supported \n");
         }
-    } 
-    else if(!strcmp(chArg1,"thread"))
+    }
+    else if(!HI_OSAL_Strncmp(chArg1,"thread",DEF_FILE_NAMELENGTH))
     {
         if(chArg2[0] == '0')
         {
-            printk("thread stop \n");
+            HI_DRV_PROC_EchoHelper("thread stop \n");
             DRV_Set_ThreadStop(HI_TRUE);
         }
         else if(chArg2[0] == '1')
         {
-            printk("thread start \n");          
+            HI_DRV_PROC_EchoHelper("thread start \n");
             DRV_Set_ThreadStop(HI_FALSE);
         }
     }
-    else if(!strcmp(chArg1,"ceccnt"))
+    else if(!HI_OSAL_Strncmp(chArg1,"cec",DEF_FILE_NAMELENGTH))
     {
+#if defined (CEC_SUPPORT)
         if(chArg2[0] == '0')
         {
-#if defined (CEC_SUPPORT)
             HDMI_CHN_ATTR_S *pstChnAttr = DRV_Get_ChnAttr();
+            //cec_enable_flag = 0;
+            SI_CEC_Close();
+            DRV_Set_CECEnable(HI_UNF_HDMI_ID_0,HI_FALSE);
+            DRV_Set_CECStart(HI_UNF_HDMI_ID_0,HI_FALSE);
             pstChnAttr[HI_UNF_HDMI_ID_0].u8CECCheckCount = 0;
-#else
-            printk("do not support cec \n");
-#endif
-
+            memset(&(pstChnAttr[HI_UNF_HDMI_ID_0].stCECStatus), 0, sizeof(HI_UNF_HDMI_CEC_STATUS_S));
         }
+        else if(chArg2[0] == '1')
+        {
+            SI_CEC_SetUp();
+            DRV_Set_CECEnable(HI_UNF_HDMI_ID_0,HI_TRUE);
+        }
+#else
+        HI_DRV_PROC_EchoHelper("do not support cec \n");
+#endif
     }
-    else if (!strcmp(chArg1,"setAttr"))
+    else if (!HI_OSAL_Strncmp(chArg1,"setAttr",DEF_FILE_NAMELENGTH))
     {
         HDMI_ATTR_S *pstHDMIAttr = DRV_Get_HDMIAttr(HI_UNF_HDMI_ID_0);
         DRV_Set_ForceUpdateFlag(HI_UNF_HDMI_ID_0,HI_TRUE);
         DRV_HDMI_SetAttr(HI_UNF_HDMI_ID_0, pstHDMIAttr);
     }
-#if 0 /*--NO MODIFY : COMMENT BY CODINGPARTNER--*/
-    else if (!strcmp(chArg1,"chkSet"))
-    {
-        HDMI_ATTR_S *pstHDMIAttr = DRV_Get_HDMIAttr(HI_UNF_HDMI_ID_0);
-                  
-        HI_INFO_HDMI("--> chkhot plug SetAttr \n");
-
-        while(1)
-        {
-             HI_U32                 j = 0,RegDate = 0,stable = 0;
-            DRV_Set_ForceUpdateFlag(HI_UNF_HDMI_ID_0,HI_TRUE);                   
-            SI_SW_ResetHDMITX();
-            DelayMS(1000);
-
-            printk(" %d times sw reset \n",setAttrChkCnt);
-            setAttrChkCnt++;
-            printk("check stable 15s \n"); 
-            for (j=0 ;j<10000;j++)   
-            {
-                DelayMS(1);/*10ms*/
-                RegDate= ReadByteHDMITXP0(0x09);
-                //printf("check (0x%x)!********\n",RegDate);
-                stable = (RegDate & 0x1);
-
-                if (!stable  )
-                    break;
-            }
-
-            if (!stable )
-            {
-                printk("*************stable*************(%x)******************\n",RegDate);
-                break;
-            }  
-        }
-        
-        DRV_HDMI_SetAttr(HI_UNF_HDMI_ID_0, pstHDMIAttr);
-    }
-#endif /*--NO MODIFY : COMMENT BY CODINGPARTNER--*/
-    else if (!strcmp(chArg1,"check"))
+    else if (!HI_OSAL_Strncmp(chArg1,"check",DEF_FILE_NAMELENGTH))
     {
         HI_U32 u32Reg = 0;
-        if(!strcmp(chArg2,"timing"))
+        if(!HI_OSAL_Strncmp(chArg2,"timing",DEF_FILE_NAMELENGTH))
         {
-            HI_PRINT("Check timing... \n");
+            HI_DRV_PROC_EchoHelper("Check timing... \n");
             u32Reg = ReadByteHDMITXP0(TX_STAT_ADDR);
 
             if((u32Reg & BIT_HDMI_PSTABLE)!=0)
             {
-                HI_PRINT("Pixel Clk      : stable \n");            
+                HI_DRV_PROC_EchoHelper("Pixel Clk      : stable \n");
             }
             else
             {
-                HI_PRINT("Pixel Clk      : !!Warnning!! Clock Unstable\n");
-            }     
-            
-            HI_PRINT("Unstable Times : %d \n",unStableTimes);
+                HI_DRV_PROC_EchoHelper("Pixel Clk      : !!Warnning!! Clock Unstable\n");
+            }
+
+            HI_DRV_PROC_EchoHelper("Unstable Times : %d \n",unStableTimes);
 
             u32Reg = ReadByteHDMITXP0(0x3b);
-            u32Reg = (u32Reg << 8) | ReadByteHDMITXP0(0x3a);        
-            HI_PRINT("H Total        : %d ( 0x%x )\n",u32Reg,u32Reg);
+            u32Reg = (u32Reg << 8) | ReadByteHDMITXP0(0x3a);
+            HI_DRV_PROC_EchoHelper("H Total        : %d ( 0x%x )\n",u32Reg,u32Reg);
 
             u32Reg = ReadByteHDMITXP0(0x3d);
             u32Reg = (u32Reg << 8) | ReadByteHDMITXP0(0x3c);
-            
-            HI_PRINT("V Total        : %d ( 0x%x )\n",u32Reg,u32Reg);
+
+            HI_DRV_PROC_EchoHelper("V Total        : %d ( 0x%x )\n",u32Reg,u32Reg);
 
             u32Reg = ReadByteHDMITXP0(INTERLACE_POL_DETECT);
             if((u32Reg & BIT_I_DETECTR)!=0)
             {
-                HI_PRINT("InterlaceDetect: interlace\n");
+                HI_DRV_PROC_EchoHelper("InterlaceDetect: interlace\n");
             }
             else
             {
-                HI_PRINT("InterlaceDetect: progress\n");
+                HI_DRV_PROC_EchoHelper("InterlaceDetect: progress\n");
             }
 
             u32Reg = ReadByteHDMITXP1(DIAG_PD_ADDR);
 
-            HI_PRINT("Power State    : 0x%02x\n",u32Reg);
+            HI_DRV_PROC_EchoHelper("Power State    : 0x%02x\n",u32Reg);
 
 
         }
-        else if(!strcmp(chArg2,"ddc"))
+        else if(!HI_OSAL_Strncmp(chArg2,"ddc",DEF_FILE_NAMELENGTH))
         {
-            HI_PRINT("check ddc... \n");
+            HI_DRV_PROC_EchoHelper("check ddc... \n");
 
             u32Reg = ReadByteHDMITXP0(DDC_DELAY_CNT);
-            HI_PRINT("DDC Delay Count : 0x%02x(%d)\n",u32Reg,u32Reg);
+            HI_DRV_PROC_EchoHelper("DDC Delay Count : 0x%02x(%d)\n",u32Reg,u32Reg);
 
-            //60Mhz osc clk
-            HI_PRINT("DDC Speed in calc : %dHz\n",(60000000 / (u32Reg * 30)));
+            if(u32Reg > 0)
+            {
+                //60Mhz osc clk
+                HI_DRV_PROC_EchoHelper("DDC Speed in calc : %dHz\n",(OSC_CLK_SELECT / (u32Reg * 35)));
+            }
+            else
+            {
+                //60Mhz osc clk
+                HI_DRV_PROC_EchoHelper("DDC Speed in calc : 0Hz\n");
+            }
 
             u32Reg = ReadByteHDMITXP0(DDC_STATUS);
 
             if(u32Reg & BIT_MDDC_ST_I2C_LOW)
             {
-                HI_PRINT("I2C transaction did not start because I2C bus is pulled LOW by an external device \n");
+                HI_DRV_PROC_EchoHelper("I2C transaction did not start because I2C bus is pulled LOW by an external device \n");
             }
 
             if(u32Reg & BIT_MDDC_ST_NO_ACK)
             {
-                HI_PRINT("HDMI Transmitter did not receive an ACK from slave device during address or data write \n");
+                HI_DRV_PROC_EchoHelper("HDMI Transmitter did not receive an ACK from slave device during address or data write \n");
             }
             if(u32Reg & BIT_MDDC_ST_IN_PROGR)
             {
-                HI_PRINT("DDC operation in progress \n");
+                HI_DRV_PROC_EchoHelper("DDC operation in progress \n");
             }
 
             if(u32Reg & BIT_MDDC_ST_FIFO_FULL)
             {
-                HI_PRINT("DDC FIFO Full \n");
+                HI_DRV_PROC_EchoHelper("DDC FIFO Full \n");
             }
 
             if(u32Reg & BIT_MDDC_ST_FIFO_EMPL)
             {
-                HI_PRINT("DDC FIFO Empty \n");
+                HI_DRV_PROC_EchoHelper("DDC FIFO Empty \n");
             }
 
             if(u32Reg & BIT_MDDC_ST_FRD_USE)
             {
-                HI_PRINT("DDC FIFO Read In Use \n");
+                HI_DRV_PROC_EchoHelper("DDC FIFO Read In Use \n");
             }
 
             if(u32Reg & BIT_MDDC_ST_FWT_USE)
             {
-                HI_PRINT("DDC FIFO Write In Use \n");
+                HI_DRV_PROC_EchoHelper("DDC FIFO Write In Use \n");
             }
         }
-        else if(!strcmp(chArg2,"color"))
+        else if(!HI_OSAL_Strncmp(chArg2,"color",DEF_FILE_NAMELENGTH))
         {
-            HI_PRINT("not supported... \n");          
+            //HI_DRV_PROC_EchoHelper("not supported... \n");
+            HDMI_APP_ATTR_S  *pstAppAttr = DRV_Get_AppAttr(HI_UNF_HDMI_ID_0);
+
+            if(pstAppAttr->bEnableHdmi)
+            {
+                HI_DRV_PROC_EchoHelper("ATTR HDMI Mode : HDMI \n");
+            }
+            else
+            {
+                HI_DRV_PROC_EchoHelper("ATTR HDMI Mode : DVI \n");
+            }
+
+            if(pstAppAttr->bEnableAviInfoFrame)
+            {
+                HI_DRV_PROC_EchoHelper("ATTR AVI InfoFrame : Enable \n");
+            }
+            else
+            {
+                HI_DRV_PROC_EchoHelper("ATTR AVI InfoFrame : Disable \n");
+            }
+
+            if(pstAppAttr->enVidOutMode == HI_UNF_HDMI_VIDEO_MODE_RGB444)
+            {
+                HI_DRV_PROC_EchoHelper("VIDEO Color Mode : RGB444 \n");
+            }
+            else if(pstAppAttr->enVidOutMode == HI_UNF_HDMI_VIDEO_MODE_YCBCR444)
+            {
+                HI_DRV_PROC_EchoHelper("VIDEO Color Mode : YCbCr444 \n");
+            }
+            else if(pstAppAttr->enVidOutMode == HI_UNF_HDMI_VIDEO_MODE_YCBCR422)
+            {
+                HI_DRV_PROC_EchoHelper("VIDEO Color Mode : YCBCR422(unsupport) \n");
+            }
+            else
+            {
+                HI_DRV_PROC_EchoHelper("VIDEO Color Mode : Unknown Mode(ERR) \n");
+            }
+
+            HI_DRV_PROC_EchoHelper("InfoFrame Color Space:");
+            u32Reg = DRV_ReadByte_8BA(0, TX_SLV1, 0x44);
+            u32Reg &= 0x60;
+            u32Reg >>=5;
+            HI_DRV_PROC_EchoHelper("%s \n", g_pColorSpace[u32Reg]);
+
+            u32Reg = ReadByteHDMITXP0(TX_VID_CTRL_ADDR);
+
+            if(u32Reg & BIT_VID_CTRL_CSCSEL)
+            {
+                HI_DRV_PROC_EchoHelper("csc Standard select : BT709 \n");
+            }
+            else
+            {
+                HI_DRV_PROC_EchoHelper("csc Standard select : BT601 \n");
+            }
+
+
+            u32Reg = ReadByteHDMITXP0(VID_ACEN_ADDR);
+
+            if(u32Reg & BIT_VID_ACEN_RGB2YCBCR)
+            {
+                HI_DRV_PROC_EchoHelper("csc Rgb=>Yuv : Open \n");
+            }
+            else
+            {
+                HI_DRV_PROC_EchoHelper("csc Rgb=>Yuv : close \n");
+            }
+
+            u32Reg = ReadByteHDMITXP0(TX_VID_MODE_ADDR);
+
+            if(u32Reg & BIT_TX_CSC)
+            {
+                HI_DRV_PROC_EchoHelper("csc Yuv=>Rgb : Open \n");
+            }
+            else
+            {
+                HI_DRV_PROC_EchoHelper("csc Yuv=>Rgb : close \n");
+            }
+
+            if(u32Reg & BIT_TX_DITHER)
+            {
+                HI_DRV_PROC_EchoHelper("dither : Open \n");
+            }
+            else
+            {
+                HI_DRV_PROC_EchoHelper("dither : close \n");
+            }
+
+            if(u32Reg & BIT_TX_DEMUX_YC )
+            {
+                HI_DRV_PROC_EchoHelper("One- to Two Demux : Open \n");
+            }
+            else
+            {
+                HI_DRV_PROC_EchoHelper("One- to Two Demux : close \n");
+            }
+
         }
-        else if(!strcmp(chArg2,"ro"))
+        else if(!HI_OSAL_Strncmp(chArg2,"ro",DEF_FILE_NAMELENGTH))
         {
-            HI_PRINT("not supported... \n");          
+            HI_DRV_PROC_EchoHelper("not supported... \n");
         }
-        else if(!strcmp(chArg2,"phy"))
+        else if(!HI_OSAL_Strncmp(chArg2,"phy",DEF_FILE_NAMELENGTH))
         {
             // unknown DM_TX_CTRL2
             SI_TX_PHY_ReadRegister(0x06,&u32Reg);
             if(u32Reg != 0x89)
             {
-                HI_ERR_HDMI("Phy Reg 0x06 : 0x%02x(0x89) \n",u32Reg);
+                HI_DRV_PROC_EchoHelper("Phy Reg 0x06 : 0x%02x(0x89) \n",u32Reg);
             }
 
             // unknown DM_TX_CTRL3
             SI_TX_PHY_ReadRegister(0x07,&u32Reg);
             if(u32Reg != 0x81)
             {
-                HI_ERR_HDMI("Phy Reg 0x07 : 0x%02x(0x81) \n",u32Reg);
+                HI_DRV_PROC_EchoHelper("Phy Reg 0x07 : 0x%02x(0x81) \n",u32Reg);
             }
 
             // unknown DM_TX_CTRL5
             SI_TX_PHY_ReadRegister(0x09,&u32Reg);
-            if(u32Reg != 0x1a)
-            {
-                HI_ERR_HDMI("Phy Reg 0x09 : 0x%02x(0x1a) \n",u32Reg);
-            }
+            HI_DRV_PROC_EchoHelper("Phy Reg 0x09 : 0x%02x \n",u32Reg);
 
-            // unknown BIAS_GEN_CTRL1 
+            // unknown BIAS_GEN_CTRL1
             SI_TX_PHY_ReadRegister(0x0a,&u32Reg);
             if(u32Reg != 0x07)
             {
-                HI_ERR_HDMI("Phy Reg 0x0a : 0x%02x(0x07) \n",u32Reg);
+                HI_DRV_PROC_EchoHelper("Phy Reg 0x0a : 0x%02x(0x07) \n",u32Reg);
             }
 
             // unknown BIAS_GEN_CTRL2
             SI_TX_PHY_ReadRegister(0x0b,&u32Reg);
             if(u32Reg != 0x51)
             {
-                HI_ERR_HDMI("Phy Reg 0x0b : 0x%02x(0x51) \n",u32Reg);
+                HI_DRV_PROC_EchoHelper("Phy Reg 0x0b : 0x%02x(0x51) \n",u32Reg);
             }
 
-            //unknown DM_TX_CTRL4 
+            //unknown DM_TX_CTRL4
             SI_TX_PHY_ReadRegister(0x08,&u32Reg);
             if(u32Reg != 0x40)
             {
-                HI_ERR_HDMI("Phy Reg 0x08 : 0x%02x(0x40) \n",u32Reg);
+                HI_DRV_PROC_EchoHelper("Phy Reg 0x08 : 0x%02x(0x40) \n",u32Reg);
             }
 
             // enc_bypass == nobypass
             SI_TX_PHY_ReadRegister(0x0d,&u32Reg);
             if(u32Reg != 0x00)
             {
-                HI_ERR_HDMI("Phy Reg 0x0d : 0x%02x(0x00) \n",u32Reg);
+                HI_DRV_PROC_EchoHelper("Phy Reg 0x0d : 0x%02x(0x00) \n",u32Reg);
             }
 
-                     
-            // term_en && cap_ctl  // term_en �ȹص�
+
+            // term_en && cap_ctl  // term_en ÏÈ¹Øµô
             SI_TX_PHY_ReadRegister(0x0e,&u32Reg);
             if(u32Reg & 0x01)
             {
-                HI_PRINT("term_en : Enable  \n");
+                HI_DRV_PROC_EchoHelper("term_en : Enable  \n");
             }
             else
             {
-                HI_PRINT("term_en : Disable  \n");
+                HI_DRV_PROC_EchoHelper("term_en : Disable  \n");
             }
-            
+
             if(u32Reg & 0x02)
             {
-                HI_PRINT("cap_ctl : Enable (recommond to disable)  \n");
+                HI_DRV_PROC_EchoHelper("cap_ctl : Enable (recommond to disable)  \n");
             }
             else
             {
-                HI_PRINT("cap_ctl : Disable  \n");
+                HI_DRV_PROC_EchoHelper("cap_ctl : Disable  \n");
             }
 
             // pll ctrl -deep color
             SI_TX_PHY_ReadRegister(0x02,&u32Reg);
             if((u32Reg & 0x03) == 0x00)
             {
-                HI_PRINT("dpcolor_ctl  : 8bit  \n");
-            }            
+                HI_DRV_PROC_EchoHelper("dpcolor_ctl  : 8bit  \n");
+            }
             else if((u32Reg & 0x03) == 0x01)
             {
-                HI_PRINT("dpcolor_ctl  : 10bit  \n");
-            }            
+                HI_DRV_PROC_EchoHelper("dpcolor_ctl  : 10bit  \n");
+            }
             else if((u32Reg & 0x03) == 0x02)
             {
-                HI_PRINT("dpcolor_ctl  : 12bit  \n");
+                HI_DRV_PROC_EchoHelper("dpcolor_ctl  : 12bit  \n");
             }
             else
             {
-                HI_PRINT("dpcolor_ctl  : invalid  \n");
+                HI_DRV_PROC_EchoHelper("dpcolor_ctl  : invalid  \n");
             }
 
             // oe && pwr_down
             SI_TX_PHY_ReadRegister(0x05,&u32Reg);
             if(u32Reg & 0x10)
             {
-                HI_PRINT("Phy No power Down \n");
+                HI_DRV_PROC_EchoHelper("Phy No power Down \n");
             }
             else
             {
-                HI_PRINT("Phy will be power down \n");
+                HI_DRV_PROC_EchoHelper("Phy will be power down \n");
             }
 
             if(u32Reg & 0x20)
             {
-                HI_PRINT("Phy Outputs enable\n");
+                HI_DRV_PROC_EchoHelper("Phy Outputs enable\n");
             }
             else
             {
-                HI_PRINT("Phy Outputs Disable\n");
-            }         
+                HI_DRV_PROC_EchoHelper("Phy Outputs Disable\n");
+            }
 
             SI_TX_PHY_ReadRegister(0x0c,&u32Reg);
             if(u32Reg & 0x01)
             {
-                HI_PRINT("receiver is connected \n");
+                HI_DRV_PROC_EchoHelper("receiver is connected \n");
             }
             else
             {
-                HI_PRINT("receiver is dis-connected \n");
+                HI_DRV_PROC_EchoHelper("receiver is dis-connected \n");
             }
 
             if(u32Reg & 0x02)
             {
-                HI_PRINT("Clock detected > 2.5Mhz \n");
+                HI_DRV_PROC_EchoHelper("Clock detected > 2.5Mhz \n");
             }
             else
             {
-                HI_PRINT("No clock detected \n");
-            }      
-            
-            
+                HI_DRV_PROC_EchoHelper("No clock detected \n");
+            }
+
         }
     }
-
-    else 
+    else if(!HI_OSAL_Strncmp(chArg1,"fmtforce",DEF_FILE_NAMELENGTH))
     {
-        HI_PRINT("--------------------------------- HDMI debug options --------------------------------\n");                                                     
-        HI_PRINT("you can perform HDMI debug with such commond:\n");                                                                      
-        HI_PRINT("echo [arg1] [arg2] > /proc/msp/hdmi \n\n");                                                                             
-        HI_PRINT("debug action                      arg1         arg2\n");                                                                
-        HI_PRINT("------------------------------    --------    ---------------------------------------\n");                                                
-        HI_PRINT("colorbar                          cbar        0 disable / 1 enable \n");
-        HI_PRINT("vblank(yuv data from hdmi)        vblank      0 /red / green/ blue/ black \n");
-        HI_PRINT("DVI encoder                       enc         phy(default)/ctrl  \n");
-        HI_PRINT("pixel clk bypass                  pclk        0 nobypass(default) 1 bypass  \n");
-        HI_PRINT("software reset                    swrst       no param \n"); 
-        HI_PRINT("invert Tmds clk                   tclk        0 not invert(default) / 1 invert \n");  
-        HI_PRINT("Avmute                            mute        0 unmute/ 1 mute \n");
-        HI_PRINT("Set 3D Fmt                        3d          0 disable3D /fp/sbs/tab  \n");
-        HI_PRINT("Debug audio Change                audio       0 I2S /1 SPdif /2 HBR   \n");
-        HI_PRINT("Thread stop/start                 thread      0 stop /1 start  \n");
-        HI_PRINT("cec count                         ceccnt      0 clear cec count \n");
-        HI_PRINT("Force set attr                    setAttr     no param \n"); 
-        HI_PRINT("check                             check       timing / ddc / color /ro (read only regs) / phy\n"); 
-        HI_PRINT("-------------------------------------------------------------------------------------\n"); 
+        if(chArg2[0] == '0')
+        {
+            HI_DRV_PROC_EchoHelper("Default Fmt Delay\n");
+            SetForceDelayMode(HI_FALSE,IsForceMuteDelay());
+        }
+        else if(chArg2[0] == '1')
+        {
+            HI_DRV_PROC_EchoHelper("Force Fmt Delay\n");
+            SetForceDelayMode(HI_TRUE,IsForceMuteDelay());
+        }
     }
+    else if(!HI_OSAL_Strncmp(chArg1,"muteforce",DEF_FILE_NAMELENGTH))
+    {
+        if(chArg2[0] == '0')
+        {
+            HI_DRV_PROC_EchoHelper("Default mute Delay\n");
+            SetForceDelayMode(IsForceFmtDelay(),HI_FALSE);
+        }
+        else if(chArg2[0] == '1')
+        {
+            HI_DRV_PROC_EchoHelper("Force Delay\n");
+            SetForceDelayMode(IsForceFmtDelay(),HI_TRUE);
+        }
+    }
+#if 0
+    else if(!HI_OSAL_Strncmp(chArg1,"RsenMode",DEF_FILE_NAMELENGTH))
+    {
+        if(chArg2[0] == '0')
+        {
+            HI_DRV_PROC_EchoHelper("Default detect Rsen\n");
+            DRV_Set_ForcePowerState(0);
+        }
+        else if(chArg2[0] == '1')
+        {
+            HI_DRV_PROC_EchoHelper("Force do not detect Rsen\n");
+            DRV_Set_ForcePowerState(1);
+
+        }
+    }
+#endif
+    else if(!HI_OSAL_Strncmp(chArg1,"fmtdelay",DEF_FILE_NAMELENGTH))
+    {
+        HI_U32 delay;
+
+        delay = simple_strtol(chArg2, NULL, 10);
+
+        if(delay <= 10000)
+        {
+            HI_DRV_PROC_EchoHelper("Set Foramt Delay %d ms\n",delay);
+            SetGlobalFmtDelay(delay);
+        }
+        else
+        {
+            HI_DRV_PROC_EchoHelper("Out of range[0-10000] %d ms\n",delay);
+        }
+    }
+    else if(!HI_OSAL_Strncmp(chArg1,"mutedelay",DEF_FILE_NAMELENGTH))
+    {
+        HI_U32 delay;
+
+        delay = simple_strtol(chArg2, NULL, 10);
+
+        if(delay <= 10000)
+        {
+            HI_DRV_PROC_EchoHelper("Avmut Delay %d ms\n",delay);
+            SetGlobalMuteDelay(delay);
+        }
+        else
+        {
+            HI_DRV_PROC_EchoHelper("Out of range[0-10000] %d ms\n",delay);
+        }
+    }
+    else if(!HI_OSAL_Strncmp(chArg1,"oe",DEF_FILE_NAMELENGTH))
+    {
+#if 0
+        //if(SI_TX_PHY_GetOutPutEnable())
+        if(!HI_OSAL_Strncmp(chArg2,"0",DEF_FILE_NAMELENGTH))
+        {
+            //DRV_HDMI_SetAVMute(0,HI_TRUE);
+            SI_TX_PHY_DisableHdmiOutput();
+            HI_DRV_PROC_EchoHelper("OE Close...\n");
+        }
+        else if(!HI_OSAL_Strncmp(chArg2,"1",DEF_FILE_NAMELENGTH))
+        {
+            SI_TX_PHY_EnableHdmiOutput();
+            //DRV_HDMI_SetAVMute(0,HI_FALSE);
+            HI_DRV_PROC_EchoHelper("OE Open...\n");
+        }
+        else
+        {
+            HI_DRV_PROC_EchoHelper("\necho oe [1]/[0]     >   /proc/msp/hdmi0\n\n");
+            HI_DRV_PROC_EchoHelper("Please Input OE Status Param\n\n");
+        }
+#else
+        if(SI_TX_PHY_GetOutPutEnable())
+        {
+            SI_TX_PHY_DisableHdmiOutput();
+        }
+        else
+        {
+            SI_TX_PHY_EnableHdmiOutput();
+        }
+#endif
+    }
+    else if(!HI_OSAL_Strncmp(chArg1,"ddc",DEF_FILE_NAMELENGTH))
+    {
+        HI_U32 delay;
+
+        delay = simple_strtol(chArg2, NULL, 10);
+
+        if(delay <= 127)
+        {
+            if(delay != 0)
+            {
+                HI_DRV_PROC_EchoHelper("DDC Speed nearly %d hz\n",(OSC_CLK_SELECT / (delay * 35)));
+            }
+            else
+            {
+                HI_DRV_PROC_EchoHelper("DDC Speed 0 hz\n");
+            }
+
+            DRV_Set_DDCSpeed(delay);
+        }
+        else
+        {
+            HI_DRV_PROC_EchoHelper("Delay Count Out of range[0-127] %d\n",delay);
+        }
+    }
+    else if(!HI_OSAL_Strncmp(chArg1,"edid",DEF_FILE_NAMELENGTH))
+    {
+        HI_U32 edidNum = DRV_Get_DebugEdidNum();
+        HI_U32 edidIndex = 0;
+
+        edidIndex = simple_strtol(chArg2, NULL, 10);
+
+        if((edidIndex > 0) && (edidIndex <= edidNum))
+        {
+            HDMI_EDID_S stEDID;
+            HDMI_Test_EDID_S *pEdidTmp = DRV_Get_DebugEdid(edidIndex);
+
+
+
+            DRV_Set_UserEdidMode(HI_UNF_HDMI_ID_0,HI_TRUE);
+
+            memset(&stEDID,0,sizeof(HDMI_EDID_S));
+            memcpy(stEDID.u8Edid,pEdidTmp->u8Edid,pEdidTmp->bEdidLen);
+            stEDID.u32Edidlength = pEdidTmp->bEdidLen;
+
+            DRV_Set_UserEdid(HI_UNF_HDMI_ID_0, &stEDID);
+
+            HI_DRV_PROC_EchoHelper("load UserSetting EDID:%d success,please swrst \n",edidIndex);
+        }
+        else
+        {
+            if(edidIndex == 0)
+            {
+                DRV_Set_UserEdidMode(HI_UNF_HDMI_ID_0,HI_FALSE);
+                HI_DRV_PROC_EchoHelper("Stop UserSettting EDID Mode \n");
+            }
+            else
+            {
+                HI_DRV_PROC_EchoHelper("Index:[%d] Out of Edid Range [%d] \n",edidIndex,edidNum);
+            }
+
+            HI_DRV_PROC_EchoHelper("----------------------- edidIndex %02d Out of range[1-%02d] ---------------------------\n",edidIndex,edidNum);
+            HI_DRV_PROC_EchoHelper("01. normal test\n");
+            HI_DRV_PROC_EchoHelper("02. for edid test block 4\n");
+            HI_DRV_PROC_EchoHelper("03. alter from edid test block 4,ext num err,and vsdb in block 3\n");
+            HI_DRV_PROC_EchoHelper("04. extend version 2.4\n");
+            HI_DRV_PROC_EchoHelper("05. unknown,maybe test parse edid some function\n");
+            HI_DRV_PROC_EchoHelper("06. audio Amplifier 1 \n");
+            HI_DRV_PROC_EchoHelper("07. ony dvi device, extend 2.1 detailed timing \n");
+            HI_DRV_PROC_EchoHelper("08. extend num && header err\n");
+            HI_DRV_PROC_EchoHelper("09. unknown \n");
+            HI_DRV_PROC_EchoHelper("10. audio Amplifier 2 \n");
+            HI_DRV_PROC_EchoHelper("11. hdcp test quantumdata HDMI \n");
+            HI_DRV_PROC_EchoHelper("12. hdcp test quantumdata DVI \n");
+            HI_DRV_PROC_EchoHelper("13. hitachi no vsdb(in some tv,some byte has broken) && block 2 crc err && support audio \n");
+            HI_DRV_PROC_EchoHelper("14. all 0xff and 0x7f,err edid, can read 2 block \n");
+            HI_DRV_PROC_EchoHelper("15. all 0xff and 0x7f,err edid, can read 4 block \n");
+            HI_DRV_PROC_EchoHelper("16. 2block 1block ok,2block all 0xff(0x7f) \n");
+            HI_DRV_PROC_EchoHelper("17. 4block 1block ok,2/3/4block all 0xff(0x7f) \n");
+            HI_DRV_PROC_EchoHelper("18. 2block and 1st block header all 0xff,crc ok \n");
+            HI_DRV_PROC_EchoHelper("19. dvi 1 block 0 extend ; crc ok \n");
+            HI_DRV_PROC_EchoHelper("20. dvi 1 block extend != 0 ; crc error \n");
+            HI_DRV_PROC_EchoHelper("21. dvi 2 block crc ok whole detailed in block 2 \n");
+            HI_DRV_PROC_EchoHelper("22. dvi 2 block crc err \n");
+            HI_DRV_PROC_EchoHelper("23. customer header err, base&extend crc err, extend version err \n");
+            HI_DRV_PROC_EchoHelper("24. 4k tv hisense \n");
+            HI_DRV_PROC_EchoHelper("25. Sony KLV-32J400A 2008  OE problem \n");
+            HI_DRV_PROC_EchoHelper("26. Sony 2009 chen OE problem \n");
+            HI_DRV_PROC_EchoHelper("27. multi VSDB EDID  \n");
+            HI_DRV_PROC_EchoHelper("28. multi audio block  \n");
+#if 0
+            HI_DRV_PROC_EchoHelper("29. Dvi deviece support audio \n");
+#endif
+            HI_DRV_PROC_EchoHelper("-------------------------------------------------------------------------------------\n");
+        }
+
+        HI_DRV_PROC_EchoHelper("swrst for trigle hotplug... ... ... \n");
+        SI_SW_ResetHDMITX();
+    }
+#if 0
+    else if(!HI_OSAL_Strncmp(chArg1,"output",DEF_FILE_NAMELENGTH))
+    {
+        if(chArg2[0] == '0')
+        {
+            HI_DRV_PROC_EchoHelper("output normal \n");
+            DRV_Set_ForceOutputMode(HI_FALSE);
+        }
+        else if(chArg2[0] == '1')
+        {
+            HI_DRV_PROC_EchoHelper("output force mode \n");
+            DRV_Set_ForceOutputMode(HI_TRUE);
+        }
+    }
+#endif
+#ifdef HDMI_DEBUG
+    else if(!HI_OSAL_Strncmp(chArg1, "logtype", DEF_FILE_NAMELENGTH))
+    {
+        if(strlen(chArg3) < 2)
+        {   //illegal chArg3 -- file path
+            HDMI_ProcessCmd(HDMI_DEBUG_LOGTYPE, chArg2, NULL);
+        }
+        else
+        {
+            HDMI_ProcessCmd(HDMI_DEBUG_LOGTYPE, chArg2, chArg3);
+        }
+    }
+    else if(!HI_OSAL_Strncmp(chArg1, "logmask", DEF_FILE_NAMELENGTH))
+    {
+        HDMI_ProcessCmd(HDMI_DEBUG_LOGMASK, chArg2, NULL);
+    }
+    else if(!HI_OSAL_Strncmp(chArg1, "logcatch", DEF_FILE_NAMELENGTH))
+    {
+        HDMI_ProcessCmd(HDMI_DEBUG_LOGCATCH, chArg2, NULL);
+    }
+#endif
+    else
+    {
+        HI_DRV_PROC_EchoHelper("--------------------------------- HDMI debug options --------------------------------\n");
+        HI_DRV_PROC_EchoHelper("you can perform HDMI debug with such commond:\n");
+        HI_DRV_PROC_EchoHelper("echo [arg1] [arg2] [arg3] > /proc/msp/hdmi \n\n");
+        HI_DRV_PROC_EchoHelper("debug action                arg1        arg2                        arg3\n");
+        HI_DRV_PROC_EchoHelper("--------------------------  --------    --------------------        ---------------\n");
+        HI_DRV_PROC_EchoHelper("colorbar                    cbar        0 disable / 1 enable \n");
+        HI_DRV_PROC_EchoHelper("vblank(yuv data from hdmi)  vblank      0 /red / green/ blue/ black \n");
+        HI_DRV_PROC_EchoHelper("DVI encoder                 enc         phy(default)/ctrl  \n");
+        HI_DRV_PROC_EchoHelper("pixel clk bypass            pclk        0 nobypass(default) 1 bypass  \n");
+        HI_DRV_PROC_EchoHelper("software reset              swrst       no param \n");
+        HI_DRV_PROC_EchoHelper("invert Tmds clk             tclk        0 not invert(default) / 1 invert \n");
+        HI_DRV_PROC_EchoHelper("Avmute                      mute        0 unmute/ 1 mute \n");
+        HI_DRV_PROC_EchoHelper("Set 3D InfoFrame            3d          0 disable3D /fp/sbs/tab  \n");
+        HI_DRV_PROC_EchoHelper("Debug audio Change          audio       0 I2S / 1 SPdif / 2 HBR   \n");
+        HI_DRV_PROC_EchoHelper("Thread stop/start           thread      0 stop / 1 start  \n");
+        HI_DRV_PROC_EchoHelper("cec enable                  cec         0 disable / 1 enable \n");
+        HI_DRV_PROC_EchoHelper("Force set attr              setAttr     no param \n");
+        HI_DRV_PROC_EchoHelper("check                       check       timing / ddc / color /ro (read only regs) / phy\n");
+        HI_DRV_PROC_EchoHelper("Force SetForamt Delay       fmtforce    0 Default / 1 Force \n");
+        HI_DRV_PROC_EchoHelper("Force Avmute Delay          muteforce   0 Default / 1 Force \n");
+        HI_DRV_PROC_EchoHelper("Set Foramt Delay            fmtdelay    0 ~ 10000 (ms)\n");
+        HI_DRV_PROC_EchoHelper("Avmute Delay                mutedelay   0 ~ 10000 (ms)\n");
+        HI_DRV_PROC_EchoHelper("Phy OE open/close           oe          no param\n");
+        HI_DRV_PROC_EchoHelper("Change DDC SPEED            ddc         0 ~ 127 (n=0:0khz  n=1-127: %d/(n*35) khz)\n",OSC_CLK_SELECT);
+        HI_DRV_PROC_EchoHelper("Debug edid,need swrst       edid        1 ~ %d / 0(list && stop) \n",DRV_Get_DebugEdidNum());
+#if 0
+        HI_DRV_PROC_EchoHelper("output mode                 output      0 normal / 1 force  \n");
+        HI_DRV_PROC_EchoHelper("RSEN detect mode            RsenMode    0 detect / 1 do not detect \n");
+#endif
+#ifdef HDMI_DEBUG
+        HI_DRV_PROC_EchoHelper("logtype(file / serial)      logtype     [serial/file/all]               [path]\n");
+        HI_DRV_PROC_EchoHelper("logmask(add / reduce)       logmask     [+/-/*][ cec/hdcp/hpd/edid/all]\n");
+        HI_DRV_PROC_EchoHelper("logcatch(print out of mem)  logcatch    [info/warning/error/fatal]  \n");
+#endif
+        HI_DRV_PROC_EchoHelper("-------------------------------------------------------------------------------------\n");
+    }
+#endif
     return count;
 }
 
 
 HI_S32 HDMI_ModeInit(HI_VOID)
 {
+#ifndef HI_ADVCA_FUNCTION_RELEASE
     DRV_PROC_ITEM_S  *pProcItem;
-    #if 1
+
     DRV_PROC_EX_S stFnOpt =
     {
          .fnRead = HDMI0_Proc,
     };
-#if 0 /*--NO MODIFY : COMMENT BY CODINGPARTNER--*/
-    DRV_PROC_EX_S stFnOpt =
-    {
-         .fnRead = hdmi_Proc,
-    };
-#endif /*--NO MODIFY : COMMENT BY CODINGPARTNER--*/
 
     DRV_PROC_EX_S stFnSinkOpt =
     {
          .fnRead = HDMI0_Sink_Proc,
     };
-    #else
-    DRV_PROC_EX_S stFnOpt;
-    stFnOpt.fnRead = HDMI0_Proc;
-    #endif
+
+    //Init Array
+    hdmi_InitFmtArray();
+#endif
 
     /* Register hdmi device */
     //sprintf(g_hdmiRegisterData.devfs_name, UMAP_DEVNAME_HDMI);
@@ -2434,9 +2218,11 @@ HI_S32 HDMI_ModeInit(HI_VOID)
     g_hdmiRegisterData.owner  = THIS_MODULE;
     if (HI_DRV_DEV_Register(&g_hdmiRegisterData) < 0)
     {
-        HI_FATAL_HDMI("register hdmi failed.\n");
+        HI_FATAL_HDMI("register hdmi failed.\n"); //2133
         return HI_FAILURE;
     }
+
+#ifndef HI_ADVCA_FUNCTION_RELEASE
     /* Register Proc hdmi Status */
     pProcItem = HI_DRV_PROC_AddModule("hdmi0", &stFnOpt, NULL);
     if(pProcItem != HI_NULL)
@@ -2446,19 +2232,12 @@ HI_S32 HDMI_ModeInit(HI_VOID)
 
     //pProcItem = HI_DRV_PROC_AddModule("hdmi0_sink", &stFnSinkOpt, NULL);
     HI_DRV_PROC_AddModule("hdmi0_sink", &stFnSinkOpt, NULL);
+#endif
+
     return HI_SUCCESS;
 }
 
 extern HI_S32  HDMI_DRV_Init(HI_VOID);
-
-#if 0 /*--NO MODIFY : COMMENT BY CODINGPARTNER--*/
-extern HI_S32  HI_DRV_HDMI_Init(HI_VOID);
-extern HI_S32  HI_DRV_HDMI_Open(HI_UNF_HDMI_ID_E enHdmi);
-extern HI_U32  HI_DRV_HDMI_DeInit(HI_U32 FromUserSpace);
-extern HI_U32  HI_DRV_HDMI_Close(HI_UNF_HDMI_ID_E enHdmi);
-#endif /*--NO MODIFY : COMMENT BY CODINGPARTNER--*/
-
-
 
 
 HI_VOID HDMI_ModeExit(HI_VOID)
@@ -2511,7 +2290,7 @@ int HDMI_DRV_ModInit(void)
     //android ����
 	if (switch_dev_register(&hdmi_tx_sdev))
     {
-		HI_WARN_HDMI("\n Warning:! registering HDMI switch device Failed \n");		
+		HI_WARN_HDMI("\n Warning:! registering HDMI switch device Failed \n"); //2212
 		g_switchOk = HI_FALSE;
         //return -EINVAL;
 	}

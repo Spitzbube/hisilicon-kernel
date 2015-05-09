@@ -6,6 +6,44 @@
 #define __TX_PHY_H__
 
 
+#if    defined(CHIP_TYPE_hi3716cv200)   \
+    || defined(CHIP_TYPE_hi3716mv400)   \
+    || defined(CHIP_TYPE_hi3718cv100)   \
+    || defined(CHIP_TYPE_hi3719cv100)   \
+    || defined(CHIP_TYPE_hi3718mv100)   \
+    || defined(CHIP_TYPE_hi3719mv100)   \
+    || defined(CHIP_TYPE_hi3796cv100)   \
+    || defined(CHIP_TYPE_hi3798cv100)
+
+// 65Mhz
+#define OSC_CLK_SELECT  65000000
+
+#elif  defined(CHIP_TYPE_hi3798mv100) \
+    || defined(CHIP_TYPE_hi3796mv100) \
+    || defined(CHIP_TYPE_hi3716mv310)
+
+// 50Mhz
+#define OSC_CLK_SELECT  50000000
+
+#define PHY_OE_ADDR         0x00
+#define     RG_TX_RSTB      0x01
+
+#define PHY_PWD_ADDR        0x01
+#define     RG_TX_EN        0x01
+
+#define PHY_AUD_ADDR        0x02
+
+#define PHY_PLL1_ADDR       0x03
+
+#define PHY_PLL2_ADDR       0x04
+#define     MASK_DEEPCOLOR  0x03
+
+#define PHY_DRV_ADDR        0x05
+
+#define PHY_CLK_ADDR        0x06
+
+
+#endif
 //#define BOARD_TYPE_S40V2_fpga
 
 #define HDMI_TX_PHY_ADDR 0xf8ce1800L

@@ -87,10 +87,10 @@ typedef struct tagPM_DEVICE_S  {
 typedef struct hiUMAP_DEVICE_S
 {
     HI_CHAR devfs_name[HIMEDIA_DEVICE_NAME_MAX_LEN];     /* devfs */
-    HI_S32  minor;
-	struct module *owner;
-    struct file_operations *fops;
-	PM_BASEOPS_S *drvops;
+    HI_S32  minor; //64
+	struct module *owner; //68
+    struct file_operations *fops; //72
+	PM_BASEOPS_S *drvops; //76
 }UMAP_DEVICE_S, *PTR_UMAP_DEVICE_S;
 
 HI_S32  DRV_PM_ModInit(HI_VOID);
