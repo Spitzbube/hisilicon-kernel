@@ -101,8 +101,12 @@ HI_S32 DRV_HDMI_WriteRegister(HI_U32 u32RegAddr, HI_U32 u32Value)
     HI_U32 VirAddr;
     volatile HI_U32     *pu32VirAddr = HI_NULL;
 
+#if 0
     VirAddr = (HI_U32)IO_ADDRESS(u32RegAddr);
-    HI_INFO_HDMI("WriteRegister u32RegAddr:0x%x, VirAddr:0x%x\n", u32RegAddr, VirAddr);
+#else
+    VirAddr = (u32RegAddr >= 0xff000000)? u32RegAddr - 0x4000000: u32RegAddr + 0x1000000;
+#endif
+    HI_INFO_HDMI("WriteRegister u32RegAddr:0x%x, VirAddr:0x%x\n", u32RegAddr, VirAddr); //105
 
     pu32VirAddr = (volatile HI_U32 *)(VirAddr);
     pu32VirAddr[0] = (HI_U32)u32Value;
@@ -115,7 +119,11 @@ HI_S32 DRV_HDMI_ReadRegister(HI_U32 u32RegAddr, HI_U32 *pu32Value)
     HI_U32 VirAddr;
     volatile HI_U32     *pu32VirAddr = HI_NULL;
 
+#if 0
     VirAddr = (HI_U32)IO_ADDRESS(u32RegAddr);
+#else
+    VirAddr = (u32RegAddr >= 0xff000000)? u32RegAddr - 0x4000000: u32RegAddr + 0x1000000;
+#endif
     pu32VirAddr = (volatile HI_U32 *)(VirAddr);
     *pu32Value = *pu32VirAddr;
 
@@ -275,7 +283,7 @@ HI_S32 DRV_BlockRead_8BAS(I2CShortCommandType * I2CCommand, HI_U8 * Data)
         ((I2CCommand->NBytes + I2CCommand->RegAddrL) > 255)
        )
     {
-        HI_ERR_HDMI("CMD INVALID Reg or Size.\n");
+        HI_ERR_HDMI("CMD INVALID Reg or Size.\n"); //278
         return HI_FAILURE;
     }
 
@@ -289,7 +297,7 @@ HI_S32 DRV_BlockRead_8BAS(I2CShortCommandType * I2CCommand, HI_U8 * Data)
     }
     else
     {
-        HI_ERR_HDMI("SLVADDR ERR:%u.\n", I2CCommand->SlaveAddr);
+        HI_ERR_HDMI("SLVADDR ERR:%u.\n", I2CCommand->SlaveAddr); //292
         return HI_FAILURE;
     }
 
@@ -317,7 +325,7 @@ HI_U8 DRV_BlockWrite_8BAS( I2CShortCommandType * I2CCommand, HI_U8 * Data )
         ((I2CCommand->NBytes + I2CCommand->RegAddrL) > 255)
        )
     {
-        HI_ERR_HDMI("CMD INVALID Reg or Size.\n");
+        HI_ERR_HDMI("CMD INVALID Reg or Size.\n"); //320
         return HI_FAILURE;
     }
 
@@ -331,7 +339,7 @@ HI_U8 DRV_BlockWrite_8BAS( I2CShortCommandType * I2CCommand, HI_U8 * Data )
     }
     else
     {
-        HI_ERR_HDMI("SLVADDR error:%u\n", I2CCommand->SlaveAddr);
+        HI_ERR_HDMI("SLVADDR error:%u\n", I2CCommand->SlaveAddr); //334
         return HI_FAILURE;
     }
 
