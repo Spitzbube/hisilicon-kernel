@@ -85,7 +85,7 @@ typedef struct
     FN_DISP_Attach               pfnDispAttach;
     FN_DISP_Detach               pfnDispDetach;
     FN_DISP_SetFormat            pfnDispSetFormat;
-    FN_DISP_GetFormat            pfnDispGetFormat;
+    FN_DISP_GetFormat            pfnDispGetFormat; //20
     FN_DISP_SetCustomTiming      pfnDispSetCustomTiming;
     FN_DISP_GetCustomTiming      pfnDispGetCustomTiming;
     FN_DISP_AddIntf              pfnDispAddIntf;

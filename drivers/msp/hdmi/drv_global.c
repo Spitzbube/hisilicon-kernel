@@ -18,41 +18,97 @@ static HDMI_COMM_ATTR_S g_stHdmiCommParam;
 
 static HDMI_CHN_ATTR_S  g_stHdmiChnParam[HI_UNF_HDMI_ID_BUTT];
 
+static HI_UNF_EDID_BASE_INFO_S g_stEdidInfo[HI_UNF_HDMI_ID_BUTT];
 
-#if 0 /*--NO MODIFY : COMMENT BY CODINGPARTNER--*/
-void DRV_Get_CommAttr(HDMI_COMM_ATTR_S **pstCommAttr)
+static HDMI_PRIVATE_EDID_S g_stPriEdidInfo[HI_UNF_HDMI_ID_BUTT];
+
+#warning TODO: EDID_BLOCK_TEST1 - EDID_BLOCK_TEST28
+HI_U8 EDID_BLOCK_TEST1[1];
+HI_U8 EDID_BLOCK_TEST2[1];
+HI_U8 EDID_BLOCK_TEST3[1];
+HI_U8 EDID_BLOCK_TEST4[1];
+HI_U8 EDID_BLOCK_TEST5[1];
+HI_U8 EDID_BLOCK_TEST6[1];
+HI_U8 EDID_BLOCK_TEST7[1];
+HI_U8 EDID_BLOCK_TEST8[1];
+HI_U8 EDID_BLOCK_TEST9[1];
+HI_U8 EDID_BLOCK_TEST10[1];
+HI_U8 EDID_BLOCK_TEST11[1];
+HI_U8 EDID_BLOCK_TEST12[1];
+HI_U8 EDID_BLOCK_TEST13[1];
+HI_U8 EDID_BLOCK_TEST14[1];
+HI_U8 EDID_BLOCK_TEST15[1];
+HI_U8 EDID_BLOCK_TEST16[1];
+HI_U8 EDID_BLOCK_TEST17[1];
+HI_U8 EDID_BLOCK_TEST18[1];
+HI_U8 EDID_BLOCK_TEST19[1];
+HI_U8 EDID_BLOCK_TEST20[1];
+HI_U8 EDID_BLOCK_TEST21[1];
+HI_U8 EDID_BLOCK_TEST22[1];
+HI_U8 EDID_BLOCK_TEST23[1];
+HI_U8 EDID_BLOCK_TEST24[1];
+HI_U8 EDID_BLOCK_TEST25[1];
+HI_U8 EDID_BLOCK_TEST26[1];
+HI_U8 EDID_BLOCK_TEST27[1];
+HI_U8 EDID_BLOCK_TEST28[1];
+
+static HDMI_Test_EDID_S *EDID_List[] =
 {
-    printk("Get_CommAttr \n");
-    //printk("g_stHdmiCommParam : 0x%x \n",&g_stHdmiCommParam);
-    *pstCommAttr = &g_stHdmiCommParam;
-#if 0 /*--NO MODIFY : COMMENT BY CODINGPARTNER--*/
-    printk("pstCommAttr : 0x%x \n",pstCommAttr);
-    printk("&pstCommAttr : 0x%x \n",&pstCommAttr);
-    printk("*pstCommAttr : 0x%x \n",*pstCommAttr);
-#endif /*--NO MODIFY : COMMENT BY CODINGPARTNER--*/
-}
-#endif /*--NO MODIFY : COMMENT BY CODINGPARTNER--*/
+    &(HDMI_Test_EDID_S){sizeof(EDID_BLOCK_TEST1) , EDID_BLOCK_TEST1},
+    &(HDMI_Test_EDID_S){sizeof(EDID_BLOCK_TEST2) , EDID_BLOCK_TEST2},
+    &(HDMI_Test_EDID_S){sizeof(EDID_BLOCK_TEST3) , EDID_BLOCK_TEST3},
+    &(HDMI_Test_EDID_S){sizeof(EDID_BLOCK_TEST4) , EDID_BLOCK_TEST4},
+    &(HDMI_Test_EDID_S){sizeof(EDID_BLOCK_TEST5) , EDID_BLOCK_TEST5},
+    &(HDMI_Test_EDID_S){sizeof(EDID_BLOCK_TEST6) , EDID_BLOCK_TEST6},
+    &(HDMI_Test_EDID_S){sizeof(EDID_BLOCK_TEST7) , EDID_BLOCK_TEST7},
+    &(HDMI_Test_EDID_S){sizeof(EDID_BLOCK_TEST8) , EDID_BLOCK_TEST8},
+    &(HDMI_Test_EDID_S){sizeof(EDID_BLOCK_TEST9) , EDID_BLOCK_TEST9},
+    &(HDMI_Test_EDID_S){sizeof(EDID_BLOCK_TEST10), EDID_BLOCK_TEST10},
+    &(HDMI_Test_EDID_S){sizeof(EDID_BLOCK_TEST11), EDID_BLOCK_TEST11},
+    &(HDMI_Test_EDID_S){sizeof(EDID_BLOCK_TEST12), EDID_BLOCK_TEST12},
+    &(HDMI_Test_EDID_S){sizeof(EDID_BLOCK_TEST13), EDID_BLOCK_TEST13},
+    &(HDMI_Test_EDID_S){sizeof(EDID_BLOCK_TEST14), EDID_BLOCK_TEST14},
+    &(HDMI_Test_EDID_S){sizeof(EDID_BLOCK_TEST15), EDID_BLOCK_TEST15},
+    &(HDMI_Test_EDID_S){sizeof(EDID_BLOCK_TEST16), EDID_BLOCK_TEST16},
+    &(HDMI_Test_EDID_S){sizeof(EDID_BLOCK_TEST17), EDID_BLOCK_TEST17},
+    &(HDMI_Test_EDID_S){sizeof(EDID_BLOCK_TEST18), EDID_BLOCK_TEST18},
+    &(HDMI_Test_EDID_S){sizeof(EDID_BLOCK_TEST19), EDID_BLOCK_TEST19},
+    &(HDMI_Test_EDID_S){sizeof(EDID_BLOCK_TEST20), EDID_BLOCK_TEST20},
+    &(HDMI_Test_EDID_S){sizeof(EDID_BLOCK_TEST21), EDID_BLOCK_TEST21},
+    &(HDMI_Test_EDID_S){sizeof(EDID_BLOCK_TEST22), EDID_BLOCK_TEST22},
+    &(HDMI_Test_EDID_S){sizeof(EDID_BLOCK_TEST23), EDID_BLOCK_TEST23},
+    &(HDMI_Test_EDID_S){sizeof(EDID_BLOCK_TEST24), EDID_BLOCK_TEST24},
+    &(HDMI_Test_EDID_S){sizeof(EDID_BLOCK_TEST25), EDID_BLOCK_TEST25},
+    &(HDMI_Test_EDID_S){sizeof(EDID_BLOCK_TEST26), EDID_BLOCK_TEST26},
+    &(HDMI_Test_EDID_S){sizeof(EDID_BLOCK_TEST27), EDID_BLOCK_TEST27},
+    &(HDMI_Test_EDID_S){sizeof(EDID_BLOCK_TEST28), EDID_BLOCK_TEST28},
+    NULL
+};
+
+
+HI_DRV_HDMI_AUDIO_CAPABILITY_S g_stHdmiOldAudio;
+
+HI_U32 g_u32DDCDelayCount = 0x1e;
+
+HI_BOOL g_bExtEdid[HI_UNF_HDMI_ID_BUTT] = {HI_FALSE};
+HDMI_EDID_S g_ExtEdid[HI_UNF_HDMI_ID_BUTT];
 
 HI_DRV_HDMI_AUDIO_CAPABILITY_S *DRV_Get_OldAudioCap()
 {
-#if 1
-#warning TODO: DRV_Get_OldAudioCap
-	return 0;
-#else
     return &g_stHdmiOldAudio;
-#endif
 }
 
 
 HDMI_COMM_ATTR_S *DRV_Get_CommAttr()
 {
-    HI_INFO_HDMI("Get_CommAttr \n");
+    HI_INFO_HDMI("Get_CommAttr \n"); //83
     return &g_stHdmiCommParam;
 }
 
 
 void DRV_PrintCommAttr()
 {
+#if 0
     printk("g_stHdmiCommParam \n"
         "bOpenGreenChannel :%d \n"
         "bOpenedInBoot :%d \n"
@@ -64,8 +120,20 @@ void DRV_PrintCommAttr()
         g_stHdmiCommParam.enDefaultMode,
         g_stHdmiCommParam.kThreadTimerStop,
         g_stHdmiCommParam.enVidInMode);
+#else
+    HI_PRINT("g_stHdmiCommParam \n"
+        "bOpenGreenChannel :%d \n"
+        "bOpenedInBoot :%d \n"
+        "kThreadTimerStop :%d \n"
+        "enVidInMode :%d \n",
+        g_stHdmiCommParam.bOpenMce2App,
+        g_stHdmiCommParam.bOpenedInBoot,
+        g_stHdmiCommParam.kThreadTimerStop,
+        g_stHdmiCommParam.enVidInMode);
+#endif
 }
 
+#if 0
 HI_S32 DRV_Get_IsGreenChannel(HI_VOID)
 {
     return g_stHdmiCommParam.bOpenGreenChannel;
@@ -76,6 +144,18 @@ void DRV_Set_GreenChannel(HI_BOOL bGreen)
     HI_INFO_HDMI("Set_GreenChannel bGreen : %d \n",bGreen);
     g_stHdmiCommParam.bOpenGreenChannel = bGreen;
 }
+#else
+HI_S32 DRV_Get_IsMce2App(HI_VOID)
+{
+    return g_stHdmiCommParam.bOpenMce2App;
+}
+
+void DRV_Set_Mce2App(HI_BOOL bSmooth)
+{
+	HI_INFO_HDMI("Set_GreenChannel bGreen : %d \n",bSmooth); //108
+    g_stHdmiCommParam.bOpenMce2App = bSmooth;
+}
+#endif
 
 HI_S32 DRV_Get_IsOpenedInBoot(HI_VOID)
 {
@@ -84,10 +164,11 @@ HI_S32 DRV_Get_IsOpenedInBoot(HI_VOID)
 
 void DRV_Set_OpenedInBoot(HI_BOOL bOpened)
 {
-    HI_INFO_HDMI("Set_OpenedInBoot bOpend : %d \n",bOpened);
+    HI_INFO_HDMI("Set_OpenedInBoot bOpend : %d \n",bOpened); //119
     g_stHdmiCommParam.bOpenedInBoot = bOpened;
 }
 
+#if 0
 HI_S32 DRV_Get_DefHDMIMode(HI_VOID)
 {
     return g_stHdmiCommParam.enDefaultMode; 
@@ -98,7 +179,7 @@ void DRV_Set_DefHDMIMode(HI_S32 defMod)
     HI_INFO_HDMI("Set_DefHDMIMode defMod : %d \n",defMod);
     g_stHdmiCommParam.enDefaultMode = defMod;
 }
-
+#endif
 
 HI_S32 DRV_Get_IsThreadStoped(HI_VOID)
 {
@@ -107,7 +188,7 @@ HI_S32 DRV_Get_IsThreadStoped(HI_VOID)
 
 void DRV_Set_ThreadStop(HI_BOOL bStop)
 {
-    HI_INFO_HDMI("Set_ThreadStatus bStop : %d \n",bStop);
+    HI_INFO_HDMI("Set_ThreadStatus bStop : %d \n",bStop); //130
     g_stHdmiCommParam.kThreadTimerStop = bStop;
 }
 
@@ -149,7 +230,7 @@ HI_U32 DRV_HDMI_SetDefaultAttr(HI_VOID)
     ret = HI_DRV_MODULE_GetFunction(HI_ID_DISP, (HI_VOID**)&disp_func_ops);
     if((NULL == disp_func_ops) || (ret != HI_SUCCESS))
     {
-        HI_FATAL_HDMI("can't get disp funcs!\n");
+        HI_FATAL_HDMI("can't get disp funcs!\n"); //172
         //return HI_FAILURE;
     }
 
@@ -157,11 +238,12 @@ HI_U32 DRV_HDMI_SetDefaultAttr(HI_VOID)
     if(disp_func_ops && disp_func_ops->pfnDispGetFormat)
     {
         disp_func_ops->pfnDispGetFormat(HI_DRV_DISPLAY_1, &enEncFmt);
+        //enEncFmt = DispFormatAdjust(enEncFmt);
     }
     
     // if don't get disp fmt,then use default fmt
     pstVidAttr->enVideoFmt = enEncFmt;
-    if (enEncFmt < HI_DRV_DISP_FMT_861D_640X480_60)
+    if ((enEncFmt < HI_DRV_DISP_FMT_861D_640X480_60) || DRV_Get_Is4KFmt(enEncFmt))
     {
         pstAppAttr->enVidOutMode = HI_UNF_HDMI_VIDEO_MODE_YCBCR444;
     }
@@ -199,19 +281,20 @@ HDMI_AUDIO_ATTR_S *DRV_Get_AudioAttr(HI_UNF_HDMI_ID_E enHdmi)
 
 HI_UNF_EDID_BASE_INFO_S *DRV_Get_SinkCap(HI_UNF_HDMI_ID_E enHdmi)
 {
-#warning TODO: DRV_Get_SinkCap
-    return 0; //&g_stEdidInfo[enHdmi];
+    return &g_stEdidInfo[enHdmi];
 }
 
 
 HI_BOOL DRV_Get_IsNeedForceUpdate(HI_UNF_HDMI_ID_E enHdmi)
 {
+	HI_INFO_HDMI("Get g_stHdmiChnParam[%d].ForceUpdateFlag %d\n",enHdmi,g_stHdmiChnParam[enHdmi].ForceUpdateFlag); //228
     return g_stHdmiChnParam[enHdmi].ForceUpdateFlag;
 }
 
 
 void DRV_Set_ForceUpdateFlag(HI_UNF_HDMI_ID_E enHdmi,HI_BOOL bupdate)
 {
+	HI_INFO_HDMI("Set g_stHdmiChnParam[%d].ForceUpdateFlag %d\n",enHdmi,g_stHdmiChnParam[enHdmi].ForceUpdateFlag); //235
     g_stHdmiChnParam[enHdmi].ForceUpdateFlag = bupdate;
 }
 
@@ -268,13 +351,14 @@ void DRV_Set_ChnStart(HI_UNF_HDMI_ID_E enHdmi,HI_BOOL bChnStart)
     g_stHdmiChnParam[enHdmi].bStart = bChnStart;
 }
 
+HI_BOOL DRV_Get_IsCECEnable(HI_UNF_HDMI_ID_E enHdmi)
+{
+    return g_stHdmiChnParam[enHdmi].bCECEnable;
+}
+
 void DRV_Set_CECEnable(HI_UNF_HDMI_ID_E enHdmi,HI_BOOL bCecEnable)
 {
-#if 1
-#warning DRV_Set_CECEnable: TODO
-#else
     g_stHdmiChnParam[enHdmi].bCECEnable = bCecEnable;
-#endif
 }
 
 HI_BOOL DRV_Get_IsCECStart(HI_UNF_HDMI_ID_E enHdmi)
@@ -287,110 +371,216 @@ void DRV_Set_CECStart(HI_UNF_HDMI_ID_E enHdmi,HI_BOOL bCecStart)
     g_stHdmiChnParam[enHdmi].bCECStart = bCecStart;
 }
 
+HI_BOOL DRV_Get_IsValidSinkCap(HI_UNF_HDMI_ID_E enHdmi)
+{
+    return g_stHdmiChnParam[enHdmi].bValidSinkCap;
+}
+
+void DRV_Set_SinkCapValid(HI_UNF_HDMI_ID_E enHdmi,HI_BOOL bSinkValid)
+{
+    g_stHdmiChnParam[enHdmi].bValidSinkCap = bSinkValid;
+}
+
+void DRV_Set_DefaultOutputMode(HI_UNF_HDMI_ID_E enHdmi,HI_UNF_HDMI_DEFAULT_ACTION_E enDefaultMode)
+{
+    g_stHdmiChnParam[enHdmi].enDefaultMode = enDefaultMode;
+}
+
+
 HI_UNF_HDMI_DEFAULT_ACTION_E DRV_Get_DefaultOutputMode(HI_UNF_HDMI_ID_E enHdmi)
 {
     return g_stHdmiChnParam[enHdmi].enDefaultMode;
 }
 
-
-HI_BOOL DRV_Get_IsValidSinkCap(HI_UNF_HDMI_ID_E enHdmi)
-{
-#if 1
-#warning TODO: DRV_Get_IsValidSinkCap
-#else
-    return g_stHdmiChnParam[enHdmi].bValidSinkCap;
-#endif
-}
-
-
 void DRV_Set_DDCSpeed(HI_U32 delayCount)
 {
-#if 1
-#warning TODO: DRV_Set_DDCSpeed
-#else
     g_u32DDCDelayCount = delayCount;
-#endif
+}
+
+HI_U32 DRV_Get_DDCSpeed(void)
+{
+    return g_u32DDCDelayCount;
 }
 
 
+HDMI_EDID_S *DRV_Get_UserEdid(HI_UNF_HDMI_ID_E enHdmi)
+{
+    return &g_ExtEdid[enHdmi];
+}
 
 void DRV_Set_UserEdid(HI_UNF_HDMI_ID_E enHdmi,HDMI_EDID_S *pEDID)
 {
-#if 1
-#warning TODO: DRV_Set_UserEdid
-#else
     //only memset one ExtEdid,NOt All
     memset(&g_ExtEdid[enHdmi],0,sizeof(HDMI_EDID_S));
 
     memcpy(&g_ExtEdid[enHdmi],pEDID,sizeof(HDMI_EDID_S));
-#endif
 }
 
 HI_BOOL DRV_Get_IsUserEdid(HI_UNF_HDMI_ID_E enHdmi)
 {
-#if 1
-#warning TODO: DRV_Get_IsUserEdid
-#else
     return g_bExtEdid[enHdmi];
-#endif
 }
 
 void DRV_Set_UserEdidMode(HI_UNF_HDMI_ID_E enHdmi,HI_BOOL bUserEdid)
 {
-#if 1
-#warning TODO: DRV_Set_UserEdidMode
-#else
     g_bExtEdid[enHdmi] = bUserEdid;
-#endif
 }
 
 HI_U32 DRV_Get_DebugEdidNum(void)
 {
     HI_U32 index;
 
-#if 1
-#warning TODO: DRV_Get_DebugEdidNum
-#else
     //calc edid list number
     for (index = 0; EDID_List[index] != NULL; index++)
     {
         continue;
     }
 
-    COM_INFO("%d EDID in list \n",index);
-#endif
+    HI_INFO_HDMI("%d EDID in list \n",index); //378
     return index;
 }
 
 //param start frome 1,not 0
 HDMI_Test_EDID_S *DRV_Get_DebugEdid(HI_U32 u32Num)
 {
-#if 1
-#warning TODO: DRV_Get_DebugEdid
-#else
     return EDID_List[u32Num-1];
+}
+
+
+VSDB_MODE_E DRV_Get_VSDBMode(HI_UNF_HDMI_ID_E enHdmi)
+{
+    return g_stHdmiChnParam[enHdmi].enVSDBMode;
+}
+
+
+void DRV_Set_VSDBMode(HI_UNF_HDMI_ID_E enHdmi,VSDB_MODE_E enVSDBMode)
+{
+    g_stHdmiChnParam[enHdmi].enVSDBMode = enVSDBMode;
+}
+
+//HDMI_VIDEO_ATTR_S   *pstVidAttr = DRV_Get_VideoAttr(enHdmi);
+HI_BOOL DRV_Get_Is4KFmt(HI_DRV_DISP_FMT_E enFmt)
+{
+    if ((enFmt == HI_DRV_DISP_FMT_3840X2160_24)
+     || (enFmt == HI_DRV_DISP_FMT_3840X2160_25)
+     || (enFmt == HI_DRV_DISP_FMT_3840X2160_30)
+     || (enFmt == HI_DRV_DISP_FMT_4096X2160_24)
+#if 0
+     || (enFmt == HI_DRV_DISP_FMT_3840X2160_23_976)
+     || (enFmt == HI_DRV_DISP_FMT_3840X2160_29_97)
 #endif
+     )
+    {
+        return HI_TRUE;
+    }
+
+    return HI_FALSE;
+}
+
+// 640*480 is CEA861 Fmt,so not In this func
+HI_BOOL DRV_Get_IsLCDFmt(HI_DRV_DISP_FMT_E enFmt)
+{
+    if((enFmt == HI_DRV_DISP_FMT_VESA_800X600_60)
+     || (enFmt == HI_DRV_DISP_FMT_VESA_1024X768_60)
+     || (enFmt == HI_DRV_DISP_FMT_VESA_1280X720_60)
+
+     || (enFmt == HI_DRV_DISP_FMT_VESA_1280X800_60)
+     || (enFmt == HI_DRV_DISP_FMT_VESA_1280X1024_60)
+     || (enFmt == HI_DRV_DISP_FMT_VESA_1360X768_60)
+
+     || (enFmt == HI_DRV_DISP_FMT_VESA_1366X768_60)
+     || (enFmt == HI_DRV_DISP_FMT_VESA_1400X1050_60)
+     || (enFmt == HI_DRV_DISP_FMT_VESA_1440X900_60)
+
+     || (enFmt == HI_DRV_DISP_FMT_VESA_1440X900_60_RB)
+     || (enFmt == HI_DRV_DISP_FMT_VESA_1600X900_60_RB)
+     || (enFmt == HI_DRV_DISP_FMT_VESA_1600X1200_60)
+
+     || (enFmt == HI_DRV_DISP_FMT_VESA_1680X1050_60)
+     || (enFmt == HI_DRV_DISP_FMT_VESA_1680X1050_60_RB)
+     || (enFmt == HI_DRV_DISP_FMT_VESA_1920X1080_60)
+
+     || (enFmt == HI_DRV_DISP_FMT_VESA_1920X1200_60)
+#if 0
+     || (enFmt == HI_DRV_DISP_FMT_VESA_1920X1440_60)
+     || (enFmt == HI_DRV_DISP_FMT_VESA_1680X1050_60_RB)
+#endif
+     || (enFmt == HI_DRV_DISP_FMT_VESA_2048X1152_60)
+     || (enFmt == HI_DRV_DISP_FMT_VESA_2560X1440_60_RB)
+     || (enFmt == HI_DRV_DISP_FMT_VESA_2560X1600_60_RB)
+
+     || (enFmt == HI_DRV_DISP_FMT_CUSTOM))
+    {
+        return HI_TRUE;
+    }
+    return HI_FALSE;
 }
 
 #if 0
+HI_BOOL DRV_Get_IsPixelRepeatFmt(HI_DRV_DISP_FMT_E enFmt)
+{
+    if ((enFmt == HI_DRV_DISP_FMT_PAL)
+       || (enFmt == HI_DRV_DISP_FMT_PAL_B)
+       || (enFmt == HI_DRV_DISP_FMT_PAL_B1)
+       || (enFmt == HI_DRV_DISP_FMT_PAL_D)
+       || (enFmt == HI_DRV_DISP_FMT_PAL_D1)
+       || (enFmt == HI_DRV_DISP_FMT_PAL_G)
+       || (enFmt == HI_DRV_DISP_FMT_PAL_H)
+       || (enFmt == HI_DRV_DISP_FMT_PAL_K)
+       || (enFmt == HI_DRV_DISP_FMT_PAL_I)
+       || (enFmt == HI_DRV_DISP_FMT_PAL_M)
+       || (enFmt == HI_DRV_DISP_FMT_PAL_N)
+       || (enFmt == HI_DRV_DISP_FMT_PAL_Nc)
+       || (enFmt == HI_DRV_DISP_FMT_PAL_60)
+       || (enFmt == HI_DRV_DISP_FMT_1440x576i_50)
+       || (enFmt == HI_DRV_DISP_FMT_SECAM_SIN)
+       || (enFmt == HI_DRV_DISP_FMT_SECAM_COS)
+       || (enFmt == HI_DRV_DISP_FMT_SECAM_L)
+       || (enFmt == HI_DRV_DISP_FMT_SECAM_B)
+       || (enFmt == HI_DRV_DISP_FMT_SECAM_G)
+       || (enFmt == HI_DRV_DISP_FMT_SECAM_D)
+       || (enFmt == HI_DRV_DISP_FMT_SECAM_K)
+       || (enFmt == HI_DRV_DISP_FMT_SECAM_H)
+       || (enFmt == HI_DRV_DISP_FMT_NTSC)
+       || (enFmt == HI_DRV_DISP_FMT_NTSC_J)
+       || (enFmt == HI_DRV_DISP_FMT_1440x480i_60)
+       || (enFmt == HI_DRV_DISP_FMT_NTSC_443))
+    {
+        return HI_TRUE;
+    }
+    return HI_FALSE;
+}
+#endif
+
+HDMI_PRIVATE_EDID_S *DRV_Get_PriSinkCap(HI_UNF_HDMI_ID_E enHdmi)
+{
+    return &g_stPriEdidInfo[enHdmi];
+}
+
+#if 0
+HI_BOOL DRV_Get_IsForceOutput(void)
+{
+    //return g_stHdmiChnParam[enHdmi].bForceOutput;
+    return bForceOutput;
+}
+
 void DRV_Set_ForceOutputMode(HI_BOOL bForce)
 {
-#if 1
-#warning TODO: DRV_Set_ForceOutputMode
-#else
     //g_stHdmiChnParam[enHdmi].bForceOutput = bForce;
     bForceOutput = bForce;
-#endif
+}
+
+
+HI_BOOL DRV_Get_ForcePowerState(void)
+{
+    //return g_stHdmiChnParam[enHdmi].bForceOutput;
+    return bForcePowerON;
 }
 
 void DRV_Set_ForcePowerState(HI_BOOL bForce)
 {
-#if 1
-#warning TODO: DRV_Set_ForcePowerState
-#else
     //g_stHdmiChnParam[enHdmi].bForceOutput = bForce;
     bForcePowerON = bForce;
-#endif
 }
 #endif
 

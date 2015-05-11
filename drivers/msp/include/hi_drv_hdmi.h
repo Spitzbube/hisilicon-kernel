@@ -78,6 +78,7 @@ typedef struct hiHDMI_AUDIO_ATTR_S
     HI_U8                   u8I2SCtlVbit;        /**<reserve:config 0,I2S control(0x7A:0x1D)*//**CNcomment:������������Ϊ0, I2S control (0x7A:0x1D) */
 
 //  HI_BOOL                 bEnableAudInfoFrame; /**<Enable flag of Audio InfoFrame,suggestion:enable*//**<CNcomment:�Ƿ�ʹ�� AUDIO InfoFrame������ʹ�� */
+    //28
 }HDMI_AUDIO_ATTR_S;
 
 /*In order to extern ,so we define struct*/
@@ -99,6 +100,7 @@ typedef struct hiHDMI_VIDEO_ATTR_S
 
 //  HI_U32                  bDebugFlag;          /**<the flag of hdmi dubug,suggestion:disable*//**<CNcomment:< �Ƿ�ʹ�� ��hdmi�ڲ�debug��Ϣ�� ����ر� */
 //  HI_BOOL                 bHDCPEnable;         /**<0:HDCP disable mode,1:eable HDCP mode*//**<CNcomment:< 0:HDCP�����1:HDCPģʽ�� */
+    //12
 }HDMI_VIDEO_ATTR_S;
 
 /*In order to extern ,so we define struct*/
@@ -119,6 +121,7 @@ typedef struct hiHDMI_APP_ATTR_S
 
     HI_U32                  bDebugFlag;          /**<the flag of hdmi dubug,suggestion:disable*//**<CNcomment:< �Ƿ�ʹ�� ��hdmi�ڲ�debug��Ϣ�� ����ر� */
     HI_BOOL                 bHDCPEnable;         /**<0:HDCP disable mode,1:eable HDCP mode*//**<CNcomment:< 0:HDCP�����1:HDCPģʽ�� */
+    //48
 }HDMI_APP_ATTR_S;
 
 
@@ -144,9 +147,8 @@ typedef struct hiHDMI_AUDIO_CAPABILITY_S
 typedef struct hiHI_DRV_HDMI_AUDIO_CAPABILITY_S
 {
 	HI_BOOL bAudioFmtSupported[HI_UNF_HDMI_MAX_AUDIO_CAP_COUNT]; //???
-	HI_U32 u32AudioSampleRateSupported[HI_UNF_HDMI_MAX_AUDIO_SMPRATE_COUNT]; //60
-	HI_U32 u32MaxPcmChannels; //???
-	int fill[24]; //
+	HI_U32 u32AudioSampleRateSupported[8/*HI_UNF_HDMI_MAX_AUDIO_SMPRATE_COUNT*/]; //60
+	HI_U32 u32MaxPcmChannels; //92
 	//96
 }HI_DRV_HDMI_AUDIO_CAPABILITY_S;
 

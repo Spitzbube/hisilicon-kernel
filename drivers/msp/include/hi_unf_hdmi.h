@@ -68,9 +68,9 @@ typedef enum hiUNF_HDMI_EVENT_TYPE_E
 /*Video color space mode*//**CNcomment:��Ƶ��ɫ�ռ�����*/
 typedef enum hiUNF_HDMI_VIDEO_MODE
 {
-    HI_UNF_HDMI_VIDEO_MODE_RGB444,          /**<RGB444 output mode*//**<CNcomment:RGB444���ģʽ */ 
+    HI_UNF_HDMI_VIDEO_MODE_RGB444, //0         /**<RGB444 output mode*//**<CNcomment:RGB444���ģʽ */
     HI_UNF_HDMI_VIDEO_MODE_YCBCR422,        /**<YCBCR422 output mode*//**<CNcomment:YCBCR422���ģʽ */ 
-    HI_UNF_HDMI_VIDEO_MODE_YCBCR444,        /**<YCBCR444 output mode*//**<CNcomment:YCBCR444���ģʽ */ 
+    HI_UNF_HDMI_VIDEO_MODE_YCBCR444, //2       /**<YCBCR444 output mode*//**<CNcomment:YCBCR444���ģʽ */
         
     HI_UNF_HDMI_VIDEO_MODE_BUTT    
 }HI_UNF_HDMI_VIDEO_MODE_E;
@@ -353,7 +353,7 @@ typedef struct hiHI_UNF_EDID_BASE_INFO_S
 		HI_U32 u32PixelClk; //2504
 		//68
 	} stPerferTiming; //2440
-	//2508	; 0x9cc
+	//2508 = 0x9cc
 }HI_UNF_EDID_BASE_INFO_S;
 
 /**the config parameter of HDMI interface*/

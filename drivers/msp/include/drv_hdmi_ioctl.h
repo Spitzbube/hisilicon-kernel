@@ -134,6 +134,7 @@ typedef struct hiHDMI_EDID_S
     HI_U8                           u8EdidValid;
     HI_U32                          u32Edidlength;
     HI_U8                           u8Edid[512];
+    //524
 }HDMI_EDID_S;
 
 typedef struct hiHDMI_PLAYSTAUS_S

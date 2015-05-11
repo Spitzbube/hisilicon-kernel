@@ -38,18 +38,15 @@ extern "C" {
 
 typedef struct
 {
-    HI_BOOL     bOpenGreenChannel;        /* Green Channel */
+	HI_BOOL     bOpenMce2App;             /* smooth change Mce to App mode*/
+    //HI_BOOL     bOpenGreenChannel;        /* Green Channel */
     //HI_BOOL     bOnlySetAttr;             /*boot => mce : we only need set default param to attr(no config) and create thread*/
     HI_BOOL     bOpenedInBoot;             /*boot => mce : we only need set default param to attr(no config) and create thread*/
     //HI_BOOL     bReadEDIDOk;
-    HI_U32      enDefaultMode;            /*init parameter*//*CNcomment: ��ʼ������ */
+    //HI_U32      enDefaultMode;            /*init parameter*//*CNcomment: ��ʼ������ */
     struct task_struct  *kThreadTimer;    /*timer thread*//*CNcomment:��ʱ���߳� */
     HI_BOOL     kThreadTimerStop;
     struct task_struct  *kCECRouter;      /*CEC thread*//*CNcomment: CEC�߳� */
-#if 0 /*--NO MODIFY : COMMENT BY CODINGPARTNER--*/
-    HI_BOOL     bHdmiStarted;             /*HDMI Start Flag*//*CNcomment:HDMI �ӿ��Ƿ�������־ */
-    HI_BOOL     bHdmiExit;                /*HDMI exit flag*//*CNcomment:HDMI ģ���˳���־ */
-#endif /*--NO MODIFY : COMMENT BY CODINGPARTNER--*/
     HI_UNF_HDMI_VIDEO_MODE_E enVidInMode; /*reservation,please setting VIDEO_MODE_YCBCR422 mode*//*CNcomment:������������ΪVIDEO_MODE_YCBCR422 */
 }HDMI_COMM_ATTR_S;
 
@@ -73,15 +70,18 @@ void DRV_PrintCommAttr(HI_VOID);
 HI_UNF_HDMI_VIDEO_MODE_E DRV_Get_VIDMode(HI_VOID);
 void DRV_Set_VIDMode(HI_UNF_HDMI_VIDEO_MODE_E enVInMode);
 
-
+#if 0
 HI_S32 DRV_Get_IsGreenChannel(HI_VOID);
 void DRV_Set_GreenChannel(HI_BOOL bGreen);
+#endif
 
 HI_S32 DRV_Get_IsOpenedInBoot(HI_VOID);
 void DRV_Set_OpenedInBoot(HI_BOOL bOpened);
 
+#if 0
 HI_S32 DRV_Get_DefHDMIMode(HI_VOID);
 void DRV_Set_DefHDMIMode(HI_S32 defMod);
+#endif
 
 HI_S32 DRV_Get_IsThreadStoped(HI_VOID);
 void DRV_Set_ThreadStop(HI_BOOL bStop);
@@ -99,6 +99,13 @@ typedef struct
     HI_U32      u32ProcHandle;
 }HDMI_PROC_EVENT_S;
 
+
+typedef struct
+{
+    HI_BOOL      bUnderScanDev;
+}HDMI_PRIVATE_EDID_S;
+
+
 typedef struct
 {
     HI_BOOL            bOpen;
@@ -106,7 +113,7 @@ typedef struct
     HI_BOOL            bValidSinkCap; //????
     HDMI_PROC_EVENT_S  eventList[MAX_PROCESS_NUM];
     //HI_U32           Event[5];        /*Current Event Array, sequence will be change */
-    HDMI_ATTR_S        stHDMIAttr;          /*HDMI implement parameter*//*CNcomment:HDMI ���в��� */
+    HDMI_ATTR_S        stHDMIAttr; //332         /*HDMI implement parameter*//*CNcomment:HDMI ���в��� */
     HI_BOOL            ForceUpdateFlag;
     HI_BOOL            partUpdateFlag;
 
@@ -120,7 +127,7 @@ typedef struct
     HI_UNF_HDMI_CEC_STATUS_S           stCECStatus; //544
 
     HI_UNF_HDMI_DEFAULT_ACTION_E       enDefaultMode; //???
-    //???
+    //576
 }HDMI_CHN_ATTR_S;
 #endif /*--NO MODIFY : COMMENT BY CODINGPARTNER--*/
 
@@ -180,6 +187,7 @@ void DRV_Set_UserEdidMode(HI_UNF_HDMI_ID_E enHdmi,HI_BOOL bUserEdid);
 HI_U32 DRV_Get_DebugEdidNum(void);
 HDMI_Test_EDID_S *DRV_Get_DebugEdid(HI_U32 u32Num);
 
+HI_BOOL DRV_Get_Is4KFmt(HI_DRV_DISP_FMT_E enFmt);
 
 void DRV_Set_ForceOutputMode(HI_BOOL bForce);
 

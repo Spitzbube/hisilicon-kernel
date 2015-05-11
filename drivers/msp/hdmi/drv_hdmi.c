@@ -952,7 +952,9 @@ HI_U32 DRV_HDMI_Init(HI_U32 FromUserSpace)
     reg = ReadByteHDMITXP0(TX_SYS_CTRL1_ADDR);
     
     /* Need to reset this  param */
+#if 0 //TODO
     pstCommAttr->bOpenGreenChannel = HI_FALSE;
+#endif
     pstCommAttr->bOpenedInBoot = HI_FALSE;
 
     HI_INFO_HDMI("****Enter DRV_HDMI_Init*****\n");
@@ -1067,9 +1069,10 @@ HI_U32 DRV_HDMI_Init(HI_U32 FromUserSpace)
             HI_INFO_HDMI("Open Already in MCE!\n");
             /* open already flag */
             //pstCommAttr->bOpenGreenChannel = HI_TRUE;
+#if 0 //TODO
             DRV_Set_GreenChannel(HI_TRUE);
-    
             HI_INFO_HDMI("****green channel change %d *****\n",pstCommAttr->bOpenGreenChannel);
+#endif
             return HI_SUCCESS;   //Open Already in MCE!
         }
         else
@@ -1365,10 +1368,10 @@ HI_U32 DRV_HDMI_Open(HI_UNF_HDMI_ID_E enHdmi, HDMI_OPEN_S *pOpen, HI_U32 FromUse
     
     g_HDMIOpenNum ++; //record open num
 
+#if 0 //TODO
     /* Need to set this  param */
     DRV_Set_DefHDMIMode(pOpen->enDefaultMode);
     
-
     //set output mode
      HI_INFO_HDMI("enForceMode:%d\n", DRV_Get_DefHDMIMode());
     if (HI_UNF_HDMI_DEFAULT_ACTION_HDMI == DRV_Get_DefHDMIMode())
@@ -1390,6 +1393,7 @@ HI_U32 DRV_HDMI_Open(HI_UNF_HDMI_ID_E enHdmi, HDMI_OPEN_S *pOpen, HI_U32 FromUse
         Ret = SI_Set_Force_OutputMode(HI_FALSE, HI_FALSE);
         pstAppAttr->bEnableHdmi = HI_FALSE;
     }
+#endif
 
     DRV_Set_ChnOpen(enHdmi,HI_TRUE);
 
@@ -1436,6 +1440,7 @@ HI_U32 DRV_HDMI_Open(HI_UNF_HDMI_ID_E enHdmi, HDMI_OPEN_S *pOpen, HI_U32 FromUse
         g_UserCallbackFlag = HDMI_CALLBACK_KERNEL;
     }
 
+#if 0 //TODO
     if (!DRV_Get_IsGreenChannel())
     {
         if (bOpenLastTime)
@@ -1443,6 +1448,7 @@ HI_U32 DRV_HDMI_Open(HI_UNF_HDMI_ID_E enHdmi, HDMI_OPEN_S *pOpen, HI_U32 FromUse
             return HI_SUCCESS;
         }
     }
+#endif
   
     //// ֻ��һ���� ////
     // Enable Interrupts: VSync, Ri check, HotPlug
@@ -1658,7 +1664,7 @@ HI_U32 DRV_HDMI_SetAttr(HI_UNF_HDMI_ID_E enHdmi, HDMI_ATTR_S *pstAttr)
    
     DRV_HDMI_SetAPPAttr(enHdmi, &pstAttr->stAppAttr,HI_FALSE);
 
-    if(DRV_Get_IsGreenChannel() || DRV_Get_IsOpenedInBoot())
+    if(/*DRV_Get_IsGreenChannel() ||*/ DRV_Get_IsOpenedInBoot())
     {
         HI_INFO_HDMI("Green Channel First Time \n");
         return HI_SUCCESS;
@@ -2530,11 +2536,13 @@ static HI_U32 hdmi_SetInfoFrame(HI_UNF_HDMI_ID_E enHdmi, HI_UNF_HDMI_INFOFRAME_S
             siRet = hdmi_Create_AVI_Infoframe((HI_UNF_HDMI_AVI_INFOFRAME_VER2_S *)&(pstInfoFrame->unInforUnit.stAVIInfoFrame), pu8AviInfoFrame);
             memcpy(pstAviInfoFrm, &(pstInfoFrame->unInforUnit.stAVIInfoFrame), sizeof(HI_UNF_HDMI_AVI_INFOFRAME_VER2_S));
 
+#if 0 //TODO
             if (DRV_Get_IsGreenChannel())
             {
                 //printk("%s.%d \n",__FUNCTION__,__LINE__);
                 //return HI_SUCCESS;
             }
+#endif
             //printk("\n\n~~~~~~~~~~~~~info 3~~~~~~~~~~\n\n");
             /* Set relative Register in HDMI IP */
             SI_DisableInfoFrame(AVI_TYPE);
@@ -3001,7 +3009,9 @@ HI_U32 DRV_HDMI_Start(HI_UNF_HDMI_ID_E enHdmi)
     }
 #endif /*--NO MODIFY : COMMENT BY CODINGPARTNER--*/
 
+#if 0 //TODO
     DRV_Set_GreenChannel(HI_FALSE);
+#endif
     DRV_Set_OpenedInBoot(HI_FALSE);
 
     SI_timer_count();
@@ -4672,7 +4682,7 @@ HI_S32 DRV_HDMI_SetVOAttr(HI_UNF_HDMI_ID_E enHdmi,HDMI_VIDEO_ATTR_S *pstHDMIVOAt
     SI_WriteByteEEPROM(EE_TX_DE_ENABLED_ADDR, ucData);
 
     /* Adjust Video Path Param */
-    if ((VUpdate == HI_TRUE) && (pstAppAttr->bEnableVideo == HI_TRUE) && (!DRV_Get_IsGreenChannel()))
+    if ((VUpdate == HI_TRUE) && (pstAppAttr->bEnableVideo == HI_TRUE) /*&& (!DRV_Get_IsGreenChannel())*/)
     {
         HI_U8 u8VideoPath[4];
 
