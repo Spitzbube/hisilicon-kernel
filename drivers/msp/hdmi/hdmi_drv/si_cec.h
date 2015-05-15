@@ -91,7 +91,7 @@ HI_U8 SI_CEC_Interrupt_Processing ( SiI_CEC_Int_t * );
 
 HI_U32 SI_CEC_AudioPing(HI_U32 *pu32Status);
 
-HI_U32 SI_CEC_Open(void);
+HI_U32 SI_CEC_Open(HI_U8);
 HI_U32 SI_CEC_Close(void);
 
 //=============================================================================

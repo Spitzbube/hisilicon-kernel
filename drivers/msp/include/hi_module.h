@@ -91,7 +91,7 @@ typedef enum hiMOD_ID_E
     HI_ID_TUNER       , //92
     HI_ID_KEYLED      ,
     HI_ID_E2PROM      ,
-    HI_ID_CIPHER      ,
+    HI_ID_CIPHER      , //95
     HI_ID_OTP         = 0x60,
     HI_ID_CA          ,
     HI_ID_PM          ,

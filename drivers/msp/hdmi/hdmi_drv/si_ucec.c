@@ -692,7 +692,7 @@ void store_cec_cmd(SiI_CEC_t *rx_cmd)
     }
 }
 
-unsigned int  get_cec_cmd(HI_UNF_HDMI_CEC_CMD_S *rx_cmd, unsigned int num, HI_U32 timeout)
+unsigned int  get_cec_msg(HI_UNF_HDMI_CEC_CMD_S *rx_cmd, unsigned int num, HI_U32 timeout)
 {
     unsigned int i = 0;
     if(get_cmd_counter == 0)
@@ -957,7 +957,7 @@ HI_U32 SI_CEC_AudioPing(HI_U32 *pu32Status)
     return Error;
 }
 
-HI_U32 SI_CEC_Open(void)
+HI_U32 SI_CEC_Open(HI_U8 u8LogicalAddr)
 {
     //Set CEC Interrupt bit
     SI_CEC_RegisterWrite( REG__CEC_INT_ENABLE_0, 0xff );

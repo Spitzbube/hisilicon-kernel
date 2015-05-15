@@ -164,12 +164,14 @@ void DRV_Set_ChnOpen(HI_UNF_HDMI_ID_E enHdmi,HI_BOOL bChnOpen);
 HI_BOOL DRV_Get_IsChnStart(HI_UNF_HDMI_ID_E enHdmi);
 void DRV_Set_ChnStart(HI_UNF_HDMI_ID_E enHdmi,HI_BOOL bChnStart);
 
+HI_BOOL DRV_Get_IsCECEnable(HI_UNF_HDMI_ID_E enHdmi);
 void DRV_Set_CECEnable(HI_UNF_HDMI_ID_E enHdmi,HI_BOOL bCecEnable);
 
 HI_BOOL DRV_Get_IsCECStart(HI_UNF_HDMI_ID_E enHdmi);
 void DRV_Set_CECStart(HI_UNF_HDMI_ID_E enHdmi,HI_BOOL bCecStart);
 
 HI_UNF_HDMI_DEFAULT_ACTION_E DRV_Get_DefaultOutputMode(HI_UNF_HDMI_ID_E enHdmi);
+void DRV_Set_DefaultOutputMode(HI_UNF_HDMI_ID_E enHdmi,HI_UNF_HDMI_DEFAULT_ACTION_E enDefaultMode);
 
 HI_BOOL DRV_Get_IsValidSinkCap(HI_UNF_HDMI_ID_E enHdmi);
 
@@ -193,6 +195,10 @@ void DRV_Set_ForceOutputMode(HI_BOOL bForce);
 
 
 void DRV_Set_ForcePowerState(HI_BOOL bForce);
+
+HI_S32 DRV_Get_IsMce2App(HI_VOID);
+void DRV_Set_Mce2App(HI_BOOL bSmooth);
+
 
 
 #ifdef __cplusplus

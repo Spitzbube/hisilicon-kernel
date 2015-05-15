@@ -55,13 +55,13 @@ typedef enum hiUNF_HDMI_ID_E
 typedef enum hiUNF_HDMI_EVENT_TYPE_E
 {
     HI_UNF_HDMI_EVENT_HOTPLUG = 0x10,       /**<HDMI HotPlug event type*//**<CNcomment:<HDMI�Ȳ���¼� */
-    HI_UNF_HDMI_EVENT_NO_PLUG,              /**<HDMI unplug event type*//**<CNcomment:HDMI Cableû������ �¼� */
+    HI_UNF_HDMI_EVENT_NO_PLUG,  //17            /**<HDMI unplug event type*//**<CNcomment:HDMI Cableû������ �¼� */
     HI_UNF_HDMI_EVENT_EDID_FAIL,            /**<HDMI read edid fail event type*//**<CNcomment:HDMI EDID��ȡʧ���¼� */
     HI_UNF_HDMI_EVENT_HDCP_FAIL,            /**<HDCP authentication fail event type *//**<CNcomment:HDCP��֤ʧ���¼� */
-    HI_UNF_HDMI_EVENT_HDCP_SUCCESS,         /**<HDCP authentication succeed event type*//**<CNcomment:HDCP��֤�ɹ� */
+    HI_UNF_HDMI_EVENT_HDCP_SUCCESS, //20        /**<HDCP authentication succeed event type*//**<CNcomment:HDCP��֤�ɹ� */
     HI_UNF_HDMI_EVENT_RSEN_CONNECT,         /**<TMDS link is connected*//**<CNcomment:TMDS���ӳɹ� */
     HI_UNF_HDMI_EVENT_RSEN_DISCONNECT,      /**<TMDS link is disconnected*//**<CNcomment:TMDSδ���� */    
-    HI_UNF_HDMI_EVENT_HDCP_USERSETTING,     /**<HDMI Reset *//**<CNcomment:HDCP ��λ*/
+    HI_UNF_HDMI_EVENT_HDCP_USERSETTING, //23    /**<HDMI Reset *//**<CNcomment:HDCP ��λ*/
     HI_UNF_HDMI_EVENT_BUTT
 }HI_UNF_HDMI_EVENT_TYPE_E;
 
@@ -69,7 +69,7 @@ typedef enum hiUNF_HDMI_EVENT_TYPE_E
 typedef enum hiUNF_HDMI_VIDEO_MODE
 {
     HI_UNF_HDMI_VIDEO_MODE_RGB444, //0         /**<RGB444 output mode*//**<CNcomment:RGB444���ģʽ */
-    HI_UNF_HDMI_VIDEO_MODE_YCBCR422,        /**<YCBCR422 output mode*//**<CNcomment:YCBCR422���ģʽ */ 
+    HI_UNF_HDMI_VIDEO_MODE_YCBCR422, //1       /**<YCBCR422 output mode*//**<CNcomment:YCBCR422���ģʽ */
     HI_UNF_HDMI_VIDEO_MODE_YCBCR444, //2       /**<YCBCR444 output mode*//**<CNcomment:YCBCR444���ģʽ */
         
     HI_UNF_HDMI_VIDEO_MODE_BUTT    
@@ -80,7 +80,7 @@ typedef enum hiUNF_HDMI_ASPECT_RATIO_E
 {
     HI_UNF_HDMI_ASPECT_RATIO_UNKNOWN,        /**<Aspect Ratio unknown *//**<CNcomment:δ֪��߱� */ 
     HI_UNF_HDMI_ASPECT_RATIO_4TO3,           /**<Aspect Ratio 4:3  *//**<CNcomment:��߱�4:3*/ 
-    HI_UNF_HDMI_ASPECT_RATIO_16TO9,          /**<Aspect Ratio 16:9 *//**<CNcomment:��߱�16:9 */ 
+    HI_UNF_HDMI_ASPECT_RATIO_16TO9, //2         /**<Aspect Ratio 16:9 *//**<CNcomment:��߱�16:9 */
     HI_UNF_HDMI_ASPECT_RATIO_BUTT
 }HI_UNF_HDMI_ASPECT_RATIO_E;
 
@@ -161,15 +161,15 @@ typedef enum hiUNF_HDMI_CONTENT_TYPE_E
 typedef enum hiUNF_HDMI_CODING_TYPE_E
 {
     HDMI_AUDIO_CODING_REFER_STREAM_HEAD,  /**<Audio coding type, refer stream,default type*//**<CNcomment:��Ƶ�������ͣ��ο��������ȱʡ��ʽ */
-    HDMI_AUDIO_CODING_PCM,                /**<Audio coding PCM type*//**<CNcomment:��Ƶ����PCM��ʽ */
-    HDMI_AUDIO_CODING_AC3,                /**<Audio coding AC3 type*//**<CNcomment:��Ƶ����AC3��ʽ */
-    HDMI_AUDIO_CODING_MPEG1,              /**<Audio coding MPEG1 type*//**<CNcomment:��Ƶ����MPEG1��ʽ */
-    HDMI_AUDIO_CODING_MP3,                /**<Audio coding MP3 type*//**<CNcomment:��Ƶ����MP3��ʽ */
-    HDMI_AUDIO_CODING_MPEG2,              /**<Audio coding MPEG2 type*//**<CNcomment:��Ƶ����MPEG2��ʽ */
-    HDMI_AUDIO_CODING_AAC,                /**<Audio coding AAC type*//**<CNcomment:��Ƶ����AAC��ʽ */
-    HDMI_AUDIO_CODING_DTS,                /**<Audio coding DTS type*//**<CNcomment:��Ƶ����DTS��ʽ */
-    HDMI_AUDIO_CODING_DDPLUS,             /**<Audio coding DDPLUS type*//**<CNcomment:��Ƶ����DDPLUS��ʽ */
-    HDMI_AUDIO_CODING_MLP,                /**<Audio coding MLP type*//**<CNcomment:��Ƶ����MLP��ʽ */
+    HDMI_AUDIO_CODING_PCM, //1               /**<Audio coding PCM type*//**<CNcomment:��Ƶ����PCM��ʽ */
+    HDMI_AUDIO_CODING_AC3, //2               /**<Audio coding AC3 type*//**<CNcomment:��Ƶ����AC3��ʽ */
+    HDMI_AUDIO_CODING_MPEG1, //3             /**<Audio coding MPEG1 type*//**<CNcomment:��Ƶ����MPEG1��ʽ */
+    HDMI_AUDIO_CODING_MP3, //4               /**<Audio coding MP3 type*//**<CNcomment:��Ƶ����MP3��ʽ */
+    HDMI_AUDIO_CODING_MPEG2, //5             /**<Audio coding MPEG2 type*//**<CNcomment:��Ƶ����MPEG2��ʽ */
+    HDMI_AUDIO_CODING_AAC, //6               /**<Audio coding AAC type*//**<CNcomment:��Ƶ����AAC��ʽ */
+    HDMI_AUDIO_CODING_DTS, //7               /**<Audio coding DTS type*//**<CNcomment:��Ƶ����DTS��ʽ */
+    HDMI_AUDIO_CODING_DDPLUS, //8            /**<Audio coding DDPLUS type*//**<CNcomment:��Ƶ����DDPLUS��ʽ */
+    HDMI_AUDIO_CODING_MLP, //9               /**<Audio coding MLP type*//**<CNcomment:��Ƶ����MLP��ʽ */
     HDMI_AUDIO_CODING_WMA,                /**<Audio coding WMA type*//**<CNcomment:��Ƶ����WMA��ʽ */
     HDMI_AUDIO_CODING_MAX
 }HI_UNF_HDMI_CODING_TYPE_E;
@@ -260,6 +260,21 @@ typedef struct hiUNF_HDMI_SINK_CAPABILITY_S
 #define MAX_SAMPE_RATE_NUM 8
 #define HI_UNF_EDID_MAX_AUDIO_CAP_COUNT 16
 #define HI_UNF_EDID_AUDIO_SPEAKER_BUTT 11
+
+#define HI_UNF_EDID_AUDIO_FORMAT_CODE_PCM   1
+#define HI_UNF_EDID_AUDIO_FORMAT_CODE_AC3   2
+#define HI_UNF_EDID_AUDIO_FORMAT_CODE_MPEG1 3
+#define HI_UNF_EDID_AUDIO_FORMAT_CODE_MP3   4
+#define HI_UNF_EDID_AUDIO_FORMAT_CODE_MPEG2 5
+#define HI_UNF_EDID_AUDIO_FORMAT_CODE_AAC   6
+#define HI_UNF_EDID_AUDIO_FORMAT_CODE_DTS   7
+#define HI_UNF_EDID_AUDIO_FORMAT_CODE_ATRAC 8
+#define HI_UNF_EDID_AUDIO_FORMAT_CODE_ONE_BIT 9
+#define HI_UNF_EDID_AUDIO_FORMAT_CODE_DDP  10
+#define HI_UNF_EDID_AUDIO_FORMAT_CODE_DTS_HD 11
+#define HI_UNF_EDID_AUDIO_FORMAT_CODE_MAT  12
+#define HI_UNF_EDID_AUDIO_FORMAT_CODE_DST  13
+#define HI_UNF_EDID_AUDIO_FORMAT_CODE_WMA_PRO 14
 #define HI_UNF_EDID_AUDIO_FORMAT_CODE_BUTT 15
 
 #define HI_UNF_EDID_3D_FRAME_PACKETING 0
@@ -394,9 +409,9 @@ typedef struct hiUNF_HDMI_ATTR_S
 /**CNcomment: HDMI ��Ϣ֡���Ͷ��� */
 typedef enum tagHI_UNF_HDMI_INFOFRAME_TYPE_E
 {
-    HI_INFOFRAME_TYPE_AVI,          /**<HDMI AVI InfoFrame type defintion*//**<CNcomment:HDMI AVI InfoFrame ���Ͷ��� */
+    HI_INFOFRAME_TYPE_AVI, //0         /**<HDMI AVI InfoFrame type defintion*//**<CNcomment:HDMI AVI InfoFrame ���Ͷ��� */
     HI_INFOFRAME_TYPE_SPD,          /**<HDMI SPD InfoFrame type defintion*//**<CNcomment:HDMI SPD InfoFrame ���Ͷ��� */
-    HI_INFOFRAME_TYPE_AUDIO,        /**<HDMI AUDIO InfoFrame type defintion*//**<CNcomment:HDMI AUDIO InfoFrame ���Ͷ��� */    
+    HI_INFOFRAME_TYPE_AUDIO, //2       /**<HDMI AUDIO InfoFrame type defintion*//**<CNcomment:HDMI AUDIO InfoFrame ���Ͷ��� */
     HI_INFOFRAME_TYPE_MPEG,         /**<HDMI MPEG InfoFrame type defintion*//**<CNcomment:HDMI MPEG InfoFrame ���Ͷ��� */
     HI_INFOFRAME_TYPE_VENDORSPEC,   /**<HDMI Specific InfoFrame type defintion*//**<CNcomment:HDMI Vendor Specific InfoFrame ���Ͷ��� */  
     HI_INFOFRAME_TYPE_BUTT 
@@ -426,6 +441,7 @@ typedef struct hiUNF_HDMI_AVI_INFOFRAME_VER2_S
     HI_U32                         u32LineNStartofBotBar;   /**<AVI video StartofBotBar coordinate,defualt:0*//**<CNcomment:AVI��ƵStartofBotBar��꣬ȱʡΪ0 */
     HI_U32                         u32PixelNEndofLeftBar;   /**<AVI video EndofLeft coordinate,defualt:0*//**<CNcomment:AVI��ƵEndofLeft��꣬ȱʡΪ0 */
     HI_U32                         u32PixelNStartofRightBar;/**<AVI video StartofRightBar coordinate,defualt:0*//**<CNcomment:AVI��ƵStartofRightBar��꣬ȱʡΪ0 */ 
+    //72
 }HI_UNF_HDMI_AVI_INFOFRAME_VER2_S;
 
 /**HDMI AUDIO InfoFrame parameter struct ,please reference EIA-CEA-861-D*/
@@ -495,7 +511,7 @@ typedef enum hiUNF_HDMI_3D_FORMAT_E
     HI_UNF_3D_L_DEPTH_GRAPHICS_GRAPHICS_DEPTH = 0x05, /**<3d type:L+depth+Graphics+Graphics-depth*//**<CNcomment:3d ģʽ:L+depth+Graphics+Graphics-depth*/
     HI_UNF_3D_TOP_AND_BOTTOM                  = 0x06, /**<3d type:Top and Bottom*//**<CNcomment:3d ģʽ:����ģʽ*/
     HI_UNF_3D_SIDE_BY_SIDE_HALF               = 0x08, /**<3d type:Side by side half*//**<CNcomment:3d ģʽ:����ʽ ���Ұ��*/
-    HI_UNF_3D_MAX_BUTT
+    HI_UNF_3D_MAX_BUTT //9
 }HI_UNF_HDMI_3D_FORMAT_E;
 
 
@@ -901,18 +917,18 @@ typedef struct hiUNF_HDMI_LOAD_KEY_S
 
 typedef struct hiHI_UNF_HDMI_STATUS_S
 {
-	HI_BOOL bConnected; //???
-	HI_BOOL bSinkPowerOn; //???
+	HI_BOOL bConnected; //0
+	HI_BOOL bSinkPowerOn; //4
 	int fill[3];
 	//???
 }HI_UNF_HDMI_STATUS_S;
 
 typedef struct hiHI_UNF_HDMI_DELAY_S
 {
-	HI_BOOL bForceFmtDelay; //???
-	HI_BOOL bForceMuteDelay; //???
-    HI_U32 u32FmtDelay; //???
-    HI_U32 u32MuteDelay; //???
+    HI_U32 u32MuteDelay; //0
+    HI_U32 u32FmtDelay; //4
+	HI_BOOL bForceFmtDelay; //8
+	HI_BOOL bForceMuteDelay; //12
     //???
 }HI_UNF_HDMI_DELAY_S;
 

@@ -31,7 +31,7 @@ HI_U8 SI_BlockWriteEEPROM(HI_U8 NBytes, HI_U16 Addr,  HI_U8 *Data);
 HI_U8 SI_ReadByteEEPROM(HI_U8 RegAddr);
 void SI_WriteByteEEPROM(HI_U8 RegAddr, HI_U8 RegData);
 
-HI_S32 SI_GetHdmiSinkCaps(HI_UNF_HDMI_SINK_CAPABILITY_S *pCapability);
+HI_S32 SI_GetHdmiSinkCaps(/*HI_UNF_HDMI_SINK_CAPABILITY_S*/HI_UNF_EDID_BASE_INFO_S *pCapability);
 
 #endif
 

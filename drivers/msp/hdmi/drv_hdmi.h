@@ -33,7 +33,7 @@ HI_U32 DRV_HDMI_Init(HI_U32 FromUserSpace);
 HI_U32 DRV_HDMI_DeInit(HI_U32 FromUserSpace);
 HI_U32 DRV_HDMI_Open(HI_UNF_HDMI_ID_E enHdmi, HDMI_OPEN_S *pOpen, HI_U32 FromUserSpace,HI_U32 u32ProcID);
 HI_U32 DRV_HDMI_Close(HI_UNF_HDMI_ID_E enHdmi);
-HI_U32 DRV_HDMI_GetSinkCapability(HI_UNF_HDMI_ID_E enHdmi, HI_UNF_HDMI_SINK_CAPABILITY_S *pstSinkAttr);
+HI_U32 DRV_HDMI_GetSinkCapability(HI_UNF_HDMI_ID_E enHdmi, /*HI_UNF_HDMI_SINK_CAPABILITY_S*/HI_UNF_EDID_BASE_INFO_S *pstSinkAttr);
 HI_U32 DRV_HDMI_SetAttr(HI_UNF_HDMI_ID_E enHdmi, HDMI_ATTR_S *pstAttr);
 HI_U32 DRV_HDMI_GetAttr(HI_UNF_HDMI_ID_E enHdmi, HDMI_ATTR_S *pstAttr);
 HI_U32 DRV_HDMI_SetCECCommand(HI_UNF_HDMI_ID_E enHdmi, const HI_UNF_HDMI_CEC_CMD_S  *pCECCmd);
@@ -135,7 +135,7 @@ typedef struct
                                                                   
 //internal dubug option
 //#define DEBUG_EVENTLIST
-#define DEBUG_NOTIFY_COUNT
+//#define DEBUG_NOTIFY_COUNT
 //#define DEBUG_NEED_RESET
 
 //#define DEBUG_TIMER

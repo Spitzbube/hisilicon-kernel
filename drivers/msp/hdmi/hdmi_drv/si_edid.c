@@ -28,6 +28,8 @@
 #include "si_delay.h"
 
 #include "hi_reg_common.h"
+
+#include "drv_global.h"
 #include "hi_drv_module.h"
 
 
@@ -2422,6 +2424,7 @@ HI_U32 HDMI_DEBUG(const char *format, ...)
 }
 #endif
 
+#if 0
 HI_S32 SI_GetHdmiSinkCaps(HI_UNF_HDMI_SINK_CAPABILITY_S *pCapability)
 {
     HI_U8 tempOutputState = SI_GetHDMIOutputStatus();
@@ -2484,6 +2487,7 @@ HI_S32 SI_GetHdmiSinkCaps(HI_UNF_HDMI_SINK_CAPABILITY_S *pCapability)
     
     return HI_SUCCESS;
 }
+#endif
 
 //This function is used in enjoy project.
 HI_U8 SI_Force_GetEDID(HI_U8 *datablock, HI_U32 *length)
@@ -2500,4 +2504,20 @@ HI_U8 SI_Force_GetEDID(HI_U8 *datablock, HI_U32 *length)
 
     return 0;
 }
-/*------------------------END--------------------------*/
+
+
+HI_S32 SI_GetHdmiSinkCaps(HI_UNF_EDID_BASE_INFO_S *pCapability)
+{
+    HI_UNF_EDID_BASE_INFO_S *pSinkCap = DRV_Get_SinkCap(HI_UNF_HDMI_ID_0);
+
+    if(DRV_Get_IsValidSinkCap(HI_UNF_HDMI_ID_0))
+    {
+        memcpy(pCapability,pSinkCap,sizeof(HI_UNF_EDID_BASE_INFO_S));
+        return HI_SUCCESS;
+    }
+    else
+    {
+        return HI_FAILURE;
+    }
+}
+
