@@ -19,14 +19,19 @@
 #include "si_mpi_hdmi.h"
 #include "drv_hdmi.h"
 
+#if 1
+#warning TODO
+#define HDMI_DEBUG(a, ...)
+#endif
+
 #define TIMEROVERFLOW TF2
 
 Bool TimerSrvF;
 
 SyncInfoType SyncInfo;
 
-static HI_U8 OldOutputState = 0xFF;            /*HDMI last output state note*//*CNcomment:HDMIÉÏÒ»¸öÊä³ö×´Ì¬±¸·Ý */
-HI_U8 OutputState    = CABLE_UNPLUG_;   /*HDMI output state at the present time*//*CNcomment: HDMIµ±Ç°Êä³ö×´Ì¬ */
+static HI_U8 OldOutputState = 0xFF;            /*HDMI last output state note*//*CNcomment:HDMIï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½×´Ì¬ï¿½ï¿½ï¿½ï¿½ */
+HI_U8 OutputState    = CABLE_UNPLUG_;   /*HDMI output state at the present time*//*CNcomment: HDMIï¿½ï¿½Ç°ï¿½ï¿½ï¿½×´Ì¬ */
 HI_U8 OutChangeFlag  = 0;
 HI_U8 HDMIPlugInFlag = HI_FALSE;
 
@@ -46,19 +51,19 @@ HI_U8 HDMIPlugInFlag = HI_FALSE;
   |----------------------|-------------------|--------------|----->Time
  HPD(0)                 (1)                 (2)            (3)
  
- (0)~(1):ÎªHPDÄÚºË²ãÏìÓ¦¹ý³Ì
- (1)~(2):ÎªHPDÓÃ»§²ãÏìÓ¦¹ý³Ì
- (2)~(3):ÎªHPDÄÚºË²ãHDCPÊÚÈ¨¹ý³Ì
- Æä¼ä¶¼»á±»ÈÈ²å°ÎËù´ò¶Ï£¬ÐèÒª¿¼ÂÇ²»Í¬µÄ¹ý³ÌµÄ¸´Î»²Ù×÷¡£   
- ËùÒÔÐèÒªÏÂÃæµÄ¼ÆÊýÆ÷À´¿ØÖÆÁ÷³Ì¡£
+ (0)~(1):ÎªHPDï¿½ÚºË²ï¿½ï¿½ï¿½Ó¦ï¿½ï¿½ï¿½
+ (1)~(2):ÎªHPDï¿½Ã»ï¿½ï¿½ï¿½ï¿½ï¿½Ó¦ï¿½ï¿½ï¿½
+ (2)~(3):ÎªHPDï¿½ÚºË²ï¿½HDCPï¿½ï¿½È¨ï¿½ï¿½ï¿½
+ ï¿½ï¿½ä¶¼ï¿½á±»ï¿½È²ï¿½ï¿½ï¿½ï¿½ï¿½Ï£ï¿½ï¿½ï¿½Òªï¿½ï¿½ï¿½Ç²ï¿½Í¬ï¿½Ä¹ï¿½ÌµÄ¸ï¿½Î»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½   
+ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Òªï¿½ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ì¡ï¿½
 */
-HI_U32 HPDIsrCount            = 0;      /*the timer of HPD interrupt*//*CNcomment:HPDÖÐ¶Ï²úÉúµÄ¼ÆÊýÆ÷ */
-HI_U32 HPDKernelCallbackCount = 0;      /*the timer of the HPD kernel level Callback*//*CNcomment: HPD Kernel level Callback´¦ÀíÏà¶ÔÓ¦µÄHDPµÄ¼ÆÊýÆ÷ */
-HI_U32 HPDUserCallbackCount   = 0;      /*the timer of the HPD user level Callback*//*CNcomment: HPD User level Callback´¦ÀíÏà¶ÔÓ¦µÄHDPµÄ¼ÆÊýÆ÷ */
-HI_U32 HPDAuthCount           = 0;      /*the timer of the HPD authentication*//*CNcomment:HPD HDCP Auth´¦ÀíÖÐÊ¹ÓÃµÄHDPµÄ¼ÆÊýÆ÷ */
+HI_U32 HPDIsrCount            = 0;      /*the timer of HPD interrupt*//*CNcomment:HPDï¿½Ð¶Ï²ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½ï¿½ï¿½ï¿½ */
+HI_U32 HPDKernelCallbackCount = 0;      /*the timer of the HPD kernel level Callback*//*CNcomment: HPD Kernel level Callbackï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó¦ï¿½ï¿½HDPï¿½Ä¼ï¿½ï¿½ï¿½ï¿½ï¿½ */
+HI_U32 HPDUserCallbackCount   = 0;      /*the timer of the HPD user level Callback*//*CNcomment: HPD User level Callbackï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó¦ï¿½ï¿½HDPï¿½Ä¼ï¿½ï¿½ï¿½ï¿½ï¿½ */
+HI_U32 HPDAuthCount           = 0;      /*the timer of the HPD authentication*//*CNcomment:HPD HDCP Authï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¹ï¿½Ãµï¿½HDPï¿½Ä¼ï¿½ï¿½ï¿½ï¿½ï¿½ */
 
-static HI_U8 OldAuthState   = 0xFF;     /*the HDCP last state of authorization*//*CNcomment: HDCPÊÚÈ¨ÉÏÒ»¸ö×´Ì¬±¸·Ý */
-HI_U8 AuthState      = NO_HDCP;         /*the HDCP current state of authorization*//*CNcomment:HDCPÊÚÈ¨µ±Ç°×´Ì¬ */
+static HI_U8 OldAuthState   = 0xFF;     /*the HDCP last state of authorization*//*CNcomment: HDCPï¿½ï¿½È¨ï¿½ï¿½Ò»ï¿½ï¿½×´Ì¬ï¿½ï¿½ï¿½ï¿½ */
+HI_U8 AuthState      = NO_HDCP;         /*the HDCP current state of authorization*//*CNcomment:HDCPï¿½ï¿½È¨ï¿½ï¿½Ç°×´Ì¬ */
 
 #define HDCP_MUTEXT_LOCK
 #define HDCP_MUTEXT_UNLOCK
@@ -269,7 +274,7 @@ static void SI_Check_OutputStatus(void)
     {
         if ( (OldOutputState == 0xFF) || (OldOutputState == CABLE_UNPLUG_) )
         {
-           /*HDMI init ,there isn't HPD event*/ /*CNcomment:HDMI³õÊ¼»¯£¬µ±Ç°Ã»ÓÐ°ì·¨²úÉúHPD!*/
+           /*HDMI init ,there isn't HPD event*/ /*CNcomment:HDMIï¿½ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç°Ã»ï¿½Ð°ì·¨ï¿½ï¿½ï¿½ï¿½HPD!*/
             HI_INFO_HDMI("force to set HDMI Status\n");
             //Plug In Now!
             if(OutputState < CABLE_PLUGIN_CHECK_EDID)
@@ -429,6 +434,9 @@ HI_S32 SI_EDIDProcessing( void )
         return HI_FAILURE;
     }
 
+#if 1
+#warning TODO: SI_PrepareEDID removed
+#else
     if (HI_SUCCESS != SI_PrepareEDID(HI_FALSE))
     {
         /* We should set this status to DVI Mode */
@@ -436,12 +444,14 @@ HI_S32 SI_EDIDProcessing( void )
         SI_EDID_Force_Setting();
         return HI_FAILURE;
     }
+#endif
     
     if (HI_TRUE != SI_HPD_Status())
     {
         return HI_FAILURE;
     }
     SI_timer_count();
+#warning TODO
     if(! SI_ParseEDID(&EDIDParsedData))
     {
         OldParseCRC = EDIDParsedData.CRC16;
@@ -455,7 +465,11 @@ HI_S32 SI_EDIDProcessing( void )
     {
         HI_ERR_HDMI("SI_ParseEDID err!\n");
         /* SI_ParseEDID Err, Force to change DVI Output */
+#if 1
+#warning TODO: SI_EDID_Force_Setting removed
+#else
         SI_EDID_Force_Setting();
+#endif
         
         return HI_FAILURE;
     }

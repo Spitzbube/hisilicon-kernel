@@ -259,6 +259,16 @@ typedef struct hiUNF_HDMI_SINK_CAPABILITY_S
 #warning TODO
 #define MAX_SAMPE_RATE_NUM 8
 #define HI_UNF_EDID_MAX_AUDIO_CAP_COUNT 16
+#define HI_UNF_EDID_AUDIO_SPEAKER_FL_FR 0
+#define HI_UNF_EDID_AUDIO_SPEAKER_LFE   1
+#define HI_UNF_EDID_AUDIO_SPEAKER_FC    2
+#define HI_UNF_EDID_AUDIO_SPEAKER_RL_RR 3
+#define HI_UNF_EDID_AUDIO_SPEAKER_RC    4
+#define HI_UNF_EDID_AUDIO_SPEAKER_FLC_FRC 5
+#define HI_UNF_EDID_AUDIO_SPEAKER_FLW_FRW 7
+#define HI_UNF_EDID_AUDIO_SPEAKER_FLH_FRH 8
+#define HI_UNF_EDID_AUDIO_SPEAKER_TC    9
+#define HI_UNF_EDID_AUDIO_SPEAKER_FCH  10
 #define HI_UNF_EDID_AUDIO_SPEAKER_BUTT 11
 
 #define HI_UNF_EDID_AUDIO_FORMAT_CODE_PCM   1
@@ -278,10 +288,75 @@ typedef struct hiUNF_HDMI_SINK_CAPABILITY_S
 #define HI_UNF_EDID_AUDIO_FORMAT_CODE_BUTT 15
 
 #define HI_UNF_EDID_3D_FRAME_PACKETING 0
+#define HI_UNF_EDID_3D_FIELD_ALTERNATIVE 1//TODO
+#define HI_UNF_EDID_3D_LINE_ALTERNATIVE 2//TODO
+#define HI_UNF_EDID_3D_SIDE_BY_SIDE_FULL 3//TODO
+#define HI_UNF_EDID_3D_L_DEPTH 4 //TODO
+#define HI_UNF_EDID_3D_L_DEPTH_GRAPHICS_GRAPHICS_DEPTH 5 //TODO
 #define HI_UNF_EDID_3D_TOP_AND_BOTTOM 6
 #define HI_UNF_EDID_3D_SIDE_BY_SIDE_HALF 8
 #define HI_UNF_EDID_3D_BUTT 9
 #endif
+
+typedef struct hiHI_UNF_EDID_TIMING_S
+{
+	HI_U32 u32VFB; //2440
+	HI_U32 u32VBB; //2444
+	HI_U32 u32VACT; //2448
+	HI_U32 u32HFB; //2452
+	HI_U32 u32HBB; //2456
+	HI_U32 u32HACT; //2460
+	HI_U32 u32VPW; //2464
+	HI_U32 u32HPW; //2468
+	HI_BOOL bIDV; //2472
+	HI_BOOL bIHS; //2476
+	HI_BOOL bIVS; //2480
+	HI_U32 u32ImageWidth; //2484
+	HI_U32 u32ImageHeight; //2488
+	int fill_2492; //2492
+	int fill_2496; //2496
+	HI_BOOL bInterlace; //2500
+	HI_U32 u32PixelClk; //2504
+	//68
+} HI_UNF_EDID_TIMING_S;
+
+typedef struct hiHI_UNF_EDID_MANUFACTURE_INFO_S
+{
+	HI_U8 u8MfrsName[4]; //2404
+	HI_U32 u32ProductCode; //2408
+	HI_U32 u32SerialNumber; //2412
+	HI_U32 u32Week; //2416
+	HI_U32 u32Year; //2420
+	//20
+} HI_UNF_EDID_MANUFACTURE_INFO_S;
+
+typedef struct hiHI_UNF_EDID_COLOR_SPACE_S
+{
+	HI_BOOL bRGB444; //1124
+	HI_BOOL bYCbCr422; //1128
+	HI_BOOL bYCbCr444; //1132
+
+} HI_UNF_EDID_COLOR_SPACE_S;
+
+typedef enum
+{
+	HI_UNF_EDID_AUDIO_FORMAT_CODE_RESERVED = 0,
+	HI_UNF_EDID_AUDIO_FORMAT_CODE_DUMMY,
+
+} HI_UNF_EDID_AUDIO_FORMAT_CODE_E;
+
+typedef struct
+{
+	/*HI_UNF_EDID_AUDIO_FORMAT_CODE_E*/HI_U32 enAudFmtCode; //1136 = 0
+	HI_U32/*HI_UNF_SAMPLE_RATE_E???*/ enSupportSampleRate[MAX_SAMPE_RATE_NUM]; //1140 = 4
+	HI_U32 u32SupportSampleRateNum; //1172
+	HI_U8 u8AudChannel; //1176
+	HI_BOOL bSupportBitDepth[6]; //1180
+	HI_U32 u32SupportBitDepthNum; //1204
+	HI_U32 u32MaxBitRate; //1208
+	//76
+} HI_UNF_EDID_AUDIO_INFO_S;
+
 
 typedef struct hiHI_UNF_EDID_BASE_INFO_S
 {
@@ -293,11 +368,12 @@ typedef struct hiHI_UNF_EDID_BASE_INFO_S
 	struct st3DInfo
 	{
 		HI_BOOL bSupport3D; //1048
-		HI_BOOL bSupport3DType[10/*HI_UNF_EDID_3D_BUTT*/]; //1052
+		HI_BOOL bSupport3DType[HI_UNF_EDID_3D_BUTT]; //1052
 	} st3DInfo; //1048
 	//???
 	struct stDeepColor
 	{
+		HI_BOOL bDeepColorY444; //1088
 		HI_BOOL bDeepColor30Bit; //1092
 		HI_BOOL bDeepColor36Bit; //1096
 		HI_BOOL bDeepColor48Bit; //1100
@@ -306,27 +382,43 @@ typedef struct hiHI_UNF_EDID_BASE_INFO_S
 	{
 		HI_BOOL bxvYCC601; //1104
 		HI_BOOL bxvYCC709; //1108
-	} stColorMetry;
-	int fill_1112[4]; //1112
+		HI_BOOL bsYCC601; //1112
+		HI_BOOL bAdobleYCC601; //1116
+		HI_BOOL bAdobleRGB; //1120
+	} stColorMetry; //1104
+#if 0
 	struct
 	{
+		HI_BOOL bRGB444; //1124
 		HI_BOOL bYCbCr422; //1128
 		HI_BOOL bYCbCr444; //1132
-	} stColorSpace; //???
+	}
+#else
+	HI_UNF_EDID_COLOR_SPACE_S
+#endif
+	stColorSpace; //1124
+#if 0
 	struct stAudioInfo
 	{
-		HI_U32 enAudFmtCode; //1136 = 0
+		/*HI_UNF_EDID_AUDIO_FORMAT_CODE_E*/HI_U32 enAudFmtCode; //1136 = 0
 		HI_U32/*HI_UNF_SAMPLE_RATE_E???*/ enSupportSampleRate[MAX_SAMPE_RATE_NUM]; //1140 = 4
-		int fill_1172; //1172
+		HI_U32 u32SupportSampleRateNum; //1172
 		HI_U8 u8AudChannel; //1176
-		int fill_1180[8]; //1180 = 44
+		HI_BOOL bSupportBitDepth[6]; //1180
+		HI_U32 u32SupportBitDepthNum; //1204
+		HI_U32 u32MaxBitRate; //1208
 		//76
-	} stAudioInfo[HI_UNF_EDID_MAX_AUDIO_CAP_COUNT];
+	}
+#else
+	HI_UNF_EDID_AUDIO_INFO_S
+#endif
+	stAudioInfo[HI_UNF_EDID_MAX_AUDIO_CAP_COUNT]; //1136
 	HI_U32 u32AudioInfoNum; //2352
 	HI_BOOL bSupportAudioSpeaker[HI_UNF_EDID_AUDIO_SPEAKER_BUTT]; //2356
 	HI_U8 u8ExtBlockNum; //2400
 	HI_U8 u8Version; //2401
 	HI_U8 u8Revision; //2402
+#if 0
 	struct hiHI_UNF_EDID_MANUFACTURE_INFO_S
 	{
 		HI_U8 u8MfrsName[4]; //2404
@@ -335,7 +427,11 @@ typedef struct hiHI_UNF_EDID_BASE_INFO_S
 		HI_U32 u32Week; //2416
 		HI_U32 u32Year; //2420
 		//20
-	} stMfrsInfo; //2404
+	}
+#else
+	HI_UNF_EDID_MANUFACTURE_INFO_S
+#endif
+	stMfrsInfo; //2404
 	struct stCECAddr
 	{
 		HI_BOOL bPhyAddrValid; //2424
@@ -347,6 +443,7 @@ typedef struct hiHI_UNF_EDID_BASE_INFO_S
 	} stCECAddr; //2424
 	HI_BOOL bSupportDVIDual; //2432
 	HI_BOOL bSupportsAI; //2436
+#if 0
 	struct stPerferTiming
 	{
 		HI_U32 u32VFB; //2440
@@ -367,7 +464,11 @@ typedef struct hiHI_UNF_EDID_BASE_INFO_S
 		HI_BOOL bInterlace; //2500
 		HI_U32 u32PixelClk; //2504
 		//68
-	} stPerferTiming; //2440
+	}
+#else
+	HI_UNF_EDID_TIMING_S
+#endif
+	stPerferTiming; //2440
 	//2508 = 0x9cc
 }HI_UNF_EDID_BASE_INFO_S;
 

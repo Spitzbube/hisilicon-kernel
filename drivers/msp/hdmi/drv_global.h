@@ -174,13 +174,14 @@ HI_UNF_HDMI_DEFAULT_ACTION_E DRV_Get_DefaultOutputMode(HI_UNF_HDMI_ID_E enHdmi);
 void DRV_Set_DefaultOutputMode(HI_UNF_HDMI_ID_E enHdmi,HI_UNF_HDMI_DEFAULT_ACTION_E enDefaultMode);
 
 HI_BOOL DRV_Get_IsValidSinkCap(HI_UNF_HDMI_ID_E enHdmi);
+void DRV_Set_SinkCapValid(HI_UNF_HDMI_ID_E enHdmi,HI_BOOL bSinkValid);
 
 HI_DRV_HDMI_AUDIO_CAPABILITY_S *DRV_Get_OldAudioCap(void);
 
 void DRV_Set_DDCSpeed(HI_U32 delayCount);
 
 void DRV_Set_UserEdid(HI_UNF_HDMI_ID_E enHdmi,HDMI_EDID_S *pEDID);
-
+HDMI_EDID_S *DRV_Get_UserEdid(HI_UNF_HDMI_ID_E enHdmi);
 
 HI_BOOL DRV_Get_IsUserEdid(HI_UNF_HDMI_ID_E enHdmi);
 void DRV_Set_UserEdidMode(HI_UNF_HDMI_ID_E enHdmi,HI_BOOL bUserEdid);
@@ -199,6 +200,9 @@ void DRV_Set_ForcePowerState(HI_BOOL bForce);
 HI_S32 DRV_Get_IsMce2App(HI_VOID);
 void DRV_Set_Mce2App(HI_BOOL bSmooth);
 
+HDMI_PRIVATE_EDID_S *DRV_Get_PriSinkCap(HI_UNF_HDMI_ID_E enHdmi);
+
+HI_U32 DRV_Get_DDCSpeed(void);
 
 
 #ifdef __cplusplus

@@ -21,8 +21,50 @@ typedef struct {
  HI_U16 CRC16;
 } EDIDParsedDataType;
 
+typedef struct
+{
+	HI_U8 pixel_clk[2]; //0
+	HI_U8 h_active; //2
+	HI_U8 h_blank; //3
+	HI_U8 h_active_blank; //4
+	HI_U8 v_active; //5
+	HI_U8 v_blank; //6
+	HI_U8 v_active_blank; //7
+	HI_U8 h_sync_offset; //8
+	HI_U8 h_sync_pulse_width; //9
+	HI_U8 vs_offset_pulse_width; //10
+	HI_U8 hs_offset_vs_offset; //11
+	HI_U8 h_image_size; //12
+	HI_U8 v_image_size; //13
+	HI_U8 h_v_image_size; //14
+	HI_U8 h_border; //15
+	HI_U8 v_border; //16
+	HI_U8 flags; //17
+
+} DETAILED_TIMING_BLOCK;
+
+typedef struct
+{
+	HI_U8 fill_0[8];
+	HI_U8 mfg_id[2]; //8
+	HI_U8 prod_code[2]; //10
+	HI_U8 serial[4]; //12
+	HI_U8 mfg_week; //16
+	HI_U8 mfg_year; //17
+	HI_U8 version; //18
+	HI_U8 revision; //19
+	char fill_20[15]; //20
+	HI_U8 est_timing[3]; //35
+	HI_U8 std_timing[16]; //38
+#define FIRST_DETAILED_TIMING_ADDR 54
+} EDID_FIRST_BLOCK_INFO;
+
 HI_S32 SI_PrepareEDID(HI_BOOL bForceMode);
+#if 0
 HI_U8 SI_ParseEDID(EDIDParsedDataType *);
+#else
+HI_U8 SI_ParseEDID(HI_U8 *DisplayType);
+#endif
 HI_U8 ShortParseEDID(EDIDParsedDataType *);
 
 extern int g_s32VmodeOfUNFFormat[];
@@ -83,6 +125,53 @@ HI_U8 Transfer_VideoTimingFromat_to_VModeTablesIndex(HI_UNF_ENC_FMT_E unfFmt);
 #define THREE_MSB		0xE0
 #define FIVE_LSB		0x1F
 #define SVDB_TAG		0x03
+
+#define DDC_ADDR 0xA0
+#define EDID_SIZE 512
+#define EDID_BLOCK_SIZE 128
+#define EXT_BLOCK_ADDR 126
+#define EDID_MAX_ERR_NUM 16
+#define EDID_READ_FIRST_BLOCK_ERR 1
+#define STANDARDTIMING_SIZE 12
+
+#define VIDEO_CAPABILITY_DATA_BLOCK 0
+#define VENDOR_SPECIFIC_VIDEO_DATA_BLOCK 1
+#define RESERVED_VESA_DISPLAY_DEVICE 2
+#define RESERVED_VESA_VIDEO_DATA_BLOCK 3
+#define RESERVED_HDMI_VIDEO_DATA_BLOCK 4
+#define COLORIMETRY_DATA_BLOCK  5
+#define CEA_MISCELLANENOUS_AUDIO_FIELDS 16
+#define VENDOR_SPECIFIC_AUDIO_DATA_BLOCK 17
+#define RESERVED_HDMI_AUDIO_DATA_BLOCK 18
+
+#define XVYCC601      1
+#define XVYCC709      2
+#define SYCC601       4
+#define ADOBE_XYCC601 8
+#define ADOBE_RGB     16
+
+#define EXT_VER_TAG 0x02
+#define EXT_REVISION 0x02
+
+#define AUDIO_FORMAT_CODE (0xf << 3)
+#define AUDIO_MAX_CHANNEL 0x07
+
+#define EDID_VIC 0x7f
+
+#define DATA_BLOCK_LENGTH 31
+#define DATA_BLOCK_TAG_CODE 0xff
+#define AUDIO_DATA_BLOCK 1
+#define VIDEO_DATA_BLOCK 2
+#define VENDOR_DATA_BLOCK 3
+#define SPEAKER_DATA_BLOCK 4
+#define VESA_DTC_DATA_BLOCK 5
+#define USE_EXT_DATA_BLOCK 7
+
+#define BIT4 (1 << 4)
+#define BIT5 (1 << 5)
+#define BIT6 (1 << 6)
+#define BIT7 (1 << 7)
+
 
 HI_U8 SI_EDID_Force_Setting(void);
 HI_U8 SI_Set_Force_OutputMode(HI_BOOL bForce, HI_BOOL bHDMIMode);

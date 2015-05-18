@@ -92,7 +92,7 @@ void SI_ReadBlockHDMITXP1(HI_U8 Addr, HI_U8 NBytes, HI_U8 * Data )
 #if 0 /*--NO MODIFY : COMMENT BY CODINGPARTNER--*/
 /*
  ** HDMI Hardware Reset:Set PERI_CRG2
- ** ¸´Î» ÏÈ 1 ºó 0   ÐèÒªÌáÈ¡?
+ ** ï¿½ï¿½Î» ï¿½ï¿½ 1 ï¿½ï¿½ 0   ï¿½ï¿½Òªï¿½ï¿½È¡?
  */
 HI_S32 SI_HdmiHardwareReset(int iEnable)
 {
@@ -121,7 +121,7 @@ HI_S32 SI_HdmiHardwareReset(int iEnable)
         u32Phy = tmp2;
     }
 
-    //¸´Î»
+    //ï¿½ï¿½Î»
     else
     {
         tmp = u32Ctrller;
@@ -330,7 +330,7 @@ void SI_WakeUpHDMITX(void)
     RegVal = ReadByteHDMITXP0(TX_SYS_CTRL1_ADDR) | BIT_TX_PD;
     
 #if 0 /*--w00226427 said need cfg to 0x37--*/
-    //x6µÈÖ®Ç°°æ±¾0x08Ä¬ÈÏÖµ 0x34,S40 Ä¬ÈÏÖµ0x37.²»Ì«È·¶¨×öÊ²Ã´µÄ£¬ÏÈºÍÒÔÍù°æ±¾±£³ÖÒ»ÖÂ
+    //x6ï¿½ï¿½Ö®Ç°ï¿½æ±¾0x08Ä¬ï¿½ï¿½Öµ 0x34,S40 Ä¬ï¿½ï¿½Öµ0x37.ï¿½ï¿½Ì«È·ï¿½ï¿½ï¿½ï¿½Ê²Ã´ï¿½Ä£ï¿½ï¿½Èºï¿½ï¿½ï¿½ï¿½ï¿½æ±¾ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½
     RegVal &=  ~BIT_TX_CLOCK_RISING_EDGE;
 #endif /*--NO MODIFY : COMMENT BY CODINGPARTNER--*/
     
@@ -712,6 +712,10 @@ Bool SI_IsHDMICompatible(void)
 
     HI_INFO_HDMI("-->SI_IsHDMICompatible.\n");
     
+#if 1
+#warning TODO: SI_ByteReadEDID removed
+#else
+
     /* Read EDID Block 0, offser:0x7E: Externsion Number */
     Error = SI_ByteReadEDID(0, NUM_EXTENSIONS_ADDR , &NumOfExtensions);
     if (Error || !NumOfExtensions)
@@ -820,6 +824,7 @@ Bool SI_IsHDMICompatible(void)
         if ((Offset == NumOfExtensions) && (BlockPtr >= MaxBlockOffset))
             return FALSE;
     }
+#endif
 #endif    
     return TRUE;
 }

@@ -12,6 +12,11 @@
 #define _4     1  // 4:3
 #define _16    2  // 16:9
 #define _4or16   3  // 16:9
+#if 1
+#warning TODO
+#define _16_10  4
+#define _5_4   5
+#endif
 
 #define NSM    0 // no sub. mode
 

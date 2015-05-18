@@ -34,9 +34,9 @@ typedef int    (*FN_GPIO_RESUME)(/*PM_BASEDEV_S*/void *);
 typedef struct
 {
     FN_GPIO_Get_Bit                pfnGpioDirGetBit;
-    FN_GPIO_Set_Bit                pfnGpioDirSetBit;
-    FN_GPIO_Get_Bit                pfnGpioReadBit;
-    FN_GPIO_Set_Bit                pfnGpioWriteBit;
+    FN_GPIO_Set_Bit                pfnGpioDirSetBit; //4
+    FN_GPIO_Get_Bit                pfnGpioReadBit; //8
+    FN_GPIO_Set_Bit                pfnGpioWriteBit; //12
     FN_GPIO_Get_Num                pfnGpioGetNum;
     FN_GPIO_Register_Server_Func   pfnGpioRegisterServerFunc;
     FN_GPIO_UnRegister_Server_Func pfnGpioUnRegisterServerFunc;

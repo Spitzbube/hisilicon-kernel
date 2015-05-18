@@ -4,6 +4,20 @@
 #include <linux/module.h>
 
 
+struct
+{
+	int fmt;
+}
+VICModeTables[5];/* =
+{
+		{HI_UNF_ENC_FMT_BUTT},
+		{HI_UNF_ENC_FMT_3840X2160_30},
+		{HI_UNF_ENC_FMT_3840X2160_25},
+		{HI_UNF_ENC_FMT_3840X2160_24},
+		{HI_UNF_ENC_FMT_4096X2160_24}
+};*/
+
+
 void OPTM_ALG_CscCoefSet(void)
 {
 #warning TODO: OPTM_ALG_CscCoefSet
