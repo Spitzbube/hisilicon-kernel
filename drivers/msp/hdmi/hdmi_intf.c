@@ -1269,8 +1269,6 @@ static HI_S32 HDMI0_Sink_Proc(struct seq_file *p, HI_VOID *v)
 
 extern HI_U32 unStableTimes;
 
-#define VDP_DHD_0_CTRL 0xff12c000
-
 HI_S32 hdmi_ProcWrite(struct file * file,
     const char __user * buf, size_t count, loff_t *ppos)
 {

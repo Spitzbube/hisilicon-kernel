@@ -46,12 +46,12 @@
 #endif
 //#define BOARD_TYPE_S40V2_fpga
 
-#define HDMI_TX_PHY_ADDR 0xf8ce1800L
 
 HI_S32 SI_TX_PHY_WriteRegister(HI_U32 u32RegAddr, HI_U32 u32Value);
 HI_S32 SI_TX_PHY_ReadRegister(HI_U32 u32RegAddr, HI_U32 *pu32Value);
 
 HI_S32 SI_TX_PHY_HighBandwidth(HI_BOOL bTermEn);
+HI_S32 SI_TX_PHY_4KRisingTime(HI_BOOL b4KFmt);
 
 HI_S32 SI_TX_PHY_GetOutPutEnable(void);
 

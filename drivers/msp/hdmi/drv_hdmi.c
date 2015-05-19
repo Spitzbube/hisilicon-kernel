@@ -4273,7 +4273,6 @@ HI_S32 DRV_HDMI_SetAOAttr(HI_UNF_HDMI_ID_E enHdmi,HDMI_AUDIO_ATTR_S *pstHDMIAOAt
 
 HI_S32 DRV_HDMI_SetVOAttr(HI_UNF_HDMI_ID_E enHdmi,HDMI_VIDEO_ATTR_S *pstHDMIVOAttr,HI_BOOL UpdateFlag)
 {
-	extern void SI_TX_PHY_4KRisingTime(HI_BOOL);
     HI_U32 Ret = HI_SUCCESS;
     HI_U8 ucData       = 0;
     HI_U8 bRxVideoMode = 0;

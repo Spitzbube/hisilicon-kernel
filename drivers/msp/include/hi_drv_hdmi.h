@@ -31,8 +31,6 @@
 #endif
 #endif
 
-#define HDMI_TX_BASE_ADDR     0xff100000 //0xf8ce0000L
-
 
 
 /*

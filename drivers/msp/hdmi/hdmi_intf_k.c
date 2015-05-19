@@ -71,6 +71,7 @@
 #include "drv_hdmi_ext.h"
 #include "drv_global.h"
 #include "drv_hdmi_ioctl.h"
+#include "drv_reg_proc.h"
 
 HI_DECLARE_MUTEX(g_hdmiMutex); //80fac650
 HI_U32 g_VirHDMI_PHY_BASE_ADDR = 0; //81130b04 +8

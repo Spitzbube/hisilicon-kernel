@@ -26,14 +26,6 @@ void OPTM_ALG_CscCoefSet(void)
 }
 
 
-void SI_TX_PHY_4KRisingTime(/*HI_BOOL*/int a)
-{
-#warning TODO: SI_TX_PHY_4KRisingTime
-
-	printk("SI_TX_PHY_4KRisingTime: TODO\n");
-}
-
-
 void GetFormatDelay(/*HI_UNF_HDMI_ID_E*/int enHdmi, /*HI_U32*/int* delayTime)
 {
 #warning TODO: GetFormatDelay
