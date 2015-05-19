@@ -129,14 +129,14 @@ void SI_CloseHdmiDevice(void)
     {
         if (Count <= 0)
         {
-            HI_ERR_HDMI("timeout is occur\n");
+            HI_ERR_HDMI("timeout is occur\n"); //132
             break;
         }
         regvalue = ReadByteHDMITXP0(0xF2);//MDDC_STATUS_ADDR
-        HI_INFO_HDMI("MDDC_STATUS_ADDR regvalue:0x%x\n", regvalue);
+        HI_INFO_HDMI("MDDC_STATUS_ADDR regvalue:0x%x\n", regvalue); //136
         if((regvalue & 0x10) != 0)
         {
-            HI_INFO_HDMI("loop untill DDC to idle status regvalue:0x%x\n", regvalue);
+            HI_INFO_HDMI("loop untill DDC to idle status regvalue:0x%x\n", regvalue); //139
             msleep(10);
             continue;
         }
