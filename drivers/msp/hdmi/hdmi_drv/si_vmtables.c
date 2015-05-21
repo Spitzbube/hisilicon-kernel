@@ -28,6 +28,24 @@ const HI_U32 N_Val[] = { 6272,            //0:44.1 kHz
                             0,
                             24576         //e:192 kHz
                         };
+
+const HI_U32 N_Val_4K[] = { 4704,
+		0,
+		5120,
+		3072,
+		0,
+		0,
+		0,
+		0,
+		9408,
+		0,
+		10240,
+		0,
+		18816,
+		0,
+		20480
+};
+
 const VModeInfoType VModeTables[NMODES]=
 {
 // 60 Hz
@@ -136,4 +154,18 @@ const VModeInfoType VModeTables[NMODES]=
     {{PC_BASE+47,0,NSM, HI_UNF_ENC_FMT_BUTT, HI_UNF_ENC_FMT_BUTT}, 29700,   {ProgrVPosHNeg,     7500,   {2640, 1500}},  {576,59},   {1920,1440}, _4,  {0,224,3,56,352,144,1,0}, 0}, // 1920x1440@75
 #endif
 };
+
+const struct
+{
+	HI_UNF_ENC_FMT_E fmt;
+}
+VICModeTables[5] =
+{
+		{HI_UNF_ENC_FMT_BUTT},
+		{HI_UNF_ENC_FMT_3840X2160_30},
+		{HI_UNF_ENC_FMT_3840X2160_25},
+		{HI_UNF_ENC_FMT_3840X2160_24},
+		{HI_UNF_ENC_FMT_4096X2160_24}
+};
+
 

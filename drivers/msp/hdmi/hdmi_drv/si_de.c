@@ -33,7 +33,7 @@ void SI_UpdateTX_DE(HI_U8 VMode)
         VStartPos = ReadEEVStartPos(CustVMOffset);
         HRes = ReadEEHRes(CustVMOffset);
         VRes = ReadEEVRes(CustVMOffset);
-        HI_INFO_HDMI("VxH=%dx%d@Custom.\n", VRes, HRes);
+        HI_INFO_HDMI("VxH=%dx%d@Custom.\n", VRes, HRes); //36
     }
     else
     {
@@ -43,10 +43,10 @@ void SI_UpdateTX_DE(HI_U8 VMode)
         VStartPos = VModeTables[VMode].Pos.V;
         HRes = VModeTables[VMode].Res.H;
         VRes = VModeTables[VMode].Res.V;
-        HI_INFO_HDMI("VxH=%dx%d@%d.\n", VRes, HRes, VModeTables[VMode].Tag.VFreq);
+        HI_INFO_HDMI("VxH=%dx%d@%d.\n", VRes, HRes, VModeTables[VMode].Tag.VFreq); //46
     }
 
-    HI_INFO_HDMI("VxH=%dx%d.\n", VRes, HRes);
+    HI_INFO_HDMI("VxH=%dx%d.\n", VRes, HRes); //49
     // If HD (720p/1080i/1080p), set CSCSEL bit at 0x72:0x48[4]:
    if ((VMode == 2) || (VMode == 3) || (VMode == 11) || (VMode == 13) || (VMode == 14) ||
         ((VMode >= 24) && (VMode <= 27)))
@@ -104,7 +104,7 @@ void SI_UpdateTX_656(HI_U8 VMode)
    WriteWordHDMITXP0( 0x3a, VModeTables[VMode].Tag.Total.Pixels);
    WriteWordHDMITXP0( 0x3c, VModeTables[VMode].Tag.Total.Lines);
 
-   HI_INFO_HDMI("Vmode=%d. VxH=%dx%d@%d.\n", VMode, VModeTables[VMode].Res.V, VModeTables[VMode].Res.H, VModeTables[VMode].Tag.VFreq);
+   HI_INFO_HDMI("Vmode=%d. VxH=%dx%d@%d.\n", VMode, VModeTables[VMode].Res.V, VModeTables[VMode].Res.H, VModeTables[VMode].Tag.VFreq); //107
     
 #if 0 /*--SetCsc in setAttr--*/
    //if HD, set CSCSEL bit at 0x72:0x48[4]:
