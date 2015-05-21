@@ -54,11 +54,11 @@ typedef enum
 
 typedef struct
 {
-    HI_U8 bCount;
+    HI_U8 bCount; //0
     HI_U8 bRXNextCount;
-    HI_U8 bDestOrRXHeader;
-    HI_U8 bOpcode;
-    HI_U8 bOperand[ SII_MAX_CMD_SIZE ];
+    HI_U8 bDestOrRXHeader; //2
+    HI_U8 bOpcode; //3
+    HI_U8 bOperand[ SII_MAX_CMD_SIZE ]; //4
 } SiI_CEC_t;
 
 typedef enum

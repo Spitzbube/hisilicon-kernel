@@ -78,19 +78,24 @@ void SI_SiI_CEC_SendPing ( HI_U8 bCECLogAddr )
 //------------------------------------------------------------------------------
 HI_U8 SiI_CEC_SetCommand( SiI_CEC_t * pSiI_CEC )
 {
+  HI_U32 i = 0;
   HI_U8 error = FALSE;
   HI_U8 cec_int_status_reg[2];
-  HI_ERR_HDMI("***SiI_CEC_SetCommand start ***\n");
+  HI_CEC_HDMI("***SiI_CEC_SetCommand start ***\n"); //84
   // Clear Tx Buffer
   SI_CEC_RegisterModify(REG__CEC_DEBUG_3, BIT_FLUSH_TX_FIFO, BIT_FLUSH_TX_FIFO);
 
-  HI_CEC_HDMI("\n TX: Dest[0x%02X],OpCode[0x%02X], Count:%d, Oprand[0x%02X, %02X, %02X]\n", 
+  HI_CEC_HDMI("\n TX: Dest[0x%02X],OpCode[0x%02X], Count:%d, Oprand[",
       (int)pSiI_CEC->bDestOrRXHeader, 
       (int)pSiI_CEC->bOpcode,
-      (int)pSiI_CEC->bCount,
-      (int)pSiI_CEC->bOperand[0], 
-      (int)pSiI_CEC->bOperand[1], 
-      (int)pSiI_CEC->bOperand[2]);
+      (int)pSiI_CEC->bCount); //91
+
+  for (i = 0; i < pSiI_CEC->bCount; i++)
+  {
+	  HI_CEC_HDMI("0x%02x ", pSiI_CEC->bOperand[i]); //95
+  }
+
+  HI_CEC_HDMI("]\n"); //98
 
 #ifdef  CEC_TX_AUTO_CALC_ENABLED
     HI_CEC_HDMI("use CEC_TX_AUTO_CALC_ENABLED\n");
@@ -113,9 +118,13 @@ HI_U8 SiI_CEC_SetCommand( SiI_CEC_t * pSiI_CEC )
     SI_CEC_RegisterWrite(REG__CEC_TX_COMMAND, pSiI_CEC->bOpcode);
     SI_CEC_RegisterWriteBlock( REG__CEC_TX_OPERANDS_0, pSiI_CEC->bOperand, pSiI_CEC->bCount);
 
-    if( error )    
+    if( error )
+    {
+
         HI_ERR_HDMI("\n SiI_CEC_SetCommand(): Fail to write CEC opcode and operands\n") ;
-    
+
+
+    }
     
     SI_CEC_RegisterWrite(REG__CEC_TRANSMIT_DATA, 0x00); //Try only once
 
@@ -123,7 +132,7 @@ HI_U8 SiI_CEC_SetCommand( SiI_CEC_t * pSiI_CEC )
     // Write Operand count and activate send
     SI_CEC_RegisterWrite(REG__CEC_TRANSMIT_DATA, BIT_TRANSMIT_CMD | pSiI_CEC->bCount );
 #endif
-    HI_ERR_HDMI("***SiI_CEC_SetCommand stop ***\n");
+    HI_CEC_HDMI("***SiI_CEC_SetCommand stop ***\n"); //135
     return error;
 }
 
@@ -148,16 +157,30 @@ HI_U8 SI_CEC_GetCommand( SiI_CEC_t * pSiI_CEC )
         pSiI_CEC->bOpcode = SI_CEC_RegisterRead(CEC_RX_COMMAND);
         SI_CEC_RegisterReadBlock(REG__CEC_RX_OPERAND_0, pSiI_CEC->bOperand, bCount);
         
-        HI_CEC_HDMI("\n RX: HDR[0x%02X],OpCode[0x%02X], Count:%d, Oprand[0x%02X, %02X, %02X]\n", 
+        HI_CEC_HDMI("RX HDR:0x%02X,OpCode:0x%02X, Count:%d,            Oprand: 0x%02x,0x%02x,0x%02x,0x%02x,0x%02x,0x%02x,0x%02x,0x%02x,0x%02x,0x%02x,0x%02x,0x%02x,0x%02x,0x%02x,0x%02x\n",
           (int)pSiI_CEC->bDestOrRXHeader, 
           (int)pSiI_CEC->bOpcode,
           (int)bCount,
           (int)pSiI_CEC->bOperand[0], 
           (int)pSiI_CEC->bOperand[1], 
-          (int)pSiI_CEC->bOperand[2]);
+          (int)pSiI_CEC->bOperand[2],
+          (int)pSiI_CEC->bOperand[3],
+          (int)pSiI_CEC->bOperand[4],
+          (int)pSiI_CEC->bOperand[5],
+          (int)pSiI_CEC->bOperand[6],
+          (int)pSiI_CEC->bOperand[7],
+          (int)pSiI_CEC->bOperand[8],
+          (int)pSiI_CEC->bOperand[9],
+          (int)pSiI_CEC->bOperand[10],
+          (int)pSiI_CEC->bOperand[11],
+          (int)pSiI_CEC->bOperand[12],
+          (int)pSiI_CEC->bOperand[13],
+          (int)pSiI_CEC->bOperand[14]); //179
     }
     else
+    {
         error = 1;
+    }
 
     // Clear CLR_RX_FIFO_CUR;
     // Clear current frame from Rx FIFO
@@ -167,9 +190,9 @@ HI_U8 SI_CEC_GetCommand( SiI_CEC_t * pSiI_CEC )
     pSiI_CEC->bRXNextCount = 0;
     
     NewRXState = SI_CEC_RegisterRead(REG__CEC_RX_COUNT);
-    HI_INFO_HDMI("Nex Status:0x%x\n", NewRXState);
+    HI_INFO_HDMI("Nex Status:0x%x\n", NewRXState); //193
     //if( pSiI_CEC->bCount & 0xF0 )
-    if(NewRXState & 0xF0)
+    if(NewRXState & 0x70)
     {
         pSiI_CEC->bRXNextCount = SI_CEC_RegisterRead(REG__CEC_RX_COUNT);
     }
@@ -205,14 +228,14 @@ HI_U8 SI_CEC_Interrupt_Processing ( SiI_CEC_Int_t * pInt )
     {
         HI_INFO_HDMI("\nA6A7Reg: %02X %02X\n", 
             (int) cec_int_status_reg[0], 
-            (int) cec_int_status_reg[1]);
+            (int) cec_int_status_reg[1]); //231
            
         if ( cec_int_status_reg[1] & BIT_FRAME_RETRANSM_OV )
         {
            // Frame Retransmit Count Exceeded event
            HI_CEC_HDMI("\n!CEC_A7_TX_RETRY_EXCEEDED![%02X][%02X]\n",
                (int) cec_int_status_reg[0], 
-               (int) cec_int_status_reg[1]);
+               (int) cec_int_status_reg[1]); //238
            
             // flash TX otherwise after writing clear interrupt
             // BIT_FRAME_RETRANSM_OV the TX command will be re-send
@@ -223,7 +246,7 @@ HI_U8 SI_CEC_Interrupt_Processing ( SiI_CEC_Int_t * pInt )
         //
         SI_CEC_RegisterWriteBlock(REG__CEC_INT_STATUS_0,cec_int_status_reg,2);
 
-        HI_INFO_HDMI("\nA6A7Reg: %02X %02X\n", (int) cec_int_status_reg[0], (int) cec_int_status_reg[1]);
+        HI_INFO_HDMI("\nA6A7Reg: %02X %02X\n", (int) cec_int_status_reg[0], (int) cec_int_status_reg[1]); //249
 
         msleep(10);//Very Important, Must Add delay!
         // CEC RX Processing
@@ -234,12 +257,12 @@ HI_U8 SI_CEC_Interrupt_Processing ( SiI_CEC_Int_t * pInt )
                 if(! ( cec_int_status_reg[0] & BIT_RX_MSG_RECEIVED ))
                 {
                     HI_CEC_HDMI("Interrupt CEC Rx Status do not set! [%02X][%02X], bTmpRXState:[%02X]\n",
-                        (int) cec_int_status_reg[0], (int) cec_int_status_reg[1], bTmpRXState);
+                        (int) cec_int_status_reg[0], (int) cec_int_status_reg[1], bTmpRXState); //260
                 }
             }
             // Save number of frames in Rx Buffer
             pInt->bRXState = SI_CEC_RegisterRead(REG__CEC_RX_COUNT);
-            HI_CEC_HDMI("Receive Frame pInt->bRXState:0x%x\n", pInt->bRXState);
+            HI_CEC_HDMI("Receive Frame pInt->bRXState:0x%x\n", pInt->bRXState); //265
         }
 
         // RX Errors processing
@@ -255,7 +278,7 @@ HI_U8 SI_CEC_Interrupt_Processing ( SiI_CEC_Int_t * pInt )
 
         if ( cec_int_status_reg[1] & BIT_RX_FIFO_OVERRUN ) // fixed per Uematsu san
         {
-            HI_CEC_HDMI("CEC RX Overflow, Flush Rx FIFO\n");
+            HI_CEC_HDMI("CEC RX Overflow, Flush Rx FIFO\n"); //281
             pInt->bCECErrors |= SiI_CEC_ERROR_RXOVERFLOW;
             // Clear All frame from Rx FIFO
             SI_CEC_RegisterModify(REG__CEC_RX_CONTROL, BIT_CLR_RX_FIFO_ALL, BIT_CLR_RX_FIFO_ALL );
@@ -282,7 +305,7 @@ HI_U8 SI_CEC_Interrupt_Processing ( SiI_CEC_Int_t * pInt )
 
 HI_VOID SI_CEC_SetUp(void)
 {
-    HI_INFO_HDMI("set CEC_SETUP\n");
+    HI_INFO_HDMI("set CEC_SETUP\n"); //308
     WriteByteHDMICEC(0X8E, 0x04);
 }
 
