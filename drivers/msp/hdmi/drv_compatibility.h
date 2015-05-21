@@ -1,11 +1,39 @@
 #include "hi_drv_hdmi.h"
 
 typedef struct hiHDMI_DELAY_TIME_S{
-    HI_U8           u8IDManufactureName[4];   /**<Manufacture name*//**<CNcomment:Éè±¸³§ÉÌ±êÊ¶ */
-    HI_U32          u32IDProductCode;         /**<Product code*//**<CNcomment:Éè±¸ID */
-    HI_U32          u32DelayTimes;
-    HI_U8           u8ProductType[32];    /**<Product Type*//**<CNcomment:²úÆ·ÐÍºÅ */
+    HI_U8           u8IDManufactureName[4];   /**<Manufacture name*//**<CNcomment:ï¿½è±¸ï¿½ï¿½ï¿½Ì±ï¿½Ê¶ */
+    HI_U32          u32IDProductCode; //4        /**<Product code*//**<CNcomment:ï¿½è±¸ID */
+    HI_U32          u32DelayTimes; //8
+    HI_U32          Data_12; //12
+    HI_U8           u8ProductType[32]; //16   /**<Product Type*//**<CNcomment:ï¿½ï¿½Æ·ï¿½Íºï¿½ */
 }HDMI_DELAY_TIME_S;
 
-HI_S32 SetFormatDelay(HI_UNF_HDMI_SINK_CAPABILITY_S *sinkCap,HI_U32 *DelayTime);
+typedef struct
+{
+    HI_U8           u8IDManufactureName[4];   /**<Manufacture name*//**<CNcomment:ï¿½è±¸ï¿½ï¿½ï¿½Ì±ï¿½Ê¶ */
+    HI_U32          u32IDProductCode; //4        /**<Product code*//**<CNcomment:ï¿½è±¸ID */
+    HI_U8           u8ProductType[32]; //8   /**<Product Type*//**<CNcomment:ï¿½ï¿½Æ·ï¿½Íºï¿½ */
+} Struct_80faed54;
+
+
+//HI_S32 SetFormatDelay(HI_UNF_HDMI_SINK_CAPABILITY_S *sinkCap,HI_U32 *DelayTime);
+
+void SetGlobalFmtDelay(HI_U32);
+HI_U32 GetGlobalFmtDelay(void);
+
+void SetForceDelayMode(HI_BOOL bForceFmtDelay, HI_BOOL bForceMuteDelay);
+HI_BOOL IsForceFmtDelay(void);
+HI_BOOL IsForceMuteDelay(void);
+
+void SetGlobalMuteDelay(HI_U32);
+HI_U32 GetGlobalsMuteDelay(void);
+
+HI_S32 GetFormatDelay(HI_UNF_HDMI_ID_E enHdmi, HI_U32* delayTime);
+
+HI_S32 GetmuteDelay(HI_UNF_HDMI_ID_E enHdmi, HI_U32* Delay);
+
+void Check1stOE(HI_UNF_HDMI_ID_E enHdmi);
+
+
+
 

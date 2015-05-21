@@ -2674,7 +2674,6 @@ HI_U32 DRV_HDMI_ReadEvent(HI_UNF_HDMI_ID_E enHdmi,HI_U32 procID)
 }
 
 extern void hdmi_MCE_ProcHotPlug(HI_HANDLE hHdmi);
-extern void Check1stOE(HI_UNF_HDMI_ID_E enHdmi);
 
 static void hdmi_ProcEvent(HI_UNF_HDMI_EVENT_TYPE_E event,HI_U32 procID)
 {
@@ -3114,7 +3113,6 @@ HI_U32 DRV_HDMI_SetxvYCCMode(HI_UNF_HDMI_ID_E enHdmi, HI_BOOL bEnable)
 
 HI_U32 DRV_HDMI_SetAVMute(HI_UNF_HDMI_ID_E enHdmi, HI_BOOL bAvMute)
 {
-	extern void GetmuteDelay(HI_UNF_HDMI_ID_E enHdmi, HI_U32* Delay);
     HI_INFO_HDMI("Enter DRV_HDMI_SetAVMute, bAvMute:%d\n", bAvMute); //3100
     HDMI_CHECK_ID(enHdmi); //3101
     HDMI_CheckChnOpen(enHdmi); //3102
@@ -3138,7 +3136,6 @@ HI_U32 DRV_HDMI_SetAVMute(HI_UNF_HDMI_ID_E enHdmi, HI_BOOL bAvMute)
 }
 
 extern int DRV_Get_IsLCDFmt(HI_DRV_DISP_FMT_E enEncodingFormat);
-extern void GetFormatDelay(HI_UNF_HDMI_ID_E enHdmi, HI_U32* delayTime);
 
 // The Procedures for SetFormay
 // Set AV mute 
@@ -4617,11 +4614,6 @@ HI_S32 DRV_HDMI_GetStatus(HI_UNF_HDMI_ID_E enHdmi, HI_UNF_HDMI_STATUS_S *pHdmiSt
     return HI_SUCCESS;
 }
 
-extern HI_BOOL IsForceFmtDelay(void);
-extern HI_BOOL IsForceMuteDelay(void);
-extern HI_BOOL GetGlobalFmtDelay(void);
-extern HI_BOOL GetGlobalsMuteDelay(void);
-
 HI_S32 DRV_HDMI_GetDelay(HI_UNF_HDMI_ID_E enHdmi, HI_UNF_HDMI_DELAY_S *pHdmiDelay)
 {
     HDMI_CHECK_ID(enHdmi); //4591
@@ -4634,10 +4626,6 @@ HI_S32 DRV_HDMI_GetDelay(HI_UNF_HDMI_ID_E enHdmi, HI_UNF_HDMI_DELAY_S *pHdmiDela
     pHdmiDelay->u32MuteDelay = GetGlobalsMuteDelay();
     return HI_SUCCESS;
 }
-
-extern void SetForceDelayMode(HI_BOOL, HI_BOOL);
-extern void SetGlobalFmtDelay(HI_U32);
-extern void SetGlobalMuteDelay(HI_U32);
 
 HI_S32 DRV_HDMI_SetDelay(HI_UNF_HDMI_ID_E enHdmi, HI_UNF_HDMI_DELAY_S *pHdmiDelay)
 {

@@ -62,6 +62,8 @@
 
 #include "hi_osal.h"
 #include "drv_reg_proc.h"
+#include "drv_compatibility.h"
+
 #include "si_defsmddc.h"
 
 #ifdef ANDROID_SUPPORT
@@ -406,13 +408,6 @@ HI_CHAR *hdmi_GetProcArg(HI_CHAR *chCmd, HI_CHAR *chArg, HI_U32 u32ArgBufSize)
 *****************************************************************************/
 static HI_S32 HDMI0_Proc(struct seq_file *p, HI_VOID *v)
 {
-#if 1
-#warning TODO
-	extern HI_BOOL IsForceFmtDelay(void);
-	extern HI_BOOL IsForceMuteDelay(void);
-	extern HI_U32 GetGlobalFmtDelay(void);
-	extern HI_U32 GetGlobalsMuteDelay(void);
-#endif
     HI_U32 u32Reg, index, offset,u32DefHDMIMode;
 	HDMI_ATTR_S			          stHDMIAttr; 
     HDMI_VIDEO_ATTR_S            *pstVideoAttr;
@@ -1276,11 +1271,6 @@ HI_S32 hdmi_ProcWrite(struct file * file,
 #warning TODO
 	extern void SI_CEC_Close(void);
 	extern void SI_CEC_SetUp(void);
-	extern void SetForceDelayMode(HI_BOOL, HI_BOOL);
-	extern void SetGlobalMuteDelay(int a);
-	extern void SetGlobalFmtDelay(int a);
-	extern HI_BOOL IsForceFmtDelay(void);
-	extern HI_BOOL IsForceMuteDelay(void);
 #endif
 
 #ifndef HI_ADVCA_FUNCTION_RELEASE
