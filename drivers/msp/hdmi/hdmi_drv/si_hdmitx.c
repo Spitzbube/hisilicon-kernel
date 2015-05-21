@@ -8,6 +8,7 @@
 #include <linux/string.h>
 #include <linux/delay.h>
 #include <linux/interrupt.h>
+#include "drv_global.h"
 #include "si_globdefs.h"
 #include "si_cpldefs.h"
 #include "si_defstx.h"
@@ -33,7 +34,6 @@
 
 #include "hi_reg_common.h"
 
-HI_U8 SI_ByteReadEDID(HI_U8, HI_U8, HI_U8 *);
 Bool F_TxInit;
 
 //---------------------------------------------------------------------
@@ -89,61 +89,6 @@ void SI_ReadBlockHDMITXP1(HI_U8 Addr, HI_U8 NBytes, HI_U8 * Data )
     BlockRead_8BAS((I2CShortCommandType *)&I2CComm, Data);
 }
 
-#if 0 /*--NO MODIFY : COMMENT BY CODINGPARTNER--*/
-/*
- ** HDMI Hardware Reset:Set PERI_CRG2
- ** ��λ �� 1 �� 0   ��Ҫ��ȡ?
- */
-HI_S32 SI_HdmiHardwareReset(int iEnable)
-{
-    //HI_U32    u32BaseAddr;
-    //u32BaseAddr = SYS_PHY_BASE_ADDR;//f8a22000
-    
-    //HDMI_WriteReg(IO_ADDRESS(u32BaseAddr), 0x10c, 0x33f);
-    //HDMI_WriteReg(IO_ADDRESS(u32BaseAddr), 0x10c, 0x3f);
-    //volatile HI_U32 *pulArgs = (HI_U32*)IO_ADDRESS(HDMI_HARDWARE_RESET_ADDR);
-    HI_U32    u32Ctrller;
-    HI_U32    u32Phy;
-    HI_U32 tmp = 0;
-    HI_U32 tmp2 = 0;
-    
-    DRV_HDMI_ReadRegister(HDMI_SYS_CTRL_ADDR,&u32Ctrller);
-    DRV_HDMI_ReadRegister(HDMI_SYS_PHY_ADDR,&u32Phy);
-    if (iEnable == 0)
-    {
-        tmp = u32Ctrller;
-        //tmp &= 0xfffffffe;
-        tmp &= ~0x300;
-        u32Ctrller = tmp;
-    
-        tmp2 = u32Phy;
-        tmp2 &= ~0x10;
-        u32Phy = tmp2;
-    }
-
-    //��λ
-    else
-    {
-        tmp = u32Ctrller;
-        tmp |= 0x300;
-        u32Ctrller = tmp;
-
-        tmp2 = u32Phy;
-        tmp2 |= 0x10;
-        u32Phy = tmp2;
-    }
-
-    DRV_HDMI_WriteRegister(HDMI_SYS_CTRL_ADDR,u32Ctrller);
-    
-    DelayMS(1);
-    
-    DRV_HDMI_WriteRegister(HDMI_SYS_PHY_ADDR,u32Phy);
-    
-    return HI_SUCCESS;    
-}
-#endif /*--NO MODIFY : COMMENT BY CODINGPARTNER--*/
-
-
 HI_VOID SI_HW_ResetCtrl(int iEnable)
 {
     HI_U32    u32Ctrller;
@@ -182,7 +127,7 @@ HI_VOID SI_HW_ResetPhy(int iEnable)
 
 void SI_HW_ResetHDMITX(void)
 {
-    HI_INFO_HDMI("--> SI_HW_ResetHDMITX.\n");
+    HI_INFO_HDMI("--> SI_HW_ResetHDMITX.\n"); //130
     //printk("new HW reset");
 
 
@@ -219,23 +164,28 @@ void SI_HW_ResetHDMITX(void)
     //DelayMS(1); 
 
     // 0x72:0xf6 DDC_DELAY_CNT
-    WriteByteHDMITXP0(DDC_DELAY_CNT,0x1a);
+    WriteByteHDMITXP0(DDC_DELAY_CNT,DRV_Get_DDCSpeed());
 
+#if    defined(CHIP_TYPE_hi3716cv200)   \
+    || defined(CHIP_TYPE_hi3716mv400)   \
+    || defined(CHIP_TYPE_hi3718cv100)   \
+    || defined(CHIP_TYPE_hi3719cv100)
+    //for 3716Cv200 series the clk is Edge need select to falling edge
+    //the default value for 0x72:0x08 is 0x37,and the clock has been holded in falling edge
+    //and after the clock edge is changed,we need a swrst.
+    //otherwise, there will be cause clock unstable.
+    HI_INFO_HDMI("TX_SYS_CTRL1_ADDR To 0x35 \n");
     WriteByteHDMITXP0 (TX_SYS_CTRL1_ADDR, 0x35);
-    
-#if 0 /*--NO MODIFY : COMMENT BY CODINGPARTNER--*/
-    SI_HdmiHardwareReset(1);
-    DelayMS(10); 
-    //SI_HdmiHardwareReset(0);
-    DelayMS(10); 
-    //WriteByteHDMITXP0 (0x79, 0x00);
-    WriteByteHDMITXP0 (INT_CNTRL_ADDR, 0x02);
-    DelayMS(1); 
-    
-    SI_TX_PHY_INIT();
-    //udelay(100); 
-    DelayMS(1); 
-#endif /*--NO MODIFY : COMMENT BY CODINGPARTNER--*/
+#elif  defined(CHIP_TYPE_hi3718mv100)   \
+    || defined(CHIP_TYPE_hi3719mv100)   \
+    || defined(CHIP_TYPE_hi3796cv100)   \
+    || defined(CHIP_TYPE_hi3798cv100)   \
+    || defined(CHIP_TYPE_hi3798mv100)   \
+    || defined(CHIP_TYPE_hi3796mv100)   \
+    || defined(CHIP_TYPE_hi3716mv310)
+    HI_INFO_HDMI("TX_SYS_CTRL1_ADDR To 0x37 \n"); //184
+    //WriteByteHDMITXP0 (TX_SYS_CTRL1_ADDR, 0x37);
+#endif
 }
 
 
@@ -288,7 +238,7 @@ HI_BOOL SI_IsHDMIResetting(void)
     if((ReadByteHDMITXP0( TX_SWRST_ADDR ) & 0x01 ) ||
        (u32Ctrller & 0x300) || (u32Phy & 0x10))
     {
-        HI_INFO_HDMI("HDMI Is Resetting...\n");
+        //HI_INFO_HDMI("HDMI Is Resetting...\n");
         return HI_TRUE;
     }
 
@@ -300,7 +250,7 @@ void SI_SW_ResetHDMITX(void)
 {
     HI_U8 TimeOut = 50;
 
-    HI_INFO_HDMI("--> SI_SW_ResetHDMITX\n");
+    HI_INFO_HDMI("--> SI_SW_ResetHDMITX\n"); //249
     while ( !siiIsTClockStable() && --TimeOut )
     {
         DelayMS(1);         // wait for input pixel clock to stabilze
@@ -315,7 +265,7 @@ void SI_SW_ResetHDMITX(void)
     }
     else
     {
-        HI_ERR_HDMI("SoftReset TMDS is not stable!!\n");
+        HI_INFO_HDMI("SoftReset TMDS is not stable!!\n"); //264
 	    SI_AssertHDMITX_SWReset(BIT_TX_SW_RST | BIT_TX_FIFO_RST);
         DelayMS(1);
         SI_ReleaseHDMITX_SWReset(BIT_TX_SW_RST | BIT_TX_FIFO_RST);
@@ -369,11 +319,11 @@ void SI_InteralMclkEnable(HI_U8 bEnableInternalClk)
     u8Value = ReadByteHDMITXP1( ACR_CTRL_ADDR);
     if(0x01 == (bEnableInternalClk & 0x01))
     {
-        u8Value |= 0x40; 
+        u8Value |= 0x04;
     }
     else
     {
-        u8Value &= ~0x40;
+        u8Value &= ~0x04;
     }
     WriteByteHDMITXP1( ACR_CTRL_ADDR, u8Value);
 }
@@ -382,7 +332,7 @@ void SI_SetNCtsEnable(HI_U8 bEnableNCtsPkt)
 {
     HI_U8 u8Value = 0;
 
-    HI_INFO_HDMI("Set N/CTS Packet %d \n",bEnableNCtsPkt);
+    HI_INFO_HDMI("Set N/CTS Packet %d \n",bEnableNCtsPkt); //331
     u8Value = ReadByteHDMITXP1( ACR_CTRL_ADDR);
     if(0x01 == (bEnableNCtsPkt & 0x01))
     {
@@ -411,9 +361,10 @@ HI_U8 SI_IsTXInHDMIMode( void )
 //--------------------------------------------------------------------------
 void SI_TX_SetHDMIMode(HI_U8 Enabled)
 {
+#warning TODO
     HI_U8 RegVal;
 
-    HI_INFO_HDMI("Set HDMI mode to %d.\n", Enabled);
+    HI_INFO_HDMI("Set HDMI mode to %d.\n", Enabled); //362
 
     RegVal = ReadByteHDMITXP1(AUDP_TXCTRL_ADDR);
     if(Enabled)
@@ -425,7 +376,7 @@ void SI_TX_SetHDMIMode(HI_U8 Enabled)
         WriteByteHDMITXP1(AUDP_TXCTRL_ADDR, RegVal & (~BIT_TXHDMI_MODE));
     }
     
-    HI_INFO_HDMI("AUDP_TXCTRL_ADDR:0x%x\n", ReadByteHDMITXP1(AUDP_TXCTRL_ADDR));
+    HI_INFO_HDMI("AUDP_TXCTRL_ADDR:0x%x\n", ReadByteHDMITXP1(AUDP_TXCTRL_ADDR)); //374
 }
 
 void SI_SetHdmiVideo(HI_U8 Enabled)
@@ -517,7 +468,7 @@ void SI_Init_DVITX(void)
     HI_U8 RegVal;
 #endif
 
-    DEBUG_PRINTK("Enter SI_Init_DVITX.\n");
+    HI_INFO_HDMI("Enter SI_Init_DVITX.\n"); //468
     
     //SI_HW_ResetHDMITX(); lc:remove HW Reset
     //  TODO: Since HW reset was removed change color space back to RGB output
@@ -559,12 +510,12 @@ void SI_Init_DVITX(void)
 
     SI_BlockReadEEPROM ( 4, EE_TX_VIDEOPATH_ADDR, abData );
     HI_INFO_HDMI("SI_Init_DVITX to SI_SetVideoPath bVideoMode:0x%02x, abData[0]:0x%02x, abData[1]:0x%02x, abData[2]:0x%02x, abData[3]:0x%02x\n",
-        bVideoMode, abData[0], abData[1], abData[2], abData[3]);
+        bVideoMode, abData[0], abData[1], abData[2], abData[3]); //510
     SI_SetVideoPath ( bVideoMode, abData );
-    
+#if 0
     SI_BlockReadEEPROM ( 4, EE_TX_AUDIOPATH_ADDR, abData );
     SI_SetAudioPath ( abData );
-
+#endif
     SI_DisableInfoFrame(AVI_TYPE);
     SI_DisableInfoFrame(AUD_TYPE);
 
@@ -575,7 +526,7 @@ void SI_Init_DVITX(void)
     /* DVI mode must enable phy immediately */
     SI_EnableHdmiDevice();
     
-    HI_INFO_HDMI ("[HDMITX.c](SI_Init_DVITX): Call SI_TMDS_setup()\n");
+    HI_INFO_HDMI ("[HDMITX.c](SI_Init_DVITX): Call SI_TMDS_setup()\n"); //525
 #if 0 /*--NO MODIFY : COMMENT BY CODINGPARTNER--*/
     bError = SI_TMDS_setup(bVideoMode);
     if (bError == TMDS_SETUP_FAILED)
@@ -586,12 +537,12 @@ void SI_Init_DVITX(void)
     /* Enable DVI Interrupt:HPD */
     SI_InitDVIInterruptMasks();
     
-    HI_INFO_HDMI ("<=== SI_Init_DVITX: Done.\n");
+    HI_INFO_HDMI ("<=== SI_Init_DVITX: Done.\n"); //536
 
     // Enable Interrupts: VSync, Ri check, HotPlug
     WriteByteHDMITXP0( HDMI_INT_ADDR, CLR_MASK);
     WriteByteHDMITXP0( HDMI_INT_MASK_ADDR, CLR_MASK);
-    HI_INFO_HDMI("HDMI_INT_MASK_ADDR:0x%x, CLR_MASK:0x%x\n", HDMI_INT_MASK_ADDR, CLR_MASK);
+    HI_INFO_HDMI("HDMI_INT_MASK_ADDR:0x%x, CLR_MASK:0x%x\n", HDMI_INT_MASK_ADDR, CLR_MASK); //541
     
 #if defined (HDCP_SUPPORT)
 
@@ -603,7 +554,7 @@ void SI_Init_DVITX(void)
     {
         AuthState = NO_HDCP;
         SI_SendCP_Packet(OFF);
-        HI_INFO_HDMI ("NO_HDCP\n");
+        HI_INFO_HDMI ("NO_HDCP\n"); //553
     }
 #endif
 }
@@ -617,10 +568,10 @@ void SI_Start_HDMITX(void)
 
     F_TxInit = TRUE;
     
-    HI_INFO_HDMI ("Start HDMI TX\n");
+    HI_INFO_HDMI ("Start HDMI TX\n"); //567
 //    SI_SetHdmiVideo(HI_FALSE);/* Disable Video output */
       
-    HI_INFO_HDMI("Sink is HDMI Compatible!\n");
+    HI_INFO_HDMI("Sink is HDMI Compatible!\n"); //570
     
     SI_TX_SetHDMIMode(ON);    //for hdmi
 	udelay(100);
@@ -660,7 +611,7 @@ void SI_Start_HDMITX(void)
     memset(abData, 0, 4);
     SI_BlockReadEEPROM ( 4, EE_TX_VIDEOPATH_ADDR, abData );
     HI_INFO_HDMI("SI_Start_HDMITX to SI_SetVideoPath bVideoMode:0x%02x, abData[0]:0x%02x, abData[1]:0x%02x, abData[2]:0x%02x, abData[3]:0x%02x\n",
-        bVideoMode, abData[0], abData[1], abData[2], abData[3]);
+        bVideoMode, abData[0], abData[1], abData[2], abData[3]); //610
 	udelay(100);
     SI_SetVideoPath ( bVideoMode, abData );
 	udelay(100);
@@ -671,24 +622,24 @@ void SI_Start_HDMITX(void)
 	udelay(100);
     if (SI_ReadByteEEPROM(EE_AVIINFO_ENABLE))
     {
-        HI_INFO_HDMI(" avi infoframe send\n");
+        HI_INFO_HDMI(" avi infoframe send\n"); //621
         SI_EnableInfoFrame(AVI_TYPE);
     }
     else
     {
-        HI_INFO_HDMI(" no avi infoframe send\n");
+        HI_INFO_HDMI(" no avi infoframe send\n"); //626
         SI_DisableInfoFrame(AVI_TYPE);
     }
     
 	udelay(100);
     if (SI_ReadByteEEPROM(EE_AUDINFO_ENABLE))
     {
-        HI_INFO_HDMI("audio infoframe send\n");
+        HI_INFO_HDMI("audio infoframe send\n"); //633
         SI_EnableInfoFrame(AUD_TYPE);
     }
     else
     {
-        HI_INFO_HDMI("disable Audio inforfarme\n");
+        HI_INFO_HDMI("disable Audio inforfarme\n"); //638
         SI_DisableInfoFrame(AUD_TYPE);
     }
 
@@ -706,144 +657,16 @@ void SI_Start_HDMITX(void)
         SI_SetEncryption(OFF);     // Must turn encryption off when AVMUTE
 
         AuthState = REQ_AUTHENTICATION;
-        HI_INFO_HDMI ("\nBegin to HDCP Authenication!\n");
+        HI_INFO_HDMI ("\nBegin to HDCP Authenication!\n"); //656
     }
     else
     {
         AuthState = NO_HDCP;
-        HI_INFO_HDMI ("\nNO_HDCP\n");
+        HI_INFO_HDMI ("\nNO_HDCP\n"); //661
     }
 #endif
     //F_TxInit = FALSE; We directly to set SPDIF Fs!
-    HI_INFO_HDMI ("<==== startHDMITX: Done\n");
-}
-
-
-Bool SI_IsHDMICompatible(void)
-{
-#if defined (DVI_SUPPORT)
-    HI_U8 Offset, BlockCount, Data = 0;
-    HI_U8 NumOfExtensions = 0, BlockPtr;
-    HI_U8 MaxBlockOffset = 0, BlockLength, Error;
-    
-
-    HI_INFO_HDMI("-->SI_IsHDMICompatible.\n");
-    
-#if 1
-#warning TODO: SI_ByteReadEDID removed
-#else
-
-    /* Read EDID Block 0, offser:0x7E: Externsion Number */
-    Error = SI_ByteReadEDID(0, NUM_EXTENSIONS_ADDR , &NumOfExtensions);
-    if (Error || !NumOfExtensions)
-    {
-        HI_ERR_HDMI("SI_ByteReadEDID Error=%d NumOfExtensions=%d\n", Error, NumOfExtensions);
-        return FALSE;           // no extensions
-    }   
-    else if (NumOfExtensions ==1)
-    {
-        Offset = 0;
-        BlockCount = 1;
-        BlockPtr = 128;         // data starts at block #1
-    }
-    else                        // more than 2 extension blocks. 1st one is a map
-    {
-        Offset = 1;             // skip block #1
-        BlockCount = 2;
-        BlockPtr = 0;
-    }
-
-    while (Offset <= NumOfExtensions)
-    {
-        Error = SI_ByteReadEDID (Offset, BlockPtr++, &Data);
-        if (Error != 0)
-        {
-            HI_ERR_HDMI("SI_ByteReadEDID BLOCK_HEADER Error=%d\n",  Error);
-            return FALSE;
-        }
-        
-        if (Data != BLOCK_HEADER)
-        {
-            HI_ERR_HDMI("SI_ByteReadEDID BLOCK_HEADER Data=%d\n", Data);
-            return FALSE;
-        }
-
-        Error = SI_ByteReadEDID (Offset, BlockPtr++, &Data);
-        if (Error != 0)
-        {
-            HI_ERR_HDMI("SI_ByteReadEDID VERSION_THREE Error=%d\n", Error);
-            return FALSE;
-        }
-        if (Data < VERSION_THREE)
-        {
-            HI_ERR_HDMI("SI_ByteReadEDID VERSION_THREE Data=%d\n", Data);
-            return FALSE;
-        }
-        else
-        {
-            HI_INFO_HDMI("SI_ByteReadEDID VERSION_THREE BLOCK_HEADER OK\n");
-        }
-
-        Error = SI_ByteReadEDID (Offset, BlockPtr++, &MaxBlockOffset);
-        if (Error != 0)
-        {
-            HI_ERR_HDMI("SI_ByteReadEDID MaxBlockOffset Error=%d\n", Error);
-            return FALSE;
-        }
-
-        MaxBlockOffset += 0x80 * (BlockCount % 2);          // odd numbered blocks start at address 0x80 of current segment
-        BlockPtr++;
-
-        Error = SI_ByteReadEDID (Offset, BlockPtr++, &Data);
-        if (Error != 0)
-        {
-            HI_ERR_HDMI("SI_ByteReadEDID MaxBlockOffset Error=%d\n", Error);
-            return FALSE;
-        }
-
-        while (((Data & THREE_MSB) >> 5) != SVDB_TAG)      // search for the HDMI Signature
-        {
-            BlockLength = Data & FIVE_LSB;
-            BlockPtr += BlockLength;
-            Error = SI_ByteReadEDID (Offset, BlockPtr++, &Data);       // point at header of next data block
-
-            if (BlockPtr >= MaxBlockOffset)                 // SVDB not found in current 128 HI_U8 block
-                break;
-        }
-        
-        if (BlockPtr >= MaxBlockOffset)
-        {
-            BlockCount++;
-            if (!BlockCount %2)
-            {
-                Offset++;
-                BlockPtr = 0;
-            }
-        }
-        else                                                // found SVDB Tag Code
-        {
-            Error = SI_ByteReadEDID (Offset, BlockPtr++, &Data);
-            if (Data != 0x03)
-                return FALSE;
-
-            Error = SI_ByteReadEDID (Offset, BlockPtr++, &Data);
-            if (Data != 0x0C)
-                return FALSE;
-
-            Error = SI_ByteReadEDID (Offset, BlockPtr, &Data);
-            if (Data != 0x00)
-                return FALSE;
-
-            HI_INFO_HDMI("[HDMITX.C](SI_Init_HDMITX): Sink is HDMI Compatible\n");
-            return TRUE;
-        }
-
-        if ((Offset == NumOfExtensions) && (BlockPtr >= MaxBlockOffset))
-            return FALSE;
-    }
-#endif
-#endif    
-    return TRUE;
+    HI_INFO_HDMI ("<==== startHDMITX: Done\n"); //665
 }
 
 HI_S32 SI_TX_IsHDMImode()
