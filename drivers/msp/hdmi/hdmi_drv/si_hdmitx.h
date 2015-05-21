@@ -30,6 +30,7 @@ void SI_WakeUpHDMITX(void);
 void SI_PowerDownHdmiTx(void);
 void SI_SetMCLK(HI_U8);
 void SI_InteralMclkEnable(HI_U8);
+void SI_SetNCtsEnable(HI_U8 bEnableNCtsPkt);
 void SI_SetIClk(HI_U8);
 HI_U8 IsRXAttached( void );
 HI_U8 SI_IsTXInHDMIMode( void );

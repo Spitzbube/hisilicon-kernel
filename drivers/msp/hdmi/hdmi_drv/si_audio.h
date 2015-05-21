@@ -25,5 +25,9 @@ void SI_Set_AudioInfoFramePacket ( HI_U8 * abAudioPath, HI_U8 bChSpkAlloc, HI_U8
 #define ENABLE_ALL					0x00
 #define MUTE_ALL					0x06
 
+#define OVER_RUN                    0x02
+#define UNDER_RUN                   0x01
+#define SPDIF_PAR                   0x40
+
 #endif
 

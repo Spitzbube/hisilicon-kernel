@@ -6,6 +6,7 @@
 /*  1060 East Arques Avenue, Sunnyvale, California 94085                           */
 /***********************************************************************************/
 #include <linux/string.h>
+#include "drv_global.h"
 #include "si_audio.h"
 #include "si_hdmitx.h"
 #include "si_delay.h"
@@ -20,6 +21,7 @@ void SI_Set_N_Fs(void);
 
 extern Bool F_TxInit;
 extern const  HI_U32 N_Val[];
+extern const HI_U32 N_Val_4K[];
 extern const  PixPerSPDIFType PixPerSPDIF[4];
 
 #define CONFIRM_CTS_TRESHOLD 5
@@ -74,13 +76,13 @@ void SI_SetAudioPath ( HI_U8 * abAudioPath )
     // abAudioPath[1] = Sampling Freq Fs:  0 - 44KHz;   2 - 48KHz ...
     // abAudioPath[2] = Sample length : 2, 4, 8, 0xA, 0xC +1 for Max 24. Even values are Max 20. Odd: Max 24.
     // abAudioPath[3] = I2S control bits (for 0x7A:0x1D)
-    // 验证时使用过，正式版本暂时不确定是否需要mclk abAudioPath[4] = 0b000 = MCLK is 128*Fs 0b001 = MCLK is 256*Fs0  b010 = MCLK is 384*Fs  ...
-    // abAudioPath[5] = 0x01 内部mclk 0x00 外部mclk
+    // 锟斤拷证时使锟矫癸拷锟斤拷式锟芥本锟斤拷时锟斤拷确锟斤拷锟角凤拷锟斤拷要mclk abAudioPath[4] = 0b000 = MCLK is 128*Fs 0b001 = MCLK is 256*Fs0  b010 = MCLK is 384*Fs  ...
+    // abAudioPath[5] = 0x01 锟节诧拷mclk 0x00 锟解部mclk
     //
     /////////////////////////////////////////////////////////////////////////////////////////////////////
     HI_U8 bRegVal1, bRegVal2, bRegVal3;
     HI_U8 bAudioModes;
-    HI_INFO_HDMI("abAudioPath setting auido path:0x%02x,0x%02x,0x%02x,0x%02x\n", abAudioPath[0], abAudioPath[1], abAudioPath[2], abAudioPath[3]);
+    HI_INFO_HDMI("abAudioPath setting auido path:0x%02x,0x%02x,0x%02x,0x%02x\n", abAudioPath[0], abAudioPath[1], abAudioPath[2], abAudioPath[3]); //84
 	
     // Disable audio to allow FIFO to flush:
     bRegVal1 = ReadByteHDMITXP1 (AUD_MODE_ADDR);          // 0x7A:0x14
@@ -114,7 +116,7 @@ void SI_SetAudioPath ( HI_U8 * abAudioPath )
         WriteByteHDMITXP1(I2S_CHST5_ADDR, HBRA_FOR_CHST5);
         WriteByteHDMITXP1(SAMPLE_RATE_CONVERSION, HBR_SPR_MASK);
 		
-        HI_INFO_HDMI("use SDIF\n");
+        HI_INFO_HDMI("use SDIF\n"); //136
     }
     else                                // not SPDIF
     {
@@ -152,7 +154,7 @@ void SI_SetAudioPath ( HI_U8 * abAudioPath )
             }
             else                        // HBRA
             {
-                HI_INFO_HDMI("set HBRA in Audio Path\n");
+                HI_INFO_HDMI("set HBRA in Audio Path\n"); //174
                 bRegVal3 = (BIT_HBR_ON | SCK_RISING | BIT_CBIT_ORDER | BIT_COMPRESSED);
                 WriteByteHDMITXP1( I2S_IN_CTRL_ADDR, bRegVal3);		     	// Write 0xF0 to 0x7A:0x1D
 
@@ -166,15 +168,16 @@ void SI_SetAudioPath ( HI_U8 * abAudioPath )
                 WriteByteHDMITXP1(SAMPLE_RATE_CONVERSION, HBR_SPR_MASK);	// Write 0x0 to 0x7A:0x23
             }
         }
-        HI_INFO_HDMI("use I2S\n");
+        HI_INFO_HDMI("use I2S\n"); //188
     }
 
     DelayMS(1); 											// allow FIFO to flush
     bRegVal1 |= BIT_EN_AUDIO; 								// Enable audio
     WriteByteHDMITXP1( AUD_MODE_ADDR, bRegVal1);
-    HI_INFO_HDMI("Set AUDP_TXCTRL_ADDR to AUD_MODE_ADDR:0x%x AUDP_TXCTRL_ADDR:0x%x\n", bRegVal1, bRegVal2);
+    HI_INFO_HDMI("Set AUDP_TXCTRL_ADDR to AUD_MODE_ADDR:0x%x AUDP_TXCTRL_ADDR:0x%x\n", bRegVal1, bRegVal2); //194
     WriteByteHDMITXP1 ( AUDP_TXCTRL_ADDR , bRegVal2 );
     WriteByteHDMITXP1(DATA_CTRL_ADDR, ENABLE_ALL);		  // Enable output audio packets
+    SI_SetNCtsEnable(1);
     return;
 }
 
@@ -201,9 +204,22 @@ HI_U8 SI_FindFs(void)
 void SI_Set_N_Fs(void)
 {
     HI_U8 F_Sampling;
+    HI_UNF_HDMI_ID_E enHdmi = HI_UNF_HDMI_ID_0;
+    HDMI_VIDEO_ATTR_S* r5 = DRV_Get_VideoAttr(enHdmi);
 
     F_Sampling = SI_FindFs();
-    SI_WriteNValue(N_Val[F_Sampling]);
+
+    if (DRV_Get_Is4KFmt(r5->enVideoFmt))
+    {
+    	HI_INFO_HDMI("4K N Value \n"); //230
+        SI_WriteNValue(N_Val_4K[F_Sampling]);
+    }
+    else
+    {
+    	HI_INFO_HDMI("Non 4K N Value \n"); //235
+    	SI_WriteNValue(N_Val[F_Sampling]);
+    }
+
     WriteByteHDMITXP1( I2S_CHST4_ADDR, F_Sampling);
 }
 

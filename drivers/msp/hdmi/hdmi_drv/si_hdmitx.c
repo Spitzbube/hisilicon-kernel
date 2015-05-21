@@ -378,6 +378,23 @@ void SI_InteralMclkEnable(HI_U8 bEnableInternalClk)
     WriteByteHDMITXP1( ACR_CTRL_ADDR, u8Value);
 }
 
+void SI_SetNCtsEnable(HI_U8 bEnableNCtsPkt)
+{
+    HI_U8 u8Value = 0;
+
+    HI_INFO_HDMI("Set N/CTS Packet %d \n",bEnableNCtsPkt);
+    u8Value = ReadByteHDMITXP1( ACR_CTRL_ADDR);
+    if(0x01 == (bEnableNCtsPkt & 0x01))
+    {
+        u8Value |= 0x02;
+    }
+    else
+    {
+        u8Value &= ~0x02;
+    }
+    WriteByteHDMITXP1( ACR_CTRL_ADDR, u8Value);
+}
+
 //---------------------------------------------------------------------------
 void SI_SetIClk(HI_U8 IClk)
 {
