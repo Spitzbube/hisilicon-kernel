@@ -7,6 +7,7 @@
 /***********************************************************************************/
 #include <linux/string.h>
 #include <linux/delay.h>
+#include "drv_global.h"
 #include "si_typedefs.h"
 #include "si_infofrm.h"
 #include "si_isr.h"
@@ -19,7 +20,6 @@
 #include "si_timer.h"
 #include "si_mpi_hdmi.h"
 
-extern HDMIIntType HDMIIntRX;
 
 //----------------------------------------------------------------------------------
 static Bool WaitBuffReady(HI_U16 CtrInfoBits)
@@ -702,7 +702,7 @@ HI_U8 SI_SendGamutMeta_Packet(HI_U8 u8Is7109)
     return Result;
 }
 
-HI_U8 SI_3D_Setting(HI_U8 u83DFormat)
+HI_U8 SI_3D_Setting(/*HI_U8*/HI_UNF_HDMI_3D_FORMAT_E u83DFormat)
 {
     switch(u83DFormat)
     {
@@ -895,6 +895,98 @@ HI_U8 SI_GetAVIInfoFrameVID(void)
     u8Value = ReadByteHDMITXP1(0x47);
     //DRV_HDMI_ReadRegister((HI_U32)0x1017051C, &u32Value);
     return u8Value;
+}
+
+HI_S32 SI_4K_Setting(HI_U32 u8Fmt)
+{
+	if ((u8Fmt < 61) || (u8Fmt > 64))
+	{
+		HI_ERR_HDMI("Unknown 4K Mode \n"); //904
+		return HI_SUCCESS;
+	}
+	SI_Set_VSI_4K2K(u8Fmt);
+	SI_EnableInfoFrame(VENDORSPEC_TYPE);
+	return HI_SUCCESS;
+}
+
+HI_S32 SI_Set_VSI_4K2K(int a)
+{
+    HI_U8 VendorBody[20], offset = 0;
+    HI_U8 U8HDMI_Video_Format = 0, u83D_Structure = 0;
+	HI_INFO_HDMI("3D FramePacking Mode\n"); //916
+
+	if (a == 63)
+	{
+		u83D_Structure = 1;
+	}
+	else if (a == 62)
+	{
+		u83D_Structure = 2;
+	}
+	else if (a == 61)
+	{
+		u83D_Structure = 3;
+	}
+	else if (a == 64)
+	{
+		u83D_Structure = 4;
+	}
+
+    offset = 0;
+    //IEEE
+    VendorBody[offset++] = 0x03;
+    VendorBody[offset++] = 0x0c;
+    VendorBody[offset++] = 0x00;
+
+    U8HDMI_Video_Format = 0x01;//3D present
+    //u83D_Structure = 0X00;   //FramePacking
+
+    VendorBody[offset++] = (U8HDMI_Video_Format & 0x3) << 5;
+    VendorBody[offset++] = u83D_Structure; //(u83D_Structure & 0x0f) << 4;
+    SI_TX_SendInfoFramex(VENDORSPEC_TYPE, VendorBody, offset);
+
+	return HI_SUCCESS;
+}
+
+
+
+
+
+
+
+
+
+
+HI_S32 SI_VSDB_Setting(VSDB_MODE_E enVSDBMode, int u8Fmt)
+{
+	HI_UNF_HDMI_ID_E enHdmi = HI_UNF_HDMI_ID_0;
+	VSDB_MODE_E old_mode = DRV_Get_VSDBMode(enHdmi);
+
+	HI_INFO_HDMI("VSDB mode:%d , u8Fmt:%d \n", enVSDBMode, u8Fmt); //965
+	switch (enVSDBMode)
+	{
+		case VSDB_MODE_NONE:
+			SI_DisableInfoFrame(VENDORSPEC_TYPE);
+			if (old_mode != VSDB_MODE_NONE)
+			{
+				SI_DisableHdmiDevice();
+				msleep(100);
+				SI_EnableHdmiDevice();
+			}
+			break;
+		case VSDB_MODE_3D:
+			SI_3D_Setting(u8Fmt);
+			break;
+		case VSDB_MODE_4K:
+			SI_4K_Setting((HI_U8) u8Fmt);
+			break;
+		default:
+			HI_ERR_HDMI("Unknown VSDB Mode !\n"); //984
+			break;
+	}
+
+	DRV_Set_VSDBMode(enHdmi, enVSDBMode);
+	return HI_SUCCESS;
 }
 
 //----------------------------------------------------------------------------------

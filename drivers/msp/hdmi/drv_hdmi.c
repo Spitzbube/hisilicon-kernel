@@ -73,8 +73,6 @@ Modification  :
 #include "drv_compatibility.h"
 #include "hi_drv_module.h"
 
-extern void SI_VSDB_Setting(int a, int b);
-
 #ifdef ANDROID_SUPPORT
 #include <linux/switch.h>
 extern HI_BOOL g_switchOk;
@@ -3925,6 +3923,8 @@ static HI_U32 hdmi_AdjustAVIInfoFrame(HI_UNF_HDMI_ID_E enHdmi)
     
     return HI_SUCCESS;
 }
+
+extern HI_S32 SI_VSDB_Setting(VSDB_MODE_E enVSDBMode, int u8Fmt);
 
 static HI_U32 hdmi_AdjustVSDBInfoFrame(HI_UNF_HDMI_ID_E enHdmi)
 {

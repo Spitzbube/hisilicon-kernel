@@ -121,7 +121,7 @@ Bool SI_DisableInfoPacket( HI_U8 /* PacketId */);
 Bool SI_DisableInfoFrame(HI_U8 /*InfoFrameType*/);
 HI_U8 SI_TX_SendInfoFrame( HI_U8 , HI_U8 * );
 
-HI_U8 SI_3D_Setting(HI_U8 u83DFormat);
+HI_U8 SI_3D_Setting(/*HI_U8*/HI_UNF_HDMI_3D_FORMAT_E u83DFormat);
 HI_U8 SI_Set_VSI_3D_FramePacking(void);
 HI_U8 SI_Set_VSI_3D_FieldAlt(void);
 HI_U8 SI_Set_VSI_3D_LineAlt(void);
@@ -133,5 +133,6 @@ HI_U8 SI_Set_VSI_3D_SidebySide_Half(void);
 
 HI_U8 SI_GetAVIInfoFrameVID(void);
 
+HI_S32 SI_Set_VSI_4K2K(int a);
 
 #endif

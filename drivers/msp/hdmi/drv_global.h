@@ -204,6 +204,9 @@ HDMI_PRIVATE_EDID_S *DRV_Get_PriSinkCap(HI_UNF_HDMI_ID_E enHdmi);
 
 HI_U32 DRV_Get_DDCSpeed(void);
 
+VSDB_MODE_E DRV_Get_VSDBMode(HI_UNF_HDMI_ID_E enHdmi);
+void DRV_Set_VSDBMode(HI_UNF_HDMI_ID_E enHdmi,VSDB_MODE_E enVSDBMode);
+
 
 #ifdef __cplusplus
  #if __cplusplus
