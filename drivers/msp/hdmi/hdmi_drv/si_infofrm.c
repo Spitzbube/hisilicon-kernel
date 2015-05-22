@@ -51,7 +51,7 @@ static Bool WaitBuffReady(HI_U16 CtrInfoBits)
 #if 0//lc
             Result = FALSE; // repeat bit is stuck, not ready to write into the buffer
 #else
-            HI_ERR_HDMI("force to set Infoframe buffer ready\n");
+            HI_ERR_HDMI("force to set Infoframe buffer ready\n"); //54
             Result = TRUE;
 #endif   
         }
@@ -192,14 +192,14 @@ HI_U8 SI_TX_SendInfoFrame( HI_U8 bIFType, HI_U8 * InfoFramePacket )
         }
         
         TXAddr = InfoMap.DestAddr;
-#if defined (DEBUG_SUPPORT) 
-        HI_INFO_HDMI("Debug Info frame output length:%d\n", (IFHeader.Length + 4));
+#if 1 //defined (DEBUG_SUPPORT)
+        HI_INFO_HDMI("Debug Info frame output length:%d\n", (IFHeader.Length + 4)); //196
         for(index = 0; index < (IFHeader.Length + 4); index++ )
         {
             RegVal = ReadByteHDMITXP1( TXAddr++);
-            HI_INFO_HDMI("0x%02x\n", RegVal);
+            HI_INFO_HDMI("0x%02x\n", RegVal); //200
         }
-        HI_INFO_HDMI("End of Info frame\n");
+        HI_INFO_HDMI("End of Info frame\n"); //202
 #endif       
         if ( !ErrNo )
         {
@@ -250,8 +250,8 @@ HI_U8 SI_TX_SendInfoFramex( HI_U8 bIFType, HI_U8 * InfoFramePacket, HI_U8 length
         }
         
         TXAddr = InfoMap.DestAddr;
-#if defined (DEBUG_SUPPORT) 
-        HI_INFO_HDMI("Debug Info frame output length:%d\n", (IFHeader.Length + 4));
+#if 1//defined (DEBUG_SUPPORT)
+        HI_INFO_HDMI("Debug Info frame output length:%d\n", (IFHeader.Length + 4)); //254
         for(index = 0; index < (IFHeader.Length + 4); index++ )
         {
             RegVal = ReadByteHDMITXP1( TXAddr++);
@@ -494,8 +494,8 @@ void SI_SendAVIInfoFrame(void)
     HI_INFO_HDMI("open AVI packet en/repeat4\n");
     
     TXAddr = AVI_IF_ADDR;
-#if defined (DEBUG_SUPPORT) 
-    HI_INFO_HDMI("Debug AVI output:\n");
+#if 1 //defined (DEBUG_SUPPORT)
+    HI_INFO_HDMI("Debug AVI output:\n"); //498
     for(i = 0; i < 17; i++ )
     {
         RegVal = ReadByteHDMITXP1( TXAddr++);
@@ -512,12 +512,12 @@ extern HI_BOOL get_current_rgb_mode(HI_UNF_HDMI_ID_E enHdmi);
 //-------------------------------------------------------------------------------
 void SI_SendCP_Packet(HI_U8 bMuteAv)
 {
-	//5´ÎÑ­»·CP Packet ERR²úÉúÔ­Òò»¹Î´¶¨Î»³öÀ´£¬ºóÐøÐèÒª¼ÌÐø¸úÖÕ
+	//5ï¿½ï¿½Ñ­ï¿½ï¿½CP Packet ERRï¿½ï¿½ï¿½ï¿½Ô­ï¿½ï¿½Î´ï¿½ï¿½Î»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Òªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     //HI_U8 RegVal, TimeOutCount = 5;
-    HI_U8 RegVal, TimeOutCount = 5;
+    HI_U8 RegVal, TimeOutCount = 63; //5;
     HI_U8 BlankValue[3];
 
-    HI_INFO_HDMI("MUTE=%u.\n", bMuteAv);
+    HI_INFO_HDMI("MUTE=%u.\n", bMuteAv); //520
 
     if(get_current_rgb_mode(HI_UNF_HDMI_ID_0))
     {
@@ -535,35 +535,36 @@ void SI_SendCP_Packet(HI_U8 bMuteAv)
     if (SI_IsTXInHDMIMode())				// Send CP packets only if in HDMI mode
     {
         SI_WriteBlockHDMITXP0(TX_VID_BLANK1_BLUE, 3, BlankValue);
-        msleep(30);
+//        msleep(30);
     	RegVal = ReadByteHDMITXP1( INF_CTRL2 );
     	// Oscar Added 20090828 for ATC 7-19 failed issue
     	WriteByteHDMITXP1(INF_CTRL2, RegVal & (~(BIT_CP_ENABLE | BIT_CP_REPEAT)));
         
-        if(bMuteAv)
-        {
-            WriteByteHDMITXP1( CP_IF_ADDR, BIT_CP_AVI_MUTE_SET);
-        }
-        else
-        {
-            WriteByteHDMITXP1( CP_IF_ADDR, BIT_CP_AVI_MUTE_CLEAR);
-        }
-        
-        while(TimeOutCount--)
+    	while (1)
         {
             if( !(ReadByteHDMITXP1( INF_CTRL2) & BIT_CP_ENABLE))
             {
                 break;
             }
-                
+
             DelayMS(1);
+
+            if(--TimeOutCount == 0)
+            {
+                HI_INFO_HDMI("CP_Packet do not DiSable before setting\n"); //554
+                break;
+            }
         }
-        
-        if(TimeOutCount == 0)
+        if(bMuteAv)
         {
-            HI_WARN_HDMI("CP_Packet do not DiSable before setting\n");
+        	SI_SetHdmiVideo(0);
+            WriteByteHDMITXP1( CP_IF_ADDR, BIT_CP_AVI_MUTE_SET);
         }
-        
+        else
+        {
+        	SI_SetHdmiVideo(1);
+            WriteByteHDMITXP1( CP_IF_ADDR, BIT_CP_AVI_MUTE_CLEAR);
+        }
         WriteByteHDMITXP1(INF_CTRL2, RegVal | BIT_CP_ENABLE | BIT_CP_REPEAT);
     }
 #if defined (DVI_SUPPORT)
@@ -682,83 +683,60 @@ HI_U8 SI_SendGamutMeta_Packet(HI_U8 u8Is7109)
     WriteByteHDMITXP1( INF_CTRL2, RegVal | GAMUT_METADATA_EN_REPEAT );
 
     //WriteByteHDMITXP0( 0xFF, 0x01 );  //REG_BANK0 0: bank0 (Page 0) 1: bank1 (Page 2)
-#if defined (DEBUG_SUPPORT) 
-    HI_INFO_HDMI("After write Gamut Meta Packet data is:\n");
+#if 1 //defined (DEBUG_SUPPORT)
+    HI_INFO_HDMI("After write Gamut Meta Packet data is:\n"); //687
     memset(u8GamutMetaData, 0, 0x1f);
     for(dataindex = 0; dataindex < BlockSize; dataindex ++)
     {
         //u8GamutMetaData[dataindex] = ReadByteHDMITXP0((DestAddr + dataindex));
         u8GamutMetaData[dataindex] = ReadByte_Region2_HDMITXP0((DestAddr + dataindex));
-        HI_INFO_HDMI("0x%02x, ", u8GamutMetaData[dataindex]);
+        HI_INFO_HDMI("0x%02x, ", u8GamutMetaData[dataindex]); //693
     }
-    HI_INFO_HDMI("\n");
+    HI_INFO_HDMI("\n"); //695
     //WriteByteHDMITXP0( 0xFF, 0x00 );  //REG_BANK0 0: bank0 (Page 0) 1: bank1 (Page 2)
 
     RegVal = 0;
     RegVal = ReadByteHDMITXP1(INF_CTRL2);
-    HI_INFO_HDMI("INF_CTRL2:0x%x\n", RegVal);
+    HI_INFO_HDMI("INF_CTRL2:0x%x\n", RegVal); //700
 #endif
     return Result;
 }
-
-unsigned int former_3d_status = 0;
-unsigned int current_3d_status = 0;
-
 
 HI_U8 SI_3D_Setting(HI_U8 u83DFormat)
 {
     switch(u83DFormat)
     {
     case HI_UNF_3D_FRAME_PACKETING:
-        current_3d_status = 1;
         SI_Set_VSI_3D_FramePacking();
         break;
 #if defined (SUPPORT_3D)
     case HI_UNF_3D_FIELD_ALTERNATIVE:
-        current_3d_status = 1;
         SI_Set_VSI_3D_FieldAlt();
         break;
     case HI_UNF_3D_LINE_ALTERNATIVE:
-        current_3d_status = 1;
         SI_Set_VSI_3D_LineAlt();
         break;
     case HI_UNF_3D_L_DEPTH:
-        current_3d_status = 1;
         SI_Set_VSI_3D_L_Depth();
         break;
     case HI_UNF_3D_L_DEPTH_GRAPHICS_GRAPHICS_DEPTH:
-        current_3d_status = 1;
         SI_Set_VSI_3D_L_Depth_2Graphic_Depth();
         break;
     case HI_UNF_3D_SIDE_BY_SIDE_FULL:
-        current_3d_status = 1;
         SI_Set_VSI_3D_SidebySide_Full();
         break;
 #endif
     case HI_UNF_3D_TOP_AND_BOTTOM:
-        current_3d_status = 1;
         SI_Set_VSI_3D_TopandBottom_Half();
         break;
     case HI_UNF_3D_SIDE_BY_SIDE_HALF:
-        current_3d_status = 1;
         SI_Set_VSI_3D_SidebySide_Half();
         break;
     default:
-        current_3d_status = 0; 
-        
-        SI_DisableInfoFrame(VENDORSPEC_TYPE);         
-        if(former_3d_status != current_3d_status){
-            SI_DisableHdmiDevice();
-    	    msleep(100);
-    	    SI_EnableHdmiDevice();
-    	}    	    	
-    	
-    	former_3d_status = current_3d_status;
+    	HI_ERR_HDMI("Unknown 3D Mode \n"); //736
         return HI_SUCCESS;
     }
     
-    former_3d_status = current_3d_status;
-        
     SI_EnableInfoFrame(VENDORSPEC_TYPE);
     return HI_SUCCESS;
 }
@@ -768,7 +746,7 @@ HI_U8 SI_Set_VSI_3D_FramePacking(void)
     HI_U8 VendorBody[20], offset = 0;
     HI_U8 U8HDMI_Video_Format = 0, u83D_Structure = 0;
     
-    HI_INFO_HDMI("3D FramePacking Mode\n");
+    HI_INFO_HDMI("3D FramePacking Mode\n"); //749
     offset = 0;
     //IEEE
     VendorBody[offset++] = 0x03;
@@ -848,7 +826,7 @@ HI_U8 SI_Set_VSI_3D_TopandBottom_Half(void)
     HI_U8 U8HDMI_Video_Format = 0, u83D_Structure = 0;
     
     //HI_INFO_HDMI("3D Top-and-Bottom Mode\n");
-    HI_INFO_HDMI("3D Top-and-Bottom Mode\n");
+    HI_INFO_HDMI("3D Top-and-Bottom Mode\n"); //829
     offset = 0;
     //IEEE
     VendorBody[offset++] = 0x03;
@@ -873,7 +851,7 @@ HI_U8 SI_Set_VSI_3D_SidebySide_Half(void)
     //HI_U8 index, u83D_Metadata_Length = 0, u83D_Metadat[32];
     HI_U8 u83D_Metadata_Length = 0, u83D_Metadat[32];
     
-    HI_INFO_HDMI("3D side-by-side Mode\n");
+    HI_INFO_HDMI("3D side-by-side Mode\n"); //854
     offset = 0;
     //IEEE
     VendorBody[offset++] = 0x03;
