@@ -102,7 +102,7 @@ void SI_HotPlugInOrOut(void)
     /* Force to stop HDCP Authentication! */
     SI_WriteByteEEPROM(EE_TX_HDCP, 0x00);
     //HI_INFO_HDMI("GetSysStat():0x%x, ucNewStat=0x%x\n", GetSysStat(), ucNewStat);
-    HI_INFO_HDMI("SI_TX_GetHpdFlag = %d \n",SI_HPD_Status());
+    HI_INFO_HDMI("SI_TX_GetHpdFlag = %d \n",SI_HPD_Status()); //105
 #endif
 #if 0
     if(ucNewStat != 0)
@@ -118,22 +118,22 @@ void SI_HotPlugInOrOut(void)
 #endif
     HDMIPlugInFlag = SI_HPD_Status();
 #if defined (HDCP_SUPPORT)
-    HI_INFO_HDMI("wwGetSysStat():0x%x, jiffies:0x%x\n", GetSysStat(), (HI_U32)jiffies);
+    HI_INFO_HDMI("wwGetSysStat():0x%x, jiffies:0x%x\n", GetSysStat(), (HI_U32)jiffies); //121
 
     if(AuthState == AUTHENTICATED)
     {
         AuthState = REAUTHENTATION_REQ;
         SI_SendCP_Packet(ON);
-        HI_INFO_HDMI("0GetSysStat():0x%x, jiffies:0x%x\n", GetSysStat(), (HI_U32)jiffies);
+        HI_INFO_HDMI("0GetSysStat():0x%x, jiffies:0x%x\n", GetSysStat(), (HI_U32)jiffies); //127
         SI_SetEncryption(OFF);		// Must turn encryption off when AVMUTE
-        HI_INFO_HDMI("1GetSysStat():0x%x, jiffies:0x%x\n", GetSysStat(), (HI_U32)jiffies);
+        HI_INFO_HDMI("1GetSysStat():0x%x, jiffies:0x%x\n", GetSysStat(), (HI_U32)jiffies); //129
 
         SI_AutoRiCheck( OFF );
 
 	
     }  
 #endif
-    HI_INFO_HDMI("2GetSysStat():0x%x, jiffies:0x%x\n", GetSysStat(), (HI_U32)jiffies);
+    HI_INFO_HDMI("2GetSysStat():0x%x, jiffies:0x%x\n", GetSysStat(), (HI_U32)jiffies); //136
 }
 
 
@@ -155,6 +155,11 @@ HI_U32 SI_HPD_Status( void )
     {
         return HI_FALSE;
     }
+}
+
+HI_U32 SI_RSEN_Status( void )
+{
+    return (GetSysStat() & (BIT_RSEN))?HI_TRUE:HI_FALSE;
 }
 
 HI_U32 SI_HPD_SetHPDKernelCallbackCount( HI_U32 Count )
@@ -274,11 +279,6 @@ HI_U32 SI_Is_HDCPAuth_DetectHPD( void )
     }
 }
 #endif
-HI_U32 SI_RSEN_Status( void )
-{
-    return (GetSysStat() & (BIT_RSEN))?HI_TRUE:HI_FALSE;
-}
-
 void SI_InterruptHandler( void )
 {
     HI_U8 IntReg[4] = {0}, IntStatus;
@@ -303,8 +303,8 @@ void SI_InterruptHandler( void )
         */
         if(IntReg[0] & BIT_INT_HOT_PLUG)
         {
-            HI_INFO_HDMI("BIT_INT_HOT_PLUG!!!!!\n");
-            HI_INFO_HDMI("interupthandler: %x %x %x %x, jiffies:0x%x\n", IntReg[0], IntReg[1], IntReg[2], IntReg[3], (HI_U32)jiffies);
+            HI_INFO_HDMI("BIT_INT_HOT_PLUG!!!!!\n"); //293
+            HI_INFO_HDMI("interupthandler: %x %x %x %x, jiffies:0x%x\n", IntReg[0], IntReg[1], IntReg[2], IntReg[3], (HI_U32)jiffies); //294
             //We need to use this change flag to re-organize our process!!
             SI_timer_start();
             SI_HotPlugInOrOut();              // in order not to fail bouncing detection
@@ -321,22 +321,22 @@ void SI_InterruptHandler( void )
 
         if(IntReg[0] & BIT_INT_RSEN)
         {
-            HI_INFO_HDMI("\nBIT_INT_RSEN!!!\n");
+            HI_INFO_HDMI("\nBIT_INT_RSEN!!!\n"); //311
             if(HI_TRUE == SI_RSEN_Status())
             {
-                HI_INFO_HDMI("BIT_INT_RSEN is connected");
+                HI_INFO_HDMI("BIT_INT_RSEN is connected"); //314
                 DRV_HDMI_NotifyEvent(HI_UNF_HDMI_EVENT_RSEN_CONNECT);
             }
             else
             {
-                HI_INFO_HDMI("BIT_INT_RSEN is disconnected\n");
+                HI_INFO_HDMI("BIT_INT_RSEN is disconnected\n"); //319
                 DRV_HDMI_NotifyEvent(HI_UNF_HDMI_EVENT_RSEN_DISCONNECT);
             }
         }
         
         if(IntReg[1] & 0x20)
         {
-            HI_INFO_HDMI("Encrypt Disable!!!\n");
+            HI_INFO_HDMI("Encrypt Disable!!!\n"); //326
         }
 
         SI_WriteBlockHDMITXP0(HDMI_INT_ADDR, 4, IntReg);   // Now clear all other interrupts
@@ -384,5 +384,5 @@ void SI_EnableInterrupts(void)
     WriteByteHDMITXP0( HDMI_INT_MASK_ADDR, CLR_MASK);
     
     intAddr = ReadByteHDMITXP0(HDMI_INT_ADDR);
-    HI_INFO_HDMI("Clear Interrupts 0x%02x \n",intAddr);
+    HI_INFO_HDMI("Clear Interrupts 0x%02x \n",intAddr); //374
 }
