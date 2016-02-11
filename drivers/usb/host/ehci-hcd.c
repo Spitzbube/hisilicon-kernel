@@ -105,6 +105,9 @@ MODULE_PARM_DESC (ignore_oc, "ignore bogus hardware overcurrent indications");
 
 #define	INTR_MASK (STS_IAA | STS_FATAL | STS_PCD | STS_ERR | STS_INT)
 
+extern void set_usbhost_connect(struct usb_hcd *hcd, 
+			int port_index, int online, int host_type);
+
 /*-------------------------------------------------------------------------*/
 
 #include "ehci.h"
@@ -778,6 +781,8 @@ static irqreturn_t ehci_irq (struct usb_hcd *hcd)
 				continue;
 			pstatus = ehci_readl(ehci,
 					 &ehci->regs->port_status[i]);
+					 
+			set_usbhost_connect(hcd, i, pstatus & PORT_CONNECT, 0);
 
 			if (pstatus & PORT_OWNER)
 				continue;
@@ -1220,6 +1225,10 @@ EXPORT_SYMBOL_GPL(ehci_init_driver);
 MODULE_DESCRIPTION(DRIVER_DESC);
 MODULE_AUTHOR (DRIVER_AUTHOR);
 MODULE_LICENSE ("GPL");
+#ifdef CONFIG_HIUSB_EHCI
+#include "hiusb-ehci.c"
+#define	PLATFORM_DRIVER		hiusb_ehci_hcd_driver
+#endif
 
 #ifdef CONFIG_USB_EHCI_FSL
 #include "ehci-fsl.c"
@@ -1292,6 +1301,22 @@ static int __init ehci_hcd_init(void)
 
 	if (usb_disabled())
 		return -ENODEV;
+#ifdef CONFIG_HIUSB_EHCI
+	retval = platform_device_register(&hiusb_ehci_platdev);
+	if (retval < 0) {
+		printk(KERN_ERR "%s->%d, platform_device_register fail.\n",
+		       __func__, __LINE__);
+		return -ENODEV;
+	}
+#ifdef CONFIG_ARCH_HI3798MX
+	retval = platform_device_register(&hiusb_ehci1_platdev);
+	if (retval < 0) {
+		printk(KERN_ERR "%s->%d, platform_device_register fail.\n",
+		       __func__, __LINE__);
+		return -ENODEV;
+	}
+#endif
+#endif
 
 	printk(KERN_INFO "%s: " DRIVER_DESC "\n", hcd_name);
 	set_bit(USB_EHCI_LOADED, &usb_hcds_loaded);
@@ -1360,6 +1385,12 @@ clean0:
 err_debug:
 #endif
 	clear_bit(USB_EHCI_LOADED, &usb_hcds_loaded);
+#ifdef CONFIG_HIUSB_EHCI
+	platform_device_unregister(&hiusb_ehci_platdev);
+#ifdef CONFIG_ARCH_HI3798MX
+	platform_device_unregister(&hiusb_ehci1_platdev);
+#endif
+#endif
 	return retval;
 }
 module_init(ehci_hcd_init);
@@ -1382,5 +1413,11 @@ static void __exit ehci_hcd_cleanup(void)
 	debugfs_remove(ehci_debug_root);
 #endif
 	clear_bit(USB_EHCI_LOADED, &usb_hcds_loaded);
+#ifdef CONFIG_HIUSB_EHCI
+	platform_device_unregister(&hiusb_ehci_platdev);
+#ifdef CONFIG_ARCH_HI3798MX
+	platform_device_unregister(&hiusb_ehci1_platdev);
+#endif
+#endif
 }
 module_exit(ehci_hcd_cleanup);

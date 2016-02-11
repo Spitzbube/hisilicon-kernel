@@ -1171,9 +1171,6 @@ static int xhci_check_args(struct usb_hcd *hcd, struct usb_device *udev,
 	}
 
 	xhci = hcd_to_xhci(hcd);
-	if (xhci->xhc_state & XHCI_STATE_HALTED)
-		return -ENODEV;
-
 	if (check_virt_dev) {
 		if (!udev->slot_id || !xhci->devs[udev->slot_id]) {
 			printk(KERN_DEBUG "xHCI %s called with unaddressed "
@@ -1188,6 +1185,9 @@ static int xhci_check_args(struct usb_hcd *hcd, struct usb_device *udev,
 			return -EINVAL;
 		}
 	}
+
+	if (xhci->xhc_state & XHCI_STATE_HALTED)
+		return -ENODEV;
 
 	return 1;
 }
@@ -3815,7 +3815,7 @@ int xhci_find_raw_port_number(struct usb_hcd *hcd, int port1)
 	return raw_port;
 }
 
-#ifdef CONFIG_PM_RUNTIME
+#ifdef CONFIG_USB_SUSPEND
 
 /* BESL to HIRD Encoding array for USB2 LPM */
 static int xhci_besl_encoding[16] = {125, 150, 200, 300, 400, 500, 1000, 2000,
@@ -4697,6 +4697,13 @@ int xhci_gen_setup(struct usb_hcd *hcd, xhci_get_quirks_t get_quirks)
 
 	get_quirks(dev, xhci);
 
+	/* In xhci controllers which follow xhci 1.0 spec gives a spurious
+	 * success event after a short transfer. This quirk will ignore such
+	 * spurious event.
+	 */
+	if (xhci->hci_version > 0x96)
+		xhci->quirks |= XHCI_SPURIOUS_SUCCESS;
+
 	/* Make sure the HC is halted. */
 	retval = xhci_halt(xhci);
 	if (retval)
@@ -4733,6 +4740,11 @@ MODULE_DESCRIPTION(DRIVER_DESC);
 MODULE_AUTHOR(DRIVER_AUTHOR);
 MODULE_LICENSE("GPL");
 
+#ifdef CONFIG_HIUSB_XHCI
+#include "hiusb-xhci.c"
+#define PLATFORM_DRIVER        usb_xhci_driver
+#endif
+
 static int __init xhci_hcd_init(void)
 {
 	int retval;
@@ -4742,6 +4754,14 @@ static int __init xhci_hcd_init(void)
 		printk(KERN_DEBUG "Problem registering PCI driver.");
 		return retval;
 	}
+#ifdef CONFIG_HIUSB_XHCI
+	retval = platform_device_register(&hiusb_xhci_platdev);
+	if (retval < 0) {
+		printk(KERN_ERR "%s->%d, platform_device_register fail.\n",
+				__func__, __LINE__);
+		return -ENODEV;
+	}
+#endif
 	retval = xhci_register_plat();
 	if (retval < 0) {
 		printk(KERN_DEBUG "Problem registering platform driver.");
@@ -4767,6 +4787,9 @@ static int __init xhci_hcd_init(void)
 	return 0;
 unreg_pci:
 	xhci_unregister_pci();
+#ifdef CONFIG_HIUSB_XHCI
+	platform_device_unregister(&hiusb_xhci_platdev);
+#endif
 	return retval;
 }
 module_init(xhci_hcd_init);
@@ -4775,5 +4798,8 @@ static void __exit xhci_hcd_cleanup(void)
 {
 	xhci_unregister_pci();
 	xhci_unregister_plat();
+#ifdef CONFIG_HIUSB_XHCI
+	platform_device_unregister(&hiusb_xhci_platdev);
+#endif
 }
 module_exit(xhci_hcd_cleanup);

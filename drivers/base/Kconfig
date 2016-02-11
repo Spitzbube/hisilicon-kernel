@@ -217,6 +217,11 @@ config CMA
 
 if CMA
 
+config CMA_MEM_SHARED
+	bool "Support sharing CMA memory with the heap"
+	help
+	  Support sharing CMA memory with the heap
+
 config CMA_DEBUG
 	bool "CMA debug messages (DEVELOPMENT)"
 	depends on DEBUG_KERNEL

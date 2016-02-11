@@ -167,5 +167,7 @@ source "drivers/net/ethernet/via/Kconfig"
 source "drivers/net/ethernet/wiznet/Kconfig"
 source "drivers/net/ethernet/xilinx/Kconfig"
 source "drivers/net/ethernet/xircom/Kconfig"
+source "drivers/net/ethernet/hieth-sf/Kconfig"
+source "drivers/net/ethernet/hieth-gmac/Kconfig"
 
 endif # ETHERNET

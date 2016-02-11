@@ -105,7 +105,7 @@ config FB_BOOT_VESA_SUPPORT
 	  of VESA video modes set at an early boot stage via the vga= parameter.
 
 config FB_CFB_FILLRECT
-	tristate
+	tristate "Support The cfb_fillrect Function"
 	depends on FB
 	default n
 	---help---
@@ -114,7 +114,7 @@ config FB_CFB_FILLRECT
 	  (accelerated) version.
 
 config FB_CFB_COPYAREA
-	tristate
+	tristate "Support The cfb_copyarea Function"
 	depends on FB
 	default n
 	---help---
@@ -123,7 +123,7 @@ config FB_CFB_COPYAREA
 	  version.
 
 config FB_CFB_IMAGEBLIT
-	tristate
+	tristate "Support The cfb_imageblit function"
 	depends on FB
 	default n
 	---help---
@@ -2475,6 +2475,7 @@ source "drivers/video/omap2/Kconfig"
 source "drivers/video/exynos/Kconfig"
 source "drivers/video/mmp/Kconfig"
 source "drivers/video/backlight/Kconfig"
+source "drivers/video/adf/Kconfig"
 
 if VT
 	source "drivers/video/console/Kconfig"

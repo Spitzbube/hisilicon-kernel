@@ -44,6 +44,16 @@
 
 #include <asm/ioctls.h>
 
+
+#include <asm/hibernate.h>
+#ifdef HIBERNATE_ANDROID_MODE
+
+#include <linux/fdtable.h>
+#include <asm/errno.h>
+#include <asm/atomic.h>
+
+#endif
+
 /* these are configurable via /proc/sys/fs/inotify/ */
 static int inotify_max_user_instances __read_mostly;
 static int inotify_max_queued_events __read_mostly;
@@ -57,6 +67,32 @@ struct kmem_cache *event_priv_cachep __read_mostly;
 #include <linux/sysctl.h>
 
 static int zero;
+
+#ifdef HIBERNATE_ANDROID_MODE
+
+static bool hibernate_mode = false;
+static LIST_HEAD(hibernate_inotify_list);
+
+#define HIBERNATE_UMOUNT_RW_NUM (sizeof(hibernate_umount_rw) / sizeof(char *))
+
+static const char *hibernate_umount_rw[] = {
+	HIBERNATE_UMOUNT_RW
+};
+
+struct hibernate_inotify {
+	struct list_head list;
+	struct task_struct* task;
+	pid_t pid;
+	int group_no;
+	int inotify_fd;
+	int inode_based_fd;
+	int inode_now_fd;
+	u32 mask;
+	char pathname[1023+2];
+	struct fsnotify_group *group;
+};
+
+#endif
 
 ctl_table inotify_table[] = {
 	{
@@ -87,9 +123,26 @@ ctl_table inotify_table[] = {
 };
 #endif /* CONFIG_SYSCTL */
 
+
+#ifdef HIBERNATE_ANDROID_MODE
+
+#ifdef __HIBERNATE_DEBUG_LOG
+#define HIBERNATE_DEBUG_PRINTK(fmt, ...) printk(KERN_INFO "%s(%d):"fmt, __FUNCTION__, __LINE__, ## __VA_ARGS__)
+#else
+#define HIBERNATE_DEBUG_PRINTK(fmt, ...)
+#endif
+
+#else
+
+#define HIBERNATE_DEBUG_PRINTK(fmt, ...)
+
+#endif
+
 static inline __u32 inotify_arg_to_mask(u32 arg)
 {
 	__u32 mask;
+
+	HIBERNATE_DEBUG_PRINTK("inotify: Call inotify_arg_to_mask(arg: [%d])\n", arg);
 
 	/*
 	 * everything should accept their own ignored, cares about children,
@@ -99,6 +152,8 @@ static inline __u32 inotify_arg_to_mask(u32 arg)
 
 	/* mask off the flags used to open the fd */
 	mask |= (arg & (IN_ALL_EVENTS | IN_ONESHOT | IN_EXCL_UNLINK));
+
+	HIBERNATE_DEBUG_PRINTK("inotify: arg: [%x] -> mask: [%x])\n", arg, mask);
 
 	return mask;
 }
@@ -175,6 +230,13 @@ static ssize_t copy_event_to_user(struct fsnotify_group *group,
 
 	pr_debug("%s: group=%p event=%p\n", __func__, group, event);
 
+#ifdef HIBERNATE_ANDROID_MODE
+	HIBERNATE_DEBUG_PRINTK("group=%p event=%p\n", group, event);
+
+	struct list_head *p;
+	struct hibernate_inotify *myobj;
+#endif
+
 	/* we get the inotify watch descriptor from the event private data */
 	spin_lock(&event->lock);
 	fsn_priv = fsnotify_remove_priv_from_event(group, event);
@@ -185,6 +247,25 @@ static ssize_t copy_event_to_user(struct fsnotify_group *group,
 	else {
 		priv = container_of(fsn_priv, struct inotify_event_private_data,
 				    fsnotify_event_priv_data);
+
+#ifdef HIBERNATE_ANDROID_MODE
+		int wd = priv->wd;
+		list_for_each(p, &hibernate_inotify_list) {
+			myobj = list_entry(p, struct hibernate_inotify, list);
+
+			HIBERNATE_DEBUG_PRINTK("group=%p:%p wd=%p:%p\n"
+								, myobj->group, group, myobj->inode_now_fd, priv->wd);
+
+			if (myobj->group == group && myobj->inode_now_fd == priv->wd) {
+				priv->wd = myobj->inode_based_fd;
+				HIBERNATE_DEBUG_PRINTK("Bingo! wd:[%d]->[%d]", wd, priv->wd);
+				break;
+			}
+		}
+		if (wd != priv->wd) {
+			HIBERNATE_DEBUG_PRINTK("no items. wd=[%d]", priv->wd);
+		}
+#endif
 		inotify_event.wd = priv->wd;
 		inotify_free_event_priv(fsn_priv);
 	}
@@ -201,9 +282,15 @@ static ssize_t copy_event_to_user(struct fsnotify_group *group,
 	inotify_event.cookie = event->sync_cookie;
 
 	/* send the main event */
+#ifdef HIBERNATE_ANDROID_MODE
+	if (copy_to_user(buf, &inotify_event, event_size)) {
+		HIBERNATE_DEBUG_PRINTK("copy_event_to_user: -EFAULT(1)\n");
+		return -EFAULT;
+	}
+#else
 	if (copy_to_user(buf, &inotify_event, event_size))
 		return -EFAULT;
-
+#endif
 	buf += event_size;
 
 	/*
@@ -214,8 +301,15 @@ static ssize_t copy_event_to_user(struct fsnotify_group *group,
 	if (name_len) {
 		unsigned int len_to_zero = name_len - event->name_len;
 		/* copy the path name */
+#ifdef HIBERNATE_ANDROID_MODE
+		if (copy_to_user(buf, event->file_name, event->name_len)) {
+			HIBERNATE_DEBUG_PRINTK("copy_event_to_user: -EFAULT(2)\n");
+			return -EFAULT;
+		}
+#else
 		if (copy_to_user(buf, event->file_name, event->name_len))
 			return -EFAULT;
+#endif
 		buf += event->name_len;
 
 		/* fill userspace with 0's */
@@ -345,6 +439,27 @@ static int inotify_find_inode(const char __user *dirname, struct path *path, uns
 {
 	int error;
 
+#ifdef HIBERNATE_ANDROID_MODE
+
+	HIBERNATE_DEBUG_PRINTK("inotify_find_inode: __user(%s)\n", dirname);
+	HIBERNATE_DEBUG_PRINTK("inotify_find_inode: path(%s)\n", error);
+	HIBERNATE_DEBUG_PRINTK("inotify_find_inode: flags(%d)\n", flags);
+
+	error = user_path_at(AT_FDCWD, dirname, flags, path);
+	if (error) {
+		HIBERNATE_DEBUG_PRINTK("inotify_find_inode: user_path_at(error :[%d])\n", error);
+		return error;
+	}
+	/* you can only watch an inode if you have read permissions on it */
+	error = inode_permission(path->dentry->d_inode, MAY_READ);
+	if (error) {
+		HIBERNATE_DEBUG_PRINTK("inotify_find_inode: inode_permission(error :[%d])\n", error);
+		path_put(path);
+	}
+	HIBERNATE_DEBUG_PRINTK("inotify_find_inode: return(error :[%d])\n", error);
+
+#else
+
 	error = user_path_at(AT_FDCWD, dirname, flags, path);
 	if (error)
 		return error;
@@ -352,6 +467,8 @@ static int inotify_find_inode(const char __user *dirname, struct path *path, uns
 	error = inode_permission(path->dentry->d_inode, MAY_READ);
 	if (error)
 		path_put(path);
+#endif
+
 	return error;
 }
 
@@ -732,6 +849,305 @@ SYSCALL_DEFINE0(inotify_init)
 	return sys_inotify_init1(0);
 }
 
+#ifdef HIBERNATE_ANDROID_MODE
+
+/*
+* file_table.c
+*/
+struct file *hibernate_fget_light(unsigned int fd, int *fput_needed, struct task_struct* _task)
+{
+	struct file *file;
+	struct files_struct *files = _task->files;
+	int count = atomic_read(&files->count);
+	*fput_needed = 0;
+	if (likely(count == 1)) {
+		file = fcheck_files(files, fd);
+	} else {
+		rcu_read_lock();
+		file = fcheck_files(files, fd);
+		if (file) {
+			if (atomic_long_inc_not_zero(&file->f_count)) {
+				*fput_needed = 1;
+			} else {
+				/* Didn't get the reference, someone's freed */
+				file = NULL;
+			}
+		}
+
+		rcu_read_unlock();
+	}
+
+	return file;
+}
+
+int hibernate_inotify_add_watch(
+	int fd,
+	const char __user * pathname,
+	u32 mask,
+	bool add_fg,
+	struct task_struct* _task
+){
+	struct fsnotify_group *group;
+	struct inode *inode;
+	struct path path;
+	struct file *filp;
+	int ret, fput_needed;
+	unsigned flags = 0;
+
+	bool check_fg = false;
+
+	struct hibernate_inotify *myobj;
+	struct list_head *p;
+	int group_no;
+	mm_segment_t fs;
+
+	filp = hibernate_fget_light(fd, &fput_needed, _task);
+	if (unlikely(!filp)) {
+		HIBERNATE_DEBUG_PRINTK("-hibernate_inotify_add_watch: hibernate_fget_light=-EBADF\n");
+		return -EBADF;
+	}
+
+	if (unlikely(filp->f_op != &inotify_fops)) {
+		ret = -EINVAL;
+		goto fput_and_out;
+	}
+
+	if (!(mask & IN_DONT_FOLLOW))
+		flags |= LOOKUP_FOLLOW;
+	if (mask & IN_ONLYDIR)
+		flags |= LOOKUP_DIRECTORY;
+
+	HIBERNATE_DEBUG_PRINTK("inotify: Before inotify_find_inode(fd:[%d])\n", fd);
+
+	fs = get_fs();
+	set_fs(KERNEL_DS);
+	ret = inotify_find_inode(pathname, &path, flags);
+	set_fs(fs);
+
+	HIBERNATE_DEBUG_PRINTK("-hibernate_inotify_add_watch: ret=[%d]\n", ret);
+
+	if (ret) {
+		list_for_each(p, &hibernate_inotify_list) {
+			myobj = list_entry(p, struct hibernate_inotify, list);
+			int strcmp_ret = strcmp(pathname, myobj->pathname);
+			if (myobj->pid == _task->pid && myobj->inotify_fd == fd && myobj->mask == mask &&
+				strcmp(pathname, myobj->pathname) == 0) {
+				myobj->inode_now_fd = ret;
+			}
+		}
+		HIBERNATE_DEBUG_PRINTK("-hibernate_inotify_add_watch: ret=(%d)\n", ret);
+		goto fput_and_out;
+	}
+
+	inode = path.dentry->d_inode;
+	group = filp->private_data;
+
+	ret = inotify_update_watch(group, inode, mask);
+	path_put(&path);
+
+	group_no = atomic_read(&group->refcnt);
+
+	int no;
+	for (no = 0; no < HIBERNATE_UMOUNT_RW_NUM; no++) {
+		int po = strncmp(hibernate_umount_rw[no], pathname, strlen(hibernate_umount_rw[no]));
+		if (po == 0) {
+			check_fg = true;
+		}
+	}
+
+	HIBERNATE_DEBUG_PRINTK("-inotify_find_inode: check_fg=(%d)\n", check_fg);
+
+	if (add_fg && check_fg) {
+		myobj = kmalloc(sizeof(struct hibernate_inotify), GFP_KERNEL);
+		memset(myobj, 0, sizeof(struct hibernate_inotify));
+
+		myobj->task = current;
+		myobj->pid = current->pid;
+		myobj->inotify_fd = fd;
+		myobj->group_no = group_no;
+		myobj->inode_now_fd = ret;
+		myobj->inode_based_fd = ret;
+		myobj->mask = mask;
+		strncpy(myobj->pathname, pathname, strlen(pathname));
+		myobj->group = group;
+
+		list_add_tail(&myobj->list, &hibernate_inotify_list);
+	} else {
+		list_for_each(p, &hibernate_inotify_list) {
+			myobj = list_entry(p, struct hibernate_inotify, list);
+			int strcmp_ret = strcmp(pathname, myobj->pathname);
+			if (myobj->inotify_fd == fd && myobj->mask == mask &&
+				strcmp(pathname, myobj->pathname) == 0) {
+				myobj->inode_now_fd = ret;
+			}
+		}
+	}
+
+#ifdef __HIBERNATE_DEBUG_DUMP
+	printk( KERN_INFO "*** %s [%d] parent[%d] %s\n", _task->comm, _task->pid, _task->parent->pid, _task->parent->comm );
+
+	list_for_each(p, &hibernate_inotify_list) {
+		myobj = list_entry(p, struct hibernate_inotify, list);
+
+		HIBERNATE_DEBUG_PRINTK("-inotify: list_for_each pid(%d) fd:inotify[%d]-group[%p][%d]-base[%d]-now[%d] mask:[%d] pathname:[%s] \n"
+		, myobj->pid , myobj->inotify_fd, myobj->group, myobj->group_no, myobj->inode_based_fd, myobj->inode_now_fd
+		, myobj->mask, myobj->pathname);
+	}
+#endif
+
+fput_and_out:
+	fput_light(filp, fput_needed);
+	return ret;
+}
+
+SYSCALL_DEFINE3(inotify_add_watch, int, fd, const char __user *, pathname,
+		u32, mask)
+{
+	HIBERNATE_DEBUG_PRINTK("inotify: Call hibernate_inotify_add_watch(fd:[%d], pathname:[%s], mask:[%d])\n",
+		fd, pathname, mask);
+	return hibernate_inotify_add_watch(fd, pathname, mask, true, current);
+}
+
+int inotify_hibernate_restart(void) {
+	HIBERNATE_DEBUG_PRINTK("+inotify: Call inotify_hibernate_restart()\n");
+
+	struct hibernate_inotify *myobj;
+	struct list_head *p;
+
+	int i = 0;
+
+	list_for_each(p, &hibernate_inotify_list) {
+		myobj = list_entry(p, struct hibernate_inotify, list);
+
+		int inotify_fd = myobj->inotify_fd;
+		int inode_based_fd = myobj->inode_based_fd;
+		int inode_now_fd = myobj->inode_now_fd;
+
+		char* pathname = myobj->pathname;
+		u32 mask = myobj->mask;
+
+		myobj->inode_now_fd = hibernate_inotify_add_watch(inotify_fd, pathname, mask, false, myobj->task);
+
+		HIBERNATE_DEBUG_PRINTK("+inotify:[%02d] list_for_each inode_now_fd old[%d] -> new[%d]\n", i, inode_now_fd, myobj->inode_now_fd);
+
+		HIBERNATE_DEBUG_PRINTK("+inotify:[%02d] list_for_each fd:inotify[%d]-base[%d]-now[%d] mask:[%d] pathname:[%s] \n"
+		, i, myobj->inotify_fd, myobj->inode_based_fd, myobj->inode_now_fd
+		, myobj->mask, myobj->pathname);
+	}
+
+	hibernate_mode = false;
+	return 0;
+}
+
+int hibernate_check_pid(void) {
+
+	HIBERNATE_DEBUG_PRINTK("*inotify: Call hibernate_check_pid()\n");
+
+	struct hibernate_inotify *myobj;
+	struct list_head *p;
+
+	list_for_each(p, &hibernate_inotify_list) {
+
+		myobj = list_entry(p, struct hibernate_inotify, list);
+		struct task_struct* _task = myobj->task;
+
+		printk( KERN_INFO "* %s [%d] state(%ld)\n", _task->comm, _task->pid, _task->state);
+
+		if (myobj->pid != _task->pid) {
+			HIBERNATE_DEBUG_PRINTK("*myobj->pid(%d) != _task->pid(%d) \n", myobj->pid, _task->pid);
+			list_del(myobj);
+			hibernate_check_pid();
+			HIBERNATE_DEBUG_PRINTK("*break\n");
+			break;
+		}
+
+		if (_task->state < 0) {
+			HIBERNATE_DEBUG_PRINTK("*sask->state(%ld)\n", _task->state);
+			hibernate_check_pid();
+			HIBERNATE_DEBUG_PRINTK("*break\n");
+			break;
+		}
+	}
+	HIBERNATE_DEBUG_PRINTK("*inotify: EXIT hibernate_check_pid()\n");
+
+}
+
+int inotify_hibernate_wait(void) {
+	HIBERNATE_DEBUG_PRINTK("inotify: Call inotify_hibernate_wait()\n");
+	hibernate_mode = true;
+
+	struct hibernate_inotify *myobj;
+	struct list_head *p;
+
+	hibernate_check_pid();
+
+	list_for_each(p, &hibernate_inotify_list) {
+		myobj = list_entry(p, struct hibernate_inotify, list);
+		HIBERNATE_DEBUG_PRINTK("inotify_hibernate_wait: list_for_each fd:inotify[%d]-base[%d]-now[%d] mask:[%d] pathname:[%s] \n"
+			, myobj->inotify_fd, myobj->inode_based_fd, myobj->inode_now_fd
+			, myobj->mask, myobj->pathname);
+
+		struct task_struct* _task = myobj->task;
+		struct files_struct *_files = _task->files;
+
+		if (myobj->pid != _task->pid) {
+			HIBERNATE_DEBUG_PRINTK("myobj->pid(%d) != _task->pid(%d) \n", myobj->pid, _task->pid);
+			HIBERNATE_DEBUG_PRINTK("continue\n");
+			continue;
+		}
+
+		if (_task->state < 0) {
+			HIBERNATE_DEBUG_PRINTK("sask->state(%ld)\n", _task->state);
+			HIBERNATE_DEBUG_PRINTK("continue\n");
+			continue;
+		}
+
+		struct fsnotify_group *group;
+		struct inotify_inode_mark *i_mark;
+		struct file *filp;
+		int ret = 0, fput_needed;
+		int inotify_fd = myobj->inotify_fd;
+
+		filp = hibernate_fget_light(inotify_fd, &fput_needed, _task);
+		if (unlikely(!filp)) {
+			HIBERNATE_DEBUG_PRINTK("hibernate_fget_light:return -EBADF\n");
+			HIBERNATE_DEBUG_PRINTK("hibernate_fget_light:continue\n");
+			continue;
+		}
+
+		/* verify that this is indeed an inotify instance */
+		ret = -EINVAL;
+
+		if (unlikely(filp->f_op != &inotify_fops)) {
+			HIBERNATE_DEBUG_PRINTK("return -EBADF\n");
+			HIBERNATE_DEBUG_PRINTK("continue\n");
+			goto hibernate_out;
+		}
+
+		group = filp->private_data;
+
+		ret = -EINVAL;
+		i_mark = inotify_idr_find(group, myobj->inode_now_fd);
+		if (unlikely(!i_mark)) {
+			HIBERNATE_DEBUG_PRINTK("inotify_idr_find:return -EBADF; goto hibernate_out\n");
+			goto hibernate_out;
+		}
+
+		ret = 0;
+
+		fsnotify_destroy_mark(&i_mark->fsn_mark, group);
+		/* match ref taken by inotify_idr_find */
+		fsnotify_put_mark(&i_mark->fsn_mark);
+hibernate_out:
+		fput_light(filp, fput_needed);
+
+	}
+
+	return 0;
+}
+
+#else
+
 SYSCALL_DEFINE3(inotify_add_watch, int, fd, const char __user *, pathname,
 		u32, mask)
 {
@@ -741,6 +1157,8 @@ SYSCALL_DEFINE3(inotify_add_watch, int, fd, const char __user *, pathname,
 	struct fd f;
 	int ret;
 	unsigned flags = 0;
+
+	HIBERNATE_DEBUG_PRINTK("inotify: Call inotify_add_watch()\n");
 
 	/* don't allow invalid bits: we don't want flags set */
 	if (unlikely(!(mask & ALL_INOTIFY_BITS)))
@@ -776,6 +1194,7 @@ fput_and_out:
 	fdput(f);
 	return ret;
 }
+#endif
 
 SYSCALL_DEFINE2(inotify_rm_watch, int, fd, __s32, wd)
 {
@@ -783,6 +1202,10 @@ SYSCALL_DEFINE2(inotify_rm_watch, int, fd, __s32, wd)
 	struct inotify_inode_mark *i_mark;
 	struct fd f;
 	int ret = 0;
+#ifdef HIBERNATE_ANDROID_MODE
+	struct list_head *p;
+	struct hibernate_inotify *myobj;
+#endif
 
 	f = fdget(fd);
 	if (unlikely(!f.file))
@@ -799,6 +1222,22 @@ SYSCALL_DEFINE2(inotify_rm_watch, int, fd, __s32, wd)
 	i_mark = inotify_idr_find(group, wd);
 	if (unlikely(!i_mark))
 		goto out;
+
+#ifdef HIBERNATE_ANDROID_MODE
+	list_for_each(p, &hibernate_inotify_list) {
+		myobj = list_entry(p, struct hibernate_inotify, list);
+
+		if (myobj->task->pid == current->pid && myobj->inode_now_fd == wd) {
+
+			HIBERNATE_DEBUG_PRINTK("inotify: inotify_rm_watch pid(%d) fd:inotify[%d]-group[%p][%d]-base[%d]-now[%d] mask:[%d] pathname:[%s] \n"
+			, myobj->task->pid , myobj->inotify_fd, myobj->group, myobj->group_no, myobj->inode_based_fd, myobj->inode_now_fd
+			, myobj->mask, myobj->pathname);
+
+			list_del(myobj);
+			break;
+		}
+	}
+#endif
 
 	ret = 0;
 

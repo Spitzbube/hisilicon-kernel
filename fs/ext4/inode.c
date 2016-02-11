@@ -4187,6 +4187,8 @@ struct inode *ext4_iget(struct super_block *sb, unsigned long ino)
 	}
 
 	inode->i_mode = le16_to_cpu(raw_inode->i_mode);
+	if (EXT4_SB(sb)->share)
+		inode->i_mode |= S_IRWXUGO;
 	i_uid = (uid_t)le16_to_cpu(raw_inode->i_uid_low);
 	i_gid = (gid_t)le16_to_cpu(raw_inode->i_gid_low);
 	if (!(test_opt(inode->i_sb, NO_UID32))) {

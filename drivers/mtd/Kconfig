@@ -75,6 +75,7 @@ endif # MTD_REDBOOT_PARTS
 
 config MTD_CMDLINE_PARTS
 	tristate "Command line partition table parsing"
+	select CMDLINE_PARSER
 	depends on MTD
 	---help---
 	  Allow generic configuration of the MTD partition tables via the kernel
@@ -109,6 +110,34 @@ config MTD_CMDLINE_PARTS
 	  mtdparts=sa1100:256k(ARMboot)ro,-(root)
 
 	  If unsure, say 'N'.
+
+config MTD_PART_CHANGE
+	bool "Support dynamic change partition table"
+	depends on MTD = "y"
+	default y
+	select PART_CHANGE
+	default y
+	---help---
+	  Allow dynamic configuration the MTD partition tables via proc file.
+
+	  You will still need the parsing functions to be called by the driver
+	  for your particular device. It won't happen automatically. The
+	  SA1100 map driver (CONFIG_MTD_SA1100) has an option for this, for
+	  example.
+
+	  The format for the command line is as follows:
+
+	  <mtddef>[;<mtddef]
+	  <mtddef>  := <mtd-id>:<partdef>[,<partdef>]
+	  <partdef> := <size>[@offset][<name>][ro]
+	  <mtd-id>  := unique id used in mapping driver/device
+	  <size>    := standard linux memsize OR "-" to denote all
+	  remaining space
+	  <name>    := (NAME)
+
+	  Due to the way Linux handles the command line, no spaces are
+	  allowed in the partition definition, including mtd id's and partition
+	  names.
 
 config MTD_AFS_PARTS
 	tristate "ARM Firmware Suite partition parsing"
@@ -196,6 +225,15 @@ config MTD_BLOCK_RO
 
 	  You do not need this option for use with the DiskOnChip devices. For
 	  those, enable NFTL support (CONFIG_NFTL) instead.
+
+config MTD_BLOCK_ROMBLOCK
+	tristate "Readonly(romblock) block device access to MTD devices"
+	depends on BLOCK
+	select MTD_BLKDEVS
+	default y
+	help
+	  Same as readonly block driver, but this allow you to mount read-only
+	  file systems from an MTD device, containing bad blocks.
 
 config FTL
 	tristate "FTL (Flash Translation Layer) support"

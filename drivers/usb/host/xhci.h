@@ -1716,10 +1716,8 @@ static inline void xhci_unregister_pci(void) {}
 int xhci_register_plat(void);
 void xhci_unregister_plat(void);
 #else
-static inline int xhci_register_plat(void)
-{ return 0; }
-static inline void xhci_unregister_plat(void)
-{  }
+int xhci_register_plat(void);
+void xhci_unregister_plat(void);
 #endif
 
 /* xHCI host controller glue */

@@ -1055,6 +1055,13 @@ copy_data_pages(struct memory_bitmap *copy_bm, struct memory_bitmap *orig_bm)
 	}
 }
 
+#ifdef CONFIG_PM_HIBERNATE
+int swsusp_page_is_saveable (struct zone *zone, unsigned long pfn)
+{
+	return page_is_saveable(zone, pfn) != NULL;
+}
+#endif
+
 /* Total number of image pages */
 static unsigned int nr_copy_pages;
 /* Number of pages needed for saving the original pfns of the image pages */
@@ -1280,6 +1287,8 @@ static unsigned long minimum_image_size(unsigned long saveable)
 	return saveable <= size ? 0 : saveable - size;
 }
 
+#ifndef CONFIG_PM_HIBERNATE
+
 /**
  * hibernate_preallocate_memory - Preallocate memory for hibernation image
  *
@@ -1447,6 +1456,8 @@ int hibernate_preallocate_memory(void)
 	swsusp_free();
 	return -ENOMEM;
 }
+
+#endif /* !CONFIG_PM_HIBERNATE */
 
 #ifdef CONFIG_HIGHMEM
 /**

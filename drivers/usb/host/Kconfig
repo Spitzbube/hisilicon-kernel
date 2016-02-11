@@ -3,6 +3,14 @@
 #
 comment "USB Host Controller Drivers"
 
+if ARCH_S40 || ARCH_HI3798MX
+source "drivers/usb/host/Kconfig.s40"
+endif
+
+if ARCH_GODBOX
+source "drivers/usb/host/Kconfig.godbox"
+endif
+
 config USB_C67X00_HCD
 	tristate "Cypress C67x00 HCD support"
 	help

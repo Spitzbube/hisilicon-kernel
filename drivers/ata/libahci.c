@@ -49,6 +49,8 @@
 
 static int ahci_skip_host_reset;
 int ahci_ignore_sss;
+extern int fbs_fixed;
+static int fbs_en = 1;
 EXPORT_SYMBOL_GPL(ahci_ignore_sss);
 
 module_param_named(skip_host_reset, ahci_skip_host_reset, int, 0444);
@@ -56,6 +58,9 @@ MODULE_PARM_DESC(skip_host_reset, "skip global host reset (0=don't skip, 1=skip)
 
 module_param_named(ignore_sss, ahci_ignore_sss, int, 0444);
 MODULE_PARM_DESC(ignore_sss, "Ignore staggered spinup flag (0=don't ignore, 1=ignore)");
+
+module_param(fbs_en, uint, 0600);
+MODULE_PARM_DESC(fbs_en, "ahci fbs flags (default:0)");
 
 static int ahci_set_lpm(struct ata_link *link, enum ata_lpm_policy policy,
 			unsigned hints);
@@ -1560,8 +1565,8 @@ static void ahci_error_intr(struct ata_port *ap, u32 irq_stat)
 		u32 fbs = readl(port_mmio + PORT_FBS);
 		int pmp = fbs >> PORT_FBS_DWE_OFFSET;
 
-		if ((fbs & PORT_FBS_SDE) && (pmp < ap->nr_pmp_links) &&
-		    ata_link_online(&ap->pmp_link[pmp])) {
+		if ((fbs & PORT_FBS_SDE) && (pmp < ap->nr_pmp_links) /*&&
+		    ata_link_online(&ap->pmp_link[pmp])*/) {
 			link = &ap->pmp_link[pmp];
 			fbs_need_dec = true;
 		}
@@ -2154,7 +2159,10 @@ static void ahci_pmp_attach(struct ata_port *ap)
 	cmd |= PORT_CMD_PMP;
 	writel(cmd, port_mmio + PORT_CMD);
 
-	ahci_enable_fbs(ap);
+	if (fbs_en && fbs_fixed)
+		ahci_enable_fbs(ap);
+	else
+		ahci_disable_fbs(ap);
 
 	pp->intr_mask |= PORT_IRQ_BAD_PMP;
 

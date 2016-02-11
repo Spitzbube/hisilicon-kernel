@@ -729,7 +729,7 @@ int xhci_hub_control(struct usb_hcd *hcd, u16 typeReq, u16 wValue,
 			}
 			/* In spec software should not attempt to suspend
 			 * a port unless the port reports that it is in the
-			 * enabled (PED = â€˜1â€™,PLS < â€˜3â€™) state.
+			 * enabled (PED = â€?â€?PLS < â€?â€? state.
 			 */
 			temp = xhci_readl(xhci, port_array[wIndex]);
 			if ((temp & PORT_PE) == 0 || (temp & PORT_RESET)
@@ -863,6 +863,22 @@ int xhci_hub_control(struct usb_hcd *hcd, u16 typeReq, u16 wValue,
 			xhci_writel(xhci, temp, port_array[wIndex]);
 
 			temp = xhci_readl(xhci, port_array[wIndex]);
+			break;
+		/* For downstream facing ports (these):  one hub port is put
+		 * into test mode according to USB2 11.24.2.13, then the hub
+		 * must be reset (which for root hub now means rmmod+modprobe,
+		 * or else system reboot).  
+		 */
+		case USB_PORT_FEAT_TEST:
+			if (hcd->speed != HCD_USB2)
+				goto error;
+			if (!timeout || timeout > 5)
+				goto error;
+			xhci_quiesce(xhci);
+			xhci_halt(xhci);
+			temp = xhci_readl(xhci, port_array[wIndex] + 1);
+			temp |= timeout << 28;
+			xhci_writel(xhci, temp, port_array[wIndex]+1);
 			break;
 		case USB_PORT_FEAT_U1_TIMEOUT:
 			if (hcd->speed != HCD_USB3)

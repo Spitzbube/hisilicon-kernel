@@ -21,33 +21,33 @@ config ARM
 	select HARDIRQS_SW_RESEND
 	select HAVE_AOUT
 	select HAVE_ARCH_JUMP_LABEL if !XIP_KERNEL
-	select HAVE_ARCH_KGDB
+	select HAVE_ARCH_KGDB if !CA_SUPPORT_ADVCA
 	select HAVE_ARCH_SECCOMP_FILTER
-	select HAVE_ARCH_TRACEHOOK
-	select HAVE_BPF_JIT
-	select HAVE_C_RECORDMCOUNT
-	select HAVE_DEBUG_KMEMLEAK
-	select HAVE_DMA_API_DEBUG
+	select HAVE_ARCH_TRACEHOOK if !CA_SUPPORT_ADVCA
+	select HAVE_BPF_JIT if !CA_SUPPORT_ADVCA
+	select HAVE_C_RECORDMCOUNT if !CA_SUPPORT_ADVCA
+	select HAVE_DEBUG_KMEMLEAK if !CA_SUPPORT_ADVCA
+	select HAVE_DMA_API_DEBUG if !CA_SUPPORT_ADVCA
 	select HAVE_DMA_ATTRS
 	select HAVE_DMA_CONTIGUOUS if MMU
-	select HAVE_DYNAMIC_FTRACE if (!XIP_KERNEL)
-	select HAVE_FTRACE_MCOUNT_RECORD if (!XIP_KERNEL)
-	select HAVE_FUNCTION_GRAPH_TRACER if (!THUMB2_KERNEL)
-	select HAVE_FUNCTION_TRACER if (!XIP_KERNEL)
+	select HAVE_DYNAMIC_FTRACE if ((!XIP_KERNEL) && !CA_SUPPORT_ADVCA)
+	select HAVE_FTRACE_MCOUNT_RECORD if ((!XIP_KERNEL) && !CA_SUPPORT_ADVCA)
+	select HAVE_FUNCTION_GRAPH_TRACER if ((!THUMB2_KERNEL) && !CA_SUPPORT_ADVCA)
+	select HAVE_FUNCTION_TRACER if ((!XIP_KERNEL) && !CA_SUPPORT_ADVCA)
 	select HAVE_GENERIC_DMA_COHERENT
 	select HAVE_GENERIC_HARDIRQS
-	select HAVE_HW_BREAKPOINT if (PERF_EVENTS && (CPU_V6 || CPU_V6K || CPU_V7))
+	select HAVE_HW_BREAKPOINT if (PERF_EVENTS && (CPU_V6 || CPU_V6K || CPU_V7) && !CA_SUPPORT_ADVCA)
 	select HAVE_IDE if PCI || ISA || PCMCIA
-	select HAVE_IRQ_TIME_ACCOUNTING
+	select HAVE_IRQ_TIME_ACCOUNTING if !CA_SUPPORT_ADVCA
 	select HAVE_KERNEL_GZIP
 	select HAVE_KERNEL_LZMA
 	select HAVE_KERNEL_LZO
 	select HAVE_KERNEL_XZ
-	select HAVE_KPROBES if !XIP_KERNEL
+	select HAVE_KPROBES if (!XIP_KERNEL && !CA_SUPPORT_ADVCA)
 	select HAVE_KRETPROBES if (HAVE_KPROBES)
 	select HAVE_MEMBLOCK
 	select HAVE_OPROFILE if (HAVE_PERF_EVENTS)
-	select HAVE_PERF_EVENTS
+	select HAVE_PERF_EVENTS if !CA_SUPPORT_ADVCA
 	select HAVE_REGS_AND_STACK_ACCESS_API
 	select HAVE_SYSCALL_TRACEPOINTS
 	select HAVE_UID16
@@ -140,7 +140,7 @@ config SBUS
 
 config STACKTRACE_SUPPORT
 	bool
-	default y
+	default y if !CA_SUPPORT_ADVCA
 
 config HAVE_LATENCYTOP_SUPPORT
 	bool
@@ -149,7 +149,7 @@ config HAVE_LATENCYTOP_SUPPORT
 
 config LOCKDEP_SUPPORT
 	bool
-	default y
+	default y if !CA_SUPPORT_ADVCA
 
 config TRACE_IRQFLAGS_SUPPORT
 	bool
@@ -864,6 +864,76 @@ config ARCH_OMAP1
 	help
 	  Support for older TI OMAP1 (omap7xx, omap15xx or omap16xx)
 
+config ARCH_GODBOX
+	bool "Hisilicon Godbox family"
+	select ARM_AMBA
+	select HAVE_CLK
+	select COMMON_CLKDEV
+	select CLKDEV_LOOKUP
+	select HAVE_MACH_CLKDEV
+	select NEED_MACH_IO_H
+	select NEED_MACH_MEMORY_H
+	select MIGHT_HAVE_PCI
+	select GENERIC_TIME
+	select GENERIC_CLOCKEVENTS
+	select USB_ARCH_HAS_OHCI
+	select USB_ARCH_HAS_EHCI
+
+	help
+	  This enables support for Hisilicon GODBOX platform.
+
+config ARCH_S40
+	bool "Hisilicon S40 family"
+	select ARM_AMBA
+	select HAVE_CLK
+	select CLKDEV_LOOKUP
+	select HAVE_SCHED_CLOCK
+	select GENERIC_TIME
+	select GENERIC_CLOCKEVENTS
+	select ARCH_HAS_CPUFREQ
+	select MIGHT_HAVE_PCI
+	select HAVE_SMP
+	select HAVE_ARM_SCU
+	select MIGHT_HAVE_CACHE_L2X0
+	select NEED_MACH_IO_H
+	select NEED_MACH_MEMORY_H
+	select ARCH_HAS_CPUFREQ
+	select USB_ARCH_HAS_OHCI
+	select USB_ARCH_HAS_EHCI
+	select USB_ARCH_HAS_XHCI
+	help
+	  This enables support for Hisilicon S40 platform.
+	  With the advanced ARM Cortex A9 processor,
+	  S40 serial provides high-speed processing capability.
+	  And S40 serial constains a very powerfull media process engine,
+	  two ethernet interface, EHCI and OHCI controllers, PCI-Express
+	  controller and many peripheral equipments.
+
+config ARCH_HI3798MX
+	bool "Hisilicon HI3798MX family"
+	select ARM_AMBA
+	select HAVE_CLK
+	select CLKDEV_LOOKUP
+	select HAVE_SCHED_CLOCK
+	select GENERIC_TIME
+	select GENERIC_CLOCKEVENTS
+	select ARCH_HAS_CPUFREQ
+	select MIGHT_HAVE_PCI
+	select HAVE_SMP
+	select NEED_MACH_IO_H
+	select NEED_MACH_MEMORY_H
+	select ARCH_HAS_CPUFREQ
+	select USB_ARCH_HAS_OHCI
+	select USB_ARCH_HAS_EHCI
+	select USB_ARCH_HAS_XHCI
+	help
+	  This enables support for Hisilicon HI3798MX platform.
+	  With the advanced ARM Cortex A9 processor,
+	  HI3798MX serial provides high-speed processing capability.
+	  And HI3798MX serial constains a very powerfull media process engine,
+	  two ethernet interface, EHCI and OHCI controllers, PCI-Express
+	  controller and many peripheral equipments.
+
 endchoice
 
 menu "Multiple platform selection"
@@ -1027,6 +1097,14 @@ source "arch/arm/mach-vt8500/Kconfig"
 source "arch/arm/mach-w90x900/Kconfig"
 
 source "arch/arm/mach-zynq/Kconfig"
+
+if ARCH_S40
+source "arch/arm/mach-s40/Kconfig"
+endif
+
+if ARCH_HI3798MX
+source "arch/arm/mach-hi3798mx/Kconfig"
+endif
 
 # Definitions to make life easier
 config ARCH_ACORN
@@ -1602,6 +1680,8 @@ config HZ
 		ARCH_S5PV210 || ARCH_EXYNOS4
 	default AT91_TIMER_HZ if ARCH_AT91
 	default SHMOBILE_TIMER_HZ if ARCH_SHMOBILE
+	default HI_S40_HZ if ARCH_S40
+	default HI_HI3798MX_HZ if ARCH_HI3798MX
 	default 100
 
 config SCHED_HRTICK
@@ -1819,6 +1899,15 @@ config XEN
 	help
 	  Say Y if you want to run Linux in a Virtual Machine on Xen on ARM.
 
+config ARM_FLUSH_CONSOLE_ON_RESTART
+	bool "Force flush the console on restart"
+	help
+	  If the console is locked while the system is rebooted, the messages
+	  in the temporary logbuffer would not have propogated to all the
+	  console drivers. This option forces the console lock to be
+	  released if it failed to be acquired, which will cause all the
+	  pending messages to be flushed.
+
 endmenu
 
 menu "Boot options"
@@ -1847,6 +1936,21 @@ config DEPRECATED_PARAM_STRUCT
 	help
 	  This was deprecated in 2001 and announced to live on for 5 years.
 	  Some old boot loaders still use this way.
+
+config BUILD_ARM_APPENDED_DTB_IMAGE
+	bool "Build a concatenated zImage/dtb by default"
+	depends on OF
+	help
+	  Enabling this option will cause a concatenated zImage and list of
+	  DTBs to be built by default (instead of a standalone zImage.)
+	  The image will built in arch/arm/boot/zImage-dtb
+
+config BUILD_ARM_APPENDED_DTB_IMAGE_NAMES
+	string "Default dtb names"
+	depends on BUILD_ARM_APPENDED_DTB_IMAGE
+	help
+	  Space separated list of names of dtbs to append when
+	  building a concatenated zImage-dtb.
 
 # Compressed boot loader in ROM.  Yes, we really want to ask about
 # TEXT and BSS so we preserve their values in the config files.

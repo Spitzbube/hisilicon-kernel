@@ -231,31 +231,26 @@ static int ohci_urb_enqueue (
 			frame &= ~(ed->interval - 1);
 			frame |= ed->branch;
 			urb->start_frame = frame;
+			ed->last_iso = frame + ed->interval * (size - 1);
 		}
 	} else if (ed->type == PIPE_ISOCHRONOUS) {
 		u16	next = ohci_frame_no(ohci) + 1;
 		u16	frame = ed->last_iso + ed->interval;
+		u16	length = ed->interval * (size - 1);
 
 		/* Behind the scheduling threshold? */
 		if (unlikely(tick_before(frame, next))) {
 
-			/* USB_ISO_ASAP: Round up to the first available slot */
+			/* URB_ISO_ASAP: Round up to the first available slot */
 			if (urb->transfer_flags & URB_ISO_ASAP) {
 				frame += (next - frame + ed->interval - 1) &
 						-ed->interval;
 
 			/*
-			 * Not ASAP: Use the next slot in the stream.  If
-			 * the entire URB falls before the threshold, fail.
+			 * Not ASAP: Use the next slot in the stream,
+			 * no matter what.
 			 */
 			} else {
-				if (tick_before(frame + ed->interval *
-					(urb->number_of_packets - 1), next)) {
-					retval = -EXDEV;
-					usb_hcd_unlink_urb_from_ep(hcd, urb);
-					goto fail;
-				}
-
 				/*
 				 * Some OHCI hardware doesn't handle late TDs
 				 * correctly.  After retiring them it proceeds
@@ -266,9 +261,16 @@ static int ohci_urb_enqueue (
 				urb_priv->td_cnt = DIV_ROUND_UP(
 						(u16) (next - frame),
 						ed->interval);
+				if (urb_priv->td_cnt >= urb_priv->length) {
+					++urb_priv->td_cnt;	/* Mark it */
+					ohci_dbg(ohci, "iso underrun %p (%u+%u < %u)\n",
+							urb, frame, length,
+							next);
+				}
 			}
 		}
 		urb->start_frame = frame;
+		ed->last_iso = frame + length;
 	}
 
 	/* fill the TDs and link them to the ed; and
@@ -927,8 +929,9 @@ static void ohci_stop (struct usb_hcd *hcd)
 	if (quirk_nec(ohci))
 		flush_work(&ohci->nec_work);
 
-	ohci_usb_reset (ohci);
 	ohci_writel (ohci, OHCI_INTR_MIE, &ohci->regs->intrdisable);
+	ohci_usb_reset (ohci);
+
 	free_irq(hcd->irq, hcd);
 	hcd->irq = 0;
 
@@ -1094,6 +1097,10 @@ MODULE_AUTHOR (DRIVER_AUTHOR);
 MODULE_DESCRIPTION(DRIVER_DESC);
 MODULE_LICENSE ("GPL");
 
+#ifdef CONFIG_HIUSB_OHCI
+#include "hiusb-ohci.c"
+#define PLATFORM_DRIVER		hiusb_ohci_hcd_driver
+#endif
 #ifdef CONFIG_PCI
 #include "ohci-pci.c"
 #define PCI_DRIVER		ohci_pci_driver
@@ -1224,6 +1231,23 @@ static int __init ohci_hcd_mod_init(void)
 	pr_debug ("%s: block sizes: ed %Zd td %Zd\n", hcd_name,
 		sizeof (struct ed), sizeof (struct td));
 	set_bit(USB_OHCI_LOADED, &usb_hcds_loaded);
+
+#ifdef CONFIG_HIUSB_OHCI
+	retval = platform_device_register(&hiusb_ohci_platdev);
+	if (retval < 0) {
+		printk(KERN_ERR "%s->%d, platform_device_register fail.\n",
+		       __func__, __LINE__);
+		return -ENODEV;
+	}
+#ifdef CONFIG_ARCH_HI3798MX
+	retval = platform_device_register(&hiusb_ohci1_platdev);
+	if (retval < 0) {
+		printk(KERN_ERR "%s->%d, platform_device_register fail.\n",
+		       __func__, __LINE__);
+		return -ENODEV;
+	}
+#endif	
+#endif
 
 #ifdef DEBUG
 	ohci_debug_root = debugfs_create_dir("ohci", usb_debug_root);
@@ -1403,6 +1427,13 @@ static int __init ohci_hcd_mod_init(void)
 #endif
 
 	clear_bit(USB_OHCI_LOADED, &usb_hcds_loaded);
+
+#ifdef CONFIG_HIUSB_OHCI
+	platform_device_unregister(&hiusb_ohci_platdev);
+#ifdef CONFIG_ARCH_HI3798MX
+	platform_device_unregister(&hiusb_ohci1_platdev);
+#endif
+#endif
 	return retval;
 }
 module_init(ohci_hcd_mod_init);
@@ -1461,6 +1492,13 @@ static void __exit ohci_hcd_mod_exit(void)
 	debugfs_remove(ohci_debug_root);
 #endif
 	clear_bit(USB_OHCI_LOADED, &usb_hcds_loaded);
+
+#ifdef CONFIG_HIUSB_OHCI
+	platform_device_unregister(&hiusb_ohci_platdev);
+#ifdef CONFIG_ARCH_HI3798MX
+	platform_device_unregister(&hiusb_ohci1_platdev);
+#endif
+#endif
 }
 module_exit(ohci_hcd_mod_exit);
 

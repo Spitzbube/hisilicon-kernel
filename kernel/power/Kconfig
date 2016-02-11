@@ -18,16 +18,24 @@ config SUSPEND_FREEZER
 
 	  Turning OFF this setting is NOT recommended! If in doubt, say Y.
 
+config HAS_WAKELOCK
+	bool
+	default y
+
+config WAKELOCK
+	bool
+	default y
+
 config HIBERNATE_CALLBACKS
 	bool
 
 config HIBERNATION
 	bool "Hibernation (aka 'suspend to disk')"
-	depends on SWAP && ARCH_HIBERNATION_POSSIBLE
+	depends on SWAP && ARCH_HIBERNATION_POSSIBLE || PM_HIBERNATE
 	select HIBERNATE_CALLBACKS
-	select LZO_COMPRESS
-	select LZO_DECOMPRESS
-	select CRC32
+	select LZO_COMPRESS if !PM_HIBERNATE
+	select LZO_DECOMPRESS if !PM_HIBERNATE
+	select CRC32 if !PM_HIBERNATE
 	---help---
 	  Enable the suspend to disk (STD) functionality, which is usually
 	  called "hibernation" in user interfaces.  STD checkpoints the
@@ -274,3 +282,56 @@ config PM_GENERIC_DOMAINS_RUNTIME
 config CPU_PM
 	bool
 	depends on SUSPEND || CPU_IDLE
+
+config SUSPEND_TIME
+	bool "Log time spent in suspend"
+	---help---
+	  Prints the time spent in suspend in the kernel log, and
+	  keeps statistics on the time spent in suspend in
+	  /sys/kernel/debug/suspend_time
+
+config PM_HIBERNATE
+	bool "Hisilicon Pm!! Support"
+	select HIBERNATION
+
+config PM_HIBERNATE_SAVENO
+	int "Hisilicon Pm!! saveno"
+	default "0"
+	depends on PM_HIBERNATE
+
+config PM_HIBERNATE_LOADNO
+	int "Hisilicon Pm!! loadno for snapshot switch"
+	default "0"
+	depends on PM_HIBERNATE
+
+config PM_HIBERNATE_COMPRESS
+	int "Hisilicon Pm!! compress mode"
+	default "2"
+	depends on PM_HIBERNATE
+
+config PM_HIBERNATE_SHRINK
+	int "Hisilicon Pm!! memory shrink mode"
+	default "1"
+	depends on PM_HIBERNATE
+
+config PM_HIBERNATE_SEPARATE
+	int "Hisilicon Pm!! separate mode"
+	default "0"
+	depends on PM_HIBERNATE
+
+config PM_HIBERNATE_ONESHOT
+	bool "Hisilicon Pm!! oneshot mode"
+	depends on PM_HIBERNATE
+
+config PM_HIBERNATE_HALT
+	bool "Hisilicon Pm!! Halt after snapshot save"
+	depends on PM_HIBERNATE
+
+config PM_HIBERNATE_SILENT
+	int "Hisilicon Pm!! silent mode"
+	default "0"
+	depends on PM_HIBERNATE
+
+config PM_HIBERNATE_DEBUG
+	bool "Hisilicon Pm!! debug support"
+	depends on PM_HIBERNATE

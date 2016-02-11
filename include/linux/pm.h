@@ -28,6 +28,10 @@
 #include <linux/timer.h>
 #include <linux/completion.h>
 
+#ifdef CONFIG_PM_HIBERNATE
+#include <linux/hibernate.h>
+#endif
+
 /*
  * Callbacks for platform drivers to implement.
  */

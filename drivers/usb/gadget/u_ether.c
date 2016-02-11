@@ -76,6 +76,7 @@ struct eth_dev {
 
 	bool			zlp;
 	u8			host_mac[ETH_ALEN];
+	bool		tx_enable;
 };
 
 /*-------------------------------------------------------------------------*/
@@ -261,6 +262,7 @@ enomem:
 	return retval;
 }
 
+
 static void rx_complete(struct usb_ep *ep, struct usb_request *req)
 {
 	struct sk_buff	*skb = req->context, *skb2;
@@ -272,6 +274,10 @@ static void rx_complete(struct usb_ep *ep, struct usb_request *req)
 	/* normal completion */
 	case 0:
 		skb_put(skb, req->actual);
+
+		if (!dev->tx_enable) {
+			dev->tx_enable = 1;
+		}
 
 		if (dev->unwrap) {
 			unsigned long	flags;
@@ -535,6 +541,12 @@ static netdev_tx_t eth_start_xmit(struct sk_buff *skb,
 	 * network stack decided to xmit but before we got the spinlock.
 	 */
 	if (list_empty(&dev->tx_reqs)) {
+		spin_unlock_irqrestore(&dev->req_lock, flags);
+		return NETDEV_TX_BUSY;
+	}
+
+	/* sending packet to host with ipv6 after usbhost send in packet */
+	if (!dev->tx_enable)  {
 		spin_unlock_irqrestore(&dev->req_lock, flags);
 		return NETDEV_TX_BUSY;
 	}

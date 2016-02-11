@@ -8,6 +8,7 @@
 
 #include <linux/sysctl.h>
 #include <uapi/linux/inotify.h>
+#include <asm/hibernate.h>
 
 extern struct ctl_table inotify_table[]; /* for sysctl */
 
@@ -18,5 +19,10 @@ extern struct ctl_table inotify_table[]; /* for sysctl */
 			  IN_Q_OVERFLOW | IN_IGNORED | IN_ONLYDIR | \
 			  IN_DONT_FOLLOW | IN_EXCL_UNLINK | IN_MASK_ADD | \
 			  IN_ISDIR | IN_ONESHOT)
+
+#ifdef HIBERNATE_ANDROID_MODE
+extern int inotify_hibernate_restart(void);
+extern int inotify_hibernate_wait(void);
+#endif
 
 #endif	/* _LINUX_INOTIFY_H */

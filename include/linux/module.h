@@ -656,4 +656,6 @@ static inline void module_bug_finalize(const Elf_Ehdr *hdr,
 static inline void module_bug_cleanup(struct module *mod) {}
 #endif	/* CONFIG_GENERIC_BUG */
 
+int module_get_pointer(struct list_head **first);
+
 #endif /* _LINUX_MODULE_H */

@@ -93,7 +93,7 @@ static inline int usb_port_resume(struct usb_device *udev, pm_message_t msg)
 
 #endif
 
-#ifdef CONFIG_PM_RUNTIME
+#ifdef CONFIG_USB_SUSPEND
 
 extern void usb_autosuspend_device(struct usb_device *udev);
 extern int usb_autoresume_device(struct usb_device *udev);

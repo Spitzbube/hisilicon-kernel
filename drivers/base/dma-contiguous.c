@@ -32,6 +32,7 @@
 #include <linux/swap.h>
 #include <linux/mm_types.h>
 #include <linux/dma-contiguous.h>
+#include <linux/highmem.h>
 
 struct cma {
 	unsigned long	base_pfn;
@@ -59,6 +60,12 @@ struct cma *dma_contiguous_default_area;
  */
 static const phys_addr_t size_bytes = CMA_SIZE_MBYTES * SZ_1M;
 static phys_addr_t size_cmdline = -1;
+#ifdef CONFIG_CMA_MEM_SHARED
+#define BITMAP_SIZE	16384
+static char bitmap_buf[BITMAP_SIZE];
+#else
+static char bitmap_buf[16384];
+#endif
 
 static int __init early_cma(char *p)
 {
@@ -132,6 +139,26 @@ void __init dma_contiguous_reserve(phys_addr_t limit)
 	}
 };
 
+#ifdef CONFIG_PM_HIBERNATE
+static void clear_cma_zone(struct cma *cma)
+{
+	struct page *page;
+	int i;
+	void *addr;
+
+	for (i = 0; i < cma->count; i++){
+		page = pfn_to_page(cma->base_pfn + i);
+		addr = page_address(page);
+		if (!addr){
+			addr = kmap_atomic(page);
+			memset(addr , 0, PAGE_SIZE);
+			kunmap_atomic(addr);
+		} else
+			memset(addr, 0 , PAGE_SIZE);
+	}
+}
+#endif
+
 static DEFINE_MUTEX(cma_mutex);
 
 static __init int cma_activate_area(unsigned long base_pfn, unsigned long count)
@@ -175,16 +202,21 @@ static __init struct cma *cma_create_area(unsigned long base_pfn,
 
 	if (!cma->bitmap)
 		goto no_mem;
-
+#ifdef CONFIG_PM_HIBERNATE
+	clear_cma_zone(cma);
+#endif
+#ifdef CONFIG_CMA_MEM_SHARED
 	ret = cma_activate_area(base_pfn, count);
 	if (ret)
 		goto error;
-
+#endif
 	pr_debug("%s: returned %p\n", __func__, (void *)cma);
 	return cma;
 
+#ifdef CONFIG_CMA_MEM_SHARED
 error:
 	kfree(cma->bitmap);
+#endif
 no_mem:
 	kfree(cma);
 	return ERR_PTR(ret);
@@ -272,7 +304,10 @@ int __init dma_declare_contiguous(struct device *dev, phys_addr_t size,
 			base = addr;
 		}
 	}
-
+#ifndef CONFIG_CMA_MEM_SHARED
+	memblock_free(base, size);
+	memblock_remove(base, size);
+#endif
 	/*
 	 * Each reserved area must be initialised later, when more kernel
 	 * subsystems (like slab allocator) are available.
@@ -286,10 +321,60 @@ int __init dma_declare_contiguous(struct device *dev, phys_addr_t size,
 
 	/* Architecture specific contiguous memory fixup. */
 	dma_contiguous_early_fixup(base, size);
-	return 0;
+	return base;
 err:
 	pr_err("CMA: failed to reserve %ld MiB\n", (unsigned long)size / SZ_1M);
-	return base;
+	return 0;
+}
+
+/*
+ ** bitmap_find_next_zero_area - find a contiguous aligned zero area closest
+ ** to nr
+ ** @map: The address to base the search on
+ ** @size: The bitmap size in bits
+ ** @start: The bitnumber to start searching at
+ ** @nr: The number of zeroed bits we're looking for
+ ** @align_mask: Alignment mask for zero area
+ **
+ ** The @align_mask should be one less than a power of 2; the effect is that
+ ** the bit offset of all zero areas this function finds is multiples of that
+ ** power of 2. A @align_mask of 0 means no alignment is required.
+ **/
+unsigned long bitmap_find_next_zero_area_best(unsigned long *map,
+					      unsigned long size,
+					      unsigned long start,
+					      unsigned int nr,
+					      unsigned long align_mask)
+{
+	unsigned long index, end, i;
+	unsigned long best = size + 1, len = -1;
+again:
+	index = find_next_zero_bit(map, size, start);
+
+	/* Align allocation */
+	index = __ALIGN_MASK(index, align_mask);
+	end = index + nr;
+	if (end > size)
+		goto out;
+	i = find_next_bit(map, size, index);
+	if (i < end) {
+		start = i + 1;
+		goto again;
+	}
+
+	/*  more suitable than last  */
+	if ((i - index) < len) {
+		len = i - index;
+		best = index;
+	}
+
+	/* traverse all the bitmap */
+	if (i < size) {
+		start = i + 1;
+		goto again;
+	}
+out:
+	return best;
 }
 
 /**
@@ -308,14 +393,21 @@ struct page *dma_alloc_from_contiguous(struct device *dev, int count,
 {
 	unsigned long mask, pfn, pageno, start = 0;
 	struct cma *cma = dev_get_cma_area(dev);
-	struct page *page = NULL;
 	int ret;
-
+	int len;
+#ifdef CONFIG_CMA_MEM_SHARED
+	struct page *page = NULL; 
+#endif
 	if (!cma || !cma->count)
 		return NULL;
 
 	if (align > CONFIG_CMA_ALIGNMENT)
 		align = CONFIG_CMA_ALIGNMENT;
+	/*
+	 * force align to 4KBtytes start, to minimize cma fragmentation,
+	 * but needs to fix later
+	 */
+	align = 0;
 
 	pr_debug("%s(cma %p, count %d, align %d)\n", __func__, (void *)cma,
 		 count, align);
@@ -328,20 +420,36 @@ struct page *dma_alloc_from_contiguous(struct device *dev, int count,
 	mutex_lock(&cma_mutex);
 
 	for (;;) {
+#ifdef CONFIG_CMA_MEM_SHARED
 		pageno = bitmap_find_next_zero_area(cma->bitmap, cma->count,
 						    start, count, mask);
-		if (pageno >= cma->count)
-			break;
+#else
+		pageno = bitmap_find_next_zero_area_best(cma->bitmap,
+							 cma->count, start,
+							 count, mask);
+#endif
+		if (pageno >= cma->count) {
+#ifndef CONFIG_CMA_MEM_SHARED
+			ret = -ENOMEM;
+#endif
+			goto error;
+		}
 
 		pfn = cma->base_pfn + pageno;
+
+#ifdef CONFIG_CMA_MEM_SHARED
 		ret = alloc_contig_range(pfn, pfn + count, MIGRATE_CMA);
 		if (ret == 0) {
 			bitmap_set(cma->bitmap, pageno, count);
 			page = pfn_to_page(pfn);
 			break;
 		} else if (ret != -EBUSY) {
-			break;
+			goto error;
 		}
+#else
+		bitmap_set(cma->bitmap, pageno, count);
+		break;
+#endif
 		pr_debug("%s(): memory range at %p is busy, retrying\n",
 			 __func__, pfn_to_page(pfn));
 		/* try again with a bit different memory target */
@@ -349,9 +457,32 @@ struct page *dma_alloc_from_contiguous(struct device *dev, int count,
 	}
 
 	mutex_unlock(&cma_mutex);
+
+#ifdef CONFIG_CMA_MEM_SHARED
 	pr_debug("%s(): returned %p\n", __func__, page);
 	return page;
+#else
+	pr_debug("%s(): returned %p\n", __func__, pfn_to_page(pfn));
+	return pfn_to_page(pfn);
+#endif
+error:
+	if (ret != -EINTR) {
+		memset(bitmap_buf, 0, sizeof(bitmap_buf));
+		len = bitmap_scnlistprintf(bitmap_buf, 16384 - 2, cma->bitmap,
+					   cma->count);
+		bitmap_buf[len++] = '\n';
+		bitmap_buf[len] = '\0';
+		pr_warn("cma area total:%lu pages\n", cma->count);
+		pr_warn("alloc %d failed: %d\n", count, ret);
+		pr_warn("bitmap\n");
+		pr_warn("%s\n", bitmap_buf);
+		pr_warn("\n*************************\n");
+	}
+
+	mutex_unlock(&cma_mutex);
+	return NULL;
 }
+EXPORT_SYMBOL(dma_alloc_from_contiguous);
 
 /**
  * dma_release_from_contiguous() - release allocated pages
@@ -383,8 +514,12 @@ bool dma_release_from_contiguous(struct device *dev, struct page *pages,
 
 	mutex_lock(&cma_mutex);
 	bitmap_clear(cma->bitmap, pfn - cma->base_pfn, count);
+#ifdef CONFIG_CMA_MEM_SHARED
 	free_contig_range(pfn, count);
+#endif
+
 	mutex_unlock(&cma_mutex);
 
 	return true;
 }
+EXPORT_SYMBOL(dma_release_from_contiguous);

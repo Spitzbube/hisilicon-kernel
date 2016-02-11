@@ -65,6 +65,15 @@ ifndef KBUILD_CHECKSRC
   KBUILD_CHECKSRC = 0
 endif
 
+ifdef A
+  ifeq ("$(origin A)", "command line")
+    KBUILD_DOAS = $(A)
+  endif
+endif
+ifndef KBUILD_DOAS
+  KBUILD_DOAS = 0
+endif
+
 # Use make M=dir to specify directory of external module to build
 # Old syntax make ... SUBDIRS=$PWD is still supported
 # Setting the environment variable KBUILD_EXTMOD take precedence
@@ -272,7 +281,7 @@ ifeq ($(MAKECMDGOALS),)
 endif
 
 export KBUILD_MODULES KBUILD_BUILTIN
-export KBUILD_CHECKSRC KBUILD_SRC KBUILD_EXTMOD
+export KBUILD_CHECKSRC KBUILD_SRC KBUILD_EXTMOD KBUILD_DOAS
 
 # Beautify output
 # ---------------------------------------------------------------------------
@@ -1064,7 +1073,7 @@ distclean: mrproper
 		-o -name '*.bak' -o -name '#*#' -o -name '.*.orig' \
 		-o -name '.*.rej' \
 		-o -name '*%' -o -name '.*.cmd' -o -name 'core' \) \
-		-type f -print | xargs rm -f
+		-type f -print -follow | xargs rm -f
 
 
 # Packaging of the kernel to various formats
@@ -1273,7 +1282,7 @@ clean: $(clean-dirs)
 		-o -name '.*.d' -o -name '.*.tmp' -o -name '*.mod.c' \
 		-o -name '*.symtypes' -o -name 'modules.order' \
 		-o -name modules.builtin -o -name '.tmp_*.o.*' \
-		-o -name '*.gcno' \) -type f -print | xargs rm -f
+		-o -name '*.gcno' \) -type f -print -follow | xargs rm -f
 
 # Generate tags for editors
 # ---------------------------------------------------------------------------

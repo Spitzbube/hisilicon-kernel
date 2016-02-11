@@ -9,6 +9,10 @@
 #include <linux/freezer.h>
 #include <asm/errno.h>
 
+#ifdef CONFIG_PM_HIBERNATE
+#include <asm/suspend.h>
+#endif
+
 #ifdef CONFIG_VT
 extern void pm_set_vt_switch(int);
 #else

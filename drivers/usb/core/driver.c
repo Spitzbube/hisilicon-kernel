@@ -385,10 +385,11 @@ static int usb_unbind_interface(struct device *dev)
 	 */
 	lpm_disable_error = usb_unlocked_disable_lpm(udev);
 
-	/* Terminate all URBs for this interface unless the driver
-	 * supports "soft" unbinding.
+	/*
+	 * Terminate all URBs for this interface unless the driver
+	 * supports "soft" unbinding and the device is still present.
 	 */
-	if (!driver->soft_unbind)
+	if (!driver->soft_unbind || udev->state == USB_STATE_NOTATTACHED)
 		usb_disable_interface(udev, intf, false);
 
 	driver->disconnect(intf);
@@ -1414,7 +1415,7 @@ int usb_resume(struct device *dev, pm_message_t msg)
 
 #endif /* CONFIG_PM */
 
-#ifdef CONFIG_PM_RUNTIME
+#ifdef CONFIG_USB_SUSPEND
 
 /**
  * usb_enable_autosuspend - allow a USB device to be autosuspended

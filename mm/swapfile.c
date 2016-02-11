@@ -204,6 +204,11 @@ static unsigned long scan_swap_map(struct swap_info_struct *si,
 	 * And we let swap pages go all over an SSD partition.  Hugh
 	 */
 
+#ifdef CONFIG_PM_HIBERNATE
+	if (hibernate_swapout_disable)
+		return 0;
+#endif
+
 	si->flags += SWP_SCANNING;
 	scan_base = offset = si->cluster_next;
 

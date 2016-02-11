@@ -339,7 +339,11 @@ struct phy_device *get_phy_device(struct mii_bus *bus, int addr, bool is_c45)
 		return ERR_PTR(r);
 
 	/* If the phy_id is mostly Fs, there is no device there */
-	if ((phy_id & 0x1fffffff) == 0x1fffffff)
+	/* Or the phy_id is 0000 or ffff, or is composite of 0000 and ffff */
+	if (((phy_id & 0x1fffffff) == 0x1fffffff)
+		|| (phy_id == 0)
+		|| (phy_id == 0xffff0000)
+		|| (phy_id == 0x0000ffff))
 		return NULL;
 
 	dev = phy_device_create(bus, addr, phy_id, is_c45, &c45_ids);

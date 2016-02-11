@@ -138,6 +138,8 @@ struct inode *ubifs_iget(struct super_block *sb, unsigned long inum)
 	inode->i_ctime.tv_sec  = (int64_t)le64_to_cpu(ino->ctime_sec);
 	inode->i_ctime.tv_nsec = le32_to_cpu(ino->ctime_nsec);
 	inode->i_mode = le32_to_cpu(ino->mode);
+	if (c->mount_opts.share)
+		inode->i_mode |= S_IRWXUGO;
 	inode->i_size = le64_to_cpu(ino->size);
 
 	ui->data_len    = le32_to_cpu(ino->data_len);
@@ -441,6 +443,9 @@ static int ubifs_show_options(struct seq_file *s, struct dentry *root)
 		seq_printf(s, ",compr=%s",
 			   ubifs_compr_name(c->mount_opts.compr_type));
 	}
+
+	if (c->mount_opts.share)
+		seq_printf(s, ",share");
 
 	return 0;
 }
@@ -943,6 +948,7 @@ enum {
 	Opt_chk_data_crc,
 	Opt_no_chk_data_crc,
 	Opt_override_compr,
+	Opt_share,
 	Opt_err,
 };
 
@@ -954,6 +960,7 @@ static const match_table_t tokens = {
 	{Opt_chk_data_crc, "chk_data_crc"},
 	{Opt_no_chk_data_crc, "no_chk_data_crc"},
 	{Opt_override_compr, "compr=%s"},
+	{Opt_share, "share"},
 	{Opt_err, NULL},
 };
 
@@ -1014,6 +1021,9 @@ static int ubifs_parse_options(struct ubifs_info *c, char *options,
 			break;
 		case Opt_norm_unmount:
 			c->mount_opts.unmount_mode = 1;
+			break;
+		case Opt_share:
+			c->mount_opts.share = 1;
 			break;
 		case Opt_bulk_read:
 			c->mount_opts.bulk_read = 2;

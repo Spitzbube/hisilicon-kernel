@@ -614,13 +614,14 @@ static bool start_out_transfer(struct fsg_common *common, struct fsg_buffhd *bh)
 	return true;
 }
 
-static int sleep_thread(struct fsg_common *common)
+static int sleep_thread(struct fsg_common *common, bool can_freeze)
 {
 	int	rc = 0;
 
 	/* Wait until a signal arrives or we are woken up */
 	for (;;) {
-		try_to_freeze();
+		if (can_freeze)
+			try_to_freeze();
 		set_current_state(TASK_INTERRUPTIBLE);
 		if (signal_pending(current)) {
 			rc = -EINTR;
@@ -693,7 +694,7 @@ static int do_read(struct fsg_common *common)
 		/* Wait for the next buffer to become available */
 		bh = common->next_buffhd_to_fill;
 		while (bh->state != BUF_STATE_EMPTY) {
-			rc = sleep_thread(common);
+			rc = sleep_thread(common, false);
 			if (rc)
 				return rc;
 		}
@@ -948,7 +949,7 @@ static int do_write(struct fsg_common *common)
 		}
 
 		/* Wait for something to happen */
-		rc = sleep_thread(common);
+		rc = sleep_thread(common, false);
 		if (rc)
 			return rc;
 	}
@@ -1515,7 +1516,7 @@ static int throw_away_data(struct fsg_common *common)
 		}
 
 		/* Otherwise wait for something to happen */
-		rc = sleep_thread(common);
+		rc = sleep_thread(common, true);
 		if (rc)
 			return rc;
 	}
@@ -1636,7 +1637,7 @@ static int send_status(struct fsg_common *common)
 	/* Wait for the next buffer to become available */
 	bh = common->next_buffhd_to_fill;
 	while (bh->state != BUF_STATE_EMPTY) {
-		rc = sleep_thread(common);
+		rc = sleep_thread(common, true);
 		if (rc)
 			return rc;
 	}
@@ -1839,7 +1840,7 @@ static int do_scsi_command(struct fsg_common *common)
 	bh = common->next_buffhd_to_fill;
 	common->next_buffhd_to_drain = bh;
 	while (bh->state != BUF_STATE_EMPTY) {
-		rc = sleep_thread(common);
+		rc = sleep_thread(common, true);
 		if (rc)
 			return rc;
 	}
@@ -2185,7 +2186,7 @@ static int get_next_command(struct fsg_common *common)
 	/* Wait for the next buffer to become available */
 	bh = common->next_buffhd_to_fill;
 	while (bh->state != BUF_STATE_EMPTY) {
-		rc = sleep_thread(common);
+		rc = sleep_thread(common, true);
 		if (rc)
 			return rc;
 	}
@@ -2204,7 +2205,7 @@ static int get_next_command(struct fsg_common *common)
 
 	/* Wait for the CBW to arrive */
 	while (bh->state != BUF_STATE_FULL) {
-		rc = sleep_thread(common);
+		rc = sleep_thread(common, true);
 		if (rc)
 			return rc;
 	}
@@ -2386,7 +2387,7 @@ static void handle_exception(struct fsg_common *common)
 			}
 			if (num_active == 0)
 				break;
-			if (sleep_thread(common))
+			if (sleep_thread(common, true))
 				return;
 		}
 
@@ -2520,7 +2521,7 @@ static int fsg_main_thread(void *common_)
 		}
 
 		if (!common->running) {
-			sleep_thread(common);
+			sleep_thread(common, true);
 			continue;
 		}
 

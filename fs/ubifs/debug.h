@@ -148,6 +148,7 @@ struct ubifs_global_debug_info {
 	unsigned int tst_rcvry:1;
 };
 
+#if 0
 #define ubifs_assert(expr) do {                                                \
 	if (unlikely(!(expr))) {                                               \
 		pr_crit("UBIFS assert failed in %s at %u (pid %d)\n",          \
@@ -155,6 +156,10 @@ struct ubifs_global_debug_info {
 		dump_stack();                                                  \
 	}                                                                      \
 } while (0)
+#else
+#define ubifs_assert(expr) do {                                                \
+} while (0)
+#endif
 
 #define ubifs_assert_cmt_locked(c) do {                                        \
 	if (unlikely(down_write_trylock(&(c)->commit_sem))) {                  \

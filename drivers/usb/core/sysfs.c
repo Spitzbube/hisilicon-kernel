@@ -338,7 +338,7 @@ static void remove_persist_attributes(struct device *dev)
 
 #endif	/* CONFIG_PM */
 
-#ifdef	CONFIG_PM_RUNTIME
+#ifdef	CONFIG_USB_SUSPEND
 
 static ssize_t
 show_connected_duration(struct device *dev, struct device_attribute *attr,

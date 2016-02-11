@@ -71,4 +71,6 @@ static inline int string_unescape_any_inplace(char *buf)
 	return string_unescape_any(buf, buf, 0);
 }
 
+char *ultohstr(u64 size, char *buf, int len);
+
 #endif

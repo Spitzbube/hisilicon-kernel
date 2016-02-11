@@ -52,3 +52,7 @@ obj-$(CONFIG_USB_FSL_MPH_DR_OF)	+= fsl-mph-dr-of.o
 obj-$(CONFIG_USB_OCTEON2_COMMON) += octeon2-common.o
 obj-$(CONFIG_USB_HCD_BCMA)	+= bcma-hcd.o
 obj-$(CONFIG_USB_HCD_SSB)	+= ssb-hcd.o
+obj-$(CONFIG_ARCH_GODBOX)	+= hiusb-godbox.o
+obj-$(CONFIG_ARCH_S40)		+= hiusb-ehci-s40.o hiusb-xhci-s5.o hiusb-ehci-s5.o hiusb-otg-s40.o hiusb-ehci-cfg.o
+obj-$(CONFIG_ARCH_HI3798MX)	+= hiusb-ehci-hi3798mx.o hiusb-xhci-hi3798mx.o hiusb-otg-s40.o hiusb-ehci-cfg.o
+obj-$(CONFIG_HIUSB_OTG)		+= hiusb-otg.o

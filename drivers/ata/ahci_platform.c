@@ -26,7 +26,10 @@
 #include "ahci.h"
 
 static void ahci_host_stop(struct ata_host *host);
-
+extern int ncq_fixed;
+unsigned int ncq_en = 1;
+module_param(ncq_en, uint, 0600);
+MODULE_PARM_DESC(ncq_en, "ahci ncq flag (default:0)");
 enum ahci_type {
 	AHCI,		/* standard platform ahci */
 	IMX53_AHCI,	/* ahci on i.mx53 */
@@ -160,6 +163,8 @@ static int ahci_probe(struct platform_device *pdev)
 	/* prepare host */
 	if (hpriv->cap & HOST_CAP_NCQ)
 		pi.flags |= ATA_FLAG_NCQ;
+	if (!ncq_en || !ncq_fixed)
+		pi.flags &= ~ATA_FLAG_NCQ;
 
 	if (hpriv->cap & HOST_CAP_PMP)
 		pi.flags |= ATA_FLAG_PMP;

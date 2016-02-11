@@ -46,6 +46,8 @@
 #include <linux/io.h>
 #include <linux/mtd/partitions.h>
 
+#include "hinfc_gen.h"
+
 /* Define default oob placement schemes for large and small page devices */
 static struct nand_ecclayout nand_oob_8 = {
 	.eccbytes = 3,
@@ -3228,6 +3230,15 @@ static struct nand_flash_dev *nand_get_flash_type(struct mtd_info *mtd,
 		return ERR_PTR(-ENODEV);
 	}
 
+	/*
+	 * some nand, the id bytes signification is nonstandard 
+	 * with the linux kernel.
+	 */
+	type = hinfc_get_flash_type(mtd, chip, id_data, &busw);
+	if (type)
+		goto ident_done;
+
+	/* "type == NULL" we not fount this nand chip in nand spl table. */
 	if (!type)
 		type = nand_flash_ids;
 
@@ -3274,6 +3285,7 @@ static struct nand_flash_dev *nand_get_flash_type(struct mtd_info *mtd,
 	if (*maf_id != NAND_MFR_SAMSUNG && !type->pagesize)
 		chip->options &= ~NAND_SAMSUNG_LP_OPTIONS;
 ident_done:
+	hinfc_nand_param_adjust(mtd, chip);
 
 	/* Try to identify manufacturer */
 	for (maf_idx = 0; nand_manuf_ids[maf_idx].id != 0x0; maf_idx++) {
@@ -3322,11 +3334,7 @@ ident_done:
 	if (mtd->writesize > 512 && chip->cmdfunc == nand_command)
 		chip->cmdfunc = nand_command_lp;
 
-	pr_info("NAND device: Manufacturer ID: 0x%02x, Chip ID: 0x%02x (%s %s),"
-		" %dMiB, page size: %d, OOB size: %d\n",
-		*maf_id, *dev_id, nand_manuf_ids[maf_idx].name,
-		chip->onfi_version ? chip->onfi_params.model : type->name,
-		(int)(chip->chipsize >> 20), mtd->writesize, mtd->oobsize);
+	hinfc_show_info(mtd, nand_manuf_ids[maf_idx].name, type->name);
 
 	return type;
 }
@@ -3382,12 +3390,12 @@ int nand_scan_ident(struct mtd_info *mtd, int maxchips,
 		}
 		chip->select_chip(mtd, -1);
 	}
-	if (i > 1)
-		pr_info("%d NAND chips detected\n", i);
 
 	/* Store the number of chips and calc total size for mtd */
 	chip->numchips = i;
 	mtd->size = i * chip->chipsize;
+
+	hinfc_show_chipsize(chip);
 
 	return 0;
 }
@@ -3578,8 +3586,6 @@ int nand_scan_tail(struct mtd_info *mtd)
 		break;
 
 	case NAND_ECC_NONE:
-		pr_warn("NAND_ECC_NONE selected by board driver. "
-			   "This is not recommended!\n");
 		chip->ecc.read_page = nand_read_page_raw;
 		chip->ecc.write_page = nand_write_page_raw;
 		chip->ecc.read_oob = nand_read_oob_std;

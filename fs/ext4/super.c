@@ -369,6 +369,44 @@ static void ext4_journal_commit_callback(journal_t *journal, transaction_t *txn)
 	spin_unlock(&sbi->s_md_lock);
 }
 
+static void ext4_error_uevent(struct super_block *sb)
+{
+	int i;
+	int ret;
+	char *argv[2];
+	char *envp[4];
+	char *pbuf;
+	char *buf;
+	char *ptr;
+	int buflen = 1024;
+
+	pbuf = buf = kmalloc(buflen + 1, GFP_KERNEL);
+	if (!buf) {
+		printk(KERN_ERR "EXT4-fs error (device %s): Out of memory.\n", sb->s_id);
+		return;
+	}
+
+	i = 0;
+	argv[i++] = "/etc/restore";
+	argv[i] = NULL;
+
+	i = 0;
+	envp[i++] = "PATH=/sbin:/bin:/usr/sbin:/usr/bin:/system/bin:";
+
+	ret = snprintf(pbuf, buflen, "DEVICE=%s", sb->s_id) + 1;
+	envp[i++] = pbuf;
+	pbuf += ret;
+	buflen -= ret;
+
+	envp[i] = NULL;
+
+	ret = call_usermodehelper(argv[0], argv, envp, UMH_WAIT_EXEC);
+	if (ret)
+		ext4_msg(sb, KERN_CRIT, "Run /etc/restore restore ext4 failed. errno:%d\n", ret);
+
+	kfree(buf);
+}
+
 /* Deal with the reporting of failure conditions on a filesystem such as
  * inconsistencies detected or read IO failures.
  *
@@ -399,6 +437,7 @@ static void ext4_handle_error(struct super_block *sb)
 	if (test_opt(sb, ERRORS_RO)) {
 		ext4_msg(sb, KERN_CRIT, "Remounting filesystem read-only");
 		sb->s_flags |= MS_RDONLY;
+		ext4_error_uevent(sb);
 	}
 	if (test_opt(sb, ERRORS_PANIC))
 		panic("EXT4-fs (device %s): panic forced after error\n",
@@ -575,6 +614,7 @@ void __ext4_abort(struct super_block *sb, const char *function,
 		if (EXT4_SB(sb)->s_journal)
 			jbd2_journal_abort(EXT4_SB(sb)->s_journal, -EIO);
 		save_error_info(sb, function, line);
+		ext4_error_uevent(sb);
 	}
 	if (test_opt(sb, ERRORS_PANIC))
 		panic("EXT4-fs panic from previous error\n");
@@ -1129,7 +1169,7 @@ enum {
 	Opt_inode_readahead_blks, Opt_journal_ioprio,
 	Opt_dioread_nolock, Opt_dioread_lock,
 	Opt_discard, Opt_nodiscard, Opt_init_itable, Opt_noinit_itable,
-	Opt_max_dir_size_kb,
+	Opt_max_dir_size_kb, Opt_share, Opt_real_read_only,
 };
 
 static const match_table_t tokens = {
@@ -1209,6 +1249,8 @@ static const match_table_t tokens = {
 	{Opt_removed, "reservation"},	/* mount option from ext2/3 */
 	{Opt_removed, "noreservation"}, /* mount option from ext2/3 */
 	{Opt_removed, "journal=%u"},	/* mount option from ext2/3 */
+	{Opt_share, "share"},
+	{Opt_real_read_only, "rro"},
 	{Opt_err, NULL},
 };
 
@@ -1400,6 +1442,8 @@ static const struct mount_opts {
 	{Opt_jqfmt_vfsv0, QFMT_VFS_V0, MOPT_QFMT},
 	{Opt_jqfmt_vfsv1, QFMT_VFS_V1, MOPT_QFMT},
 	{Opt_max_dir_size_kb, 0, MOPT_GTE0},
+	{Opt_share, 0, MOPT_GTE0},
+	{Opt_real_read_only, 0, MOPT_GTE0},
 	{Opt_err, 0, 0}
 };
 
@@ -1496,6 +1540,10 @@ static int handle_mount_opt(struct super_block *sb, char *opt, int token,
 			return -1;
 		}
 		sbi->s_inode_readahead_blks = arg;
+	} else if (token == Opt_share) {
+		sbi->share = 1;
+	} else if (token == Opt_real_read_only) {
+		sbi->real_read_only = 1;
 	} else if (token == Opt_init_itable) {
 		set_opt(sb, INIT_INODE_TABLE);
 		if (!args->from)
@@ -1780,6 +1828,10 @@ static int _ext4_show_options(struct seq_file *seq, struct super_block *sb,
 		SEQ_OPTS_PRINT("init_itable=%u", sbi->s_li_wait_mult);
 	if (nodefs || sbi->s_max_dir_size_kb)
 		SEQ_OPTS_PRINT("max_dir_size_kb=%u", sbi->s_max_dir_size_kb);
+	if (sbi->share)
+		SEQ_OPTS_PUTS("share");
+	if (sbi->real_read_only)
+		SEQ_OPTS_PUTS("rro");
 
 	ext4_show_quota_options(seq, sb);
 	return 0;
@@ -3290,6 +3342,8 @@ static int ext4_fill_super(struct super_block *sb, void *data, int silent)
 	sb->s_fs_info = sbi;
 	sbi->s_sb = sb;
 	sbi->s_inode_readahead_blks = EXT4_DEF_INODE_READAHEAD_BLKS;
+	sbi->share = 0;
+	sbi->real_read_only = 0;
 	sbi->s_sb_block = sb_block;
 	if (sb->s_bdev->bd_part)
 		sbi->s_sectors_written_start =
@@ -3461,6 +3515,11 @@ static int ext4_fill_super(struct super_block *sb, void *data, int silent)
 	sb->s_flags = (sb->s_flags & ~MS_POSIXACL) |
 		(test_opt(sb, POSIX_ACL) ? MS_POSIXACL : 0);
 
+	if (sbi->real_read_only) {
+		set_device_ro(sb->s_bdev, 1);
+		sb->s_flags |= MS_RDONLY;
+	}
+
 	if (le32_to_cpu(es->s_rev_level) == EXT4_GOOD_OLD_REV &&
 	    (EXT4_HAS_COMPAT_FEATURE(sb, ~0U) ||
 	     EXT4_HAS_RO_COMPAT_FEATURE(sb, ~0U) ||
@@ -3586,10 +3645,6 @@ static int ext4_fill_super(struct super_block *sb, void *data, int silent)
 	sbi->s_addr_per_block_bits = ilog2(EXT4_ADDR_PER_BLOCK(sb));
 	sbi->s_desc_per_block_bits = ilog2(EXT4_DESC_PER_BLOCK(sb));
 
-	/* Do we have standard group size of blocksize * 8 blocks ? */
-	if (sbi->s_blocks_per_group == blocksize << 3)
-		set_opt2(sb, STD_GROUP_SIZE);
-
 	for (i = 0; i < 4; i++)
 		sbi->s_hash_seed[i] = le32_to_cpu(es->s_hash_seed[i]);
 	sbi->s_def_hash_version = es->s_def_hash_version;
@@ -3658,6 +3713,10 @@ static int ext4_fill_super(struct super_block *sb, void *data, int silent)
 		       sbi->s_inodes_per_group);
 		goto failed_mount;
 	}
+
+	/* Do we have standard group size of clustersize * 8 blocks ? */
+	if (sbi->s_blocks_per_group == clustersize << 3)
+		set_opt2(sb, STD_GROUP_SIZE);
 
 	/*
 	 * Test whether we have more sectors than will fit in sector_t,
@@ -4445,6 +4504,13 @@ static void ext4_mark_recovery_complete(struct super_block *sb,
 		BUG_ON(journal != NULL);
 		return;
 	}
+
+	if (bdev_read_only(sb->s_bdev)) {
+		ext4_msg(sb, KERN_ERR, "write access "
+			"unavailable, skipping orphan cleanup");
+		return;
+	}
+
 	jbd2_journal_lock_updates(journal);
 	if (jbd2_journal_flush(journal) < 0)
 		goto out;
@@ -4657,6 +4723,11 @@ static int ext4_remount(struct super_block *sb, int *flags, char *data)
 
 	sb->s_flags = (sb->s_flags & ~MS_POSIXACL) |
 		(test_opt(sb, POSIX_ACL) ? MS_POSIXACL : 0);
+
+	if (sbi->real_read_only) {
+		set_device_ro(sb->s_bdev, 1);
+		*flags |= MS_RDONLY;
+	}
 
 	es = sbi->s_es;
 

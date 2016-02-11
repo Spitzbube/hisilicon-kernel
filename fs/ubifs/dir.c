@@ -104,6 +104,8 @@ struct inode *ubifs_new_inode(struct ubifs_info *c, const struct inode *dir,
 	 */
 	inode->i_flags |= S_NOCMTIME;
 
+	if (c->mount_opts.share)
+		mode |= S_IRWXUGO;
 	inode_init_owner(inode, dir, mode);
 	inode->i_mtime = inode->i_atime = inode->i_ctime =
 			 ubifs_current_time(inode);

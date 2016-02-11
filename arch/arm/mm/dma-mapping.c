@@ -298,7 +298,7 @@ static void __dma_free_remap(void *cpu_addr, size_t size)
 	vunmap(cpu_addr);
 }
 
-#define DEFAULT_DMA_COHERENT_POOL_SIZE	SZ_256K
+#define DEFAULT_DMA_COHERENT_POOL_SIZE	SZ_2M
 
 struct dma_pool {
 	size_t size;
@@ -458,6 +458,12 @@ static void __dma_remap(struct page *page, size_t size, pgprot_t prot)
 	dsb();
 	flush_tlb_kernel_range(start, end);
 }
+
+void hisi_flush_tlb_kernel_range(unsigned long start, unsigned long end)
+{
+	flush_tlb_kernel_range(start, end);
+}
+EXPORT_SYMBOL(hisi_flush_tlb_kernel_range);
 
 static void *__alloc_remap_buffer(struct device *dev, size_t size, gfp_t gfp,
 				 pgprot_t prot, struct page **ret_page,

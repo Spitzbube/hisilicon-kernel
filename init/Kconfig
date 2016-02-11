@@ -1251,10 +1251,16 @@ config HOTPLUG
 config HAVE_PCSPKR_PLATFORM
 	bool
 
+config PANIC_TIMEOUT
+	int "Default panic timeout"
+	default 0
+	help
+	  Set default panic timeout.
+
 menuconfig EXPERT
 	bool "Configure standard kernel features (expert users)"
 	# Unhide debug options, to make the on-by-default options visible
-	select DEBUG_KERNEL
+	select DEBUG_KERNEL if !CA_SUPPORT_ADVCA
 	help
 	  This option allows certain base kernel options and settings
           to be disabled or tweaked. This is for specialized

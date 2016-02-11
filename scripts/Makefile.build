@@ -290,9 +290,13 @@ cmd_record_mcount = 						\
 		$(sub_cmd_record_mcount)			\
 	fi;
 endif
+ifeq ($(KBUILD_DOAS),1)
+cmd_doas = $(call echo-cmd,cc_s_c) $(cmd_cc_s_c); mv $@ $(patsubst %.o,%.S,$@);
+endif
 
 define rule_cc_o_c
 	$(call echo-cmd,checksrc) $(cmd_checksrc)			  \
+	$(cmd_doas)							  \
 	$(call echo-cmd,cc_o_c) $(cmd_cc_o_c);				  \
 	$(cmd_modversions)						  \
 	$(call echo-cmd,record_mcount)					  \
